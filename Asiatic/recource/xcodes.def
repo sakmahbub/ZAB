@@ -1,0 +1,216 @@
+product ZAB ERP
+	
+table xcodes
+  caption "Codes"
+  columns ztime, zutime,zauserid,zuuserid, zid, xtype, xcode, xlong, zactive,xacc,xaccvat,~
+          xaccdisc,xaccait,xaccret,xaccpur,xaccwo,xprops,xmadd,xphone,xfax,xemail,xarea,xwh,xdeptname,~
+		  xregion,xfield,xterritory,xhrc1,xtypeobj,xtrcode,xtargetshare,xaccadj,xpercent,xamount,xaccdr,xacccash,~
+// New From Mamiya OP
+          xshiftimin,xshiftimout,xtwh,xaccother,~
+		  xattimecon,xemptimeout,xincholiday,xtypestore,xproject,~
+		  xwrkhours,xotstart,xotend,xothours,xminothours,xlunch,xdinner,xsnack,xdesc,xshiftmode,xdepmethod
+
+	  
+		  
+  primary key zid, xtype, xcode
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  
+  list xlong,zactive
+  
+  field xaccdr
+    display hide
+  end field
+ 
+  field xamount
+    display hide
+  end field
+  
+  field xpercent
+    display hide
+  end field
+  
+  field xaccadj
+    display hide
+  end field
+  
+  field xacccash
+    display hide
+  end field
+    
+  field xtargetshare
+    display hide
+  end field
+
+  field xtypeobj
+    display hide
+  end field
+
+  field xterritory
+    display hide
+  end field
+
+  field xtrcode
+      display hide
+  end field
+
+  field xfield
+    display hide
+  end field
+
+  field xregion
+    display hide
+  end field
+
+  field xwh
+    display hide
+  end field
+
+  field xarea
+    display hide
+  end field
+
+  field xmadd
+    display hide
+  end field
+
+  field xphone
+    display hide
+  end field
+
+  field xfax
+    display hide
+  end field
+
+  field xemail
+    display hide
+  end field
+
+  field xacc
+    display hide
+  end field
+
+  field xaccvat
+    display hide
+  end field
+
+  field xaccdisc
+    display hide
+  end field
+
+  field xaccait
+    display hide
+  end field
+
+  field xaccret
+    display hide
+  end field
+
+  field xprops
+    display hide
+  end field
+
+  field xaccpur
+    display hide
+  end field
+
+  field xaccwo
+    display hide
+  end field
+
+  field xhrc1
+    display hide
+  end field
+
+  field xdeptname
+    display hide
+  end field
+  
+   field xshiftimin
+    display hide
+  end field   
+  
+   field xshiftimout
+    display hide
+  end field 
+  
+   field xtwh
+    display hide
+  end field  
+
+  
+    field xaccother
+    display hide
+   end field 
+ 
+   field xattimecon
+    display hide
+  end field 
+
+   field xemptimeout
+    display hide
+  end field    
+
+  
+   field xincholiday
+    display hide
+  end field 
+
+  
+  field xtypestore
+    display hide
+  end field
+  
+  field xproject
+    display hide
+  end field  
+  
+  field xwrkhours
+    display hide
+  end field
+
+  field xotstart
+    display hide
+  end field
+
+  field xotend
+    display hide
+  end field
+
+  field xothours
+    display hide
+  end field
+  
+  field xminothours
+    display hide
+  end field
+
+  field xlunch
+    display hide
+  end field
+  
+  field xdinner
+    display hide
+  end field
+  
+  field xsnack
+    display hide
+  end field
+  
+  
+  field xdesc
+    display hide
+  end field
+ 
+  field xshiftmode
+    display hide
+  end field  
+  
+   field xdepmethod
+    display hide
+  end field  
+      
+  end table
+

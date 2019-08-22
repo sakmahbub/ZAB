@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table opinvheader
+  caption "Commercial Invoice Header"
+  columns ztime,zutime,zid,zauserid,zuuserid,xinvnum,xdate,xdatedel,xcus,~
+          xstatusinv,xcur,xexch,xdiscf,xait,xinvvalue,xlong,xprimetotamt,xbasetotamt,xnote,xlcno,~
+          xblno,xbldate,xtruckno,xnetweight,xgrossweight,xpiinvdesc,xopenbank,~
+		  xadvisingbank,xbuyer,xpiheading,xpiinvdescex,xexpno,xdateexp	  
+          
+
+  primary key zid, xinvnum
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

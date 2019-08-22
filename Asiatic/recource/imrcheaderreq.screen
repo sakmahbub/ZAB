@@ -1,0 +1,343 @@
+screen imrcheaderreq
+
+   	sidebar list tolist,list one
+	sections form one, jscript myscript
+
+   list tolist
+        caption "<br><center><b>"Open Chalan List"</b>"
+        table imtorheader
+        order xtornum desc
+		select "xstatustor<>'Confirmed' and left(xtornum,4)='RC--'"
+        rows 10
+        objects ~
+        xtornum attrib(link "login?screen=imrcheaderreq&command=Show&xtornum=?"),xdate,xordernum,xpiref,~
+		//pidate equals((select cast(xpidate as date) from opordheader where zid=imtorheader.zid and xordernum=imtorheader.xordernum))
+		pidate equals((select xpidate from opordheader where zid=imtorheader.zid and xordernum=imtorheader.xordernum))
+
+        headers "Chalan No","Chalan Date","Order No","PI No","PI Date"
+     end list
+
+   list one
+        caption "<br><center><b>"Transfer Order Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=imrcdetailreq&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyord
+
+        headers "Serial No","Item","Description","Qunatity Ordered"//,"Quantity Delivered"
+     end list
+
+
+
+     form one
+        caption "Chalan Receive Header"
+        table imtorheader
+        primarykey xtornum
+        order xtornum desc
+        select "left(xtornum,4)='RC--'" 
+        return "login"
+        pstyle 3
+        layout 2
+        objects Show,*next,*next,*next,Add,Update,Delete,*next,*next,*next,Clear,*next,*next,*next,Top,Previous,Next,Bottom,Details,Confirm,"<p>" ,~
+        xtornum,xdate,xdornum display(hide),xordernum,xref,xcus,xorg,xpiref,xpidate,xsup,sup,xdatecom display(hide),~
+        zbid display(hide),xtwh,xtbrname,xgatepassno,xstatustor display(const),xreqnum display(hide),~
+		//hide
+		xfwh display(hide) ,xbatch display(hide),xlong display(hide),~
+		xdocrow display(hide)
+		
+		
+		
+		field xpidate
+			attrib local
+			caption PI Date
+			display const
+			event after
+				//set xpidate=opordheader.xpidate("xpiref='"+xpiref+"'")
+				//set xpidate = #sql("select cast(xpidate as date) from opordheader where xpiref='"+xpiref+"'")
+				//set xpidate = #sql("select xpidate from opordheader where xpiref='"+xpiref+"'")
+				set xpidate = #sql("select xpidate from opordheader where xpiref='"+xpiref+"'")
+			end event
+		end field
+		
+		
+		field xsup
+			attrib local
+			caption Customer
+			display const
+			event after
+				set xsup = #sql("select xcus from opordheader where xpiref='"+xpiref+"'")
+			end event			
+		end field
+		
+		field sup
+			attrib local
+			caption Customer Name
+			display const
+			event after
+					set suplier= #sql("select xcus from opordheader where xpiref='"+xpiref+"'")
+					set sup=cacus.xorg("xcus='"+suplier+"'") 
+			end event
+		end field
+		
+		field xcus
+			caption Supplier Code
+			pick list casup
+		end field
+		
+		field xorg
+			attrib local
+			caption Supplier Name
+			display const
+			event after
+				set xorg=cacus.xorg("xcus='"+xcus+"'")
+			end event
+		end field
+		
+		
+		field xref
+			caption Chalan / Other Reference No
+		end field
+		
+		field zbid
+			caption Requisition Send To
+		end field
+		
+		field zorg
+			attrib local
+			caption Organization Name
+			display const
+			event after
+				set zorg=cazid.zorg("zbid='"+zbid+"'")
+			end event
+		end field
+		
+		
+		field xpiref
+			display const
+			pick 
+			event after
+				set globals(xordernum)=xordernum
+				set globals(xdornum)=xdornum
+			end event
+		end field
+		
+		field xtornum
+			pick list xtornumrc
+		end field
+		
+		field xordernum
+			//pick list xordernum
+		end field
+		
+		field xdate
+			caption Chalan Date
+		end field
+		
+	    field xtwh
+    		caption Store
+			display text
+			pick list xwh
+			default "05"
+	    end field
+	    
+		field xdum
+			attrib local
+			caption 
+			display const
+		end field
+		
+		field xtornum
+			caption Receive Chalan No
+		end field
+			
+       
+       field xfbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Store' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Store' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+          event after
+            //class careports(getReport{imtranissueprint,1,xtornum,Print Transfer Challan})
+            //class careports(getaspeport{imtranreceprint,1,xtornum,Print Receive Challan})
+			class careports(getReport{imtranreceprint;2;in,st;zid,svoucher;xtornum;Print Receive Challan})
+            set globals(xtornum)=xtornum
+            set globals(xpiref)=xpiref
+            if xstatustor .eq. "Transferred"
+              set #field(transfer.display)="hidden"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+            if xstatustor .eq. "Confirmed"
+              set #field(transfer.display)="hidden"
+              set #field(confirm.display)="hidden"
+              //set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+            if xstatustor .eq. "" .or. xstatustor .eq. "Open"
+           //   set #field(Confirm.display)="hidden"
+            end if
+            if xtornum1 .ne. ""
+              //set #field(transfer.display)="hidden"
+              //set #field(receive.display)="hidden"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+          end event
+        end field
+
+
+        field add
+          event before
+          	set xfwh = "RC"
+			//set xordernum = opdoheader.xordernum("xdornum='"+xdornum+"'")
+			set ref = imtorheader.xref("xtornum='"+xtornum+"'")
+			if xtwh .eq. ""
+				error "Cannot Proceed -- Please Select To Branch"
+			else if xref .eq. ref
+				error "Cannot Proceed -- Already Received !"
+			else if xref .eq. ""
+				error "Cannot Proceed -- Please Enter Challan Reference"
+			else if xordernum .eq. ""  .and. xcus .eq. ""
+				error "Cannot Proceed -- Please Select Order No. /PI No /Customer"
+			//else if xdate .lt. #date
+				//error "Cannot Proceed -- Transfer On Previous Date Not Allowed"
+			else
+				//set xcus=opordheader.xcus("xordernum='"+xordernum+"'")
+	          	set trn = "RC--"
+		        set xstatustor="Open"
+				set xpiref = opordheader.xpiref("xordernum='"+xordernum+"'")
+	       	    set xtornum = #trn("Transfer Transaction",trn,10)
+				if xordernum .ne. ""
+//giash				set xcus=opordheader.xcus("xordernum='"+xordernum+"'")
+				end if				
+
+			end if	
+//giash					set tornum = #sub(xtornum,4,10)
+//giash				if xref .eq. ""
+//giash					set xref="CH"+tornum
+				//end if	
+			end event
+					event after
+//giash          	set xref = ""
+					end event
+        end field
+
+        field Update
+          event before
+          	set xfwh = "RC"
+			//set xordernum = opdoheader.xordernum("xdornum='"+xdornum+"'")
+			if xtwh .eq. ""
+				error "Cannot Proceed -- Please Select To Branch"
+			//else if xdate .lt. #date
+				//error "Cannot Proceed -- Transfer On Previous Date Not Allowed"
+			else if xref .eq. ""
+				error "Cannot Proceed -- Please Enter Challan Reference"
+			else
+				set xpiref = opordheader.xpiref("xordernum='"+xordernum+"'")
+			end if
+				if xordernum .ne. ""
+//giash				set xcus=opordheader.xcus("xordernum='"+xordernum+"'")
+					//print xcus
+				end if
+//giash			set tornum = #sub(xtornum,4,10)
+				//if xref .eq. ""
+//giash					set xref="CH"+tornum
+				//end if					
+          end event
+		  event after
+		  	//	if xordernum .ne. ""
+				//	set xcus=opordheader.xcus("xordernum='"+xordernum+"'")
+			//	end if
+		
+		  end event
+        end field
+		
+		
+        field Confirm
+          event before
+            //if xstatustor .ne. "Transferred"
+            //  error "Cannot Proceed -- TO Not Transferred"
+            //end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,"imrcheader",6)
+            action Show
+          end event
+        end field
+
+        field Transfer
+          event before
+            if xstatustor .ne. "Open"
+              error "Cannot Proceed -- TO Already Transferred"
+			else if zbid .eq. ""
+				error "Cannot Proceed -- Please Select Company "
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,"imrcheader",6)
+           // action Show
+          end event
+        end field
+
+        field Receive
+          event before
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Transfered"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,8)
+           // action Show
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imrcdetailreq"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

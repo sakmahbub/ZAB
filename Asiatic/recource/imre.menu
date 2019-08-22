@@ -1,0 +1,11 @@
+//im.menu
+//-------------------------------------------------------------------
+option                           	|action
+//-------------------------------------------------------------------
+Receive By Challan					|#classPath+"/login?screen=imrcheaderreq" 
+Receive By LC   					|#classPath+"/login?screen=poordlcinfogrey"     
+Receiving of Goods (GRN)         	|#classPath+"/login?screen=poordheaderim"
+Receive Entry (Stock Update)		|#classPath+"/login?screen=imtrnre"
+Fabric Allocation					|#classPath+"/login?screen=imtorfabalcheader" 
+//-------------------------------------------------------------------
+

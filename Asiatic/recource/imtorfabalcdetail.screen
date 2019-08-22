@@ -1,0 +1,216 @@
+screen imtorfabalcdetail
+
+     caption "Allocation Order Detail"
+     sidebar list one//list pilist,
+     sections  form one, jscript myscript
+
+    list one
+        caption "<br><center><b>"Allocation Order Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=imtorfabalcdetail&command=Show&xtornum=?&xrow=?"),xdocrow, ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xfabrictype,xfabriccolor,~
+        xqtyord
+
+		totals "","","","Totals","","",sum
+		
+        headers "Serial No","Order Row","Item","Construction","Fabric Type","Fabric Color","Qunatity Ordered"//,"Quantity Delivered"
+     end list
+
+
+    list pilist
+        caption "Allocation Detail List For: "+xpiref
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        rows 10
+        objects ~
+        xorderrow attrib(name xorderrow#),xitem attrib(link "abc" embed onclick="return pickItem(this:xqtyreq#:xfabrictype#:xorderrow#)"),~
+		desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem),~
+		xfabrictype attrib(name xfabrictype#),xfabriccolor,xqtyord,xqtyreq attrib(name xqtyreq#)
+
+		totals "","","","Totals","",sum,sum
+		
+        headers "Order Row","Item","Construction","Fabric type","Fabric Color","Order Qty","Required Fabric Qty"
+     end list
+
+	 
+	 
+     form one
+        caption "Fabric Allocation Details For: "+xtornum
+        table imtordetail
+        primarykey xtornum,xrow
+        order xtornum,xrow
+        fixed xtornum
+        return "login"
+        pstyle 3
+        layout 2
+        objects Add,Update,Delete,*next,*next,*next,Clear,Show,Complete, "<p>",~
+        xrow attrib(row 0 1),xunit,xitem,xdesc,xrate,xqtyord,xnoofrolls,xlineamt display(const),~
+		xfabriccolor display(const),xdocrow,xfabrictype,, xnote 
+        
+
+        field xdocrow
+			caption Order Row
+			attrib readonly
+			display text
+			pick
+		end field
+		
+        field xfabrictype
+		width 50
+		column 2
+		//display text
+		//pick list xfabrictype
+		end field
+		
+        field xnoofrolls
+			caption No of Rolls/Than
+		end field
+		
+        field xqtyord
+			caption Allocation Quantity
+		end field
+		
+        field xfabrictype1
+			attrib readonly
+			display text
+			pick
+		end field
+		
+	field xnote
+		//caption Batch No.
+		column 2
+		width 53
+	end field
+	
+		field xrow
+          event after
+            set status = imtorheader.xstatustor("xtornum='"+xtornum+"'")
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Open"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+          end event
+        end field
+
+		field add
+			event before
+				set xfabriccolor="Grey Fabric"
+	
+			if xunit .eq. ""
+				error "Cannot Proceed -- Please Select Unit"
+			else if xfabrictype .eq. ""
+				error "Cannot Proceed -- Please Select Fabric Type"
+			
+			end if
+//			
+//				if xunit .eq. "Meter"
+//					set xqtyord = #round(xqtyord*1.09361,0)
+//				else if xunit .eq. "Kg"
+//					set xqtyord = #round(xqtyord,0)
+//				else 
+//					set xqtyord = #round(xqtyord,0)
+//				end if					
+//
+				
+			//set xlineamt = xrate*xqtyord
+				//set xfabrictype=oporddetail.xfabrictype("xordernum='"+xordernum+"'")
+			end event
+		end field
+
+		field update
+			event before
+			if xunit .eq. ""
+				error "Cannot Proceed -- Please Select Unit"
+			else if xfabrictype .eq. ""
+				error "Cannot Proceed -- Please Select Fabric Type"
+			
+			end if
+//			
+//				if xunit .eq. "Meter"
+//					set xqtyord = #round(xqtyord*1.09361,0)
+//				else if xunit .eq. "Kg"
+//					set xqtyord = #round(xqtyord,0)
+//				else 
+//					set xqtyord = #round(xqtyord,0)
+//				end if					
+//
+				
+			//set xlineamt = xrate*xqtyord
+				//set xfabrictype=oporddetail.xfabrictype("xordernum='"+xordernum+"'")
+			end event
+		end field
+		
+	field xbatch
+		caption Batch No.
+		width 50
+	end field
+
+        field xdesc
+          caption Product Name
+          attrib local
+          display const
+          event after
+            set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+	  	
+        embed onsubmit="submitit(this)"
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Complete"){
+            form.screen.value = "imtorfabalcheader"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+        function pickPrice(link,vatrate){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xrate.value=link.innerText
+            document.one.xvatrate.value=vatrate.innerText
+          }
+          return false
+        }
+        function pickItem(link,qtyreq,ftype,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+            document.one.xfabrictype.value=ftype.text
+            document.one.xqtyord.value=qtyreq.text
+            document.one.xdocrow.value=row.text
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xfabrictype.value=ftype.innerText
+            document.one.xqtyord.value=qtyreq.innerText
+            document.one.xdocrow.value=row.innerText
+          }
+          return false
+        }
+        
+        </script>
+     end jscript
+
+
+
+end screen

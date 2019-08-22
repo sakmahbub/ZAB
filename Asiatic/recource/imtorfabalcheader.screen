@@ -1,0 +1,224 @@
+screen imtorfabalcheader
+     caption "Fabric Allocation"
+    sidebar list tolist,list one
+	sections form one, jscript myscript
+
+    list tolist
+        caption "<br><center><b>"Open Allocation List"</b>"
+        table imtorheader
+        order xtornum
+		select "xstatustor<>'Confirmed' and left(xtornum,4)='FA--'"
+        rows 10
+        objects ~
+        xtornum attrib(link "login?screen=imtorfabalcheader&command=Show&xtornum=?"),xdate,xgrnnum
+        
+        headers "Transfer No","Transfer Date","GRN No"
+    end list
+
+	list one
+        caption "<br><center><b>"Allocation Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=imtorfabalcdetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyord,xunit
+
+        headers "Serial No","Item","Description","Qunatity Ordered","Unit"
+     end list
+
+
+
+     form one
+        caption "Fabric Allocation (Header)"
+        table imtorheader
+        primarykey xtornum
+        order xtornum desc
+        select "left(xtornum,4)='FA--'"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Show,Clear,Add,Update,Delete,Details,Confirm,"<p>" ,~
+        xtornum,xdate,~
+		//xcus,xorg,~
+		xfordernum,xtordernum,xfpiref,xtpiref,~
+        xfwh,xtwh,xfbrname,xtbrname,xref,xstatustor display(constant),xlong,//xgrnnum,
+		xbatch display(hide),xpiref display(hide)
+
+		
+		field xcus
+//			attrib local
+			caption Customer Code
+//			display const
+			event after
+//				set xcus=opordheader.xcus("xpiref='"+xtpiref+"'")
+			end event
+		end field
+		
+		field xorg
+			attrib local
+			caption Customer Name
+			display const
+			event after
+				set xorg=cacus.xorg("xcus='"+xcus+"'")
+			end event
+		end field
+		
+	    field xfwh
+    		caption From Store
+			display text
+			pick list xwh
+	    end field
+	    
+	    field xtwh
+    		caption To Store
+			display text
+			pick list xwh
+	    end field
+	    
+	    field xstatustor
+    		caption Transaction Status
+	    end field
+			
+       field xfpiref
+        attrib local
+        caption From PI
+        display const
+        event after
+          set xfpiref=opordheader.xpiref("xordernum='"+xfordernum+"'")
+        end event
+       end field
+
+       field xtpiref
+        attrib local
+        caption To PI
+        display const
+        event after
+          set xtpiref=opordheader.xpiref("xordernum='"+xtordernum+"'")
+        end event
+       end field
+	   
+	    
+			
+       field xfbrname
+        attrib local
+        caption Branch Name(From)
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Store' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Branch Name(To)
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Store' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	    field xgrnnum
+          pick list xgrnto
+        end field
+
+        field xtornum
+		caption Allocation Transaction No
+		pick list xtornumfa
+          event after
+		              //class careports(getReport{imtranissueprint;2;in,st;zid,tornum;xtornum;Print Transfer Challan})
+					  class careports(getReport{imtranissueprint;2;in,st;zid,tornum;xtornum;Print Transfer Challan})
+
+            //class careports(getjspReport{imtranissueprint,1,xtornum,Print Transfer Challan})
+            set globals(xtornum)=xtornum
+			set globals(xgrnnum)=xgrnnum
+			set globals(xfwh)=xfwh
+
+            if xstatustor .eq. "Confirmed"
+              set #field(transfer.display)="hidden"
+              set #field(confirm.display)="hidden"
+              //set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+          end event
+        end field		
+
+        field xdate
+          caption Transfer Date
+        end field
+		
+		field xlong
+          column 2
+		//  width 80
+        end field
+
+        field Confirm
+          event before
+		   double qty=#sql("select sum(xqtyord) from imtordetail where xtornum='"+xtornum+"'")
+		   if xstatustor .ne. "Open"
+              error "Cannot Proceed -- TO Already Confirmed"
+			else if qty == 0
+              error "Cannot Proceed -- Please add detail"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,"","imtorfabalcheader",9)
+            action Show
+          end event
+        end field
+
+		field add
+          event before
+			//set xordernum = opdoheader.xordernum("xdornum='"+xdornum+"'")
+		//if xfwh .eq. ""
+		//error "Cannot Proceed -- Please Select From Branch"
+		//else if xtwh .eq. ""
+		//error "Cannot Proceed -- Please Select To Branch"
+			//else if xgrnnum .eq. ""
+			//error "Please select GRN No."
+			
+			//else if xdate .lt. #date
+			//	error "Cannot Proceed -- Transfer On Previous Date Not Allowed"
+		//else
+				
+	          	set trn = "FA--"
+		        set xstatustor="Open"
+				set xbatch = moheader.xbatch("xordernum='"+xordernum+"'")
+				set xpiref = opordheader.xpiref("xordernum='"+xordernum+"'")
+	       	    set xtornum = #trn("Fabric Allocation",trn,10)
+			end if
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtorfabalcdetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

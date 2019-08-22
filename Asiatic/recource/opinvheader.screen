@@ -1,0 +1,343 @@
+screen opinvheader
+     
+     sidebar list detail,list one
+     sections form one, jscript myscript
+
+     list detail
+        caption "Invoice Detail List For "+xdornum
+        table opinvdetail
+        order xinvnum,xinvrow
+        fixed xinvnum
+        rows 20
+        objects  xinvrow attrib(link "login?screen=opinvdetail&command=Show&xinvnum=?&xinvrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where caitem.zid=opinvdetail.zid and caitem.xitem=opinvdetail.xitem)),~
+                 xqtyinv,xrate,xlineamt
+
+        headers "Row","Item","Description","Qty","Rate","Line Amount"
+    	  total "Total","","",sum,"",sum
+     end list
+
+     list one
+        caption "DO List"
+        table opdoheader
+        order xdornum
+        fixed xinvnum
+        rows 20
+        objects  xdornum attrib(link "login?screen=opinvheader&command=Show&xdornum=?"),xdate
+
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+     form one
+        caption "Commercial Invoice Header"
+        table opinvheader
+        order xinvnum 
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Details,Show,Clear,*next,*next,*next,Add, Update, Delete,*next,*next,*next,Top, Previous, Next, Bottom,~
+                *next,"<p>",~
+                xinvnum ,xlcno,xdate,xdatedel,xexpno,xdateexp,xcus,xorg,xbuyer,xbname,xcur,xexch,xpiinvdesc display(hide),~
+                xopenbank,xopdesc,xadvisingbank,xadvdesc,xtruckno,xstatusinv display(hide),~
+                xinvvalue display(const),xlong,xdiscf,xbasetotamt display(const),xprimetotamt display(const),~
+				xpiheading,xpiinvdescex display(hide),xstatusar display(hide),xnote
+
+
+		
+        field xexpno
+			width 30
+			event after
+			end event			
+		end field
+
+				
+        field xlong
+		  	caption Cause of Discount
+			width 35
+			height 1
+			//column 2
+		end field	
+		
+        field xnote
+			//width 30
+			column 2
+		end field
+		
+        field xlcno
+			pick list opordlc
+		end field
+
+        field xcur
+			display const
+		end field
+		
+			field xbuyer
+			pick xcus
+			end field
+		
+		
+		  field xbname
+		  	attrib local
+		  	dispaly const
+		  	caption Buyer Name
+			event after
+				set xbname=cacus.xorg("xcus='"+xbuyer+"'")
+			end event
+		  end field
+	
+		
+        field xinvnum
+			width 30
+			event after
+				//class careports(getReport{moplanprint;2;in,st;zid,batno;xbatch;Print Plan})
+				//class careports(getReport{opinvcominv;2;in,st;zid,invno;xinvnum;Print Commercial Invoice})
+				set globals(xinvnum)=xinvnum
+			end event			
+		end field
+		
+		field xref
+        	caption Invoice Number
+        end field
+		
+        field xdum
+          attrib local
+          caption
+          display constant
+        end field
+        
+        field xorg
+          attrib local
+          caption Name
+          display constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")
+          end event
+        end field
+		  
+		  field xopenbank
+			display const
+		  end field
+
+		field xadvisingbank
+			display const
+		  end field
+		  
+		  field xopdesc
+		  	attrib local
+		  	dispaly const
+		  	caption Bank Name
+		  	event after
+		  		set xopdesc=cabank.xname("xbank='"+xopenbank+"'")+"<br>"+cabank.xbranch("xbank='"+xopenbank+"'")+"<br>"+cabank.xmadd("xbank='"+xopenbank+"'")
+		  	end event
+		  end field
+
+		  field xadvdesc
+		  	attrib local
+		  	dispaly const
+		  	caption Bank Name
+		  	event after
+		  		set xadvdesc=cabank.xname("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xbranch("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xmadd("xbank='"+xadvisingbank+"'")
+		  	end event
+		  end field
+		  
+		  field xnote
+		  caption Export Note
+		  width 90
+		  height 9
+		  end field
+		  
+        field xcus
+			caption Customer/Delivery To
+			dispaly const
+           event after
+              set globals(xinvnum) = xinvnum
+              set globals(xcus) = xcus
+              set globals(xlcno) = xlcno
+              set xorg = cacus.xorg("xcus = '"+xcus+"'")
+           end event
+        end field
+
+        field xbuyer
+			caption Buyer/Applicant
+        end field
+		
+        field Add
+          event before
+			if xlcno .eq. ""
+				error "Cannot Proceed -- Please Select LC No"
+			end if
+			set xstatusar = "Open"
+			set xstatusjv = "Open"
+			set xopenbank=lcinfo.xopenbank("xlcno='"+xlcno+"'")
+			set xadvisingbank=lcinfo.xadvisingbank("xlcno='"+xlcno+"'")
+			set xcur=lcinfo.xcur("xlcno='"+xlcno+"'")
+			set xcus=lcinfo.xcus("xlcno='"+xlcno+"'")
+			set xnote=lcinfo.xbblcno("xlcno='"+xlcno+"'")
+          	//set trn = "COIN"
+            //set xinvnum = #trn("Invoice No",trn,10)
+          end event		  
+        end field
+
+        field update
+		 event before
+			if xlcno .eq. ""
+				error "Cannot Proceed -- Please Select LC No"
+			end if
+			 set lc=#sql("select xlcno from lcinfo where xlcno='"+xlcno+"'")	
+			if xlcno .ne. lc
+				error "Cannot Proceed -- LC No is not Correct"
+			end if
+			set xstatusar = "Open"
+			set xstatusjv = "Open"			
+			set xopenbank=lcinfo.xopenbank("xlcno='"+xlcno+"'")
+			set xadvisingbank=lcinfo.xadvisingbank("xlcno='"+xlcno+"'")
+			set xcur=lcinfo.xcur("xlcno='"+xlcno+"'")
+			set xcus=lcinfo.xcus("xlcno='"+xlcno+"'")
+			
+          	//set trn = "COIN"
+            //set xinvnum = #trn("Invoice No",trn,10)
+          end event	
+          event after
+           	set temp = #spsql(zabsp_OP_validateAfterINVheader,#id,#user,xinvnum)	
+			action show
+          end event		  
+		  end field
+		  
+		  field update1
+          event after
+		  	set xopenbank=lcinfo.xopenbank("xlcno='"+xlcno+"'")
+			set xadvisingbank=lcinfo.xadvisingbank("xlcno='"+xlcno+"'")
+			set xcur=lcinfo.xcur("xlcno='"+xlcno+"'")
+			set xcus=lcinfo.xcus("xlcno='"+xlcno+"'")
+           //	set temp = #spsql(zabsp_OP_validateAfterINVHeader,#id,#user,xinvnum,xordernum,xexch) 	
+           	action show
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+        field Packing
+          embed onclick="clicked(this)"
+        end field
+
+        field Weight
+          embed onclick="clicked(this)"
+        end field
+
+        field Certificate
+          embed onclick="clicked(this)"
+        end field
+
+        field Beneficiary'sCertificateOne
+          embed onclick="clicked(this)"
+        end field
+
+        field Beneficiary'sCertificateTwo
+          embed onclick="clicked(this)"
+        end field
+
+        field Beneficiary'sCertificateThree
+          embed onclick="clicked(this)"
+        end field
+
+        field QuantityCertificateOne
+          embed onclick="clicked(this)"
+        end field
+
+        field QuantityCertificateTwo
+          embed onclick="clicked(this)"
+        end field
+
+        field QuantityCertificateThree
+          embed onclick="clicked(this)"
+        end field
+
+        field QuantityCertificateFour
+          embed onclick="clicked(this)"
+        end field
+
+        field QuantityCertificateFive
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opinvdetail"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Print Commercial Invoice"){
+            form.screen.value = "*crystal opcominv(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="Packing List"){
+            form.screen.value = "*crystal oppackinglist(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="Weight And Measurement List"){
+            form.screen.value = "*crystal opwemeaslist(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="Certificate of Origin"){
+//            form.value
+//            form.action = "http://banti/reports/opcertioforigin.rpt"
+//  window.open("http://banti/reports/opcertioforigin.rpt","Report",toolbar=0,"scrollbars=yes");
+//      documents.forms[1]="Report"
+//      Report.elements[0].name = promt0
+//      Report.promt0.value = "100010"
+//      Report.elements[1].value = "COIN000002"
+//      for(var i = 0;i<form.elements.length;i++){
+//        alert(form.elements[i].value)
+//      }
+//            form[0].elements[0].value = "100010"
+//            form[0].elements[1].value = "COIN000002"
+//            form.xinvnum.value = "COIN000002"
+            form.screen.value = "*crystal opcertioforigin(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="Beneficiary'sCertificateOne"){
+            form.screen.value = "*crystal opbeneficiaryone(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="Beneficiary'sCertificateTwo"){
+            form.screen.value = "*crystal opbeneficiarytwo(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="Beneficiary'sCertificateThree"){
+            form.screen.value = "*crystal opbeneficiarythree(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="QuantityCertificateOne"){
+            form.screen.value = "*crystal opqtycertone(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="QuantityCertificateTwo"){
+            form.screen.value = "*crystal opqtycerttwo(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="QuantityCertificateThree"){
+            form.screen.value = "*crystal opqtycertthree(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="QuantityCertificateFour"){
+            form.screen.value = "*crystal opqtycertfour(xinvnum=Invoice No=xinvnum)"
+          }
+          if (button=="QuantityCertificateFive"){
+            form.screen.value = "*crystal opqtycertfive(xinvnum=Invoice No=xinvnum)"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

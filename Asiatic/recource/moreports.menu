@@ -1,0 +1,61 @@
+//Accounts Reports.menu     moreports.menu
+//-------------------------------------------------------------------
+option                           		|action
+//-------------------------------------------------------------------
+//Daily Production Report           	|#classPath+"/login?screen=*crystal modailyprdrep(xbatch=Batch No=)"
+//Machine Wise Daily Production      	|#classPath+"/login?screen=*jspcrystal momachinewiseprd(xdate=From Date=#date,xdate=To Date=#date)"
+Machine Wise Daily Production        	|#classPath+"/login?screen=*viewcrystal momachinewiseprd(3;in,st,st;@zid,@fdate,@tdate,rpt;xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+//Machine Wise Production Detail      	|#classPath+"/login?screen=*jspcrystal momachinewiseprddetail(xdate=From Date=#date)"
+//Machine Wise Production Detail        	|#classPath+"/login?screen=*viewcrystal momachinewiseprddetail(3;in,dt,dt;zid,fdate,tdate,rpt;xdate=From Date=#date,xviewtype=Report View)"
+Machine Wise Production Detail        	|#classPath+"/login?screen=*viewcrystal momachinewiseprddetail(2;in,dt;zid,fdate;xdate=From Date=#date,xviewtype=Report View)"
+//Shortage/Excess delivery              |#classPath+"/login?screen=*aspcrystal opdatewisedeli(xdate= From Date=#date,xdate= To Date=#date,xpiref=PI No.,xcus=Customer ID)"
+//Date Wise PI Grey Status      		|#classPath+"/login?screen=*jspcrystal datewisepigreystatus(xdate=From Date=#date,xdate=To Date=#date,xpiref=PI Number)"
+Date Wise PI Grey Status        		|#classPath+"/login?screen=*viewcrystal datewisepigreystatus(4;in,dt,dt,st;@zid,@fdate,@tdate,@piref,rpt;xdate=From Date=#date,xdate=To Date=#date,xpiref=PI Number,xviewtype=Report View)"
+//PI Wise Production Summary   			|#classPath+"/login?screen=*jspcrystal mopiwiseprdsum(xpiref=PI Number)"
+PI Wise Production Summary       		|#classPath+"/login?screen=*viewcrystal mopiwiseprdsum(2;in,st;@zid,@piref,rpt;xpiref=PI Number,xviewtype=Report View)"
+//PI Wise Production Detail  		 	|#classPath+"/login?screen=*aspcrystal mopiwisedailyprd(xpiref=PI Number)"
+//PI Wise Production Detail  		 	|#classPath+"/login?screen=*jspcrystal mopiwisedailyprd(xpiref=PI Number)"
+PI Wise Production Detail        		|#classPath+"/login?screen=*viewcrystal mopiwisedailyprd(2;in,st;zid,piref,rpt;xpiref=PI Number,xviewtype=Report View)"
+PI Wise Production Status       		|#classPath+"/login?screen=*viewcrystal mopiwiseprdsumdate(4;in,dt,dt,st;@zid,@fdate,@tdate,@piref;xdate=From Date=#date,xdate=To Date=#date,xpiref=PI Number,xviewtype=Report View)"
+//PI Wise Production Status Mofified	       		|#classPath+"/login?screen=*viewcrystal mopiwiseprdsumdate(4;in,dt,dt,st;@zid,@fdate,@tdate,@oldpiref;xdate=From Date=#date,xdate=To Date=#date,xpiref=PI Number,xviewtype=Report View)"
+//PI Status                 			|#classPath+"/login?screen=*jspcrystal oppistatus(xpiref=PI Number=)"
+//PI Status       						|#classPath+"/login?screen=*viewcrystal oppistatus(2;in,st;@zid,@piref,rpt;xpiref=PI Number=,xviewtype=Report View)"
+PI Status       						|#classPath+"/login?screen=*viewcrystal oppistatus(4;in,dt,dt,st;@zid,@fdate,@tdate,@piref;xdate=From Date=#date,xdate=To Date=#date,xpiref=PI Number=,xviewtype=Report View)"
+Date Wise Batch To Batch Transfer List	|#classPath+"/login?screen=*viewcrystal mobattobattransdate(4;in,dt,dt,st;zid,fdate,tdate,fbattrn,rpt;xdate=From Date=#date,xdate=To Date=#date,xbatchtrn=Batch Transfer No,xviewtype=Report View)"
+//Item Ledger Detail (VS)         		|#classPath+"/login?screen=*viewcrystal imtrndetail(8;in,st,st,st,st,st,dt,dt;zid,wh,fgitem,tgitem,fitem,titem,fdate,tdate,rpt;xwhvs=Virtual Store=,xgitem=From Item Group,xgitem=To Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+//Item Ledger Detail (VS)          		|#classPath+"/login?screen=*viewcrystal imtrndetail(6;in,st,st,st,dt,dt;zid,wh,fgitem,fitem,fdate,tdate;xwhvs=Store=,xgitem=Item Group,xitem=Item,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Item Ledger Detail (VS)          		|#classPath+"/login?screen=*viewcrystal imtrndetail(7;in,st,st,dt,dt,st,st;zid,wh,fgitem,fdate,tdate,fitem,fabrictype;xwhvs=Store=,xgitem=Item Group,xdate=From date=#date,xdate=To Date=#date,xitem=Item,xfabrictype=Fabric Type,xviewtype=Report View)"
+//Item Ledger Summery  (VS)				|#classPath+"/login?screen=*viewcrystal imledsum(8;in,st,st,st,st,st,dt,dt;zid,xwh,fgitem,tgitem,fitem,titem,fdate,tdate,rpt;xwhvs=Virtual Store=,xgitem=From Item Group,xgitem=To Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Item Ledger Summery  (VS)          		|#classPath+"/login?screen=*viewcrystal imledsum(6;in,st,st,st,dt,dt;zid,xwh,fgitem,fitem,fdate,tdate,rpt;xwhvs=Virtual Store=,xgitem=Item Group,xitem=Item,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Monthly Stock Balance (VS)         		|#classPath+"/login?screen=*viewcrystal opmstockbaldetail(7;in,st,st,st,st,dt,dt;zid,xwh,fgitem,fitem,titem,fdate,tdate,rpt;xwhvs=Virtual Store=,xgitem=Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+//Date Wise FG Detail Inspection        |#classPath+"/login?screen=*aspcrystal modatewisedetailinsp(xdate=From Date=#date,xdate=To Date=#date)"
+//Date Wise FG Detail Inspection        |#classPath+"/login?screen=*jspcrystal modatewisedetailinsp(xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID)"
+//Customer Wise FG Detail Inspection    |#classPath+"/login?screen=*jspcrystal mocuswisedetailinsp(xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID)"
+Customer Wise FG Detail Inspection      |#classPath+"/login?screen=*viewcrystal mocuswisedetailinsp(4;in,dt,dt,st;zid,fdate,tdate,cus,rpt;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xviewtype=Report View)"
+
+//PI Wise FG Detail Inspection          |#classPath+"/login?screen=*jspcrystal mopiwisedetailinsp(xpiref=PI Number)"
+PI Wise FG Detail Inspection       		|#classPath+"/login?screen=*viewcrystal mopiwisedetailinsp(2;in,st;zid,piref,rpt;xpiref=PI Number,xviewtype=Report View)"
+//PI Register   	    	   			|#classPath+"/login?screen=*jspcrystal comorderdetail(xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xordertype=Order Type==combo)"
+PI Register								|#classPath+"/login?screen=*viewcrystal comorderdetail(5;in,dt,dt,st,st;zid,fdate,tdate,cus,type,rpt;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xordertype=Order Type==combo,xviewtype=Report View)"
+//Order Register						|#classPath+"/login?screen=*jspcrystal comorderdetailcf(xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xordertype=Order Type==combo)"
+Order Register      					|#classPath+"/login?screen=*viewcrystal comorderdetailcf(5;in,dt,dt,st,st;zid,fdate,tdate,cus,type,rpt;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xordertype=Order Type==combo,xviewtype=Report View)"
+//Process Wise Daily Production       	|#classPath+"/login?screen=*aspcrystal modailyprdrep(xfmoprcs=Process,xdate=From Date=#date, xdate=To Date=#date)"
+//Batch Wise Recipe Setting.        	|#classPath+"/login?screen=*jspcrystal mopiwiserecipe(xbatch=Batch No=)"
+Batch Wise Recipe Setting.      		|#classPath+"/login?screen=*viewcrystal mopiwiserecipe(2;in,st;zid,batch,rpt;xbatch=Batch No=,xviewtype=Report View)"
+//Not Delivery Material Requisition List |#classPath+"/login?screen=*aspcrystal mobatchwisereqn(xbatch=Batch No=)"
+//Process Wise Material Requisition 	|#classPath+"/login?screen=*aspcrystal moprcswiserecipereq(xbatch=Batch No=)"
+//Process Wise Chemical Consumption 	|#classPath+"/login?screen=*aspcrystal moprcswisecons(xbatch=Batch No=)"
+//Production Wise FG Issue	  			|#classPath+"/login?screen=*aspcrystal moprdswisefgissue(xbatch=Batch No=)"
+//Costing	Reports Details				|#classPath+"/login?screen=*aspcrystal imcosting(xpiref=PI Number)"
+Costing	Reports Details  				|#classPath+"/login?screen=*viewcrystal imcosting(2;in,st;@zid,@ppiref,rpt;xpiref=PI Number,xviewtype=Report View)"
+//Costing	Reports Summary(Raw Materials)  |#classPath+"/login?screen=*jspcrystal imcostingsummary(xpiref=PI Number)"
+Costing Summary(Raw Materials)			|#classPath+"/login?screen=*viewcrystal imcostingsummary(2;in,st;@zid,@ppiref,rpt;xpiref=PI Number,xviewtype=Report View)"
+//Average Costing By Month (Actual)   	|#classPath+"/login?screen=*aspcrystal mopicostac(xyear=Year,xper=Period)"
+//PI Wise Delivery Statement        	|#classPath+"/login?screen=*aspcrystal oppiwisedeli(xpiref=PI Number)"
+Grey Fabric Receiving Status			|#classPath+"/login?screen=*viewcrystal moinsptransactionlisting(5;in,st,st,dt,dt;zid,twh,piref,fdate,tdate,rpt;xtwh=Store,xpiref=PI No,xdate=From Date,xdate=To Date,xviewtype=Report View)"
+
+
+
+
+
+

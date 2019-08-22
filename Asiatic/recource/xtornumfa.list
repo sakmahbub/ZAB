@@ -1,0 +1,12 @@
+     list xtornumfa
+        caption "Fabric Allocation List"</b>"
+        table imtorheader
+        order xtornum
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4)='FA--')"
+		searchselect "left(xtornum,4)='FA--'"
+        rows 30
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xpiref
+     end list
+
+

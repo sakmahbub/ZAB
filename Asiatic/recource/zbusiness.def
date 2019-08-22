@@ -1,0 +1,20 @@
+product ZAB
+
+table zbusiness
+  caption "Your Business"
+  columns ztime, zutime,zauserid,zuuserid,zid,~
+          xshort,xtaxnum,zorg, xmadd,xcity, ~
+          xstate, xzip, xcountry, xphone, xfax,~
+          xcontact, xemail, xurl, xdformat,xdsep,xtimage,xbimage,xcustom, zactive, zemail,xsignatory,xdesignation,xpadd,ximage,xcat
+  primary key zid
+  unique zemail,zorg
+  foreign key
+        zemail references zusers.zemail
+  end foreign key
+
+  field zid
+    attrib auto 100000, 10
+  end field
+
+
+end table

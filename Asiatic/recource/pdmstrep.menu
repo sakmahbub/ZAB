@@ -1,0 +1,15 @@
+//pdmstrep.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Employee List (All)              |#classPath+"/login?screen=*jspcrystal pdmst(xempcategory=Employee Category)"
+Employee List (All)           		|#classPath+"/login?screen=*viewcrystal pdmst(2;in,st;zid,empcate,rpt;xempcategory=Employee Category,xviewtype=Report View)"
+//Employee List By Department	   |#classPath+"/login?screen=*jspcrystal pdmstdept(xempcategory=Employee Category,xdeptname=Department Name,xdeptname=Department Name)"
+Employee List By Department   		|#classPath+"/login?screen=*viewcrystal pdmstdept(6;in,st,st,st,st,st;zid,category,fdept,tdept,fsec,tsec,rpt;xempcategory=Employee Category,xdeptname=From Department Name,xdeptname=Department Name,xsec=From Section,xsec=To Section,xviewtype=Report View)"
+//Employee List By Category  	   |#classPath+"/login?screen=*crystal pdmstlistbycat(xempcatefac=Employee Category)"
+//Employee Salary Detail     	   |#classPath+"/login?screen=*crystal pdmstsaldetail(xempcatefac=Employee Category)"
+//Closed Employee List By Date        	   |#classPath+"/login?screen=*crystal pdmstdeptcl(xdate=From Date,xdate=To Date)"
+//Employee List By Provident Fund  |#classPath+"/login?screen=*crystal pdpflisting()"
+//Employee List Without PF  |#classPath+"/login?screen=*crystal pdnonpflisting()"
+//-------------------------------------------------------------------
+

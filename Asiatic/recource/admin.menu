@@ -1,0 +1,18 @@
+//admin.menu
+//-------------------------------------------------------------------
+option                           	|action
+//-------------------------------------------------------------------
+System Monitoring                   |#classPath+"/login?screen=zsysanalysis" 
+Audit Trial							|#classPath+"/login?screen=*viewcrystal audittrial(4;in,st,st,st;zid,command,firstpar,secpar;xcommand=Action Type,xdegree=1st Param,xdegree=2nd Param,xviewtype=Report View)"
+DB Analysis Panel                   |#classPath+"/login?screen=query"  
+Stakeholder                    		|#classPath+"/login?screen=zstakeholder"  
+
+View Transaction					|#classPath+"/login?screen=imtrnview"
+AP                            		|#classPath+"/login?menu=apadmin" 
+AR                            		|#classPath+"/login?menu=aradmin" 
+PO                            		|#classPath+"/login?menu=poadmin" 
+DO                            		|#classPath+"/login?menu=opadmin" 
+HR&Payroll                      	|#classPath+"/login?menu=adminpd" 
+
+
+//-------------------------------------------------------------------	

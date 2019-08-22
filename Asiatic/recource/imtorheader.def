@@ -1,0 +1,24 @@
+product ZAB
+
+table imtorheader
+  caption "Transfer Order Entry Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+  xtornum,xdate,xgrnnum,xdatecom,xlong,xgatepassno,xref,~
+  xfwh,xtwh,xstatustor,xbatch,xdocrow,xordernum,xpiref,xdornum,~
+  zbid,xreqnum,xstatusreq,xmoprcs,xcus,xpreparer,xdphead,xsofficer,xdirector,xporeqnum,xdaterec,xstatusrec,xregi,xidsup,xrevision,xwh,xcmpc,~
+  xdatedph,xdateed,xdatecmpc,xdateso,xchassisno,xbuyer,xsubdept,~
+  xsignatory1,xsigndate1,xsignatory2,xsigndate2,xsignatory3,xsigndate3,~
+  xsignatory4,xsigndate4,xsignatory5,xsigndate5,xsignatory6,xsigndate6,xsignatory7,~
+  xsigndate7,xshift,xdatereq,xsrnum,xsuperior2,xsuperior3,xtrn,xtitem,~
+  xsignreject,xdatereject,xnote,xnote1,xnote2,xnote3,xnote4,xnote5,xsubject,~
+  xbackground,xbudget,xavailfund,xacc,xreqtype,xstatusap,xstatusjv,xvoucher,xloannum,~
+  xstatusloan,xtype,xdategl,xtypeobj,xproject,xfproject,xtproject,xbuilding,xappnote,xassetcode
+
+
+  primary key zid,xtornum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table
+

@@ -1,0 +1,20 @@
+//imfabreports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Customer Wise Grey Fabric Status |#classPath+"/login?screen=*jspcrystal imcuswisegreyfabricsatus(xdate=Date=#date,xdate=Date=#date,xcus=Party)"
+Customer Wise Grey Fabric Status   |#classPath+"/login?screen=*viewcrystal imcuswisegreyfabricsatus(5;in,dt,dt,st,st;zid,fdate,tdate,cus,fabrictype,rpt;xdate=Date=#date,xdate=Date=#date,xcus=Party,xfabrictype=Fabric Type,xviewtype=Report View)"
+//PI Wise Grey Fabric Status |#classPath+"/login?screen=*jspcrystal impiwisegreyfabricsatus(xpiref=PI Reference)"
+PI Wise Grey Fabric Status   |#classPath+"/login?screen=*viewcrystal impiwisegreyfabricsatus(5;in,st,dt,dt,st;zid,piref,fdate,tdate,fabrictype;xpiref=PI Reference,xdate=From Date=#date,xdate=To Date=#date,xfabrictype=Fabric Type,xviewtype=Report View)"
+//Grey Fabric Ledger               |#classPath+"/login?screen=*jspcrystal imgreyfabricleddetail(xwh=Store,xitem=Item,xdate=Date=#date,xdate=Date=#date,xcus=Party)"
+Grey Fabric Ledger			 |#classPath+"/login?screen=*viewcrystal imgreyfabricleddetail(7;in,st,st,dt,dt,st,st;zid,wh,item,fdate,tdate,cus,fabrictype,rpt;xwh=Store,xitem=Item,xdate=Date=#date,xdate=Date=#date,xcus=Party,xfabrictype=Fabric Type,xviewtype=Report View)"
+//Fabric Ledger                    |#classPath+"/login?screen=*jspcrystal imfabricleddetail(xwh=Store=,xitem=Item,xdate=From date=#date,xdate=To Date=#date,xfabriccolor=Fabric Color,xcus=Customer)"
+Fabric Ledger			 |#classPath+"/login?screen=*viewcrystal imfabricleddetail(8;in,st,st,dt,dt,st,st,st;zid,wh,item,fdate,tdate,fcolor,cus,fabrictype,rpt;xwh=Store=,xitem=Item,xdate=From date=#date,xdate=To Date=#date,xfabriccolorreport=Fabric Color,xcus=Customer,xfabrictype=Fabric Type,xviewtype=Report View)"
+Grey Fabric Receiving Status			|#classPath+"/login?screen=*viewcrystal moinsptransactionlisting(5;in,st,st,dt,dt;zid,twh,piref,fdate,tdate,rpt;xwh=Store,xpiref=PI No,xdate=From Date,xdate=To Date,xviewtype=Report View)"
+//PI Wise Fin. Fabric Insp. Report |#classPath+"/login?screen=*jspcrystal mopiwisedetailinsp(xpiref=PI Number)"
+PI Wise Fin. Fabric Insp.   |#classPath+"/login?screen=*viewcrystal mopiwisedetailinsp(2;in,st;zid,piref,rpt;xpiref=PI Number,xviewtype=Report View)"
+//Customer Wise Fin. Fabric Insp. Report |#classPath+"/login?screen=*jspcrystal mocuswisedetailinsp(xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID)"
+Customer Wise Fin. Fabric Insp.   |#classPath+"/login?screen=*viewcrystal mocuswisedetailinsp(4;in,dt,dt,st;zid,fdate,tdate,cus,rpt;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xviewtype=Report View)"
+//Customer Wise Fin. Fabric Insp.   |#classPath+"/login?screen=*viewcrystal mocuswisedetailinsp(5;in,dt,dt,st,st;zid,fdate,tdate,cus,fabrictype,rpt;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xfabrictype=Fabric Type,xviewtype=Report View)"
+//-------------------------------------------------------------------
+
