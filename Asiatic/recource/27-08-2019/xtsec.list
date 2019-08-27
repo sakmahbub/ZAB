@@ -1,0 +1,8 @@
+     list xtsec
+        table xcodes
+        order xcode
+        select "(xcode like '%"+zvalue+"%' and xtype='Section')"
+        rows 200
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"),zactive
+
+end list
