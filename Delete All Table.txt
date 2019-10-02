@@ -1,0 +1,37 @@
+
+select 'delete from '+name+' where zid=@zid' from sys.objects where type='U' order by name
+
+select 'delete from '+name from sys.objects where type='U' order by name
+
+select * from sys.objects  where type='U' order by name
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
