@@ -1,0 +1,3 @@
+select xstaff, cast(xdate as date),count(*) from pdattdata where xstaff='C1785' and cast(xdate as date) between '2019-08-21' and '2019-09-20' group by  xstaff,cast(xdate as date)
+select * from pdattview where xstaff='C1785' and xothours>'00:00:00' and cast(xdate as date) between '2019-08-21' and '2019-09-20'
+select * from pdattdata
