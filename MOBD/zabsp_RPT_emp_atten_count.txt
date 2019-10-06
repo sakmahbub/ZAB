@@ -1,0 +1,82 @@
+USE [ZABDB]
+GO
+/****** Object:  StoredProcedure [dbo].[zabsp_RPT_emp_atten_count]    Script Date: 10/6/2019 5:25:51 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+--	EXEC zabsp_RPT_emp_atten_count 100000,'','','',3,'2019-08-21','2019-09-20','',''
+
+ALTER PROC [dbo].[zabsp_RPT_emp_atten_count] 
+									 @zid INT
+									,@dept VARCHAR(50)
+									,@sec VARCHAR(50)
+									,@subsec VARCHAR(50)
+									,@punch INT
+									,@fdate VARCHAR(50)
+									,@tdate VARCHAR(50)
+									,@fstaff VARCHAR(50)
+									,@tstaff VARCHAR(50)
+
+
+AS
+	DECLARE	@zorg VARCHAR(150),@madd VARCHAR(250),@staff VARCHAR(150),
+			@name VARCHAR(150),@empcategory VARCHAR(50),@emptype VARCHAR(50),@sex VARCHAR(150),@designation VARCHAR(150),
+			@deptname VARCHAR(50),@section VARCHAR(50),@subsector VARCHAR(50),
+			@date DATE,@cardno VARCHAR(50),@punchDate DATETIME,@punchCount VARCHAR(50),@counter INT
+					
+
+	DECLARE @table TABLE(zid INT,zorg VARCHAR(150),madd VARCHAR(250),xstaff VARCHAR(150),
+						 xname VARCHAR(150),xempcategory VARCHAR(50),xemptype VARCHAR(50),xsex VARCHAR(150),xdesignation VARCHAR(150),
+						 xdeptname VARCHAR(50),xsection VARCHAR(50),xsubsector VARCHAR(50),
+						 xdate DATE,xpunchDate DATETIME,xcardno VARCHAR(50),xpunchCount VARCHAR(50))
+
+	SET @fdate = CAST(@fdate AS DATE)
+	SET @tdate = CAST(@tdate AS DATE)
+
+	select @zorg=zorg, @madd=xmadd from zbusiness WHERE zid=@zid
+	SET @counter = 0
+
+	DECLARE atten_cursor CURSOR FORWARD_ONLY FOR 
+		SELECT p.xstaff,CAST(a.xdate AS DATE),COUNT(*) FROM pdmst p LEFT JOIN pdattdata a ON p.zid=a.zid and p.xstaff =a.xstaff
+		WHERE p.zid=@zid
+		AND p.xdeptname >= CASE WHEN @dept = '' THEN '' ELSE @dept END
+		AND p.xdeptname <= CASE WHEN @dept = '' THEN 'zzz' ELSE @dept END
+		AND p.xsection >= CASE WHEN @sec = '' THEN '' ELSE @sec END
+		AND p.xsection <= CASE WHEN @sec = '' THEN 'zzz' ELSE @sec END
+		AND p.xsubsector >= CASE WHEN @subsec = '' THEN '' ELSE @subsec END
+		AND p.xsubsector <= CASE WHEN @subsec = '' THEN 'zzz' ELSE @subsec END
+		AND CAST(a.xdate AS DATE) BETWEEN @fdate AND @tdate
+		AND p.xstaff>= CASE WHEN @fstaff = '' AND @tstaff = '' THEN '' ELSE @fstaff END
+		AND p.xstaff<= CASE WHEN @fstaff = '' AND @tstaff = '' THEN 'zzz' ELSE @tstaff END
+	    GROUP BY p.xstaff,CAST(a.xdate AS DATE)
+		HAVING COUNT(*)>=@punch
+
+    OPEN atten_cursor
+    FETCH FROM atten_cursor INTO  @staff,@date,@punchCount
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+
+		SELECT @cardno=xcardno,@name=xname,@empcategory=xempcategory,@emptype=xemptype,@sex=xsex,@designation=xdesignation,@deptname=xdeptname,@section=xsection,@subsector=xsubsector FROM pdmst WHERE zid=@zid and xstaff=@staff
+
+		SET @counter = @punchCount
+		WHILE @counter>0
+		BEGIN
+			SET @counter=@counter-1
+
+			SELECT @punchDate=xdate FROM (SELECT ROW_NUMBER() OVER(ORDER BY xdate) AS xrow,xdate FROM pdattdata WHERE zid=@zid AND xstaff=@staff) AS tbl WHERE xrow=@counter
+			
+			INSERT INTO @table(zid,zorg,madd,xstaff,xname,xempcategory,xemptype,xsex,xdesignation,xdeptname,xsection,xsubsector,xcardno,xpunchDate,xpunchCount)
+					values(@zid,@zorg,@madd,@staff,@name,@empcategory,@emptype,@sex,@designation,@deptname,@section,@subsector,@cardno,@punchDate,@punchCount)
+		END
+
+	SET @counter=0
+	SET @punchDate = NULL
+
+  	FETCH NEXT FROM atten_cursor INTO @staff,@date,@punchCount
+	END
+	CLOSE atten_cursor
+	DEALLOCATE atten_cursor
+	
+	SELECT zid,zorg,madd,xstaff,xname,xempcategory,xemptype,xsex,xdesignation,xdeptname,xsection,xsubsector,xcardno,xpunchDate,xpunchCount FROM @table

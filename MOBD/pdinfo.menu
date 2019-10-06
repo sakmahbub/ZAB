@@ -1,0 +1,15 @@
+pdinfo.menu
+//-------------------------------------------------------------------
+option                           |action                                     |modules|models|width
+//-------------------------------------------------------------------
+Employee info 1  	   		|#classPath+"/login?screen=*viewcrystal pdinfofone(2;in,st;zid,staff;xstaff=Employee ID,xviewtype=Report View)"
+Employee info 2  	   		|#classPath+"/login?screen=*viewcrystal pdinfoftwo(2;in,st;zid,staff;xstaff=Employee ID,xviewtype=Report View)"
+Employee info 3  	   		|#classPath+"/login?screen=*viewcrystal pdinfofthree(2;in,st;zid,staff;xstaff=Employee ID,xviewtype=Report View)"
+Employee info 4  	   		|#classPath+"/login?screen=*viewcrystal pdinfoffour(2;in,st;zid,staff;xstaff=Employee ID,xviewtype=Report View)"
+Employee info 5  	   		|#classPath+"/login?screen=*viewcrystal pdinfof5(2;in,st;zid,staff;xstaff=Employee ID,xviewtype=Report View)"
+Employee info 6  	   		|#classPath+"/login?screen=*viewcrystal pdinfof6(2;in,st;zid,staff;xstaff=Employee ID,xviewtype=Report View)"
+Employee info 7  	   		|#classPath+"/login?screen=*viewcrystal pdinfof7(2;in,st;zid,staff;xstaff=Employee ID,xviewtype=Report View)"
+Employee info 8  	   		|#classPath+"/login?screen=*viewcrystal pdinfof8(2;in,st;zid,staff;xstaff=Employee ID,xviewtype=Report View)"
+//-------------------------------------------------------------------
+
+
