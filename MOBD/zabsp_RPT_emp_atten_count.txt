@@ -1,12 +1,12 @@
 USE [ZABDB]
 GO
-/****** Object:  StoredProcedure [dbo].[zabsp_RPT_emp_atten_count]    Script Date: 10/6/2019 5:25:51 PM ******/
+/****** Object:  StoredProcedure [dbo].[zabsp_RPT_emp_atten_count]    Script Date: 10/9/2019 2:13:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
---	EXEC zabsp_RPT_emp_atten_count 100000,'','','',3,'2019-08-21','2019-09-20','',''
+--	EXEC zabsp_RPT_emp_atten_count 100000,'','','',2,'2019-08-21','2019-08-21','C1080','C1080',''
 
 ALTER PROC [dbo].[zabsp_RPT_emp_atten_count] 
 									 @zid INT
@@ -18,7 +18,7 @@ ALTER PROC [dbo].[zabsp_RPT_emp_atten_count]
 									,@tdate VARCHAR(50)
 									,@fstaff VARCHAR(50)
 									,@tstaff VARCHAR(50)
-
+									,@reptype VARCHAR(50)
 
 AS
 	DECLARE	@zorg VARCHAR(150),@madd VARCHAR(250),@staff VARCHAR(150),
@@ -36,6 +36,7 @@ AS
 	SET @tdate = CAST(@tdate AS DATE)
 
 	select @zorg=zorg, @madd=xmadd from zbusiness WHERE zid=@zid
+	IF @punch = '' SET @punch = 0
 	SET @counter = 0
 
 	DECLARE atten_cursor CURSOR FORWARD_ONLY FOR 
@@ -63,12 +64,15 @@ AS
 		SET @counter = @punchCount
 		WHILE @counter>0
 		BEGIN
-			SET @counter=@counter-1
 
-			SELECT @punchDate=xdate FROM (SELECT ROW_NUMBER() OVER(ORDER BY xdate) AS xrow,xdate FROM pdattdata WHERE zid=@zid AND xstaff=@staff) AS tbl WHERE xrow=@counter
+			SELECT @punchDate=xdate FROM (SELECT ROW_NUMBER() OVER(ORDER BY xdate desc) AS xrow,xdate FROM pdattdata WHERE zid=@zid AND xstaff=@staff AND CAST(xdate AS DATE)=@date) AS tbl WHERE xrow=@counter
 			
-			INSERT INTO @table(zid,zorg,madd,xstaff,xname,xempcategory,xemptype,xsex,xdesignation,xdeptname,xsection,xsubsector,xcardno,xpunchDate,xpunchCount)
-					values(@zid,@zorg,@madd,@staff,@name,@empcategory,@emptype,@sex,@designation,@deptname,@section,@subsector,@cardno,@punchDate,@punchCount)
+			INSERT INTO @table(zid,zorg,madd,xstaff,xname,xempcategory,xemptype,xsex,xdesignation,xdeptname,xsection,xsubsector,xcardno,xdate,xpunchDate,xpunchCount)
+					values(@zid,@zorg,@madd,@staff,@name,@empcategory,@emptype,@sex,@designation,@deptname,@section,@subsector,@cardno,@date,@punchDate,@punchCount)
+
+			SET @counter=@counter-1
+			--print CAST(@counter AS VARCHAR)+' '+CAST(@punchDate AS VARCHAR)+' '+CAST(@punchCount AS VARCHAR)
+			
 		END
 
 	SET @counter=0
@@ -79,4 +83,4 @@ AS
 	CLOSE atten_cursor
 	DEALLOCATE atten_cursor
 	
-	SELECT zid,zorg,madd,xstaff,xname,xempcategory,xemptype,xsex,xdesignation,xdeptname,xsection,xsubsector,xcardno,xpunchDate,xpunchCount FROM @table
+	SELECT zid,zorg,madd,xstaff,xname,xempcategory,xemptype,xsex,xdesignation,xdeptname,xsection,xsubsector,xcardno,xdate,xpunchDate,xpunchCount FROM @table

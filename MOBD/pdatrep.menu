@@ -1,0 +1,7 @@
+//HR Reports.menu
+//-------------------------------------------------------------------
+option                           			|action
+//-------------------------------------------------------------------
+Card Punch Count			    |#classPath+"/login?screen=*viewcrystal pdpunchcount(10;in,st,st,st,in,st,st,st,st,st;@zid,@dept,@sec,@subsec,@punch,@fdate,@tdate,@fstaff,@tstaff,@reptype;xdeptname=Deptment Name,xsection=Section,xsubsector=Sub Section,xnum=Punch Count,xdate=From Date=#date,xdate=To Date=#date,xstaff=From Staff,xstaff=To Staff="zzz",xreptype=Report Type,xviewtype=Report View)"
+
+	
