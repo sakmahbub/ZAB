@@ -1,0 +1,15 @@
+
+
+SELECT p.xstaff,CAST(a.xdate AS DATE),COUNT(*) FROM pdmst p LEFT JOIN pdattdata a ON p.zid=a.zid and p.xstaff =a.xstaff
+WHERE p.zid=100000
+AND p.xdeptname >= '' AND p.xdeptname <= 'zzz'
+AND p.xsection >= '' AND p.xsection <= 'zzz'
+AND p.xsubsector >= '' AND p.xsubsector <= 'zzz'
+AND CAST(a.xdate AS DATE) BETWEEN '2019-08-21' AND '2019-08-21'
+AND p.xstaff>= 'C1080' AND p.xstaff<= 'C1080'
+GROUP BY p.xstaff,CAST(a.xdate AS DATE)
+HAVING COUNT(*)>=2
+
+
+select * from pdattdata where xstaff='C1080' and cast(xdate as date)='2019-08-21 00:00:00.000'
+select * from pdattview where cast(xdate as date) between '2019-08-21' and '2019-09-20' and xtimein1 is not null
