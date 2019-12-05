@@ -1,0 +1,12 @@
+
+
+WhileReadingRecords;
+NumberVar DayIn := Day (PrintDate); //or your {date.field}
+"On this the" 
+& Totext (DayIn , 0 )
+& (if DayIn in 4 to 20 then 'th' else
+if remainder (DayIn , 10) = 1 then 'st' else
+if remainder (DayIn , 10) = 2 then 'nd' else
+if remainder (DayIn , 10) = 3 then 'rd' else 'th')
+& " day of "
+& Totext (PrintDate , "MMMM, yyyy") //again or your {date.field}
