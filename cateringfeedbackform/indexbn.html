@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>Catering Feedback Form of InterContinental</title>
+		<link rel="icon" href="img/favicon.jpg">
+
+		<link rel="stylesheet" href="js/jquery-ui.css">
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet">
+
+		<link rel="stylesheet" href="css/animate.css">
+		<link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .w-50{
+            width: 50%;
+        } 
+        .m-b-4px{
+            margin-bottom:  4px;
+        }  
+        .m-b-15px{
+            margin-bottom:  15px;
+        }    
+        .m-b-20px{
+            margin-bottom:  20px;
+        }        
+        .m-t-50px{
+            margin-top:  50px;
+        }
+        .m-b-50px{
+            margin-bottom:  50px;
+        }
+        .txt-box{
+            border: none;
+            border-bottom: 1px solid #555;
+            width: 100%;
+        }
+        .text-normal{
+            font-weight: normal;
+        }
+        .text-center{
+            text-align: center;
+        }
+        .center-pos{
+            margin-left: auto !important;
+            margin-right: auto !important;
+            display: block;
+        }
+        .height-20px{
+            height: 20px;
+        }
+        .textarea{
+            width: 100%;
+            height: 100px;
+        }
+    </style>
+	</head>
+    <body>
+       
+       <button><h4><a href="index.html"> Feedback for English </a></h4></button>
+       
+        <div class="container-fluid" id="content">
+
+            <div class="text-center w-50 center-block m-b-50px">
+                <img src="img/InterContinental.png" width=250 class="profile-pic">
+                <h3>ক্যাটারিং ফিডব্যাক ফর্ম </h3>
+                <p>আমাদের সাথে অনুষ্ঠান আয়োজনের জন্য ধন্যবাদ!</p>
+
+                <p> ইন্টারকন্টিনেন্টাল হোটেল সর্বদা সর্বাত্মক সচেষ্ট থাকে গ্রাহকদের বিশেষ সেবা প্রদানের জন্যে। অনুগ্রহ ক্রমে অনুরোধ করা যাচ্ছে যে, আপনার কিছু মূল্যবান সময় ব্যয় করে আমাদের সেবা সম্পর্কে মতামত প্রদান করুন যেন আমরা আপনাদেরকে সর্বদা বিশেষ সেবা প্রদানে এবং আপনাদের প্রত্যাশা পূরণে সক্ষম হই। </p>
+
+                <strong>ফর্মের নীচে যথাযথ ভাবে টিক চিহ্ন দিন</strong>
+
+            </div>
+            <div id="form">
+                
+
+                <div class="row m-b-20px">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="row m-b-20px">
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <span>প্রতিষ্ঠানের নাম:</span>
+                                    </div>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="text" class="txt-box" id="company_name">
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="row m-b-20px">
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <span>ইভেন্ট এর তারিখ:</span>
+                                    </div>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="date" class="txt-box" id="date_event">
+                                    </div>
+                                </div>
+                            </div>                             
+                            
+  
+                     
+                                                      
+                                                                                
+                                                                                                                                    
+                            
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="row m-b-20px">
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <span>প্রবর্তক এর নাম:</span>
+                                    </div>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="text" class="txt-box" id="organiser_name">
+                                    </div>
+                                </div>
+                            </div>
+                            
+<!--                       <div class="row">-->
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="row m-b-20px">
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <span>ই-মেইল: <sup style="color: red">*</sup></span>
+                                    </div>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="email" class="txt-box" id="email">
+                                    </div>
+                                </div>
+                            </div>                            
+                                                           
+                   <!---     </div> -->
+                        
+                        </div>
+ 
+   
+                         <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="row m-b-20px">
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <span>ব্যবহৃত রুম/ইভেন্ট/অনুষ্ঠান:</span>
+                                    </div>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="text" class="txt-box" id="space_used">
+                                    </div>
+                                </div>
+                            </div>                       
+                        
+                        
+                        
+
+                            
+<!--                       <div class="row">-->
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <div class="row m-b-20px">
+                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                        <span>মোবাইল: <sup style="color: red">*</sup></span>
+                                    </div>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="number" class="txt-box" id="mobile">
+                                    </div>
+                                </div>
+                            </div>                            
+                                                           
+<!--                        </div>-->
+                        </div>                           
+                                                 
+                                                                                           
+                                          
+                    </div>
+                </div>
+
+               
+               
+               
+                <div class="row m-b-20px">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="row m-b-20px">
+                            <div class="col-lg-6">
+						<!--	
+                                <div class="row m-b-20px">
+                                    <div class="col-lg-12">
+                                        <strong>1. --HOW DID YOU HEAR ABOUT OUR HOTEL?</strong>
+                                    </div>
+                                </div>
+				
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-sm-6 col-xs-6">
+                                                <div class="row">
+                                                    <div class="col-lg-10 col-sm-10 col-xs-8">
+                                                        <label for="sales" class="text-normal">Sales Call</label>
+														 </div>
+                                                    <div class="col-lg-2 col-sm-2 col-xs-4">
+                                                        <input type="checkbox" id="previously_used">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-sm-6 col-xs-6">
+                                                <div class="row">
+                                                    <div class="col-lg-10 col-sm-10 col-xs-6">
+                                                        <label for="media" class="text-normal">Media</label>
+                                                    </div>
+                                                    <div class="col-lg-2 col-sm-2 col-xs-4">
+                                                        <input type="checkbox"  id="media">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-sm-6 col-xs-6">
+                                                <div class="row">
+                                                    <div class="col-lg-10 col-sm-10 col-xs-8">
+                                                        <label for="agency" class="text-normal">Agency</label>
+                                                    </div>
+                                                    <div class="col-lg-2 col-sm-2 col-xs-4">
+                                                        <input type="checkbox"  id="agency">
+                                                    </div>
+                                                </div>
+                                            </div>
+											
+                                            <div class="col-lg-6 col-sm-6 col-xs-6">
+                                                <div class="row">
+                                                    <div class="col-lg-10 col-sm-10 col-xs-6">
+                                                       <label for="previously_used" class="text-normal">Used the hotel previously</label>
+                                                
+                                                    </div>
+                                                    <div class="col-lg-2 col-sm-2 col-xs-4">
+                                                        <input type="checkbox"  id="sales">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-sm-6 col-xs-6">
+                                                <div class="row">
+                                                    <div class="col-lg-10 col-sm-10 col-xs-8">
+                                                        <label for="recommendation" class="text-normal">Recommendation</label>
+                                                    </div>
+                                                    <div class="col-lg-2 col-sm-2 col-xs-4">
+                                                        <input type="checkbox"  id="recommendation">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-sm-6 col-xs-6">
+                                                <div class="row">
+                                                    <div class="col-lg-10 col-sm-10 col-xs-6">
+                                                        <label for="referral" class="text-normal">Referral</label>
+                                                    </div>
+                                                    <div class="col-lg-2 col-sm-2 col-xs-4">
+                                                        <input type="checkbox" id="referral">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+								
+						-->		
+
+			<!-------------------------------------------------------------------------------------------------------------->
+								<div class="row m-b-20px  m-t-50px">
+                                    <div class="col-lg-12">
+                                        <strong>১. আপনি হোটেল সম্মন্ধে কিভাবে জেনেছেন?</strong>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+
+                                        <div class="row">
+                                            
+                                            <div class="col-lg-4 col-sm-4 col-xs-4">
+                                               <div class="text-center height-20px">সেলস</div>
+                                                <input type="radio" class="center-pos height-20px" name="hear"  value="সেলস">
+                                            </div>
+											
+                                            <div class="col-lg-4 col-sm-4 col-xs-4">
+                                               <div class="text-center">মিডিয়া</div>
+                                               <input type="radio" class="center-pos height-20px" name="hear" value="মিডিয়া">
+                                               
+                                            </div>
+                                            <div class="col-lg-4 col-sm-4 col-xs-4">
+                                               <div class="text-center">এজেন্সি</div>
+                                               <input type="radio" class="center-pos height-20px" name="hear" value="এজেন্সি">
+                                               
+                                            </div>
+											
+                                            <div class="col-lg-4 col-sm-4 col-xs-4">
+                                               <div class="text-center">পূর্বে হোটেল ব্যবহার </div>
+                                               <input type="radio" class="center-pos height-20px" name="hear" value="পূর্বে হোটেল ব্যবহার">
+                                               
+                                            </div>
+											<div class="col-lg-4 col-sm-4 col-xs-4">
+                                               <div class="text-center">সুপারিশ</div>
+                                               <input type="radio" class="center-pos height-20px" name="hear" value="সুপারিশ">
+                                              
+                                            </div>
+                                            <!----
+											<div class="col-lg-4 col-sm-4 col-xs-4">
+                                               <div class="text-center">Referral</div>
+                                               <input type="radio" class="center-pos height-20px" name="hear" value="Referral">
+                                              
+                                            </div>
+                                            ----->
+											<div class="row">
+											
+											 </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+
+                                <div class="row m-b-20px  m-t-50px">
+                                    <div class="col-lg-12">
+                                        <strong> ২.অনুষ্ঠানের পূর্বে যখন অনুসন্ধান করেছেন কি চুক্তি করেছেন? </strong>
+                                    </div>
+                                </div>
+
+                                <div class="row m-b-20px">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-8 col-sm-8 col-xs-8">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                       <span>হোটেল কি সর্বদা দ্রুত প্রতিক্রিয়া সরবরাহ করে? (২৪ ঘন্টার মধ্যে)</span>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="quick_response_yes" class="text-normal">হ্যাঁ</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="quick_response" value="হ্যাঁ" id="quick_response_yes">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="quick_response_no" class="text-normal">না</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="quick_response" value="না" id="quick_response_no">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row m-b-20px">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-8 col-sm-8 col-xs-8">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                       <span>হোটেল কি সর্বদা আপনাকে সমস্ত প্রয়োজনীয় তথ্য সরবরাহ করে?</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="necessary_information_yes" class="text-normal">হ্যাঁ</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="necessary" value="হ্যাঁ" id="necessary_information_yes">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="necessary_information_no" class="text-normal">না</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="necessary" value="না" id="necessary_information_no">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row m-b-20px">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-sm-12 col-xs-12">
+                                                <div class="row m-b-20px">
+                                                    <div class="col-md-5 col-sm-5 col-xs-12">
+                                                        <span>আপনার সাথে চুক্তি সম্পাদনকারী ব্যক্তির নাম:</span>
+                                                    </div>
+                                                    <div class="col-md-7 col-sm-7 col-xs-12">
+                                                        <input type="text" class="txt-box" id="dealt_with">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+ 
+
+
+                                <div class="row m-b-20px  m-t-50px">
+                                    <div class="col-lg-12">
+                                        <strong>৩. ভেন্যু সম্পর্কিত রেট প্রদান করুন </strong>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+
+                                        <div class="row">
+                                            <div class="col-lg-4 col-sm-4 col-xs-4">
+                                               <div class="height-20px m-b-4px"></div>
+                                               <div class="height-20px m-b-4px">সাজসজ্জা</div>
+                                               <div class="height-20px m-b-4px">তাপমাত্রা</div>
+                                               <div class="height-20px m-b-4px">সাউণ্ড</div>
+                                               <div class="height-20px m-b-4px">আলোকসজ্জা</div>
+                                               <div class="height-20px m-b-4px">পরিস্কার-পরিচ্ছন্নতা</div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center height-20px">খুবভালো</div>
+                                                <input type="radio" class="center-pos height-20px" name="decor"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="temperature"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="sound"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="lighting"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="cleanliness"  value="খুবভালো">
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center">ভালো</div>
+                                               <input type="radio" class="center-pos height-20px" name="decor" value="ভালো">
+                                               <input type="radio" class="center-pos height-20px" name="temperature" value="ভালো">
+                                               <input type="radio" class="center-pos height-20px" name="sound" value="ভালো">
+                                               <input type="radio" class="center-pos height-20px" name="lighting" value="ভালো">
+                                               <input type="radio" class="center-pos height-20px" name="cleanliness" value="ভালো">
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center">সন্তোষজনক</div>
+                                               <input type="radio" class="center-pos height-20px" name="decor" value="সন্তোষজনক">
+                                               <input type="radio" class="center-pos height-20px" name="temperature" value="সন্তোষজনক">
+                                               <input type="radio" class="center-pos height-20px" name="sound" value="সন্তোষজনক">
+                                               <input type="radio" class="center-pos height-20px" name="lighting" value="সন্তোষজনক">
+                                               <input type="radio" class="center-pos height-20px" name="cleanliness" value="সন্তোষজনক">
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center">খারাপ</div>
+                                               <input type="radio" class="center-pos height-20px" name="decor" value="খারাপ">
+                                               <input type="radio" class="center-pos height-20px" name="temperature" value="খারাপ">
+                                               <input type="radio" class="center-pos height-20px" name="sound" value="খারাপ">
+                                               <input type="radio" class="center-pos height-20px" name="lighting" value="খারাপ">
+                                               <input type="radio" class="center-pos height-20px" name="cleanliness" value="খারাপ">
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row m-b-20px  m-t-50px">
+                                    <div class="col-lg-12">
+                                        <strong> ৪. মিটিং ও ব্যানকুয়েটের প্রয়োজনীয়তা </strong>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-8 col-sm-8 col-xs-8">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                       <span>সঠিক ভাবে সেট-আপ?</span>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="setup_correctly_yes" class="text-normal">হ্যাঁ</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="setupcorrectly" value="হ্যাঁ" id="setup_correctly_yes">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="setup_correctly_no" class="text-normal">না</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="setupcorrectly" value="না" id="setup_correctly_no">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-8 col-sm-8 col-xs-8">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                       <span>সঠিক সময়ে?</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="setup_time_yes" class="text-normal">হ্যাঁ</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="setuptime" value="হ্যাঁ" id="setup_time_yes">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="setup_time_no" class="text-normal">না</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="setuptime" value="না" id="setup_time_no">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-8 col-sm-8 col-xs-8">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                       <span>ভালো মান?</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="quality_yes" class="text-normal">হ্যাঁ</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="quality" value="হ্যাঁ" id="quality_yes">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="quality_no" class="text-normal">না</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="quality" value="না" id="quality_no">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+                                <div class="row m-b-20px  m-t-50px">
+                                    <div class="col-lg-12">
+                                        <strong>৫. হোটেলের খাদ্য ও পরিবেশন সম্পর্কে রেটিং প্রদান করুন</strong>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+
+                                        <div class="row">
+                                            <div class="col-lg-5 col-sm-5 col-xs-5">
+                                               <div class="height-20px m-b-4px"></div>
+                                               <div class="height-20px m-b-4px">খাদ্যর মান</div>
+                                               <div class="height-20px m-b-4px">খাদ্যর উপস্থাপনা</div>
+                                               <div class="height-20px m-b-4px"> সেবার কার্যকারীতা </div>
+                                               <div class="height-20px m-b-4px"> সেবার সৌজন্যতা </div>
+                                               <div class="height-20px m-b-4px"> দলের সদস্যদের উপস্থাপনা </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center height-20px">খুবভালো</div>
+                                                <input type="radio" class="center-pos height-20px" name="food_quality"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="food_presentation"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="efficiency"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="courtesy"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="appearance"  value="খুবভালো">
+                                            </div>
+                                            <div class="col-lg-1 col-sm-1 col-xs-1">
+                                               <div class="text-center">ভালো</div>
+                                                <input type="radio" class="center-pos height-20px" name="food_quality"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="food_presentation"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="efficiency"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="courtesy"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="appearance"  value="ভালো">
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center">সন্তোষজনক</div>
+                                                <input type="radio" class="center-pos height-20px" name="food_quality"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="food_presentation"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="efficiency"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="courtesy"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="appearance"  value="সন্তোষজনক">
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center">খারাপ</div>
+                                                <input type="radio" class="center-pos height-20px" name="food_quality"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="food_presentation"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="efficiency"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="courtesy"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="appearance"  value="খারাপ">
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                             </div> 
+                             <div class="col-lg-6">  
+
+                                <div class="row m-b-20px">
+                                    <div class="col-lg-12">
+                                        <strong>৬. আপনি হোটেলের সেবা সম্পর্কিত রেটিং প্রদান করুন </strong>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+
+                                        <div class="row">
+                                            <div class="col-lg-4 col-sm-4 col-xs-4">
+                                               <div class="height-20px m-b-4px"></div>
+                                               <div class="height-20px m-b-4px"> গেস্ট রিলেশন </div>
+                                               <div class="height-20px m-b-4px"> ডোরম্যান </div>
+                                               <div class="height-20px m-b-4px"> কনসিয়ার্জ </div>
+                                               <div class="height-20px m-b-4px"> রিসেপশন </div>
+                                               <div class="height-20px m-b-4px"> ক্যাশিয়ার </div>
+                                               <div class="height-20px m-b-4px"> লাউঞ্জ </div>
+                                               <div class="height-20px m-b-4px"> রেস্টুরেন্ট </div>
+                                               <div class="height-20px m-b-4px"> হাউসকিপিং </div>
+                                               <div class="height-20px m-b-4px"> বিজনেস সেন্টার </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center height-20px">খুবভালো</div>
+                                                <input type="radio" class="center-pos height-20px" name="guest_relations"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="doorman"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="concierge"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="reception"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="cashier"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="lounge"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="restaurants"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="housekeeping"  value="খুবভালো">
+                                                <input type="radio" class="center-pos height-20px" name="business_centre"  value="খুবভালো">
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center">ভালো</div>
+                                                <input type="radio" class="center-pos height-20px" name="guest_relations"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="doorman"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="concierge"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="reception"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="cashier"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="lounge"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="restaurants"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="housekeeping"  value="ভালো">
+                                                <input type="radio" class="center-pos height-20px" name="business_centre"  value="ভালো">
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center">সন্তোষজনক</div>
+                                                <input type="radio" class="center-pos height-20px" name="guest_relations"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="doorman"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="concierge"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="reception"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="cashier"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="lounge"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="restaurants"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="housekeeping"  value="সন্তোষজনক">
+                                                <input type="radio" class="center-pos height-20px" name="business_centre"  value="সন্তোষজনক">
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                               <div class="text-center">খারাপ</div>
+                                                <input type="radio" class="center-pos height-20px" name="guest_relations"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="doorman"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="concierge"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="reception"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="cashier"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="lounge"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="restaurants"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="housekeeping"  value="খারাপ">
+                                                <input type="radio" class="center-pos height-20px" name="business_centre"  value="খারাপ">
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+
+                                <div class="row m-b-20px  m-t-50px">
+                                    <div class="col-lg-12">
+                                        <strong>৭. আপনি কি সামগ্রিক পারফরমেন্স দিয়ে সন্তুষ্ট?</strong>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="satisfied_yes" class="text-normal">হ্যাঁ</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="satisfied" value="হ্যাঁ" id="satisfied_yes">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="satiesfied_no" class="text-normal">না</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="satisfied" value="না" id="satisfied_no">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+<!--
+                                <div class="row m-b-20px  m-t-50px">
+                                    <div class="col-lg-12">
+                                        <strong>8. WHAT OTHER HOTELS HAD YOU CONSIDERED FOR THIS EVENT?</strong>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-sm-12 col-xs-12">
+                                                <textarea class='textarea' id="other_hotel"></textarea>
+                                            </div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+-->
+
+                                <div class="row m-b-20px  m-t-50px">
+                                    <div class="col-lg-12">
+                                        <strong>৮. আপনি কি পুনঃরায় হোটেল হতে সেবা গ্রহণে আগ্রহী?</strong>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="hotel_again_yes" class="text-normal">হ্যাঁ</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="hotelagain" value="হ্যাঁ" id="hotel_again_yes">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-sm-2 col-xs-2">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-sm-6 col-xs-4">
+                                                        <label for="hotel_again_no" class="text-normal">না</label>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4 col-xs-4">
+                                                        <input type="radio" name="hotelagain" value="না" id="hotel_again_no">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="row m-b-20px  m-t-50px">
+                                    <div class="col-lg-12">
+                                        <strong> ৯. আপনার পরবর্তী মিটিং পরিকল্পনা আলোচনা করুন </strong>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-sm-12 col-xs-12">
+                                                <div class="row m-b-20px">
+                                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                                        <span>পরিকল্পনা? </span>
+                                                    </div>
+                                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                                        <input type="text" class="txt-box" id="what">
+                                                    </div>
+                                                </div>
+                                                <div class="row m-b-20px">
+                                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                                        <span>কখন? </span>
+                                                    </div>
+                                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                                        <input type="text" class="txt-box" id="when">
+                                                    </div>
+                                                </div>
+                                                <div class="row m-b-20px">
+                                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                                        <span>কোথায়? </span>
+                                                    </div>
+                                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                                        <input type="text" class="txt-box" id="where">
+                                                    </div>
+                                                </div>
+                                                <div class="row m-b-20px">
+                                                    <div class="col-md-4 col-sm-4 col-xs-12">
+                                                        <span> অতিথির সংখ্যা? </span>
+                                                    </div>
+                                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                                        <input type="text" class="txt-box" id="number">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                             </div> 
+                        </div>
+
+                        <div id="editor"></div>
+
+                        <div class="row row-footer">
+                            <div class="col">
+                                <div>
+                                        <div class="row m-b-20px m-t-50px">
+                                            <div class="col-lg-12">
+                                                <strong> মন্তব্য / পরামর্শ</strong>
+                                            </div>
+                                        </div>
+
+                                        <div class="row  m-b-50px">
+                                            <div class="col-lg-12">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-sm-12 col-xs-12">
+                                                        <textarea class='textarea' id="comment"></textarea>
+                                                        <div class="col-md-12 text-center m-t-50px">
+                                                            <button id="submit_btn" class="btn btn-primary">পাঠিয়ে দিন</button>
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+            </div>
+
+
+
+
+        </div>
+
+
+
+        <!-- Including Bootstrap JS (with its jQuery dependency) so that dynamic components work -->
+        <script src="js/jquery-3.1.0.min.js"></script>
+        <script src="js/jquery-ui.js"></script>
+		<script src="js/sweetalert.min.js"></script>
+       <script src="js/jquery.ajax-cross-origin.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/myScripts.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/0.9.0rc1/jspdf.min.js"></script>
+<!--        <script src="js/html2canvas.min.js"></script>-->
+
+        <script src="https://smtpjs.com/v3/smtp.js"></script>
+   <script>
+       
+       $("#submit_btn").on("click", function(){
+           var email = $("#email").val();
+           var mobile = $("#mobile").val();
+          
+        if(email === "" || mobile === ""){
+              
+            swal({
+              title: "Please fill the required fields marked with '*'",
+              text: "Email and Phone can not be empty!",
+              icon: "warning",
+            });
+               
+        }else{
+                  
+      
+           $("#submit_btn").text("Loading...");
+           disableForm(true);
+           
+           var companyName = $("#company_name").val();
+           var spaceUsed = $("#space_used").val();           
+           var organisername = $("#organiser_name").val();
+           var dateevent = $("#date_event").val();
+           
+        /*   
+           var previouslyUsed = $("#previously_used").prop('checked') ? 1:0;
+           var media = $("#media").prop('checked') ? 1:0;
+           var agency = $("#agency").prop('checked') ? 1:0;
+           var sales = $("#sales").prop('checked') ? 1:0;
+           var recommendation = $("#recommendation").prop('checked') ? 1:0;
+           var referral = $("#referral").prop('checked') ? 1:0;
+        */
+		
+			var hear = $('input[name=hear]:checked').val();
+		
+           var quickResponse = $('input[name=quick_response]:checked').val();
+           var necessary = $('input[name=necessary]:checked').val();
+           var dealtwith = $("#dealt_with").val();
+           
+           
+           var decor = $('input[name=decor]:checked').val();
+           var temperature = $('input[name=temperature]:checked').val();
+           var sound = $('input[name=sound]:checked').val();
+           var lighting = $('input[name=lighting]:checked').val();
+           var cleanliness = $('input[name=cleanliness]:checked').val();
+           
+           var setupcorrectly = $('input[name=setupcorrectly]:checked').val();
+           var setuptime = $('input[name=setuptime]:checked').val();
+           var quality = $('input[name=quality]:checked').val();
+           
+           var foodQuality = $('input[name=food_quality]:checked').val();
+           var foodPresentation = $('input[name=food_presentation]:checked').val();
+           var efficiency = $('input[name=efficiency]:checked').val();
+           var courtesy = $('input[name=courtesy]:checked').val();
+           var appearance = $('input[name=appearance]:checked').val();
+           
+           var guestRelations = $('input[name=guest_relations]:checked').val();
+           var doorman = $('input[name=doorman]:checked').val();
+           var concierge = $('input[name=concierge]:checked').val();
+           var reception = $('input[name=reception]:checked').val();
+           var cashier = $('input[name=cashier]:checked').val();
+           var lounge = $('input[name=lounge]:checked').val();
+           var restaurants = $('input[name=restaurants]:checked').val();
+           var housekeeping = $('input[name=housekeeping]:checked').val();
+           var businessCentre = $('input[name=business_centre]:checked').val();
+           
+           var satisfied = $('input[name=satisfied]:checked').val();
+           
+           var otherHotel = $("#other_hotel").val();
+           
+           var hotelagain = $('input[name=hotelagain]:checked').val();
+           
+           var what = $("#what").val();
+           var when = $("#when").val();
+           var where = $("#where").val();
+           var number = $("#number").val();
+           
+           var comment = $("#comment").val();
+           
+           
+          var emailFrom = "";
+          if(companyName != ""){
+            emailFrom = " from " + companyName;
+          }
+           
+           var table =  "<h1>Catering Feedback" + emailFrom + "</h1>"+
+                        "<table>"+
+                            "<tr style='background-color: #ccc;'><td>প্রতিষ্ঠানের নাম:</td><td> "+companyName+"</td></tr>"+
+                            "<tr><td>প্রবর্তক এর নাম:</td><td> "+organisername+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td> ব্যবহৃত রুম/ইভেন্ট/অনুষ্ঠান:</td><td> "+spaceUsed+"</td></tr>"+
+                            "<tr><td>ইভেন্ট এর তারিখ:</td><td> "+dateevent+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>ই-মেইল:</td><td> "+email+"</td></tr>"+
+                            "<tr><td>মোবাইল:</td><td> "+mobile+"</td></tr>"+
+               
+                        //    "<tr><td><strong>1. HOW DID YOU HEAR ABOUT OUR HOTEL?</strong></td></tr>"+
+							
+							"<tr style='background-color: #ccc;'><td><strong>১. আপনি হোটেল সম্মন্ধে কিভাবে জেনেছেন?</strong></td><td> "+hear+"</td></tr>"+
+							
+						//	"<tr style='background-color: #ccc;'><td>Via:</td><td> "+hear+"</td></tr>"+
+			   
+			   /*
+                            "<tr style='background-color: #ccc;'><td>Used the hotel previously:</td><td> "+previouslyUsed+"</td></tr>"+
+                            "<tr><td>Media:</td><td> "+media+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>Agency:</td><td> "+agency+"</td></tr>"+
+                            "<tr><td> Sales Call :</td><td> "+sales+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>Recommendation:</td><td> "+recommendation+"</td></tr>"+
+                            "<tr><td>Referral:</td><td> "+referral+"</td></tr>"+
+               */
+			   
+                            "<tr><td><strong> ২.অনুষ্ঠানের পূর্বে যখন অনুসন্ধান করেছেন কি চুক্তি করেছেন?  </strong></td></tr>"+
+               
+                            "<tr style='background-color: #ccc;'><td>হোটেল কি সর্বদা দ্রুত প্রতিক্রিয়া সরবরাহ করে? (২৪ ঘন্টার মধ্যে)</td><td> "+quickResponse+"</td></tr>"+
+                            "<tr><td>হোটেল কি সর্বদা আপনাকে সমস্ত প্রয়োজনীয় তথ্য সরবরাহ করে?</td><td> "+necessary+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>আপনার সাথে চুক্তি সম্পাদনকারী ব্যক্তির নাম: </td><td> "+dealtwith+"</td></tr>"+
+                    
+                           "<tr><td><strong>৩. ভেন্যু সম্পর্কিত রেট প্রদান করুন</strong></td></tr>"+
+               
+                            "<tr style='background-color: #ccc;'><td>সাজসজ্জা :</td><td> "+decor+"</td></tr>"+
+                            "<tr><td>তাপমাত্রা:</td><td> "+temperature+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>সাউণ্ড:</td><td> "+sound+"</td></tr>"+
+                            "<tr><td>আলোকসজ্জা:</td><td> "+lighting+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>পরিস্কার-পরিচ্ছন্নতা:</td><td> "+cleanliness+"</td></tr>"+
+
+                           "<tr><td><strong> ৪. মিটিং ও ব্যানকুয়েটের প্রয়োজনীয়তা </strong></td></tr>"+
+						   
+						   "<tr style='background-color: #ccc;'><td>সঠিক ভাবে সেট-আপ?</td><td> "+setupcorrectly+"</td></tr>"+
+                            "<tr><td>সঠিক সময়ে?</td><td> "+setuptime+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>ভালো মান?</td><td> "+quality+"</td></tr>"+
+               
+               
+               	            "<tr><td><strong>৫. হোটেলের খাদ্য ও পরিবেশন সম্পর্কে রেটিং প্রদান করুন</td></tr>"+
+							
+							"<tr style='background-color: #ccc;'><td>খাদ্যর মান:</td><td> "+foodQuality+"</td></tr>"+
+                            "<tr><td>খাদ্যর উপস্থাপনা:</td><td> "+foodPresentation+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>সেবার কার্যকারীতা:</td><td> "+efficiency+"</td></tr>"+
+                            "<tr><td>সেবার সৌজন্যতা:</td><td> "+courtesy+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>দলের সদস্যদের উপস্থাপনা:</td><td> "+appearance+"</td></tr>"+
+							
+								 "<tr><td><strong>৬. আপনি হোটেলের সেবা সম্পর্কিত রেটিং প্রদান করুন</strong></td></tr>"+
+							
+							"<tr style='background-color: #ccc;'><td>গেস্ট রিলেশন:</td><td> "+guestRelations+"</td></tr>"+
+                            "<tr><td>ডোরম্যান:</td><td> "+doorman+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>কনসিয়ার্জ:</td><td> "+concierge+"</td></tr>"+
+                            "<tr><td>রিসেপশন:</td><td> "+reception+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>ক্যাশিয়ার:</td><td> "+cashier+"</td></tr>"+
+							"<tr><td>লাউঞ্জ:</td><td> "+lounge+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>রেস্টুরেন্ট:</td><td> "+restaurants+"</td></tr>"+
+                            "<tr><td>হাউসকিপিং:</td><td> "+housekeeping+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td> বিজনেস সেন্টার:</td><td> "+businessCentre+"</td></tr>"+
+               
+							
+							"<tr><td><strong>৭. আপনি কি সামগ্রিক পারফরমেন্স দিয়ে সন্তুষ্ট?</strong></td><td> "+satisfied+"</td></tr>"+
+							
+							
+							"<tr style='background-color: #ccc;'><td><strong>৮. আপনি কি পুনঃরায় হোটেল হতে সেবা গ্রহণে আগ্রহী?</strong></td><td> "+hotelagain+"</td></tr>"+
+							
+							"<tr><td><strong> ৯. আপনার পরবর্তী মিটিং পরিকল্পনা আলোচনা করুন </strong></td></tr>"+
+               
+                            "<tr style='background-color: #ccc;'><td>পরিকল্পনা? </td><td> "+what+"</td></tr>"+
+                            "<tr><td>কখন?</td><td> "+when+"</td></tr>"+
+                            "<tr style='background-color: #ccc;'><td>কোথায়? </td><td> "+where+"</td></tr>"+
+                            "<tr><td>অতিথির সংখ্যা?</td><td> "+number+"</td></tr>"+
+                                
+                            
+                            "<tr style='background-color: #ccc;'><td>মন্তব্য / পরামর্শ :</td><td> "+comment+"</td></tr>"+
+
+                        "</table>";
+
+           
+                        Email.send({
+    //                      https://accounts.google.com/b/0/DisplayUnlockCaptcha
+                            SecureToken : "fa57d2ab-c72a-421d-a545-26b9abf3cd57", 
+//                            Host : "smtp.gmail.com",
+//                            Username : "XXXXXXXX@gmail.com",
+//                            Password : "XXXXXXXXXX",
+                 <!--     To : ["fnbleaders@intercontinental-dhaka.com","Catering@intercontinental-dhaka.com"],  -->
+                             To : ["sakilcpa2@gmail.com","demo@zaberp.com"],
+							From : email,
+                            Subject : "Catering Feedback" + emailFrom,
+                            Body : table
+
+                        }).then(
+                          message => finished(message)
+                        );
+                  
+                  
+                  
+//           var urlx = "http://localhost:9090/zab/submitcateringfeedbackform?companyName="+companyName+"&spaceUsed="+spaceUsed+"&organisername="+organisername+"&dateevent="+dateevent+"&email="+email+"&previouslyUsed="+previouslyUsed+"&media="+media+"&agency="+agency+"&sales="+sales+"&recommendation="+recommendation+"&referral="+referral+"&quickResponse="+quickResponse+"&necessary="+necessary+"&dealtwith="+dealtwith+"&decor= "+decor+"&temperature="+temperature+"&sound="+sound+"&lighting="+lighting+"&cleanliness="+cleanliness+"&setupcorrectly="+setupcorrectly+"&setuptime="+setuptime+"&quality="+quality+"&foodQuality="+foodQuality+"&foodPresentation="+foodPresentation+"&efficiency="+efficiency+"&courtesy="+courtesy+"&appearance="+appearance+"&guestRelations="+guestRelations+"&doorman="+doorman+"&concierge="+concierge+"&reception="+reception+"&cashier="+cashier+"&lounge="+lounge+"&restaurants="+restaurants+"&housekeeping="+housekeeping+"&businessCentre="+businessCentre+"&satisfied="+satisfied+"&otherHotel="+otherHotel+"&hotelagain="+hotelagain+"&what="+what+"&when="+when+"&where="+where+"&number="+number+"&comment="+comment;
+//           
+//            $.ajax({
+//              crossOrigin: true,
+//              url: urlx,
+//              success: function(data) {
+//
+//
+//                  
+//
+//                swal({
+//                  title: "Thanks for your feedback!",
+//                  text: "Feedback submitted successfully.",
+//                  icon: "success",
+//                });
+//                resetForm();
+//              }
+//            });
+                   }
+           
+           });
+
+       var finished = function(message){
+           if(message === "OK"){
+               swal({
+                   title: "Thanks for your feedback!",
+                   text: "Feedback submitted successfully.",
+                   icon: "success",
+               });
+               resetForm();
+
+           }else{
+                swal({
+                  title: "Feedback submission unsuccessful!",
+                  text: message,
+                  icon: "error",
+                });
+           }
+                $("#submit_btn").text("SUBMIT");
+                disableForm(false);
+       }
+       
+       var resetForm = function(){
+           $("#company_name").val("");
+           $("#space_used").val("");           
+           $("#organiser_name").val("");
+           $("#date_event").val("");
+           $("#email").val("");
+           
+           $('input:checkbox').prop('checked', false);
+           $('input:radio').prop('checked', false);
+           
+           $("#dealt_with").val("");
+        
+           $("#other_hotel").val("");
+           
+           $("#what").val("");
+           $("#when").val("");
+           $("#where").val("");
+           $("#number").val("");
+           
+           $("#comment").val("");
+       }
+	   resetForm();
+       
+       var disableForm = function(boolean){
+           $("#company_name").prop("disabled", boolean);
+           $("#space_used").prop("disabled", boolean);        
+           $("#organiser_name").prop("disabled", boolean);
+           $("#date_event").prop("disabled", boolean);
+           $("#email").prop("disabled", boolean);
+           $("#mobile").prop("disabled", boolean);
+           
+           $('input:radio').prop("disabled", boolean);
+		/*   $('input:checkbox').prop("disabled", boolean); */
+           $('input:radio').prop("disabled", boolean);
+           
+           $("#dealt_with").prop("disabled", boolean);
+        
+           $("#other_hotel").prop("disabled", boolean);
+           
+           $("#what").prop("disabled", boolean);
+           $("#when").prop("disabled", boolean);
+           $("#where").prop("disabled", boolean);
+           $("#number").prop("disabled", boolean);
+           
+           $("#comment").prop("disabled", boolean);
+           
+           $("#submit_btn").prop("disabled", boolean);
+       }
+   </script>
+    </body>
+</html>
