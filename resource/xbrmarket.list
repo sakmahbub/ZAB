@@ -1,9 +1,0 @@
-     list xacc
-        table xcodes
-        order xtype,xcode
-        select "(xcode like '%"+zvalue+"%' and xtype='Market' and xwh='"+#wh+"')"
-        rows 20
-	searchselect "xtype='Market' and xwh='"+#wh+"'"
-        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
-                xterritory
-     end list

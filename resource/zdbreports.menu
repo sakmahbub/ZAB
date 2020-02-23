@@ -1,8 +1,0 @@
-//Administration.menu
-//---------------------------------------------------------------------------------------
-option                  |action                                          
-//---------------------------------------------------------------------------------------
-Date wise Backup Report   	   |#classPath+"/login?screen=*jspcrystal dbbackup(xdate=From Date,xdate=To Date)"   
-Date wise Restore Report  	   |#classPath+"/login?screen=*jspcrystal dbrestore(xdate=From Date, xdate=To Date)"     
-//-------------------------------------------------------------------
-

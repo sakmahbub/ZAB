@@ -1,9 +1,0 @@
-//Accounts.menu
-//-------------------------------------------------------------------
-option                           |action
-//-------------------------------------------------------------------
-Procurement & Inventory 		 |#classPath+"/login?screen=podashboard"			 |im  	 |		|inventory.png|180 //|fa-home|180
-Management				   		 |#classPath+"/login?screen=mgndashboard"			 |ac     |      |sales.png|180
-Dashboard Reports            	 |#classPath+"/login?menu=mgndashboard"
-//-------------------------------------------------------------------
-

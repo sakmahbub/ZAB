@@ -1,6 +1,0 @@
-//misprodanalysis.menu
-//-------------------------------------------------------------------
-option                           |action
-//-------------------------------------------------------------------
-///View Product History	        |#classPath+"/login?screen=*viewcrystal poreqprint(2;in,st;@zid,@reqnum;xporeq=PR No,xviewtype=Report View)"
-Item analysis Report            |#classPath+"/login?screen=*viewcrystal caprodhistory(2;in,st;@pzid,@pitem;xitem=Item,xviewtype=Report View)"
