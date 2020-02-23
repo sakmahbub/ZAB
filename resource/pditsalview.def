@@ -1,0 +1,19 @@
+
+product ZAB ERP
+
+table pditsalview
+
+  caption "Tax Salary"
+  columns zid,xstaff,xname,xyear,xper,xtaxyear,xtaxper,xtype,xempcategory,xchallan,xdate,xtaxamt,xamount,xarrear,xsign
+  primary key zid,xstaff,xname,xyear,xper,xtaxyear,xtaxper,xtype,xempcategory,xchallan,xdate,xtaxamt,xamount,xarrear,xsign
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pditsalview(zid,xstaff,xname,xyear,xper,xtaxyear,xtaxper,xtype,xempcategory,xchallan,xdate,xtaxamt,xamount,xarrear,xsign) ~	
+	as Select a.zid,a.xstaff,b.xname,a.xyear,a.xper,a.xtaxyear,a.xtaxper,a.xtype,b.xempcategory, ~
+		c.xchallan,c.xdate,c.xamount,a.xamount,a.xarrear,a.xsign from pdbal a ~
+		join pdmst b on a.zid=b.zid AND a.xstaff=b.xstaff ~
+		left join pdtaxchallan c on a.zid=c.zid AND a.xtaxyear=c.xyear AND a.xtaxper=c.xper  AND b.xempcategory=c.xempcategory
+end table
+

@@ -1,0 +1,27 @@
+//pdhrd.menu
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+option                  		|action                                          	|modules	|models	|width
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+//Personnel Info            		|#classPath+"/login?screen=pdmsthrdold"               	|ca        	|   		|100
+Personnel Info            		|#classPath+"/login?menu=pdmst"                  	|ca        	|   		|100
+Personnel Info (Search) 		|#classPath+"/login?screen=pdmstsearch"                 |ca		|		|100
+Leave Management			|#classPath+"/login?menu=pdleave"                    	|ca        	|   		|100
+Monthly Action   			|#classPath+"/login?screen=pdresigndt"                	|ca        	|   		|100
+Payroll					|#classPath+"/login?menu=pdpayroll"	                |ca        	|   		|100
+//Leave Application Entry      		|#classPath+"/login?screen=pdlapplybyhrd"            	|ca        	|   		|100
+//Leave Confirmation           		|#classPath+"/login?screen=pdleaveconfirm"           	|ca        	|   		|100
+//Calender                  		|#classPath+"/login?screen=pdcalenderheader"          	|ca        	|   		|100
+Query For Requested Staff    		|#classPath+"/login?screen=pdaccepted"               	|ca        	|   		|100
+Settings                   		|#classPath+"/login?menu=pdsetting"                 	|ca        	|   		|100
+//Absent Entry            		|#classPath+"/login?screen=pdabsent"               	|ca        	|   		|100
+//Attendance Entry          		|#classPath+"/login?screen=pdathd"               	|ca        	|   		|100
+//Roster Entry              		|#classPath+"/login?screen=pdroster"               	|ca        	|   		|100
+Over Time Entry                		|#classPath+"/login?screen=pdotheaderhrd"        	|ca        	|   		|100
+Requisition For New Staff    		|#classPath+"/login?screen=pdemprequi"               	|ca        	|   		|100
+//Overtime Entry			|#classPath+"/login?screen=pdotheader"               	|ca        	|   		|100
+//Personal Information         		|#classPath+"/login?menu=pdperinfo"                   	|ca     	|   		|100
+//Suspend Entry             		|#classPath+"/login?screen=pdsuspendheader"        	|ca        	|   		|100
+//OT Leave Entry               		|#classPath+"/login?screen=pdotleaveheader"        	|ca        	|   		|100
+Reports                   		|#classPath+"/login?menu=pdhrdrep"                   	|ca        	|   		|100
+//-------------------------------------------------------------------
+

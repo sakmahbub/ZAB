@@ -1,0 +1,103 @@
+screen optoari
+
+     sidebar list one
+     sections  form one, jscript myscript
+
+     list one
+        caption "OP To AR Interface"
+        table optoari
+        order xtype,xgcus,xgitem
+        rows 60
+        objects  xtype attrib(link "login?screen=optoari&command=Show&xtype=?&xgcus=?&xgitem=?"),xgcus,xgitem, ~
+                 xaccdr,desc equals((select xdesc from acmst where zid=optoari.zid and xacc=optoari.xaccdr)),~
+				 xacccr,desc equals((select xdesc from acmst where zid=optoari.zid and xacc=optoari.xacccr))
+				 
+		header "Sales Type","Customer Group","Item Group","DR","Description","Revenue / Sales Account Code","Description"
+     end list
+
+
+     form one
+        caption "OP To AR Interface"
+      	table optoari
+        primarykey xtype,xgcus,xgitem
+        order xtype,xgcus,xgitem
+        return "login"
+        layout 4
+        pstyle 3
+        objects Clear,Add, Update, Delete,Show,*next,Top,Previous,Next,Bottom,"<p>" ,~
+                xtype,xgcus,xgitem,xstype,xaccdr,xdescdr,xacccr,xdesccr
+
+        field xtype
+          pick "Sales,Sales Return"
+        end field
+
+        field xstype
+			caption Sales Type
+          pick "LC,Other"
+        end field
+
+        field xdescdr
+          attrib local
+          caption Debit Description
+          display const
+          event after
+            set xdescdr=acmst.xdesc("xacc='"+xaccdr+"'")
+          end event
+        end field
+
+        field xdesccr
+          attrib local
+          caption  Description
+          display const
+          event after
+            set xdesccr=acmst.xdesc("xacc='"+xacccr+"'")
+          end event
+        end field
+
+        field xacccr
+          caption Sales / Sales Return Account
+          width 20
+        end field		
+
+        field xacc
+          caption Revenue / Sales Account
+          width 20
+        end field
+
+        field xgcus
+          pick code Customer Group
+        end field
+
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	    if (detail=="Return"){
+            form.screen.value = "caitem"
+            form.searchbutton.value = "Find xitem=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

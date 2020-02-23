@@ -1,0 +1,33 @@
+
+
+
+product ZAB ERP
+
+table poappview
+  caption "PP Approval View"
+  columns zid,xstaff,xposition,xstatuspor,xstatus,xwh,xdate
+  primary key zid,xstaff,xposition,xstatuspor,xstatus,xwh,xdate
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view poappview (zid,xstaff,xposition,xpornum,xstatuspor,xstatus,xwh,xdesc,xdate,xtype,xdesignation,xdateapp,xrow)~
+as select a.zid,a.xpreparer,b.xposition,a.xpornum,a.xstatuspor,a.xstatus,a.xtwh,c.xlong,a.xdate,a.xtype,'Preparer',~
+	a.xdate,rank() OVER (ORDER BY a.xdate desc,a.xpornum) from poordheader a join pdmst b on a.zid=b.zid and a.xpreparer=b.xstaff ~
+	join branchview c on a.zid=c.zid and a.xtwh=c.xcode ~
+union all ~
+select a.zid,a.xsignatory1,b.xposition,a.xpornum,a.xstatuspor,a.xstatus,a.xtwh,c.xlong,a.xdate,a.xtype,'Signatory 1',a.xsigndate1,rank() OVER (ORDER BY a.xsigndate1 desc,a.xporeqnum) from poordheader a join pdmst b on a.zid=b.zid and a.xsignatory1=b.xstaff join branchview c on a.zid=c.zid and a.xtwh=c.xcode ~
+union all ~
+select a.zid,a.xsignatory2,b.xposition,a.xpornum,a.xstatuspor,a.xstatus,a.xtwh,c.xlong,a.xdate,a.xtype,'Signatory 2',a.xsigndate2,rank() OVER (ORDER BY a.xsigndate2 desc,a.xporeqnum) from poordheader a join pdmst b on a.zid=b.zid and a.xsignatory2=b.xstaff join branchview c on a.zid=c.zid and a.xtwh=c.xcode ~
+union all ~
+select a.zid,a.xsignatory3,b.xposition,a.xpornum,a.xstatuspor,a.xstatus,a.xtwh,c.xlong,a.xdate,a.xtype,'Signatory 3',a.xsigndate3,rank() OVER (ORDER BY a.xsigndate3 desc,a.xporeqnum) from poordheader a join pdmst b on a.zid=b.zid and a.xsignatory3=b.xstaff join branchview c on a.zid=c.zid and a.xtwh=c.xcode ~
+union all ~
+select a.zid,a.xsignatory4,b.xposition,a.xpornum,a.xstatuspor,a.xstatus,a.xtwh,c.xlong,a.xdate,a.xtype,'Signatory 4',a.xsigndate4,rank() OVER (ORDER BY a.xsigndate4 desc,a.xporeqnum) from poordheader a join pdmst b on a.zid=b.zid and a.xsignatory4=b.xstaff join branchview c on a.zid=c.zid and a.xtwh=c.xcode ~
+union all ~
+select a.zid,a.xsignatory5,b.xposition,a.xpornum,a.xstatuspor,a.xstatus,a.xtwh,c.xlong,a.xdate,a.xtype,'Signatory 5',xsigndate5,rank() OVER (ORDER BY a.xsigndate5 desc,a.xporeqnum) from poordheader a join pdmst b on a.zid=b.zid and a.xsignatory5=b.xstaff join branchview c on a.zid=c.zid and a.xtwh=c.xcode ~
+union all ~
+select a.zid,a.xsignatory6,b.xposition,a.xpornum,a.xstatuspor,a.xstatus,a.xtwh,c.xlong,a.xdate,a.xtype,'Signatory 6',a.xsigndate6,rank() OVER (ORDER BY a.xsigndate6 desc,a.xporeqnum) from poordheader a join pdmst b on a.zid=b.zid and a.xsignatory6=b.xstaff join branchview c on a.zid=c.zid and a.xtwh=c.xcode ~
+union all ~
+select a.zid,a.xsignatory7,b.xposition,a.xpornum,a.xstatuspor,a.xstatus,a.xtwh,c.xlong,a.xdate,a.xtype,'Signatory 7',a.xsigndate7,rank() OVER (ORDER BY a.xsigndate7 desc,a.xporeqnum) from poordheader a join pdmst b on a.zid=b.zid and a.xsignatory7=b.xstaff join branchview c on a.zid=c.zid and a.xtwh=c.xcode
+				  
+end table

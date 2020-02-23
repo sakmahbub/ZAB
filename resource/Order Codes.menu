@@ -1,0 +1,15 @@
+//Order Codes.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Customer Order Codes             |#classPath+"/main?page=xtrn(xtypetrn=Customer Order)"
+Customer Order Parameters        |#classPath+"/main?page=xtrnp(xtypetrn=Customer Order)"
+Delivery Order Codes             |#classPath+"/main?page=xtrn(xtypetrn=Delivery Order)"
+Delivery Order Parameters        |#classPath+"/main?page=xtrnp(xtypetrn=Delivery Order)"
+Invoice Codes                    |#classPath+"/main?page=xtrn(xtypetrn=Invoice)"
+Invoice Parameters               |#classPath+"/main?page=xtrnp(xtypetrn=Invoice)"
+Sales Returns Codes              |#classPath+"/main?page=xtrn(xtypetrn=Sales Returns)"
+Sales Returns Parameters         |#classPath+"/main?page=xtrnp(xtypetrn=Sales Returns)"
+OP to GL Interface Table         |#classPath+"/main?page=OPgli"
+//-------------------------------------------------------------------
+

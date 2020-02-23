@@ -1,0 +1,17 @@
+     list xcarno
+        table cacar
+        order xregi
+     //   select "xtype = 'Unit of Measure'"
+      //  navigators alpha
+        rows 20
+        //objects  xcur attrib(link "Main?page=xcur&command=Show&xcur=?"),
+        objects xregi attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xbrand,xmodel,xcapacity
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

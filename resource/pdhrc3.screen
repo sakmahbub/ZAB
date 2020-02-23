@@ -1,0 +1,88 @@
+screen pdhrc3
+     caption "GL Group 1"
+     sidebar list three,list four
+     sections form one, jscript myscript
+
+	  list three
+        caption "List of "+xhrc2
+        table pdhrc3
+        order xhrc1,xhrc2,xhrc3
+        fixed xhrc1,xhrc2
+        rows 20
+        objects  xhrc3 attrib(link "login?screen=pdhrc3&command=Show&xhrc1=?&xhrc2=?&xhrc3=?"),xdesc
+     end list
+
+	list four
+        caption "List of "+xhrc3
+        table achrc4
+        order xhrc1,xhrc2,xhrc3,xhrc4
+        fixed xhrc1,xhrc2,xhrc3
+        rows 20
+        objects  xhrc4,xdesc
+     end list
+
+
+
+     form one
+        caption "FM Area of "+xhrc2
+        table pdhrc3
+        primarykey xhrc1, xhrc2, xhrc3
+        order xhrc1,xhrc2,xhrc3
+        fixed xhrc1,xhrc2
+        //select
+        return "LogIn"
+        layout 2
+	  pstyle 3
+
+        objects Back to Region,Territory,*next, ~
+               Show,Clear,Add, Update, Delete,*next,Top,Bottom,"<p>" ,~
+               xhrc3 width(20),xdesc width(50)
+
+        field xhrc3
+	    caption FM Area
+          event after
+            set globals(xhrc3)=xhrc3
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Back
+          embed onclick="clicked(this)"
+        end field
+
+        field Territory
+          embed onclick="grouped(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but = ""
+        function clicked(b){
+          but = "clicked"
+        }
+        function grouped(b){
+          but = "grouped"
+        }
+        function submitit(form){
+          if (but == "clicked"){
+            form.screen.value = "pdhrc2"
+            form.searchbutton.value = "Find xhrc1=?&xhrc2=?"
+
+          }
+          if (but == "grouped"){
+            form.screen.value = "pdhrc4"
+            form.searchbutton.value = "Find xhrc1=?&xhrc2=?&xhrc3=?"
+
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

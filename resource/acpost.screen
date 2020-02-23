@@ -1,0 +1,70 @@
+screen acpost
+
+     caption "Posting"
+     sections form one,  jscript myscript
+
+
+
+     form one
+        caption "P<ACRONYM>osting</ACRONYM>"
+        return "login"
+        layout 2
+    	  pstyle 3
+
+        objects Post,"<p>" ,~
+                 xyear,xper,~
+                 ftrn attrib(local),ttrn attrib(local)
+
+       field post
+         event after
+//            class gltrn(acPost{xyear,xper,ftrn,ttrn})
+            set temp = #spsql(sp_acPost,#id,#user,xyear,xper,ftrn,ttrn)
+         end event
+       end field
+
+       field dummy
+         caption
+         display constant
+       end field
+
+       field fper
+         caption Period
+         display text
+       end field
+
+       field tper
+         caption To Period
+         display text
+       end field
+
+       field xdate
+         caption From Date
+       end field
+
+       field xdateref
+         caption To Date
+       end field
+
+       field ftrn
+         caption From Trn.
+         display text
+	   pick list ftrn	
+       end field
+
+       field ttrn
+         caption To Trn.
+         display text
+         default "z"
+	   pick list ttrn	
+       end field
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+     end jscript
+
+
+
+end screen

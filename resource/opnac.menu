@@ -1,0 +1,14 @@
+//Master Setup.menu
+//---------------------------------------------------------------------------------------
+option                  |action                                          |modules|models
+//---------------------------------------------------------------------------------------
+Customer Master (NAC)             |#classPath+"/login?screen=cacusnac"              |       |      |120
+Invoice Entry (NAC)              |#classPath+"/login?screen=opdoheadernac"              |       |      |120
+Sales Return (NAC)               |#classPath+"/login?screen=opcrnheadernac"     |       |      |120
+Sales Return Allocation (NAC)    |#classPath+"/login?screen=arcasreturnnac"	 |ac     |      |150
+MR Allocation (NAC) 		   |#classPath+"/login?screen=arcascreditnac" |ac     |      |150
+MR Allocation Edit (NAC)         |#classPath+"/login?screen=arcaseditnac"
+AM                               |#classPath+"/login?screen=caam"     |       |      |120
+SPO                              |#classPath+"/login?screen=caspo"     |       |      |120
+//-------------------------------------------------------------------
+

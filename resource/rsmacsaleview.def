@@ -1,0 +1,34 @@
+
+product ZAB ERP
+
+table rsmacsaleview
+  caption "RSM Wise Acctual Sales"
+
+  sql CREATE VIEW rsmacsaleview (zid,zorg,xdate,xdornum,xcrnnum,xitem,xdesc,xrate,xwh,xsm,xrsm,xfm,xterritory,xamount) ~
+      AS SELECT zb.zid,zb.zorg,ophd.xdate,ophd.xdornum,temptable.xcrnnum,opdt.xitem,ca.xdesc,opdt.xrate,ophd.xwh,ophd.xsm,ophd.xrsm,~
+      ophd.xfm,ophd.xterritory,(SUM(opdt.xqtyord)-ISNULL(Sum(temptable.retqty),0)) AS xamount FROM opdoheader ophd ~
+      INNER JOIN zbusiness zb ON zb.zid=ophd.zid ~
+      INNER Join opdodetail opdt ON ophd.zid=opdt.zid and ophd.xdornum=opdt.xdornum ~
+      INNER JOIN caitem ca ON ca.zid=opdt.zid AND ca.xitem=opdt.xitem ~
+      LEFT JOIN (SELECT cd.zid,ch.xcrnnum,ch.xordernum,cd.xitem,Sum(cd.xqtyord) as retqty From opcrnheader ch ~
+      INNER JOIN opcrndetail cd On ch.zid=cd.zid AND ch.xcrnnum=cd.xcrnnum ~
+        Group By cd.zid,ch.xcrnnum,ch.xordernum,cd.xitem)temptable ON ophd.zid=temptable.zid  AND ophd.xdornum=temptable.xordernum AND ~
+        opdt.xitem=temptable.xitem ~
+      GROUP BY zb.zid,zb.zorg,ophd.xdate,ophd.xdornum,temptable.xcrnnum,opdt.xitem,ca.xdesc,opdt.xrate,ophd.xwh,ophd.xsm,~
+      ophd.xrsm,ophd.xfm,ophd.xterritory ~
+     Union All ~
+ 	SELECT zb.zid,zb.zorg,ophd.xdate,ophd.xdornum,temptable.xcrnnum,opdt.xitem,ca.xdesc,opdt.xrate,ophd.xwh,ophd.xsm,ophd.xrsm,~
+      ophd.xfm,ophd.xterritory,(SUM(opdt.xqtyord)-ISNULL(Sum(temptable.retqty),0)) AS xamount ~
+      FROM [10.0.0.21].zabdb.dbo.opdoheader ophd ~
+      INNER JOIN [10.0.0.21].zabdb.dbo.zbusiness zb ON zb.zid=ophd.zid ~
+      INNER Join [10.0.0.21].zabdb.dbo.opdodetail opdt ON ophd.zid=opdt.zid and ophd.xdornum=opdt.xdornum ~
+      INNER JOIN [10.0.0.21].zabdb.dbo.caitem ca ON ca.zid=opdt.zid AND ca.xitem=opdt.xitem ~
+      LEFT JOIN (SELECT cd.zid,ch.xcrnnum,ch.xordernum,cd.xitem,Sum(cd.xqtyord) as retqty From [10.0.0.21].zabdb.dbo.opcrnheader ch ~
+      INNER JOIN [10.0.0.21].zabdb.dbo.opcrndetail cd On ch.zid=cd.zid AND ch.xcrnnum=cd.xcrnnum ~
+        Group By cd.zid,ch.xcrnnum,ch.xordernum,cd.xitem)temptable ON ophd.zid=temptable.zid  AND ophd.xdornum=temptable.xordernum AND ~
+        opdt.xitem=temptable.xitem ~
+      GROUP BY zb.zid,zb.zorg,ophd.xdate,ophd.xdornum,temptable.xcrnnum,opdt.xitem,ca.xdesc,opdt.xrate,ophd.xwh,ophd.xsm,~
+      ophd.xrsm,ophd.xfm,ophd.xterritory
+
+
+end table

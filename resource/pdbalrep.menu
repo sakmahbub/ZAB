@@ -1,0 +1,21 @@
+//pdbalrep.menu
+//-------------------------------------------------------------------
+option                              |action
+//-------------------------------------------------------------------
+Salary Transfer Letter to Bank      |#classPath+"/login?screen=*jspcrystal pdbankletter(xempcategory=Employee Category,xbank=Bank,xyear=Year,xper=Period,xsign1=First Singnatory,xdesig1=First Desgingation,xsign2=Second Singnatory,xdesig2=Second Desgingation)"
+Bonus Transfer Letter to Bank      |#classPath+"/login?screen=*jspcrystal pdbonusbankletter(xempcategory=Employee Category,xbank=Bank,xyear=Year,xper=Period,xsign1=First Singnatory,xdesig1=First Desgingation,xsign2=Second Singnatory,xdesig2=Second Desgingation)"
+Bonus Sheet For All Dept       |#classPath+"/login?screen=*jspcrystal pdbonussht(xempcategory=Employee Category,xyear=Year,xper=Period)"
+//Bonus Sheet For All Dept       |#classPath+"/login?screen=*jspcrystal pdbonussht(xempcategory=Employee Category,xyear=Year,xper=Period,xnote=Reason)"
+//Statment of Transaction   	    	|#classPath+"/login?screen=*crystal pdtypestmt(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//-----Salaray Report---------
+//Salary Sheet For All	   		|#classPath+"/login?screen=*aspcrystal pdsalarysht(xempcategory=Employee Category,xyear=Year,xper=Period)"
+//Salary Sheet With Bonus             |#classPath+"/login?screen=*wcrystal pdsalaryshtbonus(xyear=Year,xper=Period)"
+//-----Pay Advice Report------
+//Pay Advice By Employee		    |#classPath+"/login?screen=*wcrystal pdpayadvicebyemp(xstaff=From Employee,xstaff=To Employee,xyear=Year,xper=Period)"
+//Pay Advice By Employee With Bonus |#classPath+"/login?screen=*wcrystal pdpayadvicebyempB(xstaff=From Employee,xstaff=To Employee,xyear=Year,xper=Period)"
+//Pay Advice By Department 	    |#classPath+"/login?screen=*wcrystal pdpayadvicebydept(xdeptname=Department Name,xdeptname=Department Name,xyear=Year,xper=Period)"
+//Pay Advice By Group	 	    |#classPath+"/login?screen=*wcrystal pdpayadvicebygrp(xgroup=Group,xyear=Year,xper=Period)"
+//Pay Advice By Grade	 	    |#classPath+"/login?screen=*wcrystal pdpayadvicebygrade(xgrade=Grade,xgrade=Grade,xyear=Year,xper=Period)"
+//Pay Slip (Without Eid Gratia)     |#classPath+"/login?screen=*crystal pdpayslipnoeid(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//Salary Summary	            |#classPath+"/login?screen=*crystal pdsalsumdept(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//-------------------------------------------------------------------

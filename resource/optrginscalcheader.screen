@@ -1,0 +1,101 @@
+screen optrginscalcheader
+
+     //sidebar list rsm
+     sections form one, jscript myscript
+
+     list rsm
+      caption "RSM Wise Target"
+        table optargetrsm
+        order xyear,xper,xitem,xrsm
+        fixed xyear,xper,xitem
+        rows 20
+        objects  xyear,xper,xitem,xrsm attrib(link "login?screen=optargetrsm&command=Show&xyear=?&xper=?&xitem=?&xrsm=?"), ~
+                 xqty,xqtydel,xstatus
+
+        //header "RSM","Target Qty","Allocated Qty","Status"
+        totals "","","","Total",sum,sum
+     end list
+
+     form one
+        caption "Incentive Info"
+        table optrginscalcheader
+        primarykey xyear,xper,xsp
+        order xyear,xper,xsp
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,*next,Detail,Top,Previous,Next, Bottom,Item Detail,"<p>" ,~
+                xyear,xper,xsp//,xname
+
+      
+      field xqtydel
+        caption Quantity Allocated To RSM
+      end field
+
+      field xbalance
+	  attrib local	
+        display const
+	  caption Balance
+	  event after
+		set xbalance=xqty-xqtydel
+	  end event	
+      end field
+
+      field xyear
+        event after
+          set globals(xyear)=xyear
+          set globals(xper)=xper
+          set globals(xsp)=xsp
+        end event
+      end field
+
+      field xdesc
+        attrib local
+        display const
+        caption Description
+        event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        end event
+      end field
+
+
+      field Detail
+        embed onclick="clicked(this)"
+      end field
+
+      field Item
+        embed onclick="clicked(this)"
+      end field
+
+
+        embed onsubmit="return submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "optrginscalcdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+          if (button=="Item Detail"){
+            form.screen.value = "optrginscalcitemdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

@@ -1,0 +1,162 @@
+screen pdleavecanceladmin
+  caption "Leave Detail"
+  
+  sidebar list 2ndlist,list useleave
+  sections form one,jscript myscript
+	
+	  list 2ndlist
+    caption "List of Confirmed Leave :"
+    table pdleaveheader
+    order xtypeleave,xstaff
+    select "xstatus<>'Confirmed'"//" and '"+#date+"' between xdatefrom and xdateto"
+    rows 20
+    objects xyearperdate attrib(link "login?screen=pdleavecanceladmin&command=Show&xyearperdate=?&xstaff=?"),~
+	xstaff,names equals((select xname from pdmst where zid=pdleaveheader.zid and xstaff=pdleaveheader.xstaff)),xdate,xtypeleave,xdatefrom,xdateto,xday,xstatus
+    
+    header "SI No","Staff ID","Name","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Status"
+    totals "","","Total","","",sum
+  end list
+	
+  list useleave
+    caption "Used & Available Leave For <br>"+xstaff+" - "+pdmst.xname("xstaff='"+xstaff+"'")
+    table pdleaveasigne
+    order xstaff,xyear,xtypeleave
+    fixed xstaff,xyear
+  //  select "xtypeleave<>'Unpaid Leave'"
+    rows 20
+    objects  xtypeleave,xavailable,xmleave,xused,xbalance
+    //header "Leave Type","Available Leave","Monthly","Used Leave","Balance Leave"
+    totals "Total",sum,sum,sum,sum
+  end list
+
+  list 1stlist
+    caption "Leave Detail for Confirmation"
+    table pdleaveheader
+    order xyearperdate,xstaff
+    select "xstatus='Approved'"
+    rows 20
+	
+    objects xyearperdate attrib(link "login?screen=pdleavecanceladmin&command=Show&xyearperdate=?&xstaff=?"),~
+            xstaff,name equals((select xname from pdmst where zid=pdleaveheader.zid and xstaff=pdleaveheader.xstaff)),xdate,xtypeleave,xdatefrom,xdateto,xday,xstatus
+            
+    header "SI NO","Staff ID","Name","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Status"
+    totals "","","Total","","",sum
+  end list
+
+  list 2ndlistss
+    caption "List of Confirmed Leave"
+    table pdleaveheader
+   order xtypeleave,xstaff
+    select "xstatus='Confirmed'"
+    rows 20
+    objects xyearperdate attrib(link "login?screen=pdleavecanceladmin&command=Show&xyearperdate=?&xstaff=?"),~
+			xstaff,name equals((select xname from pdmst where zid=pdleaveheader.zid and xstaff=pdleaveheader.xstaff)),xdate,xtypeleave,xdatefrom,xdateto,xday,xstatus
+    
+    header "SI No","Staff ID","Name","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Status"
+    totals "","","Total","","",sum
+  end list
+
+   list 2ndlistss
+    caption "List of Confirmed Leave"
+    table pdleaveheader
+    order xtypeleave,xstaff
+    select "xstatus='Confirmed'"
+    rows 20
+    objects xyearperdate attrib(link "login?screen=pdleavecanceladmin&command=Show&xyearperdate=?&xstaff=?"),~
+	xstaff,names equals((select xname from pdmst where zid=pdleaveheader.zid and xstaff=pdleaveheader.xstaff)),xdate,xtypeleave,xdatefrom,xdateto,xday,xstatus
+    
+    header "SI No","Staff ID","Name","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Status"
+    totals "","","Total","","",sum
+  end list
+  
+  
+  form one
+    caption "Leave Confirmation Cancel"
+	  table pdleaveheader
+	  primarykey xyearperdate,xstaff
+    order xyearperdate
+    select "xstatus<>'Confirmed'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Update,Clear,Delete,~//Cancel,
+            xyearperdate,,xstaff,xname,xdate display(const),xtypeleave display(const),~
+            xdatefrom display(const),xdateto display(const),xdaterpt display(const),xday display(const),xyear display(const),~
+            xstatus display(const),xsid,sid
+
+    field xdate
+      caption Application Date
+    end field
+	
+	field xday
+	caption <font color=blue>No of Day(s)</font>
+	end field
+    
+    field xdaterpt
+      caption <font color=red>Reporting Date  </font>
+      event before
+        set xdate=#date
+      end event
+    end field
+	
+	  field xyearperdate
+	  pick list pdleavestaff
+      caption Serial No
+		event after
+			set globals(xyearperdate)=xyearperdate
+			set globals(xstaff)=xstaff
+			set globals(xyear)=xyear
+		end event
+	  end field
+	  
+    field xname
+      attrib local
+      display const
+      event after
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+      end event
+    end field
+	
+	field sid
+	   attrib local
+	   display const
+       caption Superior Name
+	   event after
+	   set sid=pdmst.xname("xposition='"+xsid+"'")
+	   end event
+       end field
+    
+    field Cancel
+	
+      event after
+        set temp = #spsql(zabsp_leavecancel,#id,#user,xstaff,xyearperdate,xyear)
+        action show
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field Detail
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+      var detail
+
+      function clicked(b){
+        detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Detail"){
+          form.screen.value = "pdleavedetail"
+          form.searchbutton.value = "Find xyearperdate=?&xstaff=?"
+          //return false
+        }
+      }
+    </script>
+  end jscript
+
+end screen

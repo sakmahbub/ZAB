@@ -1,0 +1,226 @@
+screen mostartprocessheader
+
+     //sidebar list detail,list fin,list wastage
+     sections form one,  jscript myscript
+
+    list detail
+        caption "Daily Production For <br>Batch "+xbatch
+        table modailyprdtrn
+        order xbatch,xrow
+		fixed xbatch
+		select "isnull(xitem,'')=''"
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=modailyprdtrn&command=Show&xbatch=?&xrow=?"), ~
+        xdate,xsmotime,xfmoprcs,xenddate,xemotime,xtmoprcs,xqty
+//         headers Invoice List
+     end list
+
+     list fin
+        caption "Finished Goods Production List For <br>Batch "+xbatch
+        table modailyprdtrn
+        order xbatch,xrow
+		fixed xbatch
+		select "xtype='Finished Goods'"
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=mofgissue&command=Show&xbatch=?&xrow=?"), ~
+        xdate,xfmoprcs,xtmoprcs,xqty
+//         headers Invoice List
+     end list
+
+     list wastage
+        caption "Wastage List For <br>Batch "+xbatch
+        table modailyprdtrn
+        order xbatch,xrow
+		fixed xbatch
+		select "xtype='Wastage'"
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=mofgissue&command=Show&xbatch=?&xrow=?"), ~
+        xdate,xfmoprcs,xtmoprcs,xqty
+//         headers Invoice List
+     end list
+
+
+     form one
+        caption "Start Process Header"
+        table moheader
+        order xbatch
+        return "login"
+        layout 2  
+        pstyle 3
+        objects Show,Clear,Start New Process,"<p>",~
+                xbatch,xmodate,xpiref,xordernum,xcus,xorg,xdornum display(h)//,//,xqtymor,xqtyprd
+		
+		field xpiref
+			event after
+				set globals(xpiref)=xpiref
+				set globals(xordernum)=xordernum
+				set globals(xdornum)=xdornum
+			end event
+		end field
+		
+		field xprcstype
+			attrib local
+			display const
+			caption Process Type
+			event after
+				set xprcstype=mopiheader.xprcstype("xpiref='"+xpiref+"'")
+			end event
+		end field
+		
+
+		field xcus
+			attrib local
+			caption Customer Code
+			display const
+			event after
+				set xcus=mopiheader.xcus("xpiref='"+xpiref+"'")
+			end event
+		end field
+		
+
+		field xqtymor
+			caption Production Qty in Mitre
+		end field
+
+		field xqtyprd
+			caption Production Qty in Yard
+		end field
+
+		field xitem
+			caption Finished Goods Item Code
+			pick list xitemfin
+		end field
+		
+		field xitemraw
+			pick list xitemraw
+		end field
+		
+		field xorg
+			attrib local
+			caption Customer Name
+			display const
+			event after
+				set xorg=cacus.xorg("xcus='"+xcus+"'")
+			end event
+		end field
+		
+		field xitemdesc
+			attrib local
+			caption Description
+			display const
+			event after
+				set xitemdesc=caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xitemrawdesc
+			attrib local
+			caption Description
+			display const
+			pick list xitemraw
+			event after
+				set xitemrawdesc=caitem.xdesc("xitem='"+xitemraw+"'")
+			end event
+		end field
+		
+		field xstatusmor
+			display const
+		end field
+		
+        field xstatusjv
+           display constant
+        end field
+
+
+        field xbatch
+         event after
+            set globals(xbatch)=xbatch
+          end event
+        end field
+
+
+ 		
+        embed onsubmit="submitit(this)"
+        
+
+        field Start
+          embed onclick="clicked(this)"
+        end field
+        field Daily
+          embed onclick="clicked(this)"
+        end field
+
+        field Finished
+          embed onclick="clicked(this)"
+        end field
+        
+        field Production
+          embed onclick="clicked(this)"
+        end field
+
+	
+        field Wastage
+          embed onclick="clicked(this)"
+        end field
+
+	
+	field Finished
+          embed onclick="clicked(this)"
+        end field
+	
+	
+
+        
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Start New Process"){
+            form.screen.value = "mostartprocessdetail"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Daily Production"){
+            form.screen.value = "modailyprdtrn"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Recipe Setting"){
+            form.screen.value = "mohrecipesetting"
+            form.searchbutton.value = "Top"
+          }
+
+	if (detail=="Wastage Issue"){
+            form.screen.value = "mowastage"
+            form.searchbutton.value = "Top"
+          }
+
+	
+	
+          if (detail=="Production Process"){
+            form.screen.value = "moprocess"
+            form.searchbutton.value = "Top"
+          }
+	
+	 if (detail=="Finished Goods Issue"){
+            form.screen.value = "mofgissue"
+            form.searchbutton.value = "Top"
+          }		
+	
+
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

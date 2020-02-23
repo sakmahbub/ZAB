@@ -1,0 +1,41 @@
+screen pdprocsstaff
+     caption "Staff Payment Process"
+     sections form one
+
+     form one
+        caption "Staff Pay Process"
+        return "login"
+        layout 2
+        pstyle 1
+
+        objects Process,xyear,xper,fstaff,tstaff
+
+        field Process
+          event after
+            class pd(staff{xyear,xper,fstaff,tstaff})
+          end event
+        end field
+
+        field xyear
+          attrib local
+        end field
+
+        field xper
+          attrib local
+        end field
+
+        field fstaff
+          caption From Staff
+          attrib local
+          display text
+        end field
+
+        field tstaff
+          caption To Staff
+          attrib local
+          display text
+        end field
+
+     end form
+
+end screen

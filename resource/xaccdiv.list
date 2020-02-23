@@ -1,0 +1,13 @@
+     list xaccdiv
+        table xcodes
+        order xcode
+        select "(xtype = 'Branch') and (xlong like '%"+zvalue+"%' or xcode like '%"+zvalue+"%') and xtypeobj='Store'~
+		and zactive=1 and xtypestore='Accounting Division'"
+        rows 20
+		searchselect "xtype = 'Branch' and xtypeobj='Store' and zactive=1 and xtypestore='Accounting Division'""
+		linksql select xlong from branchview
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xlong
+     end list
+
+

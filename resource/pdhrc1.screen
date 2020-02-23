@@ -1,0 +1,59 @@
+screen pdhrc1
+  caption "PD Level 1"
+  sidebar list one
+  sections form one,  jscript myscript
+
+  list one
+    caption "Area"
+    table pdhrc1
+    order xhrc1
+    rows 30
+    objects  xhrc1 attrib(link "login?screen=pdhrc1&command=Show&xhrc1=?"),xdesc
+  end list
+
+  form one
+    caption "Area"
+    table pdhrc1
+    primarykey xhrc1
+    order xhrc1
+    return "LogIn"
+    layout 2
+    pstyle 3
+
+    objects Region, ~
+      Show,Clear,Add, Update, Delete,*next, Top,Previous,Next, Bottom,"" ,~
+      xhrc1 width(10),xdesc width(40)
+
+      field xhrc1
+        caption Area
+        event after
+          set globals(xhrc1)=xhrc1
+        end event
+      end field
+
+      embed onsubmit="submitit(this)"
+        
+      field Region
+        embed onclick="clicked(this)"
+      end field
+     
+   end form
+
+   jscript myscript
+
+     <script language="javascript" type="text/javascript">
+       var but = ""
+       function clicked(b){
+         but = "clicked"
+       }
+       function submitit(form){
+         if (but == "clicked"){
+           form.screen.value = "pdhrc2"
+           form.searchbutton.value = "Find xhrc1=?"
+         }
+       }
+
+      </script>
+    end jscript
+
+end screen

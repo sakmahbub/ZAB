@@ -1,0 +1,11 @@
+     list xaccdr
+        table acmst
+        order xacc
+        select "(xacc like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%')"
+        navigators alpha
+        rows 10
+        objects xacc attrib(link "abc" embed onclick="return updateParent(this:'xaccdr')"), ~
+                xdesc
+     end list
+
+

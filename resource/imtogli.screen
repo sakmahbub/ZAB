@@ -1,0 +1,127 @@
+screen imtogli
+     caption "IM to Accounts Transfer"
+	
+	sidebar list one
+     sections  form one, jscript myscript
+
+     list one
+        caption "IM To AC Interface"
+        table imtogli
+        order xtrn,xgitem
+        rows 20
+        objects xtrn,xgitem attrib(link "login?screen=imtogli&command=Show&xtrn=?&xgitem=?"), ~
+                xacc,desc equals((select xdesc from acmst where acmst.zid=imtogli.zid and acmst.xacc=imtogli.xacc)),~
+				xacccr,descr equals((select xdesc from acmst where acmst.zid=imtogli.zid and acmst.xacc=imtogli.xacccr))
+
+
+        headers "Transaction","Item Group","Dr. Account","Description","Cr. Account","Description"
+     end list
+
+
+     form one
+        caption "<ACRONYM>IM To GL Interface</ACRONYM>"
+        table imtogli
+        primarykey xtrn,xgitem
+        order xtrn,xgitem
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,*next,Top,Previous,Next,Bottom,"<p>" ,~
+                xtrn,xgitem,xacc,xdesc,xacccr,xdesccr
+
+        field xtrn
+          display text
+		pick list xtrnimtogl
+        end field
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+        field xdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xdesc=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+        field xdesccr
+          attrib local
+          caption Description
+          display const
+          event after
+            set xdesccr=acmst.xdesc("xacc='"+xacccr+"'")
+          end event
+        end field
+
+
+         field xdeptdesc
+          attrib local
+          caption Department Name
+          display const
+          event after
+            set xdeptdesc = xcodes.xlong("xtype='Department Name' and xcode='"+xdeptname+"'")
+          end event
+        end field
+
+        field xdeptcrdesc
+          attrib local
+          caption Department Name
+          display const
+          event after
+            set xdeptcrdesc = xcodes.xlong("xtype='Department Name' and xcode='"+xdeptnamecr+"'")
+          end event
+        end field
+
+
+
+        field xtrn
+          caption IM Transaction Code
+          display combo
+          pick "select xtrn from xtrn where xtypetrn = 'Inventory Transaction'"
+        end field
+
+        field xacc
+          caption Debit Account//Purchase Account
+//          pick "select xtrn from xtrn where xtypetrn = 'AR Transactions'"
+        end field
+
+        field xacccr
+          caption Credit Account//LC Retirement Account
+          display text
+          pick list xacc
+        end field
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

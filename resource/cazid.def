@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table cazid
+  caption "Business ID"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          zbid,zorg,xcus
+
+  primary key zid,zbid
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  
+list zorg
+
+end table

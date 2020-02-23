@@ -1,0 +1,10 @@
+//Setup	Lists.menu
+//-------------------------------------------------------------------
+option                            |action
+//-------------------------------------------------------------------
+Users List	                      |#classPath+"/login?screen=*crystal userlist(xwh=Branch,xwh=Branch)"
+//Users List	                      |#classPath+"/login?screen=*crystal causerlist"     |common
+//Codes List	                      |#classPath+"/login?screen=*crystal cacodelist"     |common
+//Transaction Codes List            |#classPath+"/login?screen=*crystal catrnlist"      |common
+//-------------------------------------------------------------------
+//#classPath+"/login?screen=*crystal acmst(xacc=From Account=0,xacc=To Account=zzz)"

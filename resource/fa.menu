@@ -1,0 +1,12 @@
+//so.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Asset Name Master                |#classPath+"/login?screen=famst"
+Transactions                     |#classPath+"/login?menu=fatrn"
+Processing and Transfer          |#classPath+"/login?menu=faprocs"
+Balance Maintenane               |#classPath+"/login?screen=fabal"
+Reports                          |#classPath+"/login?menu=fareports"
+Codes and Parameters             |#classPath+"/login?menu=facodes"
+//-------------------------------------------------------------------
+

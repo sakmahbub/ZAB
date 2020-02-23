@@ -1,0 +1,95 @@
+screen fagli
+     caption "Balance Maintenance"
+     //sidebar list one//, text three
+     sections form one,list one, jscript myscript
+
+
+
+     list one
+        table fagli
+        order xcat,xvoucher
+	      navigators alpha //group xacc
+        //navigators alpha,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 20
+        objects  xcat,xvoucher attrib(link "login?screen=fagli&command=Show&xcat=?&xvoucher=?"),~
+                 xaccdr,xacccr,xacc
+
+        //headers none
+     end list
+
+
+     form one
+        caption "FA To GL Interface"
+	      table fagli
+       primarykey xcat,xvoucher
+        order xcat,xvoucher
+        //select
+        return "login"
+        layout 5
+        pstyle 3
+        objects Show,Add,Delete,Clear,*next,Top,Previous, Next, Bottom,"<p>" ,~
+        xcat,xvoucher,xaccdr,xacccr,xacc
+
+        field xvoucher
+          caption Transaction Code
+          display combo
+          pick "select xtrn from xtrn where xtypetrn='FA Transactions'"
+        end field
+
+        field xaccdr
+          display text
+          pick list xacc
+        end field
+
+        field xacccr
+          display text
+          pick list xacc
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Enter
+          embed onclick="clicked(this)"
+        end field
+
+        field DespatchAdd
+          embed onclick="desadd(this)"
+        end field
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function desadd(b){
+          b.value = "Top"
+          detail="desadd"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "opordcus"
+            form.searchbutton.value = "Find xcus=?"
+            //return false
+          }
+	    if (detail=="desadd"){
+            form.screen.value = "cadel"
+            form.searchbutton.value = "Find xcus=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

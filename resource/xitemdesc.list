@@ -1,0 +1,13 @@
+     list xitemdesc
+        caption "Items containing: "+zvalue
+        table caitem
+        order xitem
+        select "(xitem like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%')"
+        navigators alpha
+        rows 10
+        objects xitem, ~
+                xdesc,xlong
+
+     end list
+
+

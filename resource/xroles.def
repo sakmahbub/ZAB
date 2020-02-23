@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table xroles
+  caption "User Role"
+  columns ztime, zutime,zauserid,zuuserid, zid,~
+          xrole,xdesc,xaccess,zactive
+
+  primary key zid, xrole
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  list xaccess, zactive
+end table

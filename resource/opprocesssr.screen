@@ -1,0 +1,71 @@
+screen opprocesssr
+
+     sections form detail, jscript myscript
+
+
+     form detail
+        caption "Sales Return Batch Process"
+        return "login"
+        layout 2
+        pstyle 3
+        report
+        objects ~
+                Clear,Process,~
+                xdate,xdatedue,xfdornum,xtdornum,xwh
+
+
+        field xfdornum
+          attrib local
+          caption From Sales Return
+          display text
+        end field
+
+        field xtdornum
+          attrib local
+          caption To Sales Return
+          display text
+          default "z"
+        end field
+
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+        field Process
+          event after
+            set temp = #spsql(sp_CRNProcess,#id,#user,xwh,xdate,xdatedue,xfdornum,xtdornum)
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcrnheader"
+            form.searchbutton.value = "Find xcrnnum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

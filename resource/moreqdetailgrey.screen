@@ -1,0 +1,213 @@
+screen moreqdetailgrey
+
+    caption "Transfer Order Detail"
+    sidebar list recipedetail,list one
+    sections  form one, jscript myscript
+	
+	 list recipedetail
+        caption "Recipe for <br>Batch "+xbatch+" Process "+xmoprcs
+        table mohrecipesettingdetail
+        order xbatch,xrow,xitemrow
+        fixed xbatch		
+		select "xtype='Grey Fabric' and xrow="+xdocrow+" and ((xqtymix+xqtyadd)-isnull(xqtyreq,0))>0"
+        rows 20
+        objects  xitem attrib(link "abc" embed onclick="return pickRecipe(this:xqtymix#:xitemrow#)"), ~
+                 desc equals((select xdesc from caitem where zid=mohrecipesettingdetail.zid and xitem=mohrecipesettingdetail.xitem)),~
+                 (xqtymix+xqtyadd-xqtyreq) attrib(name xqtymix#),xqtyadd  attrib(name xqtyadd#),xitemrow attrib(name xitemrow#)
+
+        //totals "","Totals","","",sum,sum,""
+		
+        headers "Item","Description","Recipe Qty","Additional Qty","Row No"
+     end list
+              
+    list one
+        caption "<br><center><b>"Transfer Order Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=moreqdetailgrey&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyreq,xqtyord
+
+        headers "Serial No","Item","Description","Qunatity Required","Quantity Delivered"
+     end list
+
+	
+     list recipedetail2
+        caption "Detail List "
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+	//	select "xorderrow="+xrow+""
+        rows 20
+		objects  xitem attrib(link "abc" embed onclick="return pickRecipe(this:xqtyord#:xorderrow#)"), ~
+		desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem)),~
+			xqtyord attrib(name xqtyord#),xorderrow attrib(name xorderrow#)
+	  
+        //totals "","","Totals","","","","","",sum
+
+        headers "Item Code","Construction","Qty","Line No"
+     end list
+              
+    list one2
+        caption "<br><center><b>"Transfer Order Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=moreqdetailgrey&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyreq,xqtyord
+
+        headers "Serial No","Item","Description","Qunatity Required","Quantity Delivered"
+     end list
+
+
+     form one
+        caption "Requisition Detail For "+xtornum
+        table imtordetail
+        primarykey xtornum,xrow
+        order xtornum,xrow
+        fixed xtornum
+        return "login"
+        pstyle 3
+        layout 2
+        objects Add,Delete,Clear,Show,Top,Previous,Next,Bottom,~
+        Return,"<p>",~
+        xrow,xunit display(const),xitem,xdesc,xqtyreq,xqtycom display(hide),xqtyord display(hide),xnote,~
+        xrate display(hide),xlineamt display(hide),xfabriccolor display(hide)
+
+	    field xitem
+			pick xitemfabric
+		end field
+
+		field xdocrow
+			caption Recipe Row
+		end field
+		
+        field xrow
+          event after
+            set status = imtorheader.xstatustor("xtornum='"+xtornum+"'")
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Open"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+          end event
+        end field
+
+	field xbatch
+		caption Batch No.
+		width 50
+	end field
+
+        field xdesc
+          caption Construction
+          attrib local
+          display const
+          event after
+            set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+	  	
+        field add
+          event before
+			set xfabriccolor="Grey Fabric"
+			set itemgroup=#sql("select xgitem from caitem where zid='"+#id+"' and xitem='"+xitem+"'")
+			if itemgroup .ne. "Fabric"
+			  error "Please select Fabric Code"
+			end if
+            set xunit = caitem.xunitsel("xitem = '"+xitem+"'")
+			set docrow = imtorheader.xdocrow("xtornum='"+xtornum+"'")
+			double qtyreq = mohrecipesettingdetail.xqtyreq("xbatch='"+xbatch+"' and xrow="+docrow+" and xitemrow="+xrow)
+			//double qtymix = mohrecipesettingdetail.xqtymix("xbatch='"+xbatch+"' and xrow="+docrow+" and xitemrow="+xrow)
+			double qtymix = #sql(double,"select sum(xqtymix+xqtyadd) from mohrecipesettingdetail where xbatch='"+xbatch+"' and xrow="+docrow+" and xitemrow="+xrow)
+			
+			set qtyreq = qtyreq+xqtyreq
+			if qtyreq > qtymix
+				error "Cannot Porceed -- Quantity Exceeds "
+			end if
+          end event
+          event after
+            set temp = #spsql(zabsp_MO_validateAfterStoreReq,#id,#user,xbatch,xrow,xdocrow,xqtyreq)
+            action show
+          end event
+        end field
+
+        field update
+          event before
+		   set itemgroup=#sql("select xgitem from caitem where zid='"+#id+"' and xitem='"+xitem+"'")
+		  if itemgroup .ne. "Fabric"
+		  error "Please select Fabric"
+            set xunit = caitem.xunitsel("xitem = '"+xitem+"'")
+			set docrow = imtorheader.xdocrow("xtornum='"+xtornum+"'")
+			set qtyreq = mohrecipesettingdetail.xqtyreq("xbatch='"+xbatch+"' and xrow="+docrow)
+			set qtymix = mohrecipesettingdetail.xqtymix("xbatch='"+xbatch+"' and xrow="+docrow)
+			set qtyreq = qtyreq+xqtyreq
+			if qtyreq > xqtymix
+				error "Cannot Porceed -- Quantity Exceeds "
+			end if
+          end event
+          event after
+            set temp = #spsql(zabsp_MO_validateAfterStoreReq,#id,#user,xbatch,xrow,xdocrow,xqtyreq)
+            action show
+          end event
+        end field
+
+        field delete
+          event before
+			set batch = xbatch
+			set row = xrow
+			set docrow = xdocrow
+			set qtyreq = xqtyreq
+          end event
+          event after
+            set temp = #spsql(zabsp_MO_validateAfterStoreReq,#id,#user,batch,row,docrow,qtyreq)
+            action show
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Return"){
+            form.screen.value = "moreqheadergrey"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+        function pickRecipe(link,qty,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xqtyreq.value=qty.text
+            document.one.xitem.value=link.text
+            document.one.xrow.value=row.text
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xrow.value=row.innerText
+            document.one.xqtyreq.value=qty.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

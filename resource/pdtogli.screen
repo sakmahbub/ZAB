@@ -1,0 +1,132 @@
+screen pdtogli
+
+     sidebar list one
+	 sections  form one, jscript myscript
+
+     list one
+        caption "Payroll To GL Interface"
+        table pdtogli
+        order xtype,xcostcentre,xbank
+        rows 20
+        objects xtype attrib(link "login?screen=pdtogli&command=Show&xtype=?&xempcategory=?&xcostcentre=?&xbank=?"),xempcategory, ~
+                xbank,banknam equals((select xname from cabank where zid=pdtogli.zid and xbank=pdtogli.xbank)),~
+				xcostcentre,xtrn,xaccdr,descdr equals((select xdesc from acmst where zid=pdtogli.zid and xacc=pdtogli.xaccdr))
+				//,xacccr,descdr equals((select xdesc from acmst where zid=pdtogli.zid and xacc=pdtogli.xacccr))
+
+
+        headers "GL Flag","Division","Bank","Bank Name","Cost Centre","Voucher Type","Debit Account","Description"//,"Credit Account","Description"
+		//headers "GL Flag","Bank","Cost Centre","Voucher Type","Debit Account","Description"//,"Credit Account","Description"
+     end list
+
+
+     form one
+        caption "PD To GL Interface"
+        table pdtogli
+        order xtype,xempcategory,xcostcentre,xbank
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,*next,Top,Next,Previous,Bottom,"<p>" ,~
+                xtype,xtrn,xempcategory,,xcostcentre,costcentrename,xbank,bankname,xaccdr,xdescdr//,xacccr,xdesccr
+		
+   // field xbank
+   //   display combo
+   //   pick "select xcode from xcodes where xtype='Bank' and zactive=1"
+   //end field
+	
+	field bankname
+      caption Bank name
+	  display const
+	  attrib local
+	  event after
+	    set bankname=cabank.xname("xbank='"+xbank+"'")+"<br>"+cabank.xbacc("xbank='"+xbank+"'")+"<br>"+cabank.xbranch("xbank='"+xbank+"'")+"<br>"+cabank.xmadd("xbank='"+xbank+"'")+"<br>"+cabank.xacc("xbank='"+xbank+"'")+" - " +acmst.xdesc("xacc='"+cabank.xacc("xbank='"+xbank+"'")+"'")
+	 // set bankname=cabank.xname("xbank='"+xbank+"'")
+	  end event
+    end field
+		
+		field xtrn
+			caption GL Voucher Code
+			display combo
+			pick "select xtrn from xtrn where xtypetrn='GL Voucher' and left(xtrn,2) in ('JV','BP','PV')"
+		end field
+		
+		field xtype
+			caption GL Flag
+			pick "Salary,Bonus,Loans & Advance"
+		end field
+		
+		field xcostcentre
+			caption Cost Center
+			display combo
+			pick "select xcode from xcodes where xtype='Department Name' and zactive=1"
+		end field
+		
+		field costcentrename
+		caption Cost Center Name
+		attrib local
+		display const
+		event after
+		set costcentrename=xcodes.xlong("xcode='"+xcostcentre+"' and xtype='Department Name' and zactive=1")
+		end event
+		end field
+		
+        field xacc
+          caption Debit Account
+//          pick "select xtrn from xtrn where xtypetrn = 'AR Transactions'"
+        end field
+		
+
+        field xdum
+          attrib local
+          caption 
+          display const
+        end field
+
+        field xdescdr
+          attrib local
+          caption Debit Description
+          display const
+          event after
+            set xdescdr=acmst.xdesc("xacc='"+xaccdr+"'")
+          end event
+        end field
+
+        field xdesccr
+          attrib local
+          caption Credit Description
+          display const
+          event after
+            set xdesccr=acmst.xdesc("xacc='"+xacccr+"'")
+          end event
+        end field
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

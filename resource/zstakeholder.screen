@@ -1,0 +1,64 @@
+screen zstakeholder
+	sidebar list one
+	sections form one,jscript myscript
+	
+	list one
+		caption "Stake Holder List"
+		table zstakeholder
+		order xrow
+		rows 20
+		objects	xrow attrib(link "login?screen=zstakeholder&command=Show&xrow=?"), ~
+						xstaff,xname,xtitle,xproject,xdeptname,xdesignation,xmobile,xemail,xrem
+						
+		headers "SN","ID","Name ","Title","Project","Department","Designation","Mobile","Email", "Remark"
+	
+	end list
+
+	
+	
+	
+	
+
+form one
+
+		
+	
+	caption "Stake Holder Information"
+	table zstakeholder
+	primarykey zid,xstaff
+	order xrow
+	return "login"
+	layout 2
+	pstyle 3
+	objects Add,Update,Delete,*next,*next,*next,Show,Clear,~
+              *next,*next,*next,Top,Previous,Next,Bottom,"<p>",~
+				xrow attrib(row 0 1),xstaff,xname,xtitle,xproject,xdeptname,~
+				xdesignation,xposition,xmobile,xemail,xrem
+
+
+		
+		field xstaff
+			event after
+				
+				class careports(getReport{zstakeholder;2;in,st;zid,project;xproject;Print Stakeholder})
+				
+			end event
+		end field
+		
+		embed onsubmit="return submitit(this)"
+		
+		
+		
+					
+
+end form  
+
+
+	jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        
+        </script>
+     end jscript
+
+end screen

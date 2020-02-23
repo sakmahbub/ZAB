@@ -1,0 +1,12 @@
+     list pdcons
+        table pddoctorview
+        order xstaff
+        select "(xstaff like '%"+zvalue+"%' or xname like '%"+zvalue+"%' or  xdeptname like '%"+zvalue+"%')"
+        navigators alpha
+        rows 20
+        objects xstaff attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xname,xdeptname,xvisitinghour
+
+     end list
+
+

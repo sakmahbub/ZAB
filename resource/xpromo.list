@@ -1,0 +1,11 @@
+     list xpromo
+        caption "Promotion -->"
+        table oppromoheader
+        order xpromono desc
+        select "(xpromono like '%"+zvalue+"%')"
+		rows 20
+        objects xpromono attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xconsignment
+     end list
+
+

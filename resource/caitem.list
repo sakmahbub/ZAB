@@ -1,0 +1,18 @@
+     list caitem
+        table caitem
+        order caitem
+//        select "xgitem='Raw Materials'"
+        navigators alpha
+        rows 20
+        //objects  xcur attrib(link "Main?page=xcur&command=Show&xcur=?"),
+        objects xitem attrib(link "abc" embed onclick="return updateParent(this:'xdesc')"), ~
+                xdesc,xserial
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

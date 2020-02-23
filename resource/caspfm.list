@@ -1,0 +1,10 @@
+list caspfm
+  table cafm
+  order xfm
+  select "(xfm like '%"+zvalue+"%' or xname like '%"+zvalue+"%') and  zactive='1'"
+  rows 10
+  objects xfm attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+               xname,xfield
+end list
+
+

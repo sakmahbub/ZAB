@@ -1,0 +1,84 @@
+screen optrginsdetail
+
+  sidebar list detail 
+  sections form one,  jscript myscript
+
+
+    list detail
+      caption "Additional Point List For: "+xinstrn
+	    table optrginsdetail
+    	order xinstrn,xrow
+    	fixed xinstrn
+        rows 20
+        objects  xrow attrib(link "login?screen=optrginsdetail&command=Show&xinstrn=?&xrow=?"),~
+        		 xfpercent,xtpercent,xpoint
+
+     end list
+
+
+  form one
+    caption "Incentive Detail For "+xinstrn+""
+    table optrginsdetail
+    primary key xinstrn,xrow
+    order xinstrn,xrow
+    fixed xinstrn
+    pstyle 3
+    return "login"
+    layout 2
+    objects Add, Update, Delete,Clear,Show, *next,Return,Top,Previous,Next,Bottom,~
+            xrow attrib(row 0 1),xdum,xfpercent,xtpercent,xpoint,xdesc
+
+
+	field xdesc
+		width 50
+	end field
+	
+
+	
+	
+    field xdum
+      attrib local
+      caption
+      display const
+    end field
+
+
+
+    embed onsubmit="return submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+
+
+
+
+
+  end form
+
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var but
+      var result
+
+      function clicked(b){
+        but = b.value
+      }
+      function submitit(form){
+        result = true
+        if (but == "Return"){
+          form.screen.value = "optrginsheader"
+          form.searchbutton.value = "Find xinstrn=?"
+        }
+        but = ''
+        return result
+      }
+      </script>
+  end jscript
+
+end screen
+
+
+
+

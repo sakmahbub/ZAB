@@ -1,0 +1,285 @@
+screen opordlcinfoadmin
+
+    sidebar list one //,list terms,list dor 
+    sections form one,  jscript myscript
+
+     
+	list one
+        caption "PI List For : "+xlcno
+        table opordheader
+        order xordernum
+        //fixed xlcno	
+		select " xlcno='"+xlcno+"' and isnull(xlcno,'')<>''"		
+        rows 20
+		
+        objects  xordernum attrib(link "login?screen=opordlcheader&command=Show&xordernum=?"),~
+                 xpidate,xpiref,xcus,desc equals((select xorg from cacus where xcus=opordheader.xcus))
+				 
+        headers "PI No.","PI Date","PI Ref.","Cus ID","Name"
+     end list
+
+	list onet
+        caption "LC Detail For :"+xlcno
+        table poorddetail
+        order xordernum,xrow
+        fixed xordernum
+        rows 20
+		
+        objects  xrow attrib(link "login?screen=poorddetail&command=Show&xordernum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where xitem=poorddetail.xitem)),xqtypur,xunitpur,xqtygrn
+
+        headers "Row","Item","Description","Qty","Unit","GRN Qty"
+     end list
+
+     form one
+        caption "Export LC Info Update(Admin)"
+        table lcinfo
+		primarykey xlcno
+        order xlcno		
+		select "xtype='Export' and xordertype = 'LC'"
+        pstyle 3
+        return "login"
+        layout 3
+        objects Show,Update,Delete,Top,Next,Previous,Bottom,Clear,Confirm,StatusOpen,"<p>",~ //PILink,Ammendment,Add,
+               xlcno,xlctype,xlcissuedate,xcus,xcusdesc,xshipdate,xcur,xexch,xexpirydate,~
+			   xopenbank,xopdesc,xpaydate,xadvisingbank,xadvdesc,xmaturitydate,xprime,xbblcno,xbblcdatetext,xhscode,xbankdcno,xircno,~
+			   xfdbcno,xfdbcdate display(hide),xfbpno display(hide),xfbpdate display(hide),xport,xdestination,~
+			   xstatusjv display(hide),xordernum display(hide),xlcstatus,xincoterm,~
+			   xprimetotamt display(hide),xtype display(hide),xbankbin,xappbankbin,xfreighttype,~
+			   xordertype display(hide),xinspolicyno,xinscoverno,xpireff display(const),xstatus display(const)
+				
+		field xbankdcno
+			caption Bank DC/Ref No.
+		end field      
+
+		field xlcno
+				pick list opordlc
+				event after
+					//set global(xlcno)=xlcno
+					//set global(xordernum)=xordernum
+					//set global(xcus)=xcus
+			
+				if xlcno .eq. ""					
+					set #field(delete.attrib) = "disabled"
+					set #field(update.attrib) = "disabled"
+				
+				else if lcinfo.xstatus("xlcno='"+xlcno+"'") .eq. "Applied"
+					set #field(Confirm.display) = "hidden"
+					set #field(Update.attrib) = "disabled"
+					set #field(Delete.attrib) = "disabled"			
+				
+				end if
+				
+				end event
+				
+		end field
+			
+		
+		field xstatus
+			caption PI Tag Status
+		end field
+		
+		field xhscode
+			display combo
+			pick "select xcode from xcodes where xtype='HS Code' and zactive ='1'"
+		end field
+
+		field xfreighttype
+			display combo
+			pick "FREIGHT COLLECT,FREIGHT PREPAID"
+		end field
+
+		field xincoterm
+			caption Inco-Terms
+			//display combo
+			//pick "select xincoterm from xcodes where xtype='Inco-Terms'"
+		end field
+		
+		field xordernum
+			caption PI Reference No.
+		end field
+		
+		field xprime
+			captoin LC Value
+			//pick 
+		  end field
+
+		field xbblcno
+			length 500
+		end field
+		
+		field xdestination
+			caption Destination
+		end field
+
+		field xopenbank
+			caption Applicant Bank Code			
+		end field
+		  
+		field xcusdesc
+          attrib local
+          caption Name
+          display const
+          event after
+            set xcusdesc = cacus.xorg("xcus = '"+xcus+"'")+"<br>"+cacus.xmadd("xcus = '"+xcus+"'")
+          end event
+        end field
+
+		field xdum
+		  	attrib local
+		  	display const
+		  	caption 
+		end field
+		
+		field xfdbcno
+			caption L.C.A. From No
+		end field
+
+		field xopdesc
+		  	attrib local
+		  	display const
+		  	caption Bank Name
+		  	event after
+		  		set xopdesc=cabank.xname("xbank='"+xopenbank+"'")+"<br>"+cabank.xbranch("xbank='"+xopenbank+"'")+"<br>"+cabank.xmadd("xbank='"+xopenbank+"'")+"<br>"+cabank.xswiftcode("xbank='"+xopenbank+"'")
+		  	end event
+		end field
+
+		field xadvdesc
+		  	attrib local
+		  	display const
+		  	caption Bank Name
+		  	event after
+		  		set xadvdesc=cabank.xname("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xbranch("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xmadd("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xswiftcode("xbank='"+xadvisingbank+"'")
+		  	end event
+		end field
+
+		field add
+			event before
+				set xtype="Export"
+				if xlcno .eq. ""
+					error "Cannot Proceed -- Please Write LC No."
+				else if  xcus .eq. ""
+					error "Cannot Proceed -- Please Select  Customer"
+				else if cabank.xbank("xbank='"+xopenbank+"'") .ne. #trim(xopenbank)
+					error "Cannot Proceed -- Applicant Bank Not Exists in  Bank Master!"
+				else if cabank.xbank("xbank='"+xadvisingbank+"'") .ne. #trim(xadvisingbank)
+					error "Cannot Proceed -- Advising Bank Not Exists in  Bank Master!"
+					
+				else
+				//set xbilldate=#date
+				//set xrealdate=#date
+				set xstatusjv="Open"
+				set xprimetotamt=xprime
+				set xordertype = "LC"
+				set xstatus = "Open"
+				end if
+			end event
+			event after
+				
+			end event
+		end field
+		
+        field update
+			event before
+				if xcus .eq. ""
+					error "Cannot Proceed -- Please Select  Customer"					
+				else if cabank.xbank("xbank='"+xopenbank+"'") .ne. #trim(xopenbank)
+					error "Cannot Proceed -- Applicant Bank Not Exists in  Bank Master!"
+				else if cabank.xbank("xbank='"+xadvisingbank+"'") .ne. #trim(xadvisingbank)
+					error "Cannot Proceed -- Advising Bank Not Exists in  Bank Master!"
+				else
+					set xprimetotamt=xprime
+				end if
+				
+				
+			end event
+          event after
+	
+          end event
+        end field
+
+		field StatusOpen
+			event before
+				
+				set temp = #sesql("Update lcinfo set xstatus='Open' where xlcno='"+xlcno+"'")
+				//set 
+			end event
+			
+          event after
+           // set temp = #sesql("Update lcinfo set xstatus='Open' where xlcno='"+xlcno+"'")
+			action Show
+          end event
+        end field
+
+
+		field Confirm
+		 event before
+		 double pono=#sql("select count(xlcno) from opordheader Where xlcno='"+xlcno+"'")
+		 if pono < 1
+			error "Please LC Link With PI"
+		 end if	 
+		 
+		 end event
+          event after
+            set temp = #sql("Update lcinfo set xstatus='Applied' where xlcno='"+xlcno+"'")
+			action show
+          end event
+        end field
+		
+          field Ammendment
+            embed onclick="clicked(this)"
+          end field
+
+          field LC
+            embed onclick="clicked(this)"
+          end field
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+		
+		field PILink
+			embed onclick="clicked(this)"
+		 end field
+
+ embed onsubmit="return submitit(this)"
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "opordlcheader"
+            form.searchbutton.value = "Find xordernum=?"
+          }
+	        if (but=="Ammendment"){
+            form.screen.value = "lcexpamend"
+            form.searchbutton.value = "Top"
+          }
+        if (but=="LC Cost"){
+            form.screen.value = "poordcost"
+            form.searchbutton.value = "Top"
+          }
+		  if (but=="PILink"){
+            form.screen.value = "opordlcheaderpilcadmin"
+            //form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

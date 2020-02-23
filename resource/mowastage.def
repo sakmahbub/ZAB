@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table mowastage
+  caption "MO Wastage Return"
+  columns  ztime,zutime,zauserid,zuuserid, zid, xbatch,xrow,xdate,xitem,xqty,xwh,xstatus           
+           
+  primary key zid, xbatch,xrow
+  
+  foreign key
+        zid references zbusiness.zid
+        zid,xbatch references moheader.zid,xbatch
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+end table

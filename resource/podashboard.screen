@@ -1,0 +1,207 @@
+screen podashboard
+
+     sections form one,jscript myscript
+
+
+     form one
+        caption "Purchase Dashboard"
+        return "login"
+        layout 2
+        pstyle graph
+        objects Filter,xdiv,xfdate,xtdate,pogrnissue,poapproved,stockrcvd,stockissue,immstock//,imloaniss,imloanrec,impendinginsp
+        //objects Filter,xdiv,xfdate,xtdate,immstock
+
+		field xfdate
+		//event after
+		//	set xfdate= "01-01-"+#sub(xfdate,0,4)
+		//end event
+		//	default "01-01-"+#sub(#date,0,4)
+		end field
+		
+		field xdiv
+			display combo
+			caption Unit
+			pick "DEPZ,CEPZ,,"
+			event after
+				if #id .ne. 100000
+					set #field(xdiv.display)="hidden"
+				else 			
+					set #field(xdiv.display)="combo"
+				end if
+			end event
+		end field
+		
+		field pogrnissue
+			column 2
+			graphtype line-labels//3d-column
+			graphsp zabsp_PO_podashboard
+			graphtable pographdata
+			attrib local
+			width 900
+			display const
+			graphseries1datalabel enabled: true,rotation: 0,format: '{point.y:.2f} '//,y:10,x:10
+			graphseries1datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			graphseries2datalabel enabled: true,rotation: 0,format: '{point.y:.2f} '//,y:20
+			graphseries2datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			graphseries3datalabel enabled: true,rotation: 0,format: '{point.y:.2f} '//,y: 20
+			graphseries3datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			event after
+				if #id .ne. "100000"
+					set xdiv= ""
+				end if
+				set pogrnissue = xdiv+","+xfdate+","+xtdate
+			end event
+		end field
+
+		field poapproved
+			//column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_PO_podashboard
+			graphtable pographdata
+			attrib local
+			display const
+			graphdrillbuttonposition relativeTo: 'plotBox',position: {y: -30,x: 0}
+			event after
+				if #id .ne. "100000"
+					set xdiv= ""
+				end if
+				set poapproved = xdiv+","+xfdate+","+xtdate
+			end event
+		end field
+
+		field stockrcvd
+			//column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_PO_podashboard
+			graphtable pographdata
+			attrib local
+			display const
+			graphdrillbuttonposition relativeTo: 'plotBox',position: {y: -30,x: 0}
+			graphplegend layout: 'vertical',align: 'left',x: 120,y: 80,verticalAlign: 'top',floating: true,backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+			graphseries1datalabel enabled: true,rotation: 0,format: '{point.y:.2f} '
+			graphseries1datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			event after
+				if #id .ne. "100000"
+					set xdiv= ""
+				end if
+				set stockrcvd = xdiv+","+xfdate+","+xtdate
+			end event
+		end field
+		
+		field stockissue
+			column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_PO_podashboard
+			graphtable pographdata
+			attrib local
+			display const
+			graphdrillbuttonposition relativeTo: 'plotBox',position: {y: -30,x: 0}
+			graphplegend layout: 'vertical',align: 'left',x: 120,y: 80,verticalAlign: 'top',floating: true,backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+			graphseries1datalabel enabled: true,rotation: 0,format: '{point.y:.2f} '
+			graphseries1datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			event after
+				if #id .ne. "100000"
+					set xdiv= ""
+				end if
+				set stockissue = xdiv+","+xfdate+","+xtdate
+			end event
+		end field
+		
+		field immstock
+			column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_PO_podashboard
+			graphtable pographdata
+			attrib local
+			display const
+			graphdrillbuttonposition relativeTo: 'plotBox',position: {y: -30,x: 0}
+			event after
+				if #id .ne. "100000"
+					set xdiv= ""
+				end if
+				set immstock = xdiv+","+xfdate+","+xtdate
+			end event
+		end field
+
+		field imloaniss
+			//column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+			event after
+				set imloaniss = xfdate+","+xtdate
+			end event
+		end field
+		
+		field imloanrec
+			//column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+			event after
+				set imloanrec = xfdate+","+xtdate
+			end event
+		end field
+
+		field impendinginsp
+			//column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+			height
+			event after
+				set impendinginsp = xfdate+","+xtdate
+			end event
+		end field
+		
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetail"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Ammendment"){
+            form.screen.value = "polcamend"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Costs"){
+            form.screen.value = "poordcost"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Commodity"){
+            form.screen.value = "poordcommodity"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Shipment"){
+            form.screen.value = "poordshipment"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Receiving"){
+            form.screen.value = "poordreceive"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+        </script>
+    end jscript
+
+ end screen

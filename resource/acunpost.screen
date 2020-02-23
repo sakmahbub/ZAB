@@ -1,0 +1,46 @@
+screen acunpost
+
+     caption "UnPosting"
+     sections form one,  jscript myscript
+
+
+
+     form one
+        caption "U<ACRONYM>n</ACRONYM>P<ACRONYM>osting</ACRONYM>"
+        return "login"
+        layout 2
+	  pstyle 3 
+
+        objects UnPost,"<p>" ,~
+                 xyear, xper,xfvoucher,xtvoucher
+
+      field xfvoucher
+		attrib local
+		display text
+		caption From Voucher
+	end field
+
+      field xtvoucher
+		attrib local
+		display text
+		default "z"
+		caption To Voucher
+	end field
+ 
+	field unpost
+         event before
+//            class gltrn(acUnPost{xyear,xper})
+            set temp = #spsql(sp_acUnPost,#id,#user,xyear,xper,xfvoucher,xtvoucher)
+         end event
+       end field
+
+        embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+     end jscript
+
+
+
+end screen

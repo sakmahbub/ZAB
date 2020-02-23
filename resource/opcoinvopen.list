@@ -1,0 +1,16 @@
+     list opcoinvopen
+        table opinvheader
+        order xinvnum desc
+        select "(xinvnum like '%"+zvalue+"%' and xcus like '%"+zvalue+"%' and xstatusar='Open')"
+        navigators alpha
+        rows 20
+		searchselect "xstatusar='Open'"
+        objects xinvnum attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xcus,xdate,xinvref
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+	

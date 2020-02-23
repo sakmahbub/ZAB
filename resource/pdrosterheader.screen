@@ -1,0 +1,242 @@
+screen pdrosterheader
+
+    sidebar list detail,list detailtemp
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Roster Detail List"
+        table pdrosterdetailview
+        order xroster,xrow
+        fixed xroster
+		select "xroster<>''"
+        rows 400
+        objects  xrow,~// attrib(link "login?screen=pdrosterdetail&command=Show&xroster=?&xrow=?"), ~
+                 xdate,xdayname,xstaff,empname equals((select xname from pdmst where zid=pdrosterdetailview.zid and xstaff=pdrosterdetailview.xstaff)),~
+				 dept equals((select xdeptname from pdmst where zid=pdrosterdetailview.zid and xstaff=pdrosterdetailview.xstaff)),xshift,xnote
+        header "Line No","Date","Day Name","Staff","Name","Department","Shift","Note"
+
+     end list
+	 
+  	list detailtemp
+        caption "Roster Detail Trial"
+        table pdrosterdetailtemp
+        order xroster,xrow
+        fixed xroster
+        rows 400
+        objects  xrow,~// attrib(link "login?screen=pdrosterdetail&command=Show&xroster=?&xrow=?"), ~
+                 xdate,xstaff,empname equals((select xname from pdmst where zid=pdrosterdetailtemp.zid and xstaff=pdrosterdetailtemp.xstaff)),~
+				 dept equals((select xdeptname from pdmst where zid=pdrosterdetailtemp.zid and xstaff=pdrosterdetailtemp.xstaff)),xshift,xnote
+        header "Line No","Date","Staff","Name","Department","Shift","Note"
+
+     end list	 
+	 
+
+     form one
+        caption "Roster Header"
+	      table pdrosterheader
+        order xroster desc
+        select "left(xroster,4)='RSTR'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Update,Delete,*Next,*Next,*Next,Show,Clear,*Next,*Next,*Next,~
+				Top,Next,Previous,Bottom,*next,Trial Run,Confirm,"<p>" ,~//Detail
+                xroster,xdate,xfdate,xtdate,xgroup,xshift,xstaff,xname,xstatus,xnote,xlong,xdeptname display(hide)
+
+
+        field xgroup
+		  caption Group Name
+          display combo
+		  //pick code Group Name
+		  pick "select distinct xgroup from pdmst where xempcategory='"+#empcat+"'"
+        end field
+		
+        field xstaff
+         caption Employee ID	  
+        end field	
+
+        field xdate
+         display const	  
+        end field			
+
+        field xname
+          attrib local
+          display const
+          caption Name
+          event after
+            set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+        end field
+		
+        field xnote
+          display combo
+		  caption Holiday
+		  pick "Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday"
+        end field
+
+        field xlong
+          column 2	
+			caption Note
+        end field		
+
+
+          field xroster
+            event after
+			class careports(getReport{pdroster;4;in,st,st,st;zid,roster,staff,empcat;xroster,"","";Print Roster})
+			class careports(getReport{pdrostertemp;4;in,st,st,st;zid,roster,staff,empcat;xroster,"","";Print Trial Roster})
+              set globals(xroster)=xroster
+              set globals(xper)=xper
+              set globals(xyear)=xyear
+              set globals(xdate)=xdate
+			  if pdrosterheader.xstatus("xroster='"+xroster+"'") .ne. "Open"
+			  		set #field(update.attrib)="disabled"
+					set #field(detail.attrib)="disabled"
+         			set #field(delete.attrib)="disabled"
+					set #field(Confirm.display)="hidden"
+					set #field(Trial.display)="hidden"
+			  end if
+			 if xroster .ne. ""
+			//	set #field(add.attrib)="disabled"
+			end if  
+            end event
+          end field
+		  
+          field Trial
+            event before
+			set prevapply=#sql("select xprevroster from pddef")
+            if xgroup .eq. "" .and. xdeptname .eq. "" .and. xstaff .eq. ""
+				error "Please select Group/Department/Employee ID!"
+			else if xfdate .lt. #date .and. prevapply .eq. "No"
+				error "Previous Date Roster can not be create!"
+			else if xtdate .lt. xfdate
+				error "Please To date must be greater than from date!"
+			else if pdrosterheader.xstatus("xroster='"+xroster+"'") .ne. "Open"
+				error "Roster Already Confirmed!"
+			end if
+            end event
+			
+		event after
+		set temp =  #spsql(zabsp_Pd_Roster_Setting,#id,#user,xroster,"",xfdate,xtdate,"Trial Run")
+		action show
+		end event
+          end field			  
+		  
+          field Confirm
+            event before
+			set prevapply=#sql("select xprevroster from pddef")
+            if xgroup .eq. "" .and. xdeptname .eq. "" .and. xstaff .eq. ""
+				error "Please select Group/Department/Employee ID!"
+			else if xfdate .lt. #date .and. prevapply .eq. "No"
+				error "Previous Date Roster can not be create!"
+			else if xtdate .lt. xfdate
+				error "Please To date must be greater than from date!"
+			else if pdrosterheader.xstatus("xroster='"+xroster+"'") .ne. "Open"
+				error "Roster Already Confirmed!"
+			end if
+            end event
+			
+		event after
+		set temp =  #spsql(zabsp_Pd_Roster_Setting,#id,#user,xroster,"",xfdate,xtdate,"CrEaTeRosTeR")
+		action show
+		end event
+          end field		  
+
+          field add
+            event before
+			set xstatus="Open"
+			set prevapply=#sql("select xprevroster from pddef")
+			if xstaff .ne. ""
+			set xgroup=""
+			set xdeptname=""
+			else if xdeptname .ne. ""
+			set xgroup=""
+			end if
+            if xgroup .eq. "" .and. xdeptname .eq. "" .and. xstaff .eq. ""
+				error "Please select Group/Department/Employee ID!"
+			else if xfdate .lt. #date .and. prevapply .eq. "No"
+				error "Previous Date Roster can not be create!"				
+			else if xtdate .lt. xfdate
+				error "Please To date must be greater than from date!"
+			else
+			set temp=#sesql("select xroster from pdrosterheader where xtdate>='"+xfdate+"' and xgroup='"+xgroup+"' and xgroup<>''")
+			if #result .eq. "true" .and. prevapply .eq. "No"
+				error "Roster Already created for This Group! & Roster No : "+temp
+			else
+			set temp=#sesql("select xroster from pdrosterheader where xtdate>='"+xfdate+"' and xdeptname='"+xdeptname+"'and xdeptname<>''")
+			if #result .eq. "true"  .and. prevapply .eq. "No"
+				error "Roster Already created for this Department! & Roster No : "+temp
+			else
+			set temp=#sesql("select xroster from pdrosterheader where xtdate>='"+xfdate+"' and xstaff='"+xstaff+"' and xstaff<>''")
+			if #result .eq. "true"  .and. prevapply .eq. "No"
+				error "Roster Already created for this Staff! & Roster No : "+temp
+			end if
+			else
+			set xroster = #trn("Roster Number","RSTR",10)
+			end if
+            end event
+          end field
+
+        field update
+            event before
+			set prevapply=#sql("select xprevroster from pddef")
+			if xstaff .ne. ""
+			set xgroup=""
+			set xdeptname=""
+			else if xdeptname .ne. ""
+			set xgroup=""
+			end if			
+			if pdrosterheader.xstatus("xroster='"+xroster+"'") .ne. "Open"
+				error "Already Confirmed!"
+            else if xgroup .eq. "" .and. xdeptname .eq. "" .and. xstaff .eq. ""
+				error "Please select Group/Department/Employee ID!"
+			else if xfdate .lt. #date .and. prevapply .eq. "No"
+				error "Previous Date Roster can not be create!"
+			else if xtdate .lt. xfdate
+				error "Please To date must be greater than from date!"
+			else
+			set temp=#sql("select xdate from pdrosterheader where xtdate>='"+xfdate+"' and xgroup='"+xgroup+"' and xgroup<>'' and xgroup<>'"+xgroup+"' and xroster<>'"+xroster+"'")
+			if #result .eq. "true" .and. prevapply .eq. "No"
+				error "Roster Already created for This Group!"
+			else
+			set temp=#sql("select xdate from pdrosterheader where xtdate>='"+xfdate+"' and xdeptname='"+xdeptname+"'and xdeptname<>'' and xdeptname<>'"+xdeptname+"' and xroster<>'"+xroster+"'")
+			if #result .eq. "true" .and. prevapply .eq. "No"
+				error "Roster Already created for this Department!"
+			else
+			set temp=#sql("select xdate from pdrosterheader where xtdate>='"+xfdate+"' and xstaff='"+xstaff+"' and xstaff<>'' and xstaff<>'+xstaff+""' and xroster<>'"+xroster+"'")
+			if #result .eq. "true" .and. prevapply .eq. "No"
+				error "Roster Already created for this Staff!"
+			end if
+			end if
+            end event
+          end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdrosterdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

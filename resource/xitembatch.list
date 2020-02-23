@@ -1,0 +1,11 @@
+list xitembatch
+	caption "Items containing: "+zvalue
+	//table imstock
+	table imstockbatchview
+	order xdateexp
+	select "(xitem like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%' or xbatch like '%"+zvalue+"%') and xwh='"+#wh+"'"
+	searchselect "xwh='"+#wh+"'"
+	rows 10
+	objects xbatch attrib(link "abc" embed onclick="return updateParent(this:'$')"),xitem,~
+					xdesc,xavail,xdateexp
+end list

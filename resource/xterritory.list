@@ -1,0 +1,12 @@
+     list xterritory
+        table xcodes
+        order xtype,xcode
+        select "(xtype='Territory' and xcode like '%"+zvalue+"%')"
+        rows 20
+	searchselect "xfield<>'"null"' and xtype='Territory'"
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xtrcode,xfield,xregion
+
+     end list
+
+

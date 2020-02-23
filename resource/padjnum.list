@@ -1,0 +1,11 @@
+ list padjnum
+        table poreqheader
+        order xporeqnum
+        select "xporeqnum like '%"+zvalue+"%' and left(xporeqnum,4)='PADJ'"
+		searchselect "left(xporeqnum,4)='PADJ'"
+        rows 20
+        objects xporeqnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xdate,xadvnum
+     end list
+
+

@@ -1,0 +1,10 @@
+     list xbomnum
+        table bmbomheaderview
+        order xbomnum
+        select "(xbomnum like '%"+zvalue+"%')"
+        rows 30
+        objects xbomnum attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xdate,xitem,xdesc,zactive 
+     end list
+
+

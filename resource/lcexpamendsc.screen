@@ -1,0 +1,76 @@
+screen lcexpamendsc
+
+     sidebar list one
+     sections form one,jscript myscript
+
+     list one
+        caption "Ammendment List For "+xlcno
+        table lcamend
+        fixed xlcno
+        order xlcno,xamendno
+        rows 10
+        objects ~
+         xamendno attrib(link "login?screen=lcexpamendsc&command=Show&xamendno=?"), ~
+         xdate,xinvnum,xnote
+//         headers Invoice List
+     end list
+
+     form one
+        caption "SC Ammendment :" +xlcno
+	    table lcamend
+        fixed xlcno
+        order xlcno,xamendno
+        //select
+        return "login"
+        layout 3
+        pstyle 3
+        objects Add,Update,Delete,Show,Clear,Complete,"<p>" ,~
+                xamendno attrib(row 0 1),xdate,xapprover,xinvnum,xnote
+
+        field xnote
+          width 80
+          column 3
+          height 4
+        end field
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+        embed onsubmit="submitit(this)"
+
+
+		field add
+            event before
+			if xapprover .eq. ""
+				error "Please Write the Ammendment Approver "
+			else if xinvnum .eq. ""
+				error "Please select the invoice Number"
+			else if xinvnum .ne. opinvheader.xinvnum("xinvnum='"+xinvnum+"'")
+				error "Invoice Number does not matched"			 
+			end if            
+			end event			
+        end field
+     
+	 end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	      if (detail=="Complete"){
+            form.screen.value = "opordscinfo"
+            form.searchbutton.value = "Find xlcno=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

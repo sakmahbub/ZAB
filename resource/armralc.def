@@ -1,0 +1,21 @@
+product ZAB
+
+table armralc
+
+  caption "MR Allocation View"
+  columns  ztime,zutime,zid,xvoucher,xcus,xdate,xprime
+  primary key zid, xvoucher
+  foreign key
+        zid references zbusiness.zid
+        zid,xvoucher references arhed.zid,xvoucher
+  end foreign key
+  sql create view armralc (ztime,zutime, zid, xvoucher,xcus,xdate,xprime,xtype)~
+                 as select  ztime,zutime, zid, xvoucher,xcus,xdate,~
+                 cast(isnull((arhed.xprime-isnull((SELECT SUM(aralc.xamount) from aralc where aralc.xinvnum = arhed.xvoucher and aralc.zid = arhed.zid),0)),0) as numeric(18,2)), ~
+		 xtype ~
+                 from arhed where left(xvoucher,2)='MR'
+
+// and gldetail.xprime > 0
+end table
+
+//ztime,

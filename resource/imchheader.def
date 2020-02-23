@@ -1,0 +1,14 @@
+product ZAB
+
+table imchheader
+  caption "Chalan Receive Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+  ximtrnnum,xdate,xlong,xref,xbatch,~
+  xwh,xstatus
+
+  primary key zid,ximtrnnum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

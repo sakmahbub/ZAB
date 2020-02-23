@@ -1,0 +1,24 @@
+
+product ZAB ERP
+
+table cafifocostview
+  caption "FIFO View"
+  columns zid,ximtrnnum,xdate,xwh,xitem,xqty,xcost,xqtydel,xbalance,xqtystk
+
+  primary key zid,xitem,xrow
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view cafifocostview (zid,ximtrnnum,xdate,xwh,xitem,xqty,xcost,xqtydel,xbalance,xqtystk) ~
+                  as select im.zid,im.ximtrnnum,im.xdate,im.xwh,im.xitem,im.xqty,im.xrate,isnull(temptable.xqtydel,0) qtydel,(im.xqty-isnull(temptable.xqtydel,0)-isnull(im.xqtystk,0)) balance, ~
+			    isnull(im.xqtystk,0) ~	
+	              from imtrn im ~
+
+                  left join (select del.zid,del.xwh,isnull(del.xcostcode,'') xcostcode,del.xitem,sum(isnull(del.xqty,0)) xqtydel from imtrn del ~
+                  where del.xsign<0 and isnull(del.xdoctype,'')='' group by del.zid,del.xcostcode,del.xwh,del.xitem)temptable ~
+                  on im.zid=temptable.zid and im.xwh=temptable.xwh and im.xitem=temptable.xitem and im.ximtrnnum=temptable.xcostcode ~
+		  where im.xsign>0 and (im.xqty-isnull(temptable.xqtydel,0)-isnull(im.xqtystk,0))>0 and isnull(im.xrate,0)>0
+
+end table

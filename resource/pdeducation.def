@@ -1,0 +1,16 @@
+product ZAB ERP
+
+table pdeducation
+  caption "Qualification Detail"
+
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xstaff,xrow,xyear,xexam,xinstitute,xmajor,xresult
+
+  primary key zid,xstaff,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xstaff references pdmst.zid,xstaff
+  end foreign key
+
+end table

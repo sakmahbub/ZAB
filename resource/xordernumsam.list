@@ -1,0 +1,12 @@
+     list xordernumsam
+        table opordheader
+        order xordernum
+      
+		select "(xordernum like '%"+zvalue+"%' and xtype = 'Sample')"
+        rows 20
+		//searchselect "left(xtornum,4)='TO--'"
+        objects xordernum attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+               xpiref,xpidate
+     end list
+		
+

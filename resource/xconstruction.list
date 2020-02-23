@@ -1,0 +1,9 @@
+     list xconstruction
+        table xcodes
+        order xtype,xcode
+       select "xtype='Construction'"	
+        rows 20
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')")
+     end list
+
+

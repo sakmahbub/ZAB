@@ -1,0 +1,212 @@
+screen imtormoreqheaderpr
+     caption "Transfer Order Entry Header"
+     	sidebar list imtor,list one
+	sections form one, jscript myscript
+     
+	 list imtor
+        caption "Product Requisition "
+        table imtorheader
+        order xtornum desc
+		select "(xstatustor='Checked' OR xstatustor='Approved') and left(xtornum,4)='TO--' and xstatusreq = 'Create PO'"
+        rows 10
+        objects  xtornum  attrib(link "login?screen=imtormoreqheaderpr&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","To Branch"
+     end list
+	
+
+
+   list one
+        caption "Requisition List For Requisition No "+xtornum
+        table imtordetail
+        order xtornum,xrow desc
+        fixed xtornum
+		rows 10
+        objects ~
+        xrow attrib(link "login?screen=imtormoreqdetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xbrand,~
+        xqtyreq,xunit//,xqtycom,xqtyord,xstype
+
+		totals "","","Totals",sum
+		
+        headers "Serial No","Item","Description","Brand","Quantity Required","UOM"//,"Available Quantity","Quantity Delivered","Stock Check Status"
+     end list
+
+     form one
+        caption "Issue / PR By Store Officer"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+       select "(xstatustor='Checked' OR xstatustor='Approved') and left(xtornum,4)='TO--' and xstatusreq = 'Create PO'"
+        return "login"
+        pstyle 3
+        layout 3
+        objects Show,Clear,Create PR,Cash PR,~//Check Stock,Issue From Stock,
+        "<p>" ,~
+        xtornum ,xdate,xdatecom,~
+        xfwh,xfbrname,xref,xtwh,xtbrname,xstatustor display(constant),xporeqnum display(constant),~
+		xdocrow display(hide),xstatusreq display(hide),xdum,xlong display(const),zauserid display(hide),preparer display(const)
+				
+			
+       field xfbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+		caption Requisition No.
+          event after
+			set globals(xtornum)=xtornum
+           // class careports(getaspReport{imtranissueprint,1,xtornum,Print Transfer Challan})
+			if xstatustor .eq. "Approved"
+              set #field(Issue.display)="hidden"
+			  set #field(Create.display)="hidden"
+			   set #field(Cash.display)="hidden"
+			end if
+           end event
+        end field
+
+		 field xporeqnum
+          caption Purchase Requisition No.
+        end field
+		
+        field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xposition='"+zauserid+"'")
+		  end event
+        end field
+
+		  field xdate
+          caption Transfer Date
+        end field
+
+        field xdatecom
+          display constant
+          caption Receive Date
+        end field
+		
+		 field xdum
+		 attrib local
+          display constant
+          caption
+        end field
+
+
+        field xlong
+		caption Note
+          height 3
+          width 110
+          column 2
+        end field
+
+
+        field Create
+          event before
+            if xstatustor .eq. "Confirmed"
+              error "Cannot Proceed -- Requisition Already Checked"
+            end if
+          end event
+          event after
+            set temp = #spsql(zabsp_IM_createPORequisition,#id,#user,xtornum,xdate,"")
+            action Show
+          end event
+        end field
+		
+		 field Cash
+          event before
+            if xstatustor .eq. "Confirmed"
+              error "Cannot Proceed -- Requisition Already Checked"
+            end if
+          end event
+          event after
+            set temp = #spsql(zabsp_IM_createPORequisition,#id,#user,xtornum,xdate,"Cash")
+            action Show
+          end event
+        end field
+		
+        field Check
+          event before
+		   //if xstatustor .ne. "Approved"
+              //error "Cannot Proceed -- Requisition not Approved"
+            //else 
+			//if xstatustor .eq. "Checked"
+              //error "Cannot Proceed -- Requisition Already Checked"
+            //end if
+          end event
+          event after
+            set temp = #spsql(zabsp_IM_CheckMORequisition,#id,#user,xtornum,xdate,xfwh,xstatustor)
+              action show
+          end event
+        end field
+
+        field Issue
+          event before
+		    if xstatustor .ne. "Checked"
+             error "Cannot Proceed -- Please Check Store"
+           //else if xstatustor .eq. "Checked"
+           //   error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+           set temp = #spsql(sp_Admin_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,6)
+		   // set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,"imtormoreqheader",6)
+			action Show
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtormoreqdetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+          link.innerText
+            document.one.xtornum.value=link.innerText
+          }
+          return false
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

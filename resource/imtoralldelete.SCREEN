@@ -1,0 +1,142 @@
+screen imtoralldelete
+     caption "Transfer Order Entry Header"
+     	sidebar list one
+	sections form one, jscript myscript
+
+   list one
+        caption "<br><center><b>"Transfer Order Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=imtordetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyord
+
+        headers "Serial No","Item","Description","Qunatity Ordered"//,"Quantity Delivered"
+     end list
+
+
+
+     form one
+		caption "<font color=Red size=+2>Totally Delete Challan No => </font>"+xtornum
+        table imtorheader
+        primarykey xtornum
+        order xtornum desc
+        return "login"
+        pstyle 3
+        layout 3
+        objects Show,Clear,~
+				*next,|>,Complete_Deleted,<|,"<p>" ,~
+				xtornum,xdate,xdatecom,~
+				xfwh,xfbrname,xtwh,xtbrname,xvatchno,xlong display(hide),xstatustor display(constant),xref
+
+       field xfbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+	field Complete_Deleted
+          	event before
+			if xref .eq. "zab"
+				set temp=#spsql(zsp_Delete_All_Invoice,#id,#user,xtornum,xref)
+				print "Deleted"
+			else
+					error "Cannot Proceed  --   All Rights Reserved by ZAB ERP System"
+			end if
+   		end event
+   end field
+
+    field xtornum
+	   event after
+            class careports(getReport{imtranissueprint,1,xtornum,Print Transfer Challan})
+            class careports(getReport{imtranreceprint,1,xtornum,Print Receive Challan})
+            set globals(xtornum)=xtornum
+          end event
+	pick list ximtorprint
+	end field
+
+        field xdate
+          caption Transfer Date
+        end field
+
+        field xdatecom
+          display constant
+          caption Receive Date
+        end field
+
+
+        field xlong
+          height 3
+          width 110
+          column 2
+        end field
+
+
+        field Transfer
+          event before
+            if xstatustor .ne. "Open"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,8)
+           // action Show
+          end event
+        end field
+
+        field Receive
+          event before
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Transfered"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,8)
+           // action Show
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtordetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

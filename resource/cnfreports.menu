@@ -1,0 +1,15 @@
+//cnfreports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+View Job History            		 |#classPath+"/login?screen=*jspcrystal cnfjobhistory(xordernum= Job No.)"
+View Advance Letter (C&F)            |#classPath+"/login?screen=*jspcrystal cnfadvletter(xporeqadv=AD No)"
+C&F Bill (Robi)          			 |#classPath+"/login?screen=*jspcrystal opcnfbillrobi(xdornumcnf=BILL No,xcopy=Bill Copy)"
+C&F Bill (Editco)          			 |#classPath+"/login?screen=*jspcrystal opcnfbill(xdornumcnf=BILL No,xcopy=Bill Copy)"
+//C&F Bill (Robi old)          			 |#classPath+"/login?screen=*jspcrystal opcnfbill(xdornumcnf=BILL No,xcopy=Bill Copy)"
+C&F Bill (BFL)          			 |#classPath+"/login?screen=*jspcrystal opcnfbillbfl(xdornumcnf=Bill No.,xcopy=Bill Copy)"
+C&F Bill (AKPEN / RANCON / PLYWOOD)  |#classPath+"/login?screen=*jspcrystal opcnfbillakpn(xdornumcnf=Bill No.,xcopy=Bill Copy)"
+C&F Bill (Minimum)  				|#classPath+"/login?screen=*jspcrystal opcnfbillmin(xdornumcnf=Bill No.)"
+C&F Bill (CEAT/OTHERS)          			 |#classPath+"/login?screen=*jspcrystal opcnfbillother(xdornumcnf=Bill No.,xcopy=Bill Copy)"
+Cost List                  |#classPath+"/login?screen=*jspcrystal cnfitem()"
+//cnfjobhistory.rpt

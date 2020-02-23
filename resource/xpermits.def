@@ -1,0 +1,15 @@
+product ERP on the Net
+
+table xpermits
+  caption "User Permits"
+  //columns ztime, zutime, zid, xmenu, xoption, xalist, zactive
+  columns ztime, zutime, zid, xmenu, xoption, xalist, zactive,zauserid,zuuserid,zaip,zuip,xchild,xlocation,xnote
+  primary key zid, xmenu, xoption
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  list xalist, zactive
+field xoption
+	pick
+end field
+end table

@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table oplctogli
+  caption "OP LC To AC Interface"
+  columns  ztime,zutime,zauserid,zuuserid, zid,~
+           xtype,xgcus,xacc,xaccsales 
+
+  primary key zid, xtype,xgcus
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

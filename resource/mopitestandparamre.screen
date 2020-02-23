@@ -1,0 +1,110 @@
+screen mopitestandparamre
+     sidebar lsit test
+     sections form one,list one,  jscript myscript
+     
+
+     list test
+    	caption "Test And Parameter List"
+        table xcodes
+        order xcode
+        select "xtype='Fabric Technical Test'"
+        rows 30
+        objects xcode attrib(link "abc" embed onclick="return pickItem(this)"),xlong
+        
+        //header "Item Code","Description","Order Qty","Order Row"
+     end list
+	 
+    list one
+        caption "Required Test & Parameters For Order No: "+xordernum//+"<br> PI No: "+xpiref
+        table mopitestandparam
+        order xordernum,xrow
+        fixed xordernum
+        //select none
+        rows 20
+        objects  xrow attrib(link "login?screen=mopitestandparamre&command=Show&xordernum=?&xrow=?"), ~
+                xcode,xnote
+
+        //headers "Row","Item","Description","Qty","Unit","Rate","Line Amount"
+     end list
+
+
+     form one
+        caption "PI Test And Parameter Setting For: "//+xpiref
+        table mopitestandparam
+        order xordernum,xrow
+        fixed xordernum
+        //select
+        pstyle 3
+        return "login"
+        layout 4
+        objects Add, Update, Delete,Clear,Show, Complete,"<p>",~
+                xrow attrib(row 0 1),xcode,xnote//,xyesno
+
+        embed onsubmit="return submitit(this)"
+
+		field xcode
+			pick list xmotest
+		end field
+		
+		field xyesno
+			caption Required
+		end field
+		
+        field xnote
+          //width 75
+		  height 2
+          //column 3
+        end field
+
+        field xqtydel
+//          caption MRR Quantity
+        end field
+
+        field Add
+          event before
+			set xnote=xcodes.xlong("xtype='Fabric Technical Test' and xcode='"+xcode+"'")
+          end event
+        end field
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "moheaderrecipe"
+            form.searchbutton.value = "Find xordernum=?"
+          }
+          return result
+        }
+       function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcode.value=link.innerText
+          }else{
+            document.one.xcode.value=link.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+end screen
+
+
+
+

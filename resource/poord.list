@@ -1,0 +1,15 @@
+
+     list poord
+	caption "Purchage Order List"
+        table poordheader
+        order xpornum
+        select "(xpornum like '%"+zvalue+"%')"// or xsup like '%"+zvalue+"%')"
+        navigators alpha
+        rows 20
+        objects xpornum attrib(link "abc" embed onclick="return updateParent(this:'xpornum')"),~
+                xsup,org equals((select xorg from casup where zid=poordheader.zid and xsup=poordheader.xsup))
+     	
+	header "Purchage No.","Supplier ID","Name"
+     end list
+
+

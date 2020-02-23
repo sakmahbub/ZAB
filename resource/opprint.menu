@@ -1,0 +1,11 @@
+//OP Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Print Summary                    |#classPath+"/login?screen=opsumprint"
+//Print Product Summary            |#classPath+"/login?screen=*wcrystal opinvproductsum(xrepsumnum=Summary No)"
+//Print Customer Summary           |#classPath+"/login?screen=*wcrystal opinvcussum(xrepsumnum=Summary No)"
+//Print Invoice                    |#classPath+"/login?screen=*wcrystal opbillbatch(xrepsumnum=Summary No)"
+//-------------------------------------------------------------------
+
+ 

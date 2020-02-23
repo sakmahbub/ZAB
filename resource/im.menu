@@ -1,0 +1,34 @@
+//im.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Notifications             		  |#classPath+"/login?screen=imnotification"
+Requisition						  |#classPath+"/login?menu=imreq"
+Finished Goods Entry              |#classPath+"/login?screen=imtorheaderfg"
+//Finished Goods Entry			  |#classPath+"/login?screen=imtrnfg"
+Delivery Order                     |#classPath+"/login?screen=opdobulkheader"
+Sales Return                     |#classPath+"/login?screen=opcrnheader"  
+//Loan Transaction				  |#classPath+"/login?menu=imloan"
+//Opening Balance Entry             |#classPath+"/login?screen=imtrnre"
+Transfer Order Entry              |#classPath+"/login?screen=imtorheader"
+//Transfer Order(Workshop) Entry  |#classPath+"/login?screen=imtorheaderws"
+///Damage Entry              		  |#classPath+"/login?screen=imtorheaderdam"
+///Transfer & Receive Confirmation   |#classPath+"/login?screen=imtransfer"
+Create GRN                        |#classPath+"/login?screen=poordheaderim"
+View GRN                          |#classPath+"/login?screen=pogrnheader"
+//Create SQC                      |#classPath+"/login?screen=poqualitycertifi"
+//View SQC                        |#classPath+"/login?screen=poqtcheader"
+
+Create GRN /QC (Direct)         |#classPath+"/login?screen=pogrndirect"
+GRN Confirm Against LC            |#classPath+"/login?screen=pogrnim"
+///Goods Inspection           		  |#classPath+"/login?screen=imtorheaderinsp" 
+Inventory Transaction (Issue)     |#classPath+"/login?screen=imtrnis"
+Inventory Issue(Bulk)                 |#classPath+"/login?screen=imtorheaderissue"
+Sales Order Tag/Untag       |#classPath+"/login?screen=imtorheadersotr"
+//Create Quality Certificate      |#classPath+"/login?screen=poqualitycertifi"
+///Receive Return From User          |#classPath+"/login?screen=imreceived"        |       |      |120
+Reports                           |#classPath+"/login?menu=imreports"            |       |      |120
+
+
+//-------------------------------------------------------------------
+

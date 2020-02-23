@@ -1,0 +1,12 @@
+     list xhrc4
+        caption "<br><center><b>"Account Group level 4"</b>"
+        table achrc4
+        order xhrc1,xhrc2,xhrc3,xhrc4
+        fixed xhrc1,xhrc2,xhrc3
+        navigators alpha //group xsub "select xsub from gldetail where (xprime<xarap)"
+        rows 10
+        objects ~
+         xhrc4 attrib(link "abc" embed onclick="return updateParent(this:'xhrc4')"),xlong
+     end list
+
+

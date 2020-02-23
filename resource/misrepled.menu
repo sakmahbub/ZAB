@@ -1,0 +1,16 @@
+//MIS Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Customer Ledger Detail           |#classPath+"/login?screen=*crystal arledalltype(xwh=Branch,xwh=Branch,xmiscus=From Customer=,xmiscus=To Customer=zzz,xdate=From Date=#date,xdate=To Date=#date,xsp=From MIO,xsp=To MIO,xtype=Type)"
+Customer Ledger (Summary)        |#classPath+"/login?screen=*crystal arledsummarytype(xwh=Branch,xmiscus=From Customer,xmiscus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From MIO,xsp=To MIO,xtype=Type)"
+//Customer Ledger Sum By Date      |#classPath+"/login?screen=*crystal arledsumbydatealltype(xwh=Branch,xwh=Branch,xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+//Detail Pending Report (Credit)   |#classPath+"/login?screen=*crystal aragedetailcredittype(xwh=Branch,xmiscus=From Customer,xmiscus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Person,xsp=To Sales Person,xtype=Type)"
+Ageing Report                    |#classPath+"/login?screen=*crystal aragealltype(xwh=Branch,xwh=Branch,xmiscus=From Customer=0,xmiscus=To Customer=zzz,xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+Credit Outst. Stmt. (Aging)  	|#classPath+"/login?screen=*wcrystal arcroutstmt(xdate=From Date=#date,xdate=To Date=#date,xfm=From FM,xfm=To FM,xrsm=From RSM,xrsm=To RSM)"
+MIO Wise Credit Outst. Report  |#classPath+"/login?screen=*wcrystal arcroutbymio(xfm=From FM,xfm=To FM,xrsm=From RSM,xrsm=To RSM)"
+Money Receipt Listing            |#classPath+"/login?screen=*crystal armrstmtalltype(xwh=Branch,xwh=Branch,xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From MIO,xsp=To MIO,xtype=Type)"
+Money Receipt Summary             |#classPath+"/login?screen=*wcrystal armrstmt(xdate=From Date=#date,xdate=To Date=#date,xsp=From MIO,xsp=To MIO,xpaymentterm=Customer Type)"
+Bank Deposit Statment             |#classPath+"/login?screen=*wcrystal arbankdeposit(xdate=From Date=#date,xdate=To Date=#date)"
+//-------------------------------------------------------------------
+

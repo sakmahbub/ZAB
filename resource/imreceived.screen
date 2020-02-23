@@ -1,0 +1,203 @@
+
+screen imreceived
+     	sidebar list imtor
+	sections form one,list one,jscript myscript
+     
+	 list imtor
+        caption "RR Product"
+        table imtorheader
+        order xtornum desc
+        select "(xstatustor='Approved') and left(xtornum,4)='RR--' and xtwh='"+#wh+"'"
+		rows 7
+        objects  xtornum  attrib(link "login?screen=imreceived&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","To Branch"
+     end list
+	
+   list one
+        caption "Item List For RR No "+xtornum
+        table imtordetail
+        order xtornum,xrow desc
+        fixed xtornum
+		select "xqtyreq-xqtyalc>0"
+		rows 50
+        objects ~
+        xrow,~//attrib(link "login?screen=imtormoreqdetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xbrand,~
+        (xqtyreq-xqtyalc),xunit//,xqtycom,xqtyord,xstype
+
+		totals "","","Total","",sum
+		
+        headers "Serial No","Item","Description","Brand","Quantity Returned","UOM"//,"Available Quantity","Quantity Delivered","Stock Check Status"
+     end list
+
+     form one
+        caption "Receive Return From User"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+       select "xstatustor in ('Approved') and left(xtornum,4)='RR--'" // and xtwh='"+#wh+"'
+        return "login"
+        pstyle 3
+        layout 3
+        objects Show,Clear,Update,Receive,~
+        "<p>" ,~
+        xtornum ,xdate,xref,xdatecom display(hide),~
+        xfwh,xfbrname,xregi display(const),xtwh display(const),xtbrname,xstatustor display(constant),~//xporeqnum display(constant),~
+		xpkey display(hide) attrib(local),~
+		xdocrow display(hide),xstatusreq display(hide),xlong display(const),xpreparer display(hide),preparer display(const)
+				
+		field xfwh
+		caption Return Store
+		end field	
+
+		
+       field xfbrname
+        attrib local
+        caption Store Name
+        display  const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+		
+		field xregi
+		pick list xcardept
+			caption Department Name
+			event before
+			end event
+		end field
+		
+       field xtbrname 
+        attrib local
+        caption Store Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+		caption RR No.
+		pick list rrnum
+          event after
+			set globals(xtornum)=xtornum
+           class careports(getReport{imrrprint;2;in,st;zid,tornum;xtornum;Print Received Return})
+		   
+			if imtorheader.xtwh("xtornum='"+xtornum+"'") .ne. #wh
+             set #field(Receive.display)="hidden"
+			end if	
+			if imtorheader.xstatustor("xtornum='"+xtornum+"'") .eq. "Confirmed"
+			 set #field(Receive.display)="hidden"
+			end if				
+           end event
+        end field
+
+		 field xstatustor
+          caption RR Status
+        end field
+		
+        field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+
+		  field xdate
+          caption Transfer Date
+        end field
+
+        field xdatecom
+          caption Receive Date
+        end field
+		
+		 field xdum
+		 attrib local
+          display constant
+          caption
+        end field
+
+
+        field xlong
+		caption Note
+          height 3
+          width 70
+          column 2
+        end field
+		
+		field show
+		event after
+          set xpkey=xtornum
+		  end event
+        end field
+		
+		field update
+			event before
+				set backdate=#sql("select xdateexp from acdef")
+				set backentry=#sql("select xbacklock from acdef") 
+				if xpkey .ne. xtornum
+					error "Please press show first!"				
+				else if backentry .eq. "No" .and. xdate .le. backdate
+					error "Back Lock Entry does not allow!"
+				end if
+			end event
+		end field
+		
+        field Receive
+          event before
+		    if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Approved"
+				error "Cannot Proceed -- Doesn't Approved!"
+           else if imtorheader.xstatustor("xtornum='"+xtornum+"'") .eq. "Confirmed"
+				error "Cannot Proceed -- TO Already Confirmed!"
+            end if
+          end event
+          event after
+			set temp = #spsql(sp_confirmTO,#id,#user,#position,xtornum,xdate,xfwh,xtwh,xstatustor,"Received Return",6)
+		   //set temp = #spsql(zabsp_PROC_Issue_Pricing,#id,#user,xtornum,xfwh) 
+			//action Show
+          end event
+        end field		
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtormoreqdetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+          link.innerText
+            document.one.xtornum.value=link.innerText
+          }
+          return false
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

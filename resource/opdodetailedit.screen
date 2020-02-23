@@ -1,0 +1,203 @@
+screen opdodetailedit
+
+     sidebar list one ,list price
+     sections form one,  jscript myscript
+
+     list one
+      caption "Detail List"
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=opdodetailedit&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=opdodetail.zid and xitem=opdodetail.xitem)),xqtyord,xrate,xdiscdetamt,xvatrate,xvatamt,xlineamt
+
+        header "Line No","Item Code","Description","Qty","Rate","Disc Amt","Vat Rate","Vat Amt","Line Amt"
+        totals "","Totals","","","",sum,sum,sum,sum
+     end list
+
+     list price
+        caption "Price List For: "+xitem
+        table caitemprice
+        order xitem,xyearperdate
+        //fixed xitem
+        select "zactive='1' and xitem='"+xitem+"'"
+        rows 20
+        objects  xrate attrib(link "abc" embed onclick="return pickPrice(this)"), ~
+                 xdate
+
+        totals "","Totals",sum,"",sum
+     end list
+
+     form one
+      caption INVOICE DETAIL FOR<br> "+xdornum
+      table opdodetail
+      primarykey xdornum,xrow
+      order xdornum,xrow
+      fixed xdornum
+      return "login"
+      layout 2
+      pstyle 3
+      objects Add,Show,Clear,Update,Delete,*next,Return, Top,Previous,Next, Bottom,"<p>",~
+              xrow attrib(row 0 1;search),xunit display(const), xitem, xdesc,xqtyord,xqtybonus display(text),~
+              xrate,xlineamt display(const),xdiscdet,xdiscdetamt display(const),~
+              xvatrate display(const),xvatamt display(const),xlong,~
+              xchallanitem display(hide),xpricerow display(hide),xeta display(hide)
+
+
+
+
+      embed onsubmit="return submitit(this)"
+
+      field xdesc
+        attrib local
+        display const
+        caption Description
+        event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        end event
+      end field
+
+      field xeta
+        attrib local
+        caption
+        default "0"
+      end field
+
+      field xlong
+        width 70
+        column 2
+      end field
+
+      field add
+        event before
+	    set xdiscdetamt=0	
+          // **************** UPDATING VAT FROM CAITEM ****************
+
+          //set xunit = caitem.xunit("xitem='"+xitem+"'")
+          //set xrate = caitem.xrate("xitem='"+xitem+"'")
+          //set xvatrate = caitem.xvatamt("xitem='"+xitem+"'")
+          //set xvatrate = xcodes.xvatrate("xtype='VAT Code' and xcode='"+vatcode+"'")
+
+          // **************** CHECKING CREDIT LIMIT ****************
+
+          double bal = 0.00
+          set cus = opdoheader.xcus("xdornum='"+xdornum+"'")
+          set bal = cacreditview.xbalance("xcus='"+cus+"'")
+          set lineamt = xqtyord*xrate
+          if lineamt>bal
+            error "Cannot Proceed -- Credit Limit Exceeds"
+          end if
+
+          set xpricerow= caitemprice.xrow("xitem='"+xitem+"' and xrate="+xrate)
+
+          // **************** CHECKING SP BALANCE ****************
+          set sp = opdoheader.xsp("xdornum='"+xdornum+"'")
+          //set pp = opdoheader.xpp("xdornum='"+xdornum+"'")
+          if sp .eq. ""
+            error "Cannot Proceed -- PPO Person Is Blank"
+          end if
+          //if pp .eq. ""
+            //error "Cannot Proceed -- Sales Person Is Blank"
+          //end if
+
+          // **************** CHECKING ITEM BALANCE ****************
+          //class oppharma(checkStockInhand({xdornum,add,opdoheader,xrow,xqtyord}))
+
+        end event
+
+        event after
+         // action Show
+        end event
+      end field
+
+      field update
+        event before
+          // **************** UPDATING VAT FROM CAITEM ****************
+
+          set xvatrate = caitem.xvatamt("xitem='"+xitem+"'")
+
+          // **************** RATE UPDATE ****************
+
+          if xeta .ne. "1"
+            //set xrate = caitem.xrate("xitem='"+xitem+"'")
+          end if
+
+          // **************** CHECKING CREDIT LIMIT ****************
+
+        	double bal = 0.00
+        	double lineamt = 0.00
+        	double prvamt = 0.00
+          set cus = opdoheader.xcus("xdornum='"+xdornum+"'")
+        	set bal = cacreditview.xbalance("xcus='"+cus+"'")
+          set prvamt = opdodetail.xlineamt("xdornum='"+xdornum+"' and xrow="+xrow)
+          set bal = bal+prvamt
+          print mydate
+          set lineamt = xqtyord*xrate
+          if lineamt>bal
+            error "Cannot Proceed -- Credit Limit Exceeds"
+          end if
+
+          // **************** CHECKING OLD PRICE BALANCE ****************
+
+        	set bal = caitempriceqtyview.xbalance("xitem='"+xitem+"' and xrow="+xpricerow)
+          set prvamt = opdodetail.xqtyord("xitem='"+xitem+"' and xrow="+xrow)
+          //print prvamt
+          set bal = bal+prvamt
+
+          if xqtyord>bal
+            //error "Cannot Proceed -- Available Qty For Old Rate Exceeds By "+(xqtyord-bal)+" "+xunit
+          end if
+
+          set xpricerow= caitemprice.xrow("xitem='"+xitem+"' and xrate="+xrate)
+
+        end event
+
+        event after
+        //    action Show
+        end event
+      end field
+
+
+      field Return
+        embed onclick="clicked(this)"
+      end field
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "opdoheaderedit"
+            form.searchbutton.value = "Find xdornum=?"
+          }
+          return result
+        }
+        function pickPrice(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xrate.value=link.innerText
+            document.one.xeta.value="1"
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

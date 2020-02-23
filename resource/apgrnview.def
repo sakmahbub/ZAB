@@ -1,0 +1,19 @@
+
+product ZAB ERP
+
+table apgrnview
+
+  caption "GRN Adjustment"
+  columns zid,xgrnnum,xporeqnum,xtornum,xpornum,xprime
+  primary key zid,xgrnnum,xporeqnum,xtornum,xpornum,xprime
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view apgrnview(zid,xgrnnum,xporeqnum,xadvnum,xtornum,xpornum,xpafnum,xstatusgrn,xstatusjv,xprime,xprnamt) ~	
+	as Select a.zid,a.xgrnnum,a.xporeqnum,a.xporeqnum,a.xtornum,a.xpornum,ISNULL(a.xpafnum,''),a.xstatusgrn,a.xstatusjv, ~
+	SUM(ISNULL(b.xlineamt,0)),isnull(sum(b.xqtyprn*b.xrategrn),0) ~
+	from pogrnheader a JOIN pogrndetail b on a.zid=b.zid and a.xgrnnum=b.xgrnnum ~
+	WHERE a.xstatusgrn='Confirmed' and a.xtype<>'Cash' group by a.zid,a.xgrnnum,a.xpornum ,a.xporeqnum,a.xtornum,a.xpafnum,a.xstatusgrn,a.xstatusjv
+end table
+

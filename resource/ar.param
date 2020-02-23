@@ -1,0 +1,19 @@
+model AR
+     caption "Accounts-Receivable"
+     description "This model comprises the minimum logic and infrastructure ~
+                  required to maintain AR database."
+
+data xcodes
+ 	 xtype		          |xcode			              |zactive|xlong
+end data
+
+
+data xtrn
+	 xtypetrn		                |xtrn   |xaction	     |xdesc	            |xnum|xinc|zactive
+	 AR Transactions            |CO--   |Debit Customer|Transactions      |   0|   1|  1
+	 AR Transactions            |MR--   |Credit Customer|Transactions      |   0|   1|  1
+end data
+
+
+
+end model

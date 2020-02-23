@@ -1,0 +1,582 @@
+screen appaymentreqhapp
+	
+     sidebars list reqlist,list one
+     sections form one, jscript myscript
+	 
+     list reqlist
+      caption "PAF List"
+         table appaymentreqh
+        order xpafnum desc
+		select "(xsuperiorsp='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+	    and '"+#position+"'<>'' and left(xpafnum,4)='PAF-' and xstatusreq  not in ('Approved','')"
+		rows 10
+        objects  xpafnum attrib(link "login?screen=appaymentreqhapp&command=Show&xpafnum=?"), xdate,xcus,~
+				 desc equals((select xorg from cacus where zid = appaymentreqh.zid and  xcus=appaymentreqh.xcus)),xpornum
+               
+		  headers "PAF No","Date","Supplier Code","Supplier Name","PO No."
+	end list
+	  
+	 list one
+       caption "PAF Detail List."
+        table appaymentreqd
+        order xpafnum,xrow
+        fixed xpafnum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=appaymentreqd&command=Show&xpafnum=?&xrow=?"), ~
+                 xgrnnum,xlineamt,xamtother,xprnamt,(xlineamt+xamtother-xprnamt),xnote
+
+		headers "Line No","GRN No","GRN Amount","Other Cost","Purchase Return","Total","Note"
+		totals "Total","",sum,sum,sum,sum,""
+     end list
+
+
+     form one
+		caption "Payment Authorization Form"
+        table appaymentreqh
+		 primarykey xpafnum
+        order xpafnum
+        select "left(xpafnum,4)='PAF-'"
+		return "login"
+        layout 2
+        pstyle 3
+        objects	Add,Update,Delete,*Next,*Next,*Next,Show,Clear,*Next,*Next,*Next,~
+				Top,Next,Previous,Bottom,Approve,Reject,*next,"<p>",~
+                xpafnum,~
+				xdate display(const),xpornum display(const),xsubmitdate display(const),~
+				xapnnum  display(hide),xcus display(const),cusname display(const),~
+				xnatureofexp display(hide),xperofexp display(const),xwh display(hide),desc display(const),xrem,~
+				xstatusreq,xtornum display(hide),,~
+				xdum1 display(const),xdum2 display(const),~
+				xnamegl,xstatusvc,xcostcentre,xstatusdc,~
+				,xprime,xstatusapn,xvatamt,xstatusgrn,xtaxamt,xstatuscap,~
+				xprimetotamt,xstatuswht,xprimeadv,xstatusvat,xpaynow display(const),xstatusait,~
+				totvattax display(const),,totpayable display(const),~
+				xtype display(hide),xstatus display(hide),xstatusap display(hide),xfwh display(hide),,~
+				xsuperiorsp display(hide),xsuperior2 display(hide),xsuperior3 display(hide),~
+				xnote1,xpkey display(hide) attrib(local),,,~
+				xdum3 display(const),xdum4 display(const),,~
+				xpreparer display(hide),preparer display(const),~
+				xsignatory1 display(hide),signatory1  display(const),~
+				xsignatory2 display(hide),signatory2  display(const),~
+				xsignatory3 display(hide),signatory3 display(const),~
+				xsignatory4 display(hide),signatory4 display(const),~
+				xsignatory5 display(hide),signatory5 display(const),~
+				xsignreject display(hide),signreject display(const)
+				
+//----------------Declare Local Field--------------------
+		field xdate
+		attrib local
+		  event after
+		  set xdate=#sql("select xdate from appaymentreqh where xpafnum='"+xpafnum+"'")
+		  end event
+		end field
+		
+		field xsubmitdate
+		  caption Summary Submission Date
+		attrib local
+		  event after
+		  set xdate=#sql("select xsubmitdate from appaymentreqh where xpafnum='"+xpafnum+"'")
+		  end event
+		end field
+		
+		field xcus
+		   caption Supplier ID
+		  attrib local
+		  event after
+		  set xcus=appaymentreqh.xcus("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xwh
+		  attrib local
+		  event after
+		  set xwh=appaymentreqh.xwh("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xpornum
+		  attrib local
+		  event after
+		  set xpornum=appaymentreqh.xpornum("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xstatusreq
+		  attrib local
+		  event before
+		  set xstatusreq=appaymentreqh.xstatusreq("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xpreparer
+		  attrib local
+		  event after
+		  set xpreparer=appaymentreqh.xpreparer("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xsignatory1
+		  attrib local
+		  event after
+		  set xsignatory1=appaymentreqh.xsignatory1("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xsignatory2
+		  attrib local
+		  event after
+		  set xsignatory2=appaymentreqh.xsignatory2("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xsignatory3
+		  attrib local
+		  event after
+		  set xsignatory3=appaymentreqh.xsignatory3("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xsignatory4
+		  attrib local
+		  event after
+		  set xsignatory4=appaymentreqh.xsignatory4("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xsignatory5
+		  attrib local
+		  event after
+		  set xsignatory5=appaymentreqh.xsignatory5("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+		field xsignreject
+		  attrib local
+		  event after
+		  set xsignreject=appaymentreqh.xsignreject("xpafnum='"+xpafnum+"'")
+		  end event
+        end field
+		
+//--------------End ------------------------
+           field xapnnum
+		   pick
+		   end field
+		   
+           field xapnnum
+		   pick
+		   end field
+		   
+           field xwh
+		   caption Plant/ Store
+		   end field
+		   
+		   field xprime
+		   caption Invoice Value
+		   end field
+		   
+		   field xvatamt
+		   caption W/H VAT
+		   end field
+		   
+		   field xtaxamt
+		   caption W/H TAX
+		   end field
+		   
+		    field xprimeadv
+		   caption Advance Already paid to supplier(if Any)
+		   end field
+		   
+		   field xprimetotamt
+		   caption Total Cost 
+		   end field
+		   
+		   field xnamegl
+		   width 40
+		   end field
+		   
+		  field xstatusgrn
+			 caption Goods Received Note / Service Completion Note
+			 pick "Yes,No"
+		   end field
+		   
+		    field xcostcentre
+			display text
+			pick
+		   width 40
+		   end field
+		   
+		   field xperofexp
+          	attrib local
+          	caption Period Of Expenses
+          	event after
+          		set xperofexp = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+		  
+		    field xpaynow
+          	attrib local
+          	caption Payable to Supplier Now
+          	event after
+          		set xpaynow = xprime-xprimeadv//+xvatamt+xtaxamt
+          	end event
+          end field
+		  
+		    field totvattax
+          	attrib local
+          	caption Payable to VAT & Tax
+          	event after
+          		set totvattax =xvatamt+xtaxamt
+          	end event
+          end field
+		  
+		    field totpayable
+          	attrib local
+          	caption Total Payable
+          	event after
+          		set totpayable = xprime+xvatamt+xtaxamt
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+          
+		  	field xtype
+			caption Payment Type
+			pick "Cash,Agreement"
+			//default "Other"
+			end field
+			
+			field xstatusreq
+			caption Requisition Status
+			end field
+		  
+          field xnote
+            column 3
+            width 80
+            height 2
+          end field
+		 
+		 
+	field xnote1
+      caption Reject Note
+		  width 50
+		  height 2
+		  column 1
+    end field
+		  
+ 
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		  
+		field xdatepreparer
+        caption
+		attrib local
+		event after
+		set xdatepreparer=#sql(varchar,"select convert(VARCHAR, ztime, 100) from appaymentreqh where xpafnum='"+xpafnum+"'")
+		end event
+        end field
+		
+		field datechk
+        caption
+		attrib local
+		event after
+		set datechk=#sql(varchar,"select convert(VARCHAR, xdatechk, 100) from appaymentreqh where xpafnum='"+xpafnum+"'")
+		end event
+        end field
+		
+		
+		field datedph
+        caption
+		attrib local
+		event after
+		set datedph=#sql(varchar,"select convert(VARCHAR, xdatedph, 100) from appaymentreqh where xpafnum='"+xpafnum+"'")
+		end event
+        end field
+		
+		field datemanager
+        caption
+		attrib local
+		event after
+		set datemanager=#sql(varchar,"select convert(VARCHAR, xdatemanager, 100) from appaymentreqh where xpafnum='"+xpafnum+"'")
+		end event
+        end field
+		
+		field dategm
+        caption
+		attrib local
+		event after
+		set dategm=#sql(varchar,"select convert(VARCHAR, xdategm, 100) from appaymentreqh where xpafnum='"+xpafnum+"'")
+		end event
+        end field
+
+		field dateed
+        caption
+		attrib local
+		event after
+		set dateed=#sql(varchar,"select convert(VARCHAR, xdateed, 100) from appaymentreqh where xpafnum='"+xpafnum+"'")
+		end event
+        end field
+		
+		field datefin
+        caption
+		attrib local
+		event after
+		set datefin=#sql(varchar,"select convert(VARCHAR, xdatedf, 100) from appaymentreqh where xpafnum='"+xpafnum+"'")
+		end event
+        end field
+		
+		field datedmddc
+        caption
+		attrib local
+		event after
+		set datedmddc=#sql(varchar,"select convert(VARCHAR, xdatedmddc, 100) from appaymentreqh where xpafnum='"+xpafnum+"'")
+		end event
+        end field
+		  
+		  
+		field xdum1
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; PADDING-TOP: 2px;">COST</span>
+		display const
+		//column 2
+		end field
+		
+		field xdum2
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; PADDING-TOP: 2px;">DOCUMENTS CHECKLIST</span>
+		display const
+		//column 2
+		end field
+		
+		field xdum3
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">--------------- Signatories --------------</span>
+		display const
+		//column 2
+		end field		
+		
+	    field xdum4
+		   attrib local
+         caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; PADDING-TOP: 2px;">-------------------------------------</span>
+          end field
+		  
+		   field xregi
+           caption Department/Other
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xpafnum
+		pick list pafnum
+        	width 15
+          event after
+		  class careports(getReport{paymentform;2;in,st;zid,pafnum;xpafnum;View Payment Authorization Form})
+            set globals(xpafnum)=xpafnum
+			 set globals(xpornum)=xpornum
+			 set globals(xstatusreq)=xstatusreq
+			  set globals(xsuperiorsp)=xsuperiorsp
+		    if appaymentreqh.xstatusreq("xpafnum='"+xpafnum+"'") .eq. "" .or. #position .eq. ""
+			   set #field(Update.attrib) = "disabled"
+			    set #field(Approve.display) = "hidden"
+				set #field(Reject.display) = "hidden"
+			end if  
+			
+		   if xsuperiorsp .ne. #position .and. xsuperior2 .ne. #position .and. xsuperior3 .ne. #position
+			   set #field(Update.attrib) = "disabled"
+			    set #field(Approve.display) = "hidden"
+				set #field(Reject.display) = "hidden"
+			end if
+			set #field(Add.attrib) = "disabled"
+			set #field(Delete.attrib) = "disabled"
+          end event
+        end field
+		
+		field xwh
+		event before
+		end event
+        end field
+		
+		field desc
+        attrib local
+        caption Expense Related to (Location Name)
+        display hide
+        event after
+          set desc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+	
+       field cusname
+        attrib local
+        caption Supplier Name
+        display const
+        event after
+          set cusname=cacus.xorg("xcus='"+xcus+"'")
+        end event
+       end field
+	   
+		field show
+		event after
+          set xpkey=xpafnum
+		  end event
+        end field
+	   
+	   
+	     field Approve
+            event before
+			if xsuperiorsp .ne. #position .and. xsuperior2 .ne. #position .and. xsuperior3 .ne. #position
+				error "Superior doesn't match."
+			else if  #position .eq. ""
+				error "Superior doesn't match."
+			end if
+            end event
+            event after
+			set temp = #spsql(zabsp_apvprcs,#id,#user,#position,xpafnum,0,xstatusreq,"PAF Approval")
+			//set temp = #spsql(zabsp_sendmail,#id,#user,xpafnum,"PAF Requisition","")
+	         action show
+            end event
+          end field
+		  
+		   field Reject
+            event before
+			set status=appaymentreqh.xstatusreq("xpafnum='"+xpafnum+"'")
+			if status .eq. "" .or. status .eq. "Approved"
+				error "Cash Advance Request can not be reject!"
+			else if appaymentreqh.xnote1("xpafnum='"+xpafnum+"'") .eq. ""
+				error "Please Write Reject Note!"
+			end if
+		   end event
+		   event after
+		   set temp =  #spsql(zabsp_Reject_Request,#id,#user,#position,0,xpafnum,"PAF")
+		   action show
+		   end event
+          end field
+		
+		field update
+			event before
+			if xpkey .ne. xpafnum
+				error "Please press show first!"
+			else if xwh .eq. ""
+				error "Please select Store/Plant for Create Approval Notes"
+			else if appaymentreqh.xsuperiorsp("xpafnum='"+xpafnum+"'") .ne. #position .and. appaymentreqh.xsuperior2("xpafnum='"+xpafnum+"'") .ne. #position .and. appaymentreqh.xsuperior3("xpafnum='"+xpafnum+"'") .ne. #position
+				error "You do not have permission to update!" 
+			else if #position .eq. ""
+				error "You do not have permission to update!" 
+			end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+		
+	 field Approve
+          embed onclick="clicked(this)"
+     end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "appaymentreqd"
+            form.searchbutton.value = "Top"
+          }
+		 if (button=="Approve"){
+           if(confirm('Are You Confirm ?')){
+			form.searchbutton.value = "Approve"
+			}else{
+			form.searchbutton.value = "Show"
+			}
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xpafnum.value=link.text
+          }else{
+            document.one.xpafnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

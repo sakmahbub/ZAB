@@ -1,0 +1,19 @@
+//OP Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Print Invoice                    |#classPath+"/login?screen=*wcrystal opbillbatch(xdate=Date=#date,xsp=Sales Person)"
+Product Summary By Invoice       |#classPath+"/login?screen=*wcrystal opproductsummary(xdate=Date=#date,xsp=Sales Person)"
+Monthly Statement of Sales       |#classPath+"/login?screen=*wcrystal opmonthlysalesstmt(xcus=From Customer=0,xcus=To Customer=zzz,xdate=From Date=#date,xdate=To Date=#date,xsp=From PPO,xsp=To PPO)"
+Monthly Stock Balance            |#classPath+"/login?screen=*wcrystal opmstockbalance(xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group=zzz)"
+Sales By Sales Representative    |#classPath+"/login?screen=*wcrystal opsalesbysr(xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Representative=0,xsp=To Sales Representative=zzz)"
+//Sales Achievement By SR          |#classPath+"/login?screen=*crystal opsalesachivement(xyear=Year,xper=Peroid,xsp=Sales Representative,xwh=Branch,xitem=From Item,xitem=To Item=zzz)"
+//Item Detail By Invoice           |#classPath+"/login?screen=*crystal opitemdetail(xwh=Branch,xitem=Item,xdate=From Date=#date,xdate=To Date=#date)"
+//Product Wise Target Report       |#classPath+"/login?screen=*crystal opproducttarget(xyear=Year,xper=Period,xitem=From Item,xitem=To Item)"
+//Product Wise Sample Report       |#classPath+"/login?screen=*crystal opproductsample(xyear=Year,xper=Period,xitem=From Item,xitem=To Item)"
+//SR Wise Target                   |#classPath+"/login?screen=*crystal opsrtarget(xyear=Year,xper=Period,xwh=Branch,xsp=From Sales Representative,xsp=To Sales Representative)"
+//SR Wise Sample                   |#classPath+"/login?screen=*crystal opsrsample(xyear=Year,xper=Period,xwh=Branch,xsp=From Sales Representative,xsp=To Sales Representative)"
+//Total Target Summary             |#classPath+"/login?screen=*crystal optargetsummary(xyear=Year,xper=Period,xwh=Branch)"
+//Total Sample Summary             |#classPath+"/login?screen=*crystal opsamplesummary(xyear=Year,xper=Period,xwh=Branch)"
+//-------------------------------------------------------------------
+

@@ -1,0 +1,8 @@
+Fixed Asset Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Fixed Asset Register List        |#classPath+"/login?screen=*crystal faassetreglist(xdate=From Date=#date,xdate=To Date=#date)"
+Fixed Asset Register             |#classPath+"/login?screen=*crystal faassetregister(xyear=Year=,xper=Period=,xcode=From Code=,xcode=To Code=)"
+Fixed Asset List                 |#classPath+"/login?screen=*crystal faassetdetail(xyear=Year=,xper=Period=,xcode=From Code=,xcode=To Code=)"
+

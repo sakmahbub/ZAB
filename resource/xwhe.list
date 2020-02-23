@@ -1,0 +1,11 @@
+     list xwhe
+        table xcodes
+        order xcode
+	select "(xtype = 'Branch') and (xlong like '%"+zvalue+"%') and (Right(xcode,1)='E')"
+        //select "(xtype = 'Branch') and (xwh like '%"+zvalue+"%' or xlong like '%"+zvalue+"%')"
+        rows 20
+	searchselect "Right(xcode,1)='E' and xtype = 'Branch'"
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xlong,zactive
+     end list
+

@@ -1,0 +1,18 @@
+     list xmstcompo
+        table pmcomp
+        order xcomponent
+        select "(xcomponent like '%"+zvalue+"%' or xcompname like '%"+zvalue+"%')"
+        navigators alpha
+        rows 10
+        //objects  xcur attrib(link "Main?page=xcur&command=Show&xcur=?"),
+        objects xcomponent attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xcompname
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

@@ -1,0 +1,11 @@
+     list pocost
+        table acmst
+        order xacc //       or xacc like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%'
+        select "(xanc1='LC Cost')"
+        navigators alpha
+        rows 20
+        objects xacc attrib(link "abc" embed onclick="return updateParent(this:'xcostcode')"), ~
+                xdesc
+     end list
+
+

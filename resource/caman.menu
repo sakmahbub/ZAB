@@ -1,0 +1,9 @@
+//Suppliers.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Manufacture                        |#classPath+"/login?screen=caman"|common
+//Supplier Groups                  |#classPath+"/login?screen=xcodesgsup"
+Manufacture Code                    |#classPath+"/login?screen=xtrn(xtypetrn=Manufacture Code)"
+//-------------------------------------------------------------------
+

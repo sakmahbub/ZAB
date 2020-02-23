@@ -1,0 +1,286 @@
+screen opdoheaderupdate
+
+     //sidebar list one //,list inv //,list do
+     sections form one, jscript myscript
+
+     form one
+     
+      caption "INVOICE HEADER _ Admin <br> <font color=Red size=+4>"+xstatusord+" </font>"
+      table opdoheader
+      primarykey xdornum
+      order xdornum
+	  select "left(xdornum,2)='DO'"
+      //select "xwh='"+#wh+"' and left(xdornum,2)='DO'"
+      return "login"
+      layout 5
+      pstyle 3
+      objects Show,Clear,Update,*next,Arhed_Update,"<p>",~
+              xdornum,xdate display(const),xdatedel display(const),xcus display(const),xorg display(const),xpaymentterm display(const),~
+              xwh display(const),xsumnum display(hide),xdatepo display(hide),~
+			  xtotamt display(const),xprime display(const),xexpamt display(hide),xnetamt display(hide),xstatusord display(hide),xcrnnum display(hide),xstatusar display(hide),~
+			  xdatedue display(hide),xref display(hide),xalias display(hide),~
+		      xamount display(hide),xavlperc display(hide),xvatrate display(hide),~	
+		      xdatecom display(hide),xdisc display(hide),xdiscf display(hide),xait display(hide),xproject display(hide),~
+		      xyear display(hide),xper display(hide),xtype display(hide),xstatus display(hide),~
+			  xvatamt display(hide),xdiscamt display(hide),xpp,xsp,xname,xfm,xrsm,xsm,~
+			  xroute,xterritory display(const),xfield,xregion,xarea
+
+	//field xcrnnum
+		//caption Exp. Adjustment No
+		//pick list opdocrnexp
+		//attib readonly
+	//end field
+
+
+	    field xsm
+          width 10
+        end field		
+		
+        field xrsm
+          width 10
+        end field
+		
+        field xfm
+          width 10
+        end field
+
+        field xsp
+          width 10
+        end field	
+
+field xpornum
+	caption Order No
+end field
+
+field xdatepo
+	caption Order Date
+	default "2999-01-01"
+end field
+
+field xdisc
+	caption Additional Discount
+end field
+
+field xdate
+	caption Invoice Date
+end field
+
+field xdeltime
+	caption Delivary Shift
+	default "Any Time"
+end field
+
+field xdornum
+	pick list opordcrnable
+	event after 
+		set statusord = opdoheader.xstatusord("xdornum='"+xdornum+"'")
+		if statusord .eq. "Open"
+			set #field(Arhed_Update.display)="heddent"
+		end if
+	end event
+end field
+
+field xitem
+	pick list xitemnpl
+end field
+
+    field xdatedue
+		default "2999-01-01"
+	end field
+
+
+     // field xwh
+        //display hide
+       // default #wh
+      //end field
+
+      field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+      end field
+
+      field xdum
+        attrib local
+        caption
+        display const
+      end field
+
+
+      field xdum
+        attrib local
+        display const
+        caption
+      end field
+
+      field xdum1
+        attrib local
+        display const
+        caption
+      end field
+
+      field xorg
+        attrib local
+        display const
+        caption Customer Name
+        event after
+          set xorg=cacus.xorg("xcus='"+xcus+"'")
+//          set xorg=<font size=+2 color=red>cacus.xorg("xcus='"+xcus+"'")</font>
+        end event
+      end field
+
+      field xname
+        attrib local
+        display const
+        caption MIO Name
+        event after
+          set xname=cappo.xname("xsp='"+xsp+"'")
+        end event
+      end field
+
+      field xalias
+        attrib local
+        display hide
+        caption Name Of Delivery Man
+        event after
+          set xalias=cappo.xname("xsp='"+xpp+"'")
+        end event
+      end field
+
+      field xamount
+        caption Advance
+      end field
+
+      field xdatecom
+        caption Ledger Date
+      end field
+
+      field xpaymentterm
+        //display const
+      end field
+
+
+      field xstatusar
+        caption Post To Ledger
+      end field
+
+      field xnote
+        width 40
+        height 3
+      end field
+
+      field xcus
+         event after
+            set globals(xdornum)=xdornum
+            set globals(xcus)=xcus
+
+			if xstatusord .eq. "Confirmed"
+				set #field(xcus.display)="hidden"
+				set #field(update.display)="Hidden"
+			end if
+
+     	      if xsumnum .ne. ""
+		         	set #field(add.display)="hidden"
+         			//set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Confirm.display)="hidden"
+       	      end if
+          end event
+        end field
+
+	field Add
+	
+	end field
+
+        field Update
+            event before
+                double totamt
+                double exptotamt
+                double discamt
+                double vatmat
+                double vatamt
+				double expamt
+                //set custype = opdoheader.xpaymentterm("xdornum='"+xdornum+"'")
+				set custype = opdoheader.xpaymentterm("xdornum='"+xdornum+"'")
+                  //set xexpamt = opcrnchheader.xtotamt("xcrnnum='"+xcrnnum+"'")
+                  //set xexpmt = #sql(double,"select xtotamt from opcrnchheader where xcrnnum = '"+xcrnnum+"'")
+                  set totamt = #sql(double,"select xtotamt from opdoheader where xdornum='"+xdornum+"'")
+                  set vatamt = #sql(double,"select xvatamt from opdoheader where xdornum='"+xdornum+"'")
+                  set discamt = #sql(double,"select xdiscamt from opdoheader where xdornum='"+xdornum+"'")
+                  set expamt = #sql(double,"select xtotamt from opcrnchheader where xcrnnum='"+xcrnnum+"'")
+                  set totamt = totamt+vatamt-discamt
+                  set exptotamt = totamt - expamt
+
+                  set xexpamt = expamt
+	
+                  if custype .eq. "Cash"
+                    set xprime = exptotamt
+                  end if
+                  if xsp .ne. cappo.xsp("xsp='"+xsp+"' and xwh='"+#wh+"'")
+                    error "Cannot Proceed -- MIO Belongs To Different Depot"
+                  else if expamt > totamt
+                    error "<font size=+2 color=red>Cannot Proceed -- Exp. Adj. Not Allowed"
+                  end if
+                 //set xwh=cacus.xwh("xcus='"+xcus+"'")
+				 set xwh opdoheader.xwh("xdornum='"+xdornum+"'"
+
+                 // set xyear = #sub(xdate,0,4)
+                 // set xper = #sub(xdate,5,2)
+                  end event
+              action Show
+        end field
+
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Arhed_Update
+          embed onclick="clicked(this)"
+        end field
+
+        field New
+          embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Arhed_Update"){
+            form.screen.value = "arhedupdate"
+            form.searchbutton.value = "Top"
+			form.searchbutton.value = "Find xvoucher=?"
+          }
+          if (button=="New"){
+            form.screen.value = "arhedupdate"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+
+        function pickDetail(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text;
+            document.one.xbalance.value=primebal.text;
+            document.one.xdate.value=date.text;
+          }else{
+              document.one.xamount.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

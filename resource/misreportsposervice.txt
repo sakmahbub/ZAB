@@ -1,0 +1,20 @@
+//Accounts Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//View SR Status           |#classPath+"/login?screen=*jspcrystal imreqstatus(xtornum=SR No)"
+View Cash Advance Request           |#classPath+"/login?screen=*jspcrystal prletter(xporeqcash=PR No)"
+View Comparative Statement          |#classPath+"/login?screen=*jspcrystal poquotcomp(xporeqother=PR No)"
+View Requisition Details           |#classPath+"/login?screen=*jspcrystal poreqprint(xporeqnum=PR No)"
+//PO Report            |#classPath+"/login?screen=*jspcrystal poscmstmt(xdate=From Date=#date,xdate=To Date=#date,xwh=Division,xpurtype=Purchase Type,xreptype=Report Type)"
+PO Report            |#classPath+"/login?screen=*jspcrystal poscmstmt(xdate=From Date=#date,xdate=To Date=#date,xwh=Division,xptypepo=Purchase Type,xreptypepo=Report Type)"
+PO Report Graph            |#classPath+"/login?screen=*jspcrystal poscmstmbar(xdate=From Date=#date,xdate=To Date=#date,xpurtype=Purchase Type)"
+Supplier-wise PO Report            |#classPath+"/login?screen=*jspcrystal pomrrsum(xdate=From Date=#date,xdate=To Date=#date,xsup=Supplier=)"
+//Item-wise SR & Stock Issued                 |#classPath+"/login?screen=*jspcrystal imstorereqitem(xwh=Store=,xdate=From date=#date,xdate=To Date=#date,xdeptcar=Dept,xitem=Item)"
+//Date-wise SR & Stock issued                 |#classPath+"/login?screen=*jspcrystal imstorereq(xwh=Store=,xdate=From date=#date,xdate=To Date=#date,xdeptcar=Dept)"
+//Supplier Wise GRN Item List                 |#classPath+"/login?screen=*jspcrystal pooritemqty(xdate=From Date=#date,xdate=To Date=#date,xsup=Supplier=)"
+//Supplier Wise GRN Listing            |#classPath+"/login?screen=*jspcrystal posupwisegrndetail(xdate=From Date=#date,xdate=To Date=#date,xsup=Supplier=)"
+View PO / WO           |#classPath+"/login?screen=*jspcrystal poprint(xpornum=PO/WO No)"
+View SR Status            |#classPath+"/login?screen=*jspcrystal imreqstatus(xtornum=SR No)"
+//GRN  Status           |#classPath+"/login?screen=*jspcrystal pogrnprint(xgrnnum=GRN No)"
+Quality Certificate   |#classPath+"/login?screen=*jspcrystal poqtc(xqcnum=Quality Certificate No)"

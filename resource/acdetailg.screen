@@ -1,0 +1,316 @@
+screen acdetailg
+
+  sidebar list detail
+  sections form one,  jscript myscript
+
+ list detail
+    caption "Detail List"
+    table acdetail
+    order xvoucher,xrow
+    fixed xvoucher
+    rows 50
+    objects  xrow attrib(link "login?screen=acdetailg&command=Show&xvoucher=?&xrow=?"), ~
+             xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)),~
+			 xsub,subdesc equals((select xorg from acsubview where zid=acdetail.zid and xsub=acdetail.xsub and xacc=acdetail.xacc)),xdebit,xcredit
+
+    totals "","","","","Total",sum,sum
+
+    headers "Line No","Acc Code","Description","Sub Code","Description","Debit","Credit"
+  end list
+
+  list two
+    caption "Sub Code"
+    table acsub
+    order xacc,xsub
+    select "xacc='"+xacc+"'"
+    rows 20
+    objects  xsub attrib(link "abc" embed onclick="return pickSub(this:xdesc#)"), ~
+             xdesc attrib(name xdesc#)
+
+  end list
+
+  form one
+    caption "Voucher Check Details of "+xvoucher
+    table acdetail
+    primary key xvoucher,xrow
+    order xvoucher,xrow
+    fixed xvoucher
+    pstyle 3
+    return "login"
+    layout 2
+    objects Add,Show,Update, Delete,Clear,*next,Return,Top,Previous,Next,Bottom,Invoice Allocation,~
+            xrow attrib(row 0 1),xdum,xwh display(const),xwhdesc,xacc,xaccdesc,xsub,xsubdesc,~//xregi,xcountry,xstaff,staffname,~
+            xdebit,xcredit,xprime display(hide),xlong  //,xoldsub display(const),xoldsubdesc display(const)
+
+    field xacc
+      event after
+		set global(xacc)=xacc
+		set global(xrow)=xrow
+        set statusjv = acheader.xstatusjv("xvoucher='"+xvoucher+"'")
+		set status = acheader.xstatus("xvoucher='"+xvoucher+"'")
+         if xstatusjv .eq. "Posted" // .or. status .ne. "Open"
+          set #field(Add.display) = "hidden"
+          set #field(Delete.display) = "hidden"
+          set #field(Update.display) = "hidden"
+        end if
+		set accusage = acmst.xaccusage("xacc='"+xacc+"'")
+        if accusage .ne. "AR" .and. accusage .ne. "AP"
+			set #field(invoice.display) = "hidden"
+        end if
+
+      end event
+    end field
+
+    field xwh
+      default #wh
+	  caption Business Concern
+    end field
+
+    field xaccusage
+		attrib local
+		caption Accusage
+		display const
+		event before
+			set xaccusage = acmst.xaccusage("xacc='"+xacc+"'")
+		end event
+    end field
+
+    field xwhdesc
+		attrib local
+		caption Description
+		display const
+		event after
+			set xwhdesc = branchview.xlong("xcode='"+xwh+"'")
+		end event
+    end field
+	
+		field staffname
+		attrib local
+		caption Employee name
+		display const
+		event after
+			set staffname = pdmst.xname("xstaff='"+xstaff+"'")
+		end event
+    end field
+
+        field xsub1
+          event before
+            if acmst.xaccusage("xacc='"+xacc+"'") .eq. "None"
+              set xsub=""
+            end if
+          end event
+          event after
+			set accusage = acmst.xaccusage("xacc='"+xacc+"'")
+              //if accusage .eq. "Expenditure"
+              //  set #field(xsub.pick)="xsubexp"
+                //set xsubdesc=xcodes.xlong("xtype='Expense Sub Code' and xcode='"+xsub+"'")
+              if accusage .eq. "AR"
+                set #field(xsub.pick)="cacusac"
+                //set xsubdesc=cacus.xorg("xcus='"+xsub+"'")
+              else if accusage .eq. "AP"
+                set #field(xsub.pick)="casup"
+              else if accusage .eq. "Advance"
+                set #field(xsub.pick)="xstaffac"
+                //set xsubdesc=casup.xorg("xsup='"+xsub+"'")
+              else if acmst.xaccsource("xacc='"+xacc+"'") .eq. "Subaccount"
+                set #field(xsub.pick)="xsub"
+			  else
+                set xsub=""
+                set #field(xsub.display)="hide"
+                set #field(xsubdesc.display)="hide"
+              end if
+              set globals(xsub)=xsub
+			  set xsubdesc=#sql("select xorg from acsubview where xsub='"+xsub+"' and xacc='"+xacc+"'")  //acsubview.xorg("xsub='"+xsub="'")
+          end event
+        end field
+
+
+    field xsubdesc
+      attrib local
+      caption Sub code Description
+      display const
+      event after
+        set xsubdesc = acsubview.xorg("xacc='"+xacc+"' and xsub='"+xsub+"'")
+      end event
+    end field
+
+    field xdesc
+      width 40
+      attrib local
+      caption Sub Code Description
+      display const
+      event after
+        set xdesc = acsub.xdesc("xacc='"+xacc+"' and xsub='"+xsub+"'")
+      end event
+    end field
+
+    field xdum
+      attrib local
+      caption
+      display const
+    end field
+
+    field xaccdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xaccdesc=acmst.xdesc("xacc='"+xacc+"'")
+      end event
+    end field
+
+    field xlong
+      width 80
+      columns 3
+    end field
+
+    field xbase
+      event after
+      end event
+    end field
+
+    field Add
+	   event before
+	    set sub=acsubview.xsub("xacc='"+xacc+"' and xsub='"+xsub+"'")
+		set sub2=#sql("select max(xsub) from acsubview where xacc='"+xacc+"'")
+		if sub2 .ne. "" .and. xsub .eq. ""
+		  error "Please Enter Subcode"
+	    else if xsub .ne. "" .and. sub .ne. xsub
+				error "Subcode does not match"
+	 	else if xdebit > 0 .and. xcredit>0
+			error "Cannot Proceed -- You have amount in both Debit and Credit"
+		else if xdebit < 0.001 .and. xcredit < 0.001
+			error "Cannot Proceed -- Amount is blank"
+		else if xdebit > 0
+				set xprime=xdebit
+		else if xcredit >0
+				//set xprime = 0-xcredit
+				set xprime = -xcredit
+		end if
+
+        set xwh =acheader.xwh("xvoucher='"+xvoucher+"'")
+        //set xsub =acheader.xsub("xvoucher='"+xvoucher+"'")
+        //set sub = #sql("select xsub from acsub where xacc='"+xacc+"'")
+        //if  .eq. "true"
+        //  print "<font size=+3 color=red>Please Update With Sub Code</font>"
+        //end if
+      end event
+      event after
+        set temp = #spsql(sp_validateAfterDetailAC,#id,#user,xvoucher)
+		//set xdebit=""
+		//	set xcredit=""
+		//set xacc=""
+		//set xsub=""
+		//set xaccdesc=""
+		//set xsubdesc=""
+      end event
+    end field
+
+    field Update
+      event before
+	   set sub=acsubview.xsub("xacc='"+xacc+"' and xsub='"+xsub+"'")
+	   set sub2=#sql("select max(xsub) from acsubview where xacc='"+xacc+"'")
+		if sub2 .ne. "" .and. xsub .eq. ""
+		  error "Please Enter Subcode"
+	    else if sub .ne. xsub
+			error "Subcode does not match"  
+		else if xdebit > 0 .and. xcredit>0
+			error "Cannot Proceed -- You have amount in both Debit and Credit"
+		else if xdebit < 0.001 .and. xcredit < 0.001
+			error "Cannot Proceed -- Amount is blank"
+		else if xdebit > 0
+				set xprime=xdebit
+		else if xcredit >0
+				//set xprime = 0-xcredit
+				set xprime = -xcredit
+		end if
+			
+        //set xsub =acheader.xsub("xvoucher='"+xvoucher+"'")
+      end event
+      event after
+        set temp = #spsql(sp_validateAfterDetailAC,#id,#user,xvoucher)
+		//set xdebit=""
+		//set xcredit=""
+		//set xacc=""
+		//set xsub=""
+		//set xaccdesc=""
+		//set xsubdesc=""
+      end event
+    end field
+
+    field Delete
+      event after
+        set temp = #spsql(sp_validateAfterDetailAC,#id,#user,xvoucher)
+      end event
+    end field
+
+    embed onsubmit="return submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+    field Invoice
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var but
+      var result
+
+      function clicked(b){
+        but = b.value
+      }
+      function submitit(form){
+        result = true
+        if (but == "Return"){
+          form.screen.value = "acheaderchk"
+          form.searchbutton.value = "Find xvoucher=?"
+        }
+        if (but == "Invoice Allocation"){
+            if (form.xaccusage.value != 'Ledger'){
+                if (form.xaccusage.value == 'AP'){
+                    if (form.xprime.value > '0.00'){
+     	                form.screen.value = "acalcap"
+                        form.searchbutton.value = "Top"
+                    }
+                }
+                if (form.xaccusage.value == 'AR'){
+                    if (form.xprime.value < '0.00'){
+    	                form.screen.value = "acalcar"
+                        form.searchbutton.value = "Top"
+                    }
+                }
+            }
+        }
+
+        if (but == "Invoice Allocatio"){
+		alert(form.xaccusage.value)
+          //form.screen.value = "acalcap"
+          //form.searchbutton.value = "Top"
+        }
+        but = ''
+        return result
+      }
+      function pickSub(link,desc){
+        if (navigator.appName.indexOf("Netscape") >= 0){
+          document.one.xinvnum.value=link.text
+          document.one.xbalance.value=primebal.text
+          document.one.xdate.value=date.text
+        }else{
+          document.one.xsub.value=link.innerText
+          document.one.xdesc.value=desc.innerText
+        }
+        return false
+      }
+      </script>
+  end jscript
+
+end screen
+
+
+
+

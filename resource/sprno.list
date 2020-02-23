@@ -1,0 +1,14 @@
+     list sprno
+        caption "Store Requisition List"</b>"
+        table imtorheader
+        order xtornum desc
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4)='SPR-')"
+		searchselect "left(xtornum,4)='SPR-'"
+        rows 20
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xordernum
+		 
+		 headers "SR List","Date","Ref"
+     end list
+
+

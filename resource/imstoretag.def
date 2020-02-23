@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table imstoretag
+  caption "Stote Tag"
+  columns ztime,zutime,zauserid,zuuserid,zid,xwh,xtype,xtwh,zactive,xnote 
+  
+    primary key zid,xwh,xtype
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  end table
+

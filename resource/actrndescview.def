@@ -1,0 +1,20 @@
+product ZAB ERP
+
+table branchview
+  caption "AC Trn Desc View"
+  columns zid,xtype,xlong,xcode
+
+  primary key zid,xcode
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+	sql CREATE VIEW actrndescview(zid,xtypetrn, xtrn, xaction, xdesc) ~
+	AS SELECT a.zid,b.xtypetrn,b.xtrn,b.xaction,b.xdesc ~
+	FROM zbusiness a JOIN ~
+	xtrn b ON a.zid=b.zid ~
+	WHERE b.xtypetrn='GL Voucher'
+
+end table
+

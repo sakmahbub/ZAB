@@ -1,0 +1,106 @@
+screen optargetfmppoedit
+
+     sidebar list prdtrg,list ppo
+     sections form one, jscript myscript
+
+    list prdtrg
+      caption "FM Wise Target For "+xrsm
+        table optargetfm
+        order xyear,xper,xitem,xfm
+        fixed xyear,xper,xitem,xfm
+        rows 20
+        objects  xitem,xqty,xqtydel,xstatus
+
+        header "Item Code","Target Qty","Allocated Qty","Status"
+//        totals "Total",sum,sum
+     end list
+     list ppo
+      caption "PPO Wise Allocated Target For "+xfm
+        table optargetppo
+        order xyear,xper,xitem,xfm,xsp
+        fixed xyear,xper,xitem,xfm
+        rows 20
+        objects  xyear,xper,xitem,xrsm,xfm,xsp attrib(link "login?screen=optargetfmppoedit&command=Show&xyear=?&xper=?&xitem=?&xrsm=?&xfm=?&xsp=?"), ~
+                 xqty
+
+        //header "PPO","Target Qty"
+        totals "","","","","","Total",sum
+     end list
+
+
+     form one
+        caption "PPO Wise Target"
+        table optargetppo
+        primarykey xyear,xper,xitem,xfm,xsp
+        order xyear,xper,xitem,xfm,xsp
+        fixed xyear,xper,xitem,xfm
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Update,*next, Top,Previous,Next, Bottom,*next,Back To FM Wise Target,"<p>" ,~
+                xsp,xspname,xitem,xdesc,xqty,xrate display(hide),xval
+
+      field xsp
+        pick list casp
+      end field
+
+      field xdesc
+        attrib local
+        display const
+        caption Description
+        event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        end event
+      end field
+
+      field xspname
+        attrib local
+        display const
+        caption PPO Name
+        event after
+          set xspname=cappo.xname("xsp='"+xsp+"'")
+        end event
+      end field
+
+      field Update
+       	event before
+      		set xval=xrate*xqty
+      	end event
+        event after
+	        set temp = #spsql(zabsp_OPTRG_updateTargetRSM,#id,#user,xyear,xper,xitem,xrsm,xfm,"PPO")
+        end event
+      end field
+
+       field PPO
+        embed onclick="clicked(this)"
+      end field
+
+      field Back
+        embed onclick="clicked(this)"
+      end field
+
+        embed onsubmit="return submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Back To FM Wise Target"){
+            form.screen.value = "optargetfmedit"
+            form.searchbutton.value = "Find xyear=?&xper=?&xitem=?&xfm=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

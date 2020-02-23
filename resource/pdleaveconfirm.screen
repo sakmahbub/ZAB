@@ -1,0 +1,219 @@
+screen pdleaveconfirm
+  caption "Leave Detail"
+  sidebar list 1stlist ,list 2ndlist
+  sections form one,jscript myscript
+
+  list 1stlist
+    caption "Leave Detail for Confirmation"
+    table pdleaveheader
+    order xyearperdate,xstaff
+    select "xstatus='Approved' and xsid='"+#user+"'"
+    rows 20
+
+    objects xyearperdate attrib(link "login?screen=pdleaveconfirm&command=Show&xyearperdate=?&xstaff=?"),~
+            xstaff,names equals((select xname from pdmst where zid=pdleaveheader.zid and xstaff=pdleaveheader.xstaff)),xdate,xtypeleave,xdatefrom,xdateto,xday,xstatus
+            
+    header "SI NO","Staff ID","Name","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Status"
+    totals "","","Total","","",sum
+  end list
+
+  list 2ndlist
+    caption "List of Confirmed Leave"
+    table pdleaveheader
+    order xtypeleave,xstaff
+    select "xstatus='Confirmed'"
+    rows 20
+    objects xstaff,names equals((select xname from pdmst where zid=pdleaveheader.zid and xstaff=pdleaveheader.xstaff)),xdate,xtypeleave,xdatefrom,xdateto,xday,xstatus
+    
+    header "Staff ID","Name","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Status"
+    totals "","","Total","","",sum
+  end list
+
+
+  form one
+    caption "Leave Confirmation"
+	  table pdleaveheader
+	  primarykey xyearperdate,xstaff
+    order xyearperdate,xstaff
+    select "xstatus='Approved'"
+    return "login"
+    layout 3
+    pstyle 3
+    objects Show,Clear,Confirm,~
+            xstaff display(const),xname,xdate display(const),xtypeleave display(const),xstatus display(const),xyear display(const),~
+            xdatefrom display(const),xdateto display(const),xdaterpt display(const),xday display(const),~
+            xyearperdate display(const),xdum,~
+			xnote display(const),xnote1,xpkey display(hide) attrib(local),,~
+				signatorysec display(const),,,~
+				xpreparer  display(hide),preparer  display(const),~
+				xsignatory1 display(hide),signatory1  display(const),~
+				xsignatory2 display(hide),signatory2 display(const),~
+				xsignatory3 display(hide),signatory3 display(const),~
+				xsignatory4 display(hide),signatory4 display(const),~
+				xsignatory5 display(hide),signatory5 display(const),~
+				xsignreject display(hide),signreject display(const)			
+
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatory</span>
+		display const
+		end field				
+				
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		  
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		
+		field show
+		event after
+          set xpkey=xyearperdate
+		  end event
+        end field    
+	
+	field xdate
+      caption Application Date
+    end field
+	
+	field xday
+	caption <font color=blue>No of Day(s)</font>
+	end field
+    
+    field xdaterpt
+      caption <font color=red>Reporting Date  </font>
+      event before
+        set xdate=#date
+      end event
+    end field
+	
+	  field xyearperdate
+      caption Serial No
+      //set globals(xyearperdate)=xyearperdate
+      //set globals(xstaff)=xstaff
+	  end field
+	  
+	   field xdum
+      attrib local
+      display const
+     caption
+    end field
+	  
+    field xname
+      attrib local
+      display const
+      event after
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+      end event
+    end field
+	
+	field xnote
+	column 1
+	width 40
+	height 2
+	end field
+	
+	field xnote1
+	caption Reject Note 
+	column 1
+	width 40
+	height 2
+	end field
+	
+	   field preparer
+		   attrib local
+		   display const
+          caption Preparer
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+          end field
+    
+    field Confirm
+	if xpkey .ne. xyearperdate
+		error "Please Show First!"
+	end if
+      //event before
+        //if pdleaveheader.xtypeleave("xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'") .eq. ""
+          //error "You must choose leave type from top right corner of the screen then click update"
+        //else if pdleaveheader.xdatefrom("xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'") .eq. ""
+          //error "You must give from date"
+        //else if pdleaveheader.xdateto("xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'") .eq. ""
+          //error "You must give to date"
+        //end if
+      //end event
+      event after
+       // set temp = #spsql(zabsp_leaveconf,#id,#user,xstaff,xyearperdate,xyear)
+		set temp = #spsql(zabsp_apvprcs,#id,#user,xstaff,xyearperdate,xstatus,"Leave Approval")  
+        action show
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field Detail
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+      var detail
+
+      function clicked(b){
+        detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Detail"){
+          form.screen.value = "pdleavedetail"
+          form.searchbutton.value = "Find xyearperdate=?&xstaff=?"
+          //return false
+        }
+      }
+    </script>
+  end jscript
+
+end screen

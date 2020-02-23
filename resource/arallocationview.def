@@ -1,0 +1,20 @@
+product ZAB
+
+table arallocationview
+  caption "AR Allocation View"
+  columns  zid,xvoucher,xcus,xdate,xtotamt,xprime
+
+  primary key zid, xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xvoucher references arbillhed.zid,xvoucher
+  end foreign key
+
+  sql create view arallocationview (zid,xvoucher,xcus,xdate,xtotamt,xprime) ~
+                 as select zid, xvoucher,xcus,xdate,xprime,~
+                 cast(isnull((arbillhed.xprime-isnull((SELECT SUM(arbillalc.xamount) from arbillalc where arbillalc.xinvnum = arbillhed.xvoucher and arbillalc.zid = arbillhed.zid),0)),0) as numeric(18,2)) ~
+                 from arbillhed where xsign = 1
+
+end table
+

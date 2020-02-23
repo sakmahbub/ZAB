@@ -1,0 +1,75 @@
+screen optrginscalcdetail
+
+     //sidebar list rsm
+     sections form one, jscript myscript
+
+     list rsm
+      caption "RSM Wise Target"
+        table optargetrsm
+        order xyear,xper,xitem,xrsm
+        fixed xyear,xper,xitem
+        rows 20
+        objects  xyear,xper,xitem,xrsm attrib(link "login?screen=optargetrsm&command=Show&xyear=?&xper=?&xitem=?&xrsm=?"), ~
+                 xqty,xqtydel,xstatus
+
+        //header "RSM","Target Qty","Allocated Qty","Status"
+        totals "","","","Total",sum,sum
+     end list
+
+     form one
+        caption "Incentive Info Detail"
+        table optrginscalcdetail
+        primarykey xyear,xper,xsp,xrow
+        order xyear,xper,xsp,xrow
+        fixed xyear,xper,xsp
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,*next,Return,Top,Previous,Next, Bottom,"<p>" ,~
+                xrow attrib(row 0 1),xdesc,xqty,xpoint,xamount
+
+       field xqtydel
+        caption Quantity Allocated To RSM
+      end field
+
+      field xbalance
+	  attrib local	
+        display const
+	  caption Balance
+	  event after
+		set xbalance=xqty-xqtydel
+	  end event	
+      end field
+
+
+      field Return
+        embed onclick="clicked(this)"
+      end field
+
+
+        embed onsubmit="return submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "optrginscalcheader"
+            form.searchbutton.value = "Find xyear=?&xper=?&xsp=?"
+            //return false
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

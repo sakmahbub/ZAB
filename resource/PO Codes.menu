@@ -1,0 +1,10 @@
+//PO Codes.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Purchase Order Codes             |#classPath+"/main?page=xtrn(xtypetrn=Purchase Order)"
+Purchase Order Parameters        |#classPath+"/main?page=xtrnp(xtypetrn=Purchase Order)"
+Goods Receipt Note Codes         |#classPath+"/main?page=xtrn(xtypetrn=Goods Receipt Note)"
+Goods Receipt Note Parameters    |#classPath+"/main?page=xtrnp(xtypetrn=Goods Receipt Note)"
+//-------------------------------------------------------------------
+

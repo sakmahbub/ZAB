@@ -1,0 +1,20 @@
+
+product ZAB ERP
+
+table cacreditview
+  caption "Credit Limit View"
+  columns zid,xcus,xorg,xcrlimit,xcrused,xpaid,xbalance
+  primary key zid,xcus
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view cacreditview (zid,xcus,xorg,xcrlimit,xcrused,xpaid,xbalance)~
+                  as select zid,xcus,xorg,xcrlimit,~
+                  0,0,~
+                  xcrlimit-(isnull(isnull((select sum(xnetamt) from opdoheader where zid=cacus.zid and xcus=cacus.xcus and xpaymentterm='Credit' and xstatusord='Open' and xdornum in(select xdornum from opdodetail where zid=opdoheader.zid and xdornum=opdoheader.xdornum)),0),0)+isnull((select sum(xbalprime) from arhed where zid=cacus.zid and xsign>0 and xpaymentterm='Credit' and zid=cacus.zid and xcus=cacus.xcus),0)) ~
+                  from cacus where xpaymentterm='Credit'
+
+
+end table

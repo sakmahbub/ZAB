@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table pdlplanehd
+  caption "Plane HD"
+
+  columns ztime,zutime,zauserid,zuuserid,zid,xname,xdaydeduct,xhourdeduct
+
+  primary key zid, xname
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

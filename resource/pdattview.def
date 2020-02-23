@@ -1,0 +1,35 @@
+product ZAB ERP
+
+table pdattview
+  caption "PD Attendance View"
+  columns zid,xstaff,xposition,xyearperdate,xdate,xstatus,xnote,xtimein,xtimeout
+  primary key zid,xstaff,xposition,xyearperdate,xdate,xstatus,xnote,xtimein,xtimeout
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdattview (zid,xstaff,xposition,xyearperdate,xdate,xstatus,xnote,xnote1,xtimein1,xtimeout1,xstatusel,xstatuslate,xemplate,xempearly,xdayname,xworktime,~
+			xspec,xadminid,xsid,xpaystatus,xidsup,xshift,xworkhour,xempabsent,xstatusabsent,xstatustask,xsuperior2,xsuperior3) ~
+            as Select zid,xstaff,xposition,xyearperdate,xdate,xstatus,xnote,xnote1,xtimein1,xtimeout1,xstatusel,xstatuslate,xemplate, ~
+			xempearly,xdayname,xworktime,xspec,xadminid,xsid,'','','','','','','','','' from pdweekendview ~
+			UNION ALL ~
+			select a.zid,a.xstaff,a.xposition,a.xyearperdate,a.xdate,a.xstatus,a.xnote,a.xnote1, ~
+			(select min(xtimein) from pdatdt where pdatdt.zid=a.zid and pdatdt.xstaff=a.xstaff and pdatdt.xyearperdate=a.xyearperdate) as xtimein, ~
+			(select max(xtimein) from pdatdt where pdatdt.zid=a.zid and pdatdt.xstaff=a.xstaff and pdatdt.xyearperdate=a.xyearperdate) as xtimeout, ~
+			isnull(a.xstatusel,''),isnull(a.xstatuslate,''),isnull(a.xemplate,'0'),isnull(a.xempearly,'0'),DATENAME(weekday,a.xdate), ~
+			CAST(((select max(xtimein) from pdatdt where pdatdt.zid=a.zid and pdatdt.xstaff=a.xstaff and pdatdt.xyearperdate=a.xyearperdate) ~
+			-(select min(xtimein) from pdatdt where pdatdt.zid=a.zid and pdatdt.xstaff=a.xstaff and pdatdt.xyearperdate=a.xyearperdate)) as time(0)),'Attendence',isnull(p.xadminid,''),isnull(p.xsid,''), ~ 
+			isnull((select pdbl.xstatus from pdballog pdbl where zid=a.zid and pdbl.xyear=year(a.xdate) AND xper=MONTH(a.xdate) and pdbl.xempcategory=p.xempcategory),''),isnull(a.xidsup,''), ~
+			isnull((select xshift from pdrosterdetail pdr where pdr.zid=a.zid and pdr.xstaff=a.xstaff and cast(pdr.xdate as date)=cast(a.xdate as date)),'General'), ~
+			CAST(CAST(((select max(xtimein) from pdatdt where pdatdt.zid=a.zid and pdatdt.xstaff=a.xstaff and pdatdt.xyearperdate=a.xyearperdate) ~
+			-(select min(xtimein) from pdatdt where pdatdt.zid=a.zid and pdatdt.xstaff=a.xstaff and pdatdt.xyearperdate=a.xyearperdate)) as time(0)) AS VARCHAR(30)),isnull(a.xempabsent,''),isnull(a.xstatusabsent,''), ~
+			isnull(case when ((datepart(day,GETDATE())>15 and datepart(month,a.xdate)<datepart(month,GETDATE())) or datepart(year,a.xdate)< datepart(year,GETDATE())) then 'Closed' ELSE 'Open' END,'Open'),isnull(a.xsuperior2,''),isnull(a.xsuperior3,'') ~
+			from pdathd a join pdmst p on a.zid=p.zid and a.xstaff=p.xstaff ~
+			UNION ALL ~
+			select  a.zid,a.xstaff,c.xposition,a.xyearperdate,a.xdate,b.xtypeleave,xnote,xnote1,NULL,NULL,'','','','',DATENAME(weekday,a.xdate),'00:00:00','',isnull(c.xadminid,''),isnull(c.xsid,''),'','','','','','','','','' from pdleaveheader b ~
+			join pdleavedetail a on a.zid=b.zid and a.xyearperdate=b.xyearperdate ~
+			join pdmst c on b.zid=c.zid and b.xstaff=c.xstaff ~
+			where b.xstatus='Confirmed'	~
+			and a.xdate not in (select xdate from pdweekendview pw where pw.zid=a.zid and pw.xstaff=a.xstaff)
+  end table

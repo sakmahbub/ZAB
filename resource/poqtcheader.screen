@@ -1,0 +1,340 @@
+screen poqtcheader
+
+     sidebar list grn,list one
+     sections form one, jscript myscript
+
+     
+	list grn
+        caption "Quality Certificate Detail List"
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrndetail&command=Show&xgrnnum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where zid=pogrndetail.zid and  xitem=pogrndetail.xitem)),xqtygrn,xunitpur
+
+        headers "Row","Item","Description","Qty","Unit"
+     end list
+
+	 list one
+        caption "Work Order List"
+        table pogrnheader
+        order xpornum
+        fixed xgrnnum
+        rows 20
+        objects  xpornum attrib(link "login?screen=poqualitycertifi&command=Show&xpornum=?"), ~
+                 xdate
+
+
+        headers "Work Order No.","Date"
+     end list
+
+     form one
+        caption "Quality Certificate Header"
+        table pogrnheader
+        order xgrnnum desc
+       // fixed xgrnnum
+		return "login"
+		select "left(xgrnnum,4)='SQC-'"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Update,~//Invoice Cost,
+                Detail,Confirm,"<p>" ,~
+                xgrnnum,xdate,xcus display(const),xorg,xwh display(const),xwhdesc,~
+                xstatusgrn display(const),xstatusdoc display(const),xinvnum,xref display(hide),~
+				xpornum display(hide),~
+				xvoucher display(hide),xnote,xstatusjv display(hide),xlcno display(hide),~
+				xpkey display(hide) attrib(local),xdum,~
+		signatorysec display(const),,,~
+		xpreparer display(hide),preparer display(const),~		
+		xsignatory1 display(hide),signatory1  display(const),~
+		xsignatory2 display(hide),signatory2 display(const),~
+		xsignatory3 display(hide),signatory3 display(const),~
+		xsignatory4 display(hide),signatory4 display(const),~
+		xsignatory5 display(hide),signatory5 display(const),~
+		xsignreject display(hide),signreject display(const)				
+
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		//column 2
+		end field
+		
+		field xdum
+			display const
+			attrib local
+			caption
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='SQC Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='SQC Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='SQC Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='SQC Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='SQC Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field		
+		
+		
+		field xgrnnum
+		pick list qtcnum
+		caption QTC Number
+		evevnt after
+		set global(xpornum)=xpornum
+		set global(xgrnnum)=xgrnnum
+		set global(xstatusgrn)=xstatusgrn
+		if xstatusgrn .ne. "Open" .or.  pogrnheader.xstatusdoc("xgrnnum='"+xgrnnum+"'") .ne. "Open" 
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(confirm.display)="hidden"
+       		  end if
+    		  if pogrnheader.xlcno("xgrnnum='"+xgrnnum+"'") .eq. "" 
+		         	set #field(Invoice.display)="hidden"
+       		  end if
+			  
+		if pogrnheader.zauserid("xgrnnum='"+xgrnnum+"'") .ne. #user
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(confirm.display)="hidden"
+       		  end if  
+		end event
+        	width 18
+        end field
+		  
+		  field xinvnum
+			caption Ref No
+		  end field
+		  
+		  field xstatusgrn
+			caption SQC Status
+		  end field		  
+		  
+		  field xstatusdoc
+			caption Approval Status
+		  end field			  
+		  
+		  field xwh
+			//display text
+			pick list xwh
+          end field
+		  
+		field xwhdesc
+			attrib local
+			display const
+			caption Store Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+        field xlcinfo
+          attrib local
+          display const
+          column 3
+            caption <br><FONT SIZE=4 COLOR=red><ACRONYM>LC Info</ACRONYM></font>
+        end field
+
+ 		  field xorg
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+
+
+		field show
+		event after
+          set xpkey=xgrnnum
+		  end event
+        end field
+
+        field update
+          event before
+		  set backdate=#sql("select xdateexp from acdef")
+		  set backentry=#sql("select xbacklock from acdef")
+		  set wh=branchclientview.xcode("xcode='"+xwh+"' and zactive=1 and xtypestore='GRN'")
+		  set podate = #sql("select xdate from poordheader where xpornum='"+xpornum+"'")
+		  set podate=#sub(podate,0,10)
+		  set xdatedisplay=#sql(varchar,"select convert(VARCHAR, xdate, 106)  from poordheader where xpornum='"+xpornum+"'")
+		  if xpkey .ne. xgrnnum
+			error "Please press show first!"
+		  else if xstatusgrn .eq. ""
+            error "Please Show First!"
+		  else if pogrnheader.xstatusgrn("xgrnnum='"+xgrnnum+"'") .eq. "Confirmed"
+			error "SQC Already Confirmed!"
+		  else if xwh .eq. "" .or. wh .ne. xwh
+			error "Cannot Proceed - Store is Blank or Store not exists  or It is not SQC Store!"
+		  else if backentry .eq. "No" .and. xdate .le. backdate
+			error "Back Lock Entry does not allow!"
+		  else if podate .gt. xdate
+            error "SQC date must be greater or equal : "+xdatedisplay
+		  else if xdate .gt. #date
+			error "Future Date does not allow!"
+		  end if
+          end event
+        end field
+		
+		field Delete
+          event before
+            set pornum = xpornum
+          end event
+		event after
+		set temp = #sql("update poordheader set xstatuspor='Open' where xpornum='"+pornum+"'")
+		end event  
+        end field
+
+	field transfer
+	event after
+		set temp = #sql("update imtrn set xwh='"+xwh+"' where xdocnum='"+xgrnnum+"'")
+		set temp = #sql("update pogrnheader set xwh='"+xwh+"' where xgrnnum='"+xgrnnum+"'")
+	end event
+	end field
+
+        field xnote
+		caption Inspection Report of Preparer
+          width 50
+          column 1
+        end field
+
+        field xgrnnum
+           event after
+		   class careports(getReport{poqtc;2;in,st;zid,grnnum;xgrnnum;View Quality Certificate})
+		   // class careports(getjspReport{poqtc,1,xgrnnum,View Quality Certificate})
+              set globals(xgrnnum) = xgrnnum
+           end event
+        end field
+		
+		field confirm
+            event before
+			set justificat=#sql("select xnote from pogrnheader WHERE xgrnnum='"+xgrnnum+"'")
+			double prepqty=#sql("select sum(xqtygrn) from pogrndetail where xgrnnum='"+xgrnnum+"'")
+            if pogrnheader.xstatusgrn("xgrnnum ='"+xgrnnum+"'") .ne. "Open"
+              error "Cannot Proceed - SQC Already Confirmed"
+			else if justificat .eq. ""
+				error "Please write Justification"
+			else if prepqty <0.01
+			error "Please add detail"
+			else if pogrnheader.xstatusdoc("xgrnnum='"+xgrnnum+"'") .ne. "Open" .and. pogrnheader.xstatusdoc("xgrnnum='"+xgrnnum+"'") .ne. "Rejected"
+				error "SQC Already Confirm"
+			end if
+            end event
+            event after
+			set temp =  #spsql(zabsp_Confirmed_Request,#id,#user,#position,xwh,xgrnnum,"SQC")
+			//set temp = #spsql(zabsp_sendmail,#id,#user,#position,xtornum,"Department","")
+	         action show
+            end event
+          end field		
+
+        field Confirmold
+           event before
+		   	set justificat=#sql("select xnote from pogrnheader WHERE xgrnnum='"+xgrnnum+"'")
+            if pogrnheader.xstatusgrn("xgrnnum ='"+xgrnnum+"'") .ne. "Open"
+              error "Cannot Proceed - GRN Already Confirmed"
+			else if xwh .eq. ""
+              error "Cannot Proceed - Store is Blank"
+			else if justificat .eq. ""
+				error "Please write Justification"
+			  else
+			  set superior=pdmst.xidsup("xposition='"+#user+"'")
+			  //set staff=pdmst.xstaff("xposition='"+superior+"'")
+            end if    
+           end event
+           event after
+             // set temp = #spsql(zabsp_PO_confirmGRN,#id,#user,xgrnnum,xdate,xwh,6)
+			   set temp = #sql("Update pogrnheader set xstatusgrn='Confirmed' where xgrnnum='"+xgrnnum+"'")
+			   set temp = #sql("Update pogrnheader set xsuperiorsp='"+superior+"' where xgrnnum='"+xgrnnum+"'")
+               set temp = #spsql(zabsp_sendmail,#id,#user,xgrnnum,"QC","")
+			  action show
+           end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "poqtcdetail"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Amendment"){
+            form.screen.value = "opdcamend"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Invoice Cost"){
+            form.screen.value = "pogrncost"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

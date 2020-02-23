@@ -1,0 +1,169 @@
+screen imtordetailwsapp
+
+    sidebar list one
+    sections  form one, jscript myscript
+              
+    list one
+        caption "<br><center><b>"WRE/WIS Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=imtordetailwsapp&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+		partno equals((select xtheircode from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xprepqty,xdphqty,xunit
+
+        headers "Serial No","Item","Description","Part No","Quantity Required","Approved Qty","Unit"
+     end list
+
+
+     form one
+        caption "WRE/WIS Approval Detail For: "+xtornum
+        table imtordetail
+        primarykey xtornum,xrow
+        order xtornum,xrow
+        fixed xtornum
+        return "login"
+        pstyle 3
+        layout 2
+        objects Update,Clear,Show,Top,Previous,Next,Bottom,~//Add,Delete,
+        Return,"<p>",~
+        xrow attrib(row 0 1),xunit display(const),xitem,xdesc,xprepqty display(const),xdphqty,xqtyreq display(hide),xqtycom display(hide),~
+		xqtyord display(hide),xbrand display(hide),xnote,~
+        xrate display(hide),xlineamt display(hide)
+
+		field xdocrow
+			caption Recipe Row
+		end field
+		
+        field xrow
+          event after
+            set status = imtorheader.xstatustor("xtornum='"+xtornum+"'")
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .eq. "Confirmed"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+          end event
+        end field
+
+	field xbatch
+		caption Batch No.
+		width 50
+	end field
+	
+	field xitem
+		//attrib readonly
+	end field
+	
+	field xdphqty
+		caption Approved Qty
+		event before
+		end event
+	end field
+
+
+        field xdesc
+          caption Product Name
+          attrib local
+          display const
+          event after
+            set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+	  	
+        field add
+          event before
+		  set xunit=caitem.xunit("xitem='"+xitem+"'")
+		  if xitem .eq. ""
+		  error "Please select Product"
+		  else if xprepqty<0.0001
+		   error "Qty must be greater than 0"
+		   end if
+          end event
+          event after
+         //   set temp = #spsql(zabsp_MO_validateAfterStoreReq,#id,#user,xbatch,xrow,xdocrow,xqtyreq)
+            action show
+          end event
+        end field
+
+        field update
+          event before
+		  set xunit=caitem.xunit("xitem='"+xitem+"'")
+		  if xitem .eq. ""
+		  error "Please select Product"
+		  else if xprepqty<0.0001
+		   error "Qty must be greater than 0"
+		   end if
+	//	  if xdphqty<0.0001
+	//		set xdphqty=xprepqty
+	//		set xqtyreq=xprepqty
+	//	else
+			set xqtyreq=xdphqty
+	//	end if
+		if xdphqty>xprepqty
+		error "Approved Qty must be greater or equal to preparer Qty"
+		end if
+          end event
+          event after
+           // set temp = #spsql(zabsp_MO_validateAfterStoreReq,#id,#user,xbatch,xrow,xdocrow,xqtyreq)
+            action show
+          end event
+        end field
+
+        field delete
+          event before
+			set batch = xbatch
+			set row = xrow
+			set docrow = xdocrow
+			set qtyreq = xqtyreq
+          end event
+          event after
+           // set temp = #spsql(zabsp_MO_validateAfterStoreReq,#id,#user,batch,row,docrow,qtyreq)
+            action show
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Return"){
+            form.screen.value = "imtorheaderwsapp"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+        function pickRecipe(link,qty,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xqtyreq.value=qty.text
+            document.one.xitem.value=link.text
+            document.one.xrow.value=row.text
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xrow.value=row.innerText
+            document.one.xqtyreq.value=qty.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

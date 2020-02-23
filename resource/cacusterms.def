@@ -1,0 +1,15 @@
+product ZABDB 
+
+table cacusterms
+  caption "Customer Terms"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xcus,xrow,xcode,xnote
+          
+  primary key zid,xcus,xrow
+
+  foreign key
+        zid references zbusiness.zid
+       zid,xcus references cacus.zid,xcus
+  end foreign key
+
+end table

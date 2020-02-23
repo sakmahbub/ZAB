@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table pdtaxslabdetail
+  caption "PD Tax Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xyear,xrow,xtaxslab,xtaxrate,xtaxslabfemale
+
+  primary key zid,xyear,xrow
+  foreign key
+        zid references zbusiness.zid
+        zid,xyear references pdtaxheader.zid,xyear
+  end foreign key
+
+end table

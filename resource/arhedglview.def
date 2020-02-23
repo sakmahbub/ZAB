@@ -1,0 +1,16 @@
+product ZAB ERP
+
+table arhedglview
+  caption "ARHED View"
+  columns zid,xvoucher,xdate,xstatusjv,xdocnum
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view arhedglview (zid,xvoucher,xdate,xstatusjv,xdocnum,xmrno) ~
+                  as Select a.zid,a.xdocnum,b.xdate,b.xstatusjv,a.xdocnum,a.xvoucher from arhed a join acheader b on a.zid=b.zid AND a.xdocnum=b.xvoucher
+
+end table

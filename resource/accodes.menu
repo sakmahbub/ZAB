@@ -1,0 +1,14 @@
+//General Accounts Codes & Parmeter.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Transaction Code                 |#classPath+"/login?screen=xtrn(xtypetrn=GL Voucher)"
+//Expense Sub Code                 |#classPath+"/login?screen=xcodes(xtype=Expenditure)"
+//Project Sub Code                 |#classPath+"/login?screen=xcodes(xtype=Project)"
+//Export LC Cost                   |#classPath+"/login?screen=xcodesexplccost"
+//Import LC Cost                   |#classPath+"/login?screen=xcodesimplccost"
+//Import LC To GL Interface        |#classPath+"/login?screen=polctogli"
+//C & F Agent                      |#classPath+"/login?screen=cacnf"
+//Insurance Company                |#classPath+"/login?screen=cains"
+//-------------------------------------------------------------------
+

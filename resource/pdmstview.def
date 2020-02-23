@@ -1,0 +1,23 @@
+
+product ZAB ERP
+
+table pdmstview
+  caption "PDMST View"
+  columns zid,xstaff,xrow,xtype,xamount,xtypetrn,xdatejoin,xenddate,xdatecom,~
+          xdeptname,xdesc,xposition,xname,xdesignation,xempcategory,xvoucher,xdocrow,xlong
+
+  primary key zid,xstaff,xrow
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdmstview (zid,xstaff,xrow,xtype,xamount,xtypetrn,xdatejoin,xenddate,xdatecom,xdeptname,xdesc,xposition,xname,xdesignation,xempcategory,xvoucher,xdocrow,xlong)~
+                  as select isnull(a.zid,b.zid),isnull(a.xstaff,b.xstaff),isnull(a.xrow,0),isnull(a.xtype,''),isnull(a.xamount,0),~
+                  isnull((select xprops from xcodes where xtype='PD Transaction Type' and xcode=a.xtype),''),~
+                  b.xdatejoin,b.xenddate,b.xdatecom,b.xdeptname, ~
+                  (select xlong from xcodes where xtype='Department Name' and xcode=b.xdeptname),b.xposition,b.xname,b.xdesignation,b.xempcategory,~
+                  isnull(a.xvoucher,''),isnull(a.xdocrow,0), ~
+                  (select xlong from xcodes where a.zid=xcodes.zid and xtype='PD Transaction Type' and xcode=a.xtype) ~
+                  from pdsalarydetail a right outer join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff where b.xempstatus='Normal'
+end table

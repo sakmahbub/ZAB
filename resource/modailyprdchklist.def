@@ -1,0 +1,16 @@
+product ZAB ERP
+
+table modailyprdchklist
+
+  caption "MO Daily Production Check List"
+  columns  ztime,zutime,zauserid,zuuserid,zid,xbatch,xrow,xdocrow,xcode,xyesno,xnote
+           
+           
+  primary key zid,xbatch,xrow,xdocrow
+  
+  foreign key
+        zid references zbusiness.zid
+        zid,xbatch references moheader.zid,xbatch
+		zid,xbatch,xrow references modailyprdtrn.zid,xbatch,xrow
+  end foreign key
+end table

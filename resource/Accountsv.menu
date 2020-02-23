@@ -1,0 +1,25 @@
+//Accounts.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Chart of Accounts                |#classPath+"/login?page=GLmst"
+Sub Account                      |#classPath+"/login?page=GLsubx"
+Vessel Master                    |#classPath+"/login?page=GLvessel"
+Budget Entry                     |#classPath+"/login?page=GLbuddummy"
+Shipping GL Vouchers             |#classPath+"/login?page=GLvesseldummy"
+Debit Note                       |#classPath+"/login?page=GLheaderd"
+Credit Note                      |#classPath+"/login?page=GLheaderc"
+Cash Receipt                     |#classPath+"/login?page=GLheadercr"
+Cash Payment                     |#classPath+"/login?page=GLheadercp"
+Bank Receipt                     |#classPath+"/login?page=GLheaderbr"
+Bank Payment                     |#classPath+"/login?page=GLheaderbp"
+Journal Vouchers                 |#classPath+"/login?page=GLheaderj"
+Opening Balance                  |#classPath+"/login?page=GLopen"
+GL Reports                       |#classPath+"/login?menu=GL Reports"
+Vessel Reports                   |#classPath+"/login?menu=GLSH Reports"
+Subledger Reports                |#classPath+"/login?menu=SL Reports"
+Project Accounting Reports       |#classPath+"/login?menu=PA Reports"
+Year End Processing              |#classPath+"/login?page=GLyearend"
+Codes                            |#classPath+"/login?menu=GL Codes"
+//-------------------------------------------------------------------
+

@@ -1,0 +1,45 @@
+//HR Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+
+Salary Sheet 			     	  |#classPath+"/login?screen=*viewcrystal pdsalaryshta(10;in,st,st,in,in,st,st,st,st,st;zid,empcate,dept,year,period,bank,salbank,ot,location,note;xempcategory=Employee Category,xdeptname=Department Name,xyear=Year,xper=Period,xbank=Bank,xsalbank=Salary Type,xot=OT Status,xlocation=Location,xlong=Note,xviewtype=Report View)"
+Salary Top Sheet 			      |#classPath+"/login?screen=*viewcrystal pdsalsumdept(6;in,st,in,in,st,st;zid,empcat,year,per,bank,salbank;xempcategory=Employee Category,xyear=Year,xper=Period,xbank=Bank,xsalbank=Salary Type,xviewtype=Report View)"
+Pay Slip                          |#classPath+"/login?screen=*viewcrystal pdselfpayslip(6;in,st,st,in,in,st;zid,empcat,staff,year,per,bank;xempcategory=Employee Category,xstaff=Employee ID,xyear=Year,xper=Period,xbank=Bank,xviewtype=Report View)"
+Cash Salary Sheet				  |#classPath+"/login?screen=*viewcrystal pdsalsheet(5;in,in,in,st,st;zid,year,period,empcat,dept;xyear=Year,xper=Period,xempcategory=Category,xdeptname=Department,xviewtype=Report View)"
+PF Sheet				  		  |#classPath+"/login?screen=*viewcrystal pdsalsheetpf(4;in,in,in,st;zid,year,period,empcat;xyear=Year,xper=Period,xempcategory=Category,xviewtype=Report View)"
+///Employee PF Statement	  		  |#classPath+"/login?screen=*viewcrystal pdemppf(2;in,st;@zid,@staff;xstaff=Staff ID,xviewtype=Report View)"
+Income Tax Sheet				  |#classPath+"/login?screen=*viewcrystal pdsalsheetait(4;in,in,in,st;zid,year,period,empcat;xyear=Year,xper=Period,xempcategory=Category,xviewtype=Report View)"
+Advance Salary Sheet			  |#classPath+"/login?screen=*viewcrystal pdsalsheetadv(4;in,in,in,st;zid,year,period,empcat;xyear=Year,xper=Period,xempcategory=Category,xviewtype=Report View)"
+
+
+Bank Statement            		  |#classPath+"/login?screen=*viewcrystal pdbankStatement(5;in,in,in,st,st;zid,year,period,empcat,bank;xyear=Year,xper=Period,xempcategory=Category,xbank=Bank,xviewtype=Report View)"
+
+//Envelop Print                   |#classPath+"/login?screen=*viewcrystal pdenvelop(4;in,st,st,st;zid,empcate,dept,staff;xempcategory=Employee Category,xdeptname=Department Name,xstaff=Employee ID,xviewtype=Report View)"
+///Salary Certificate			 	  |#classPath+"/login?screen=*viewcrystal pdsalcertificate(3;in,st,in;zid,staff,year;xstaff=Employee Id, xyear=Year,xviewtype=Report View)"
+Salary Certificate			 	  |#classPath+"/login?screen=*viewcrystal pdsalcertificatehrd(4;in,st,in,in;zid,staff,year,per;xstaff=Employee Id,xyear=Year,xper=Period,xviewtype=Report View)"
+Salary Transfer Letter to Bank    |#classPath+"/login?screen=*viewcrystal pdbankletter(9;in,st,st,in,in,st,st,st,st;zid,empcate,bank,year,per,1stSign,1stDesig,2ndSign,2ndDesig;~
+									xempcategory=Employee Category,xbank=Bank,xyear=Year,xper=Period,xsign1=First Singnatory,xdesig1=First Desgingation,xsign2=Second Singnatory,xdesig2=Second Desgingation,xviewtype=Report View)"
+Loan & Advance Checking	   	      |#classPath+"/login?screen=*jspcrystal pdloantrn(xempcategory=Employee Category,xstaff=From Employee,xstaff=To Employee)"
+//Salary Sheet 			     	  |#classPath+"/login?screen=*jspcrystal pdsalaryshtforall(xempcategory=Employee Category,xyear=Year,xper=Period)"
+//Employee Listing                |#classPath+"/login?menu=pdmstrep"
+//Absent Detail		   	   		  |#classPath+"/login?screen=*crystal pdabsent(xyear=Year,xper=Period,xstaff=From Employee,xstaff=To Employee)"
+//Transaction Listing             |#classPath+"/login?menu=pdtrnrep"
+//Salary And Statements		   	  |#classPath+"/login?menu=pdbalrep"
+//Search Emp By Joining Date 	  |#classPath+"/login?screen=*jspcrystal pdDOJCheck(xper=Month,xyear=Year)"
+//Departmet Wise Summary JV 	  |#classPath+"/login?screen=*jspcrystal pddeptsum(xper=Month,xyear=Year)"
+//Date Wise Confirmation		  |#classPath+"/login?screen=*jspcrystal pdcondatewise(xdate=From Date,xdate=To Date)"
+//Yearly Summary Report		   	  |#classPath+"/login?screen=*jspcrystal pdcontribution(xtypesal=Salay Type,xyear=Year)"
+//New Join List			   	      |#classPath+"/login?screen=*jspcrystal pdjoinlist(xdate=From Date,xdate=To Date)"
+//Resignation List			   	  |#classPath+"/login?screen=*jspcrystal pdresignlist(xdate=From Date,xdate=To Date)"
+//Salary And Statements (Non Reg) |#classPath+"/login?menu=pdbalnrrep"
+//Service Charge                  |#classPath+"/login?menu=pdschgrep"
+//Bonus                           |#classPath+"/login?menu=pdbonusrep"
+//Variance Report      		   	  |#classPath+"/login?screen=*crystal pdvariance(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//Monthly Salary Statment		  |#classPath+"/login?screen=*crystal pdsalarysheet(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//Reconcilation Report     	   	  |#classPath+"/login?screen=*crystal pdreconciliation(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//Tax Assessment   			   	  |#classPath+"/login?screen=*crystal pditassesment(xyear=Year,xstaff=From ID,xstaff=To ID,xempcategory=Employee Category)"
+//Tax Assessment (NBR)   		  |#classPath+"/login?screen=*crystal pditassesmentnbr(xyear=Year,xstaff=From ID,xstaff=To ID,xempcategory=Employee Category)"
+//Tax Summary            		  |#classPath+"/login?screen=*crystal pditsummary(xyear=Year,xempcategory=Employee Category)"
+//OT Statement      		   	  |#classPath+"/login?screen=*crystal pdotstmt(xyear=Year,xstaff=Employee ID=)"
+

@@ -1,0 +1,72 @@
+screen pdcalender
+     caption "Leave Detail"
+     sections form one,jscript myscript
+
+  	list trn
+        caption "Leave Detail"
+        table pdleaveview
+        order xstaff,xtypeleave
+        select "xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"'"
+        rows 20
+        objects  xyear,xday
+//        header "Year","EMP ID","Name","Total Day","Leave Type","Paid/Unpaid"
+//        totals "","","",sum,"",""
+     end list
+
+     form one
+        caption "<ACRONYM>Calender</ACRONYM>"
+	      table pdcalender
+        order xyear,xyearperdate
+        fixed xyear
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Detail,Top,Next,Previous,Bottom,~
+          xdate,xdesc width(50),xyearperdate,xlocation
+
+        field xdate
+          event before
+            set year = #sub(xdate,0,4)
+            set per = #sub(xdate,5,2)
+            set day = #sub(xdate,8,2)
+            set xyear=year
+            set xyearperdate = year+per+day
+          end event
+        end field
+        field xyear
+          event after
+            set globals(xyear)=xyear
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdcalenderheader"
+            form.searchbutton.value = "Find xyear=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

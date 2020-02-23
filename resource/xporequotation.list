@@ -1,0 +1,13 @@
+     list xporequotation
+        table poreqhdview
+        order xporeqnum
+        select "xporeqnum like '%"+zvalue+"%' and xtype='CS' and left(xporeqnum,4) in ('PR--','JN--')"
+		searchselect "xtype='CS' and left(xporeqnum,4) in ('PR--','JN--')"
+        rows 20
+        objects xporeqnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xdate,xtype,xtornum,xname,xlong
+		
+		 Headers "Requisition No","Date","Type","Reference No","Preparer","Srore/ Project"
+     end list
+
+

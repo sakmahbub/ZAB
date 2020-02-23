@@ -1,0 +1,193 @@
+screen mostorereqdetail
+
+     
+    sidebar list one,list two
+     sections form one,  jscript myscript
+
+     list one
+        caption "Processes for Batch "+xbatch
+        table mohrecipesetting
+        order xbatch,xrow
+        fixed xbatch
+        rows 20
+        objects  xrow attrib(link "login?screen=mostorereqdetail&command=Show&xbatch=?&xrow=?"),xmoprcs, ~
+                 xdate,xfabriccolor
+
+        headers "Row No","Process Name","Date","Color"
+     end list
+              
+     list two
+        caption "Recipe for <br>Batch "+xbatch+" Process "+xmoprcs
+        table mohrecipesettingdetail
+        order xbatch,xrow,xitemrow
+        fixed xbatch,xrow
+        rows 20
+        objects  xitemrow attrib(link "login?screen=mohrecipesettingdetail&command=Show&xbatch=?&xrow=?&xitemrow=?"),xitem, ~
+                 desc equals((select xdesc from caitem where zid=mohrecipesettingdetail.zid and xitem=mohrecipesettingdetail.xitem)),~
+                 xqtymix
+
+        //totals "","Totals","","",sum,sum,""
+
+        headers "Row No","Item","Description","Recipe Qty"
+     end list
+              
+     form one
+        caption "Store Requisition For <br>Batch: "+xbatch+" Process: "+xmoprcs
+        table mohrecipesetting
+        order xbatch,xrow
+        fixed xbatch
+        pstyle 3
+        return "login"
+        layout 2
+        objects Complete,Clear,Show,Confirm Requisition,~
+                xrow attrib(row 0 1),xmoprcs,xdate,xfabriccolor,xwh,xwhdesc,xstatusprcs
+		
+	    field xwh
+    		caption Recipe Store
+			display text
+			pick list xwh
+			default modef.xwh("zid='"+#id+"'")
+	    end field
+		
+		field xwhdesc
+			attrib local
+			display const
+			caption Description
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Store' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+				
+		field xfabriccolor
+			pick "select xfabriccolor from opfabriccolorview where xordernum='"+xordernum+"'"
+		end field
+		
+		field xdate
+			caption Recipe Setting Date
+		end field
+		
+		field xmoprcs
+			event after
+				set globals(xrow)=xrow
+				set globals(xmoprcs)=xmoprcs
+			end event
+		end field
+		
+		field xdum
+			attrib local
+			display const
+			caption 
+		end field
+		
+		field xdesc
+			attrib local
+			display const
+			caption Description
+			event after
+				set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xunit
+			attrib local
+			display const
+			caption Unit
+			event after
+				set xunit=caitem.xunit("xitem='"+xitem+"'")
+			end event
+		end field
+				
+		field add
+		event before
+          	set xstatus = "Open"
+          	end event
+		end field
+		
+		field xdesc
+			attrib local
+			display const
+			caption Description
+			event after
+				set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xunit
+			display const
+			caption Unit
+		end field
+		
+
+		field Prepare
+			event after
+	            set temp = #spsql(zabsp_MO_PrepareReqForRecipe,#id,#user,xbatch,xrow,xmoprcs,xqty,xdocrow)
+	            action show
+			end event
+		end field
+		
+		
+		field Confirm
+			event before
+			end event
+			event after
+	            set temp = #spsql(zabsp_MO_ConfirmReqForRecipe,#id,#user,xbatch,xrow,xmoprcs,xdate)
+	            action show
+			end event
+		end field
+
+
+
+		
+		
+        embed onsubmit="return submitit(this)"
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+        field Recipe
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "mostorereqheader"
+            form.searchbutton.value = "Find xbatch=?"
+          }
+          if (but == "Recipe Adjustment"){
+            form.screen.value = "mostorereqrecipe"
+            form.searchbutton.value = "Top"
+          }
+              but = ''
+              return result
+        }
+      function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xdocrow.value=link.text
+          }else{
+            document.one.xdocrow.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+end screen
+
+
+
+

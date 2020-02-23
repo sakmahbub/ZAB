@@ -1,0 +1,33 @@
+screen pdgrade
+     caption "Grade Master"
+     sidebar list grade
+     sections form one
+
+	list grade
+        caption "Grade List"
+        table pdgrade
+        order xgrade
+        rows 20
+        objects  xgrade attrib(link "login?screen=pdgrade&command=Show&xgrade=?"), ~
+                 xhrent,xtransport,xmedical,xfood,xconveyance
+     end list
+
+     form one
+        caption "<ACRONYM>Grade Setting</ACRONYM>"
+	      table pdgrade
+        order xgrade
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next, Top, Previous, Next, Bottom,~
+          xgrade,xdesc,xhrent,xtransport,xmedical,xfood,xconveyance
+
+          field xdum
+            attrib local
+            display const
+            caption
+          end field
+
+    end form
+
+end screen

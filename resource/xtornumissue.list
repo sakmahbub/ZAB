@@ -1,0 +1,14 @@
+     list xtornumissue
+        caption "Transfer Order List"</b>"
+        table imtorheader
+        order xtornum desc
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4)='ISSU') and zauserid='"+#user+"'"
+		searchselect "left(xtornum,4)='ISSU' and zauserid='"+#user+"'"
+        rows 10
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate
+		 
+		headers "ISSU Number","Date" 
+     end list
+
+

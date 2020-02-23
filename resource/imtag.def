@@ -1,0 +1,12 @@
+product ZAB ERP
+
+table imtag
+  caption "Tag Header"
+  columns ztime,zutime,zid,zauserid,zuuserid,~
+  xtagnum,xdate,xdatecom,xlong,xref,xwh,xstatustag
+
+  primary key zid,xtagnum
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

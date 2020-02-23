@@ -1,0 +1,104 @@
+screen pdleavecash
+     caption "Leave Detail"
+     sections form one,jscript myscript
+
+    form one
+        caption "Employee's Leave Encashment "
+	    table pdleaveasigne
+		primary key xyear,xstaff,xtypeleave
+        order xyear,xstaff
+        return "login"
+		Select "xtypeleave in ('Earned Leave','Annual Leave') and xyear = DATEPART(year,'"+#date+"')"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Update,*next,Top,Next,Previous,Bottom,~
+          xyear display(hide),xstaff,xname,xtypeleave,~
+		  xavailable display(const),xused display(const),xbalance display(const),~
+		  xstatus display(const),xcashleave,xcashleaveconf display(const),xpkey attrib(local) display(hide)
+
+	field xstaff
+		event before
+		set xyear=#sub(#date,0,4)
+		end event
+		event after
+			set globals(xyear)=xyear
+			set globals(xstaff)=xstaff
+		end event
+	end field 	
+	
+	field xtypeleave
+		attrib readonly
+		display text
+		pick
+	end field
+	
+        field show
+		event after
+		set xpkey=xstaff
+		end event
+        end field	
+		
+        field Next
+		event after
+		set xpkey=xstaff
+		end event
+        end field	
+
+        field previous
+		event after
+		set xpkey=xstaff
+		end event
+        end field	
+
+    field xname
+      attrib local
+      display const
+      event after
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+      end event
+    end field	
+
+	field update
+	event before
+	  if xstaff .ne. xpkey
+			error "Please Press Show First!"
+	  else if xstaff .eq. ""	
+			error "Please Press Show First!"
+	  else if xcashleave > xbalance
+			error "Encashment not greater than Balance Leave!"
+	  else if xcashleave < xcashleaveconf
+			error "Encashment Already Confirmed!"
+	  end if 
+	end event  
+	end field	
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdatdt"
+            form.searchbutton.value = "Top"
+            // return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

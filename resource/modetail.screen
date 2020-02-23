@@ -1,0 +1,323 @@
+screen modetail
+     sidebar list order,list one
+     sections form one,  jscript myscript
+
+
+
+	list order
+    	caption "SO List For Create Batch of "+caitem.xdesc("xitem='"+xitem+"'")+" "+ "ColorCode "+ xcolorcode 
+        table oporddetailsoview
+        order xordernumso,xorderrow
+        //select "isnull(xbatch,'')=''"
+		//select "xitem='"+xitem+"' and xcolorcode='"+xcolorcode+"' and xavail>0"
+		fixed xitem,xcolorcode
+        select "xavail>0"
+        rows 35 
+
+		
+	   objects xitem attrib(link "abc" embed onclick="return pickItem(this:xcolorcode#:xqtydel#:xorderrow#:xordernumso#)"),~
+         desc equals((select xdesc from caitem where zid=oporddetailsoview.zid and xitem=oporddetailsoview.xitem)),xcolorcode attrib(name xcolorcode#),~
+		
+		xbcolor,xavail attrib(name xqtydel#),xorderrow attrib(name xorderrow#),xordernumso attrib(name xordernumso#)
+        
+        header "Item Code","Description","Color Code","Buyer Color","Order Qty","Row","SO NO."
+		total "","Total","","",sum
+     end list
+
+
+     list orderold
+    	caption "PI Detail List For "+opordheader.xpiref("xordernum='"+xordernum+"'")
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        select "(xqtyord-isnull(xqtymor,0))<>0"
+        rows 35 
+
+		
+	   objects xitem attrib(link "abc" embed onclick="return pickItem(this:xcolorcode#:xqtydel#:xorderrow#:xordernumso#)"),~
+         desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem)),xcolorcode attrib(name xcolorcode#),~
+		
+		xbcolor,(xqtyord-xqtymor) attrib(name xqtydel#),xorderrow attrib(name xorderrow#),xordernumso attrib(name xordernumso#)
+        
+        header "Item Code","Description","Color Code","Buyer Color","Order Qty","Row","SO NO."
+		total "","Total","","",sum
+     end list
+
+     list one
+        caption "Detail List For : "+xordernum
+        table modetail
+        order xbatch,xrow
+        fixed xbatch
+        rows 20
+        objects xrow attrib(link "login?screen=modetail&command=Show&xbatch=?&xrow=?"), ~
+				xitem,desc equals((select xdesc from caitem where caitem.zid=modetail.zid and caitem.xitem=modetail.xitem)),~
+				xcolorcode,~
+				
+				xqtymor,xqtyreq,~
+				unit equals((select xunitsel from caitem where caitem.zid=modetail.zid and caitem.xitem=modetail.xitem)),xordernumso
+
+        headers "Line No","Item","Description","Color Code","Order Qty","Required","Unit","SO No."
+	    //total  "","","","","","","","","","","","","","","","",sum,sum,""
+	    //total "","","","","Total","","","","","",sum,sum
+     end list
+
+     form one
+        caption "Batch Detail For "+xbatch //+" "+xitem+" "+xcolorcode
+        table modetail
+        order xbatch,xrow
+        fixed xbatch
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add,Update,Delete,*next,*next,*next,Clear,Show,Complete,*next,*next,*next, Top,Previous, Next, Bottom,"<p>",~
+                xrow attrib(row 0 1),xunitsel display(const),xitem ,xdesc,xcolorcode,~
+				xfabrictype display(hide),xfabriccolor display(hide),xprcstype display(hide),xfabricfinish display(hide),~
+				xwidth display(hide),xgsm display(hide),xstyle display(hide),xstylename display(hide),xcordref display(hide),xccontract display(hide),~
+				xhscode display(hide),xldref display(hide),~
+				xpercent display(hide) ,xqtymor,xordernumso attrib(readonly),xqtyreq display(hide),xqtyordmtr display(hide),xnote,xdatedel display(hide),xorderrow,xpornum display(hide)	
+				
+				
+				
+        embed onsubmit="return submitit(this)"
+		
+		field xcomposition
+			//display text
+			pick list xcomposition
+		end field
+		
+		field xordernumso
+			pick
+		end field
+		
+		field xfabrictype
+			//display text
+			pick list xfabrictype
+		end field
+		
+		field xfabriccolor
+			//display text
+			pick list xfabriccolor
+		end field
+		
+		field xdorrow
+			event after
+				set batch=moheader.xbatch("xdornum='"+xdornum+"'")
+				if moheader.xstatusreq("xbatch='"+batch+"'") .eq. "Confirmed"
+					set #field(update.display)="hidden"
+				end if
+			end event
+		end field
+		
+        field xqtyreq
+			caption Grey Fabric Required For Production
+		end field
+		
+        field xqtyordmtr
+			caption Production Qty in Meter
+		end field
+		
+        field xprcstype
+			//display text
+			pick list xprcstype
+		end field
+		
+        field xitem
+			pick xitemfin
+		end field
+		
+		field xcomposition1
+          attrib local
+          display const
+		  caption Composition
+          event after
+            set xcomposition = caitem.xcomposition("xitem = '"+xitem+"'")+" "+opordheader.xprcstype("xordernum='"+xordernum+"'")
+          end event
+        end field
+
+        field xconstruction1
+          attrib local
+          display const
+		  caption Construction
+          event after
+            set xconstruction = caitem.xconstruction("xitem = '"+xitem+"'")
+          end event
+        end field
+
+        field xfabriccolor1
+          attrib local
+          display const
+		  caption Fabric Color
+          event after
+            set xfabriccolor = caitem.xfabriccolor("xitem = '"+xitem+"'")
+          end event
+        end field
+
+
+
+        field xunitsel
+          //attrib local
+          //display const
+		  caption Unit
+          //event after
+            //set xunitsel = caitem.xunitsel("xitem = '"+xitem+"'")
+          //end event
+        end field
+
+        field xdesc
+          attrib local
+          display const
+          event after
+            set xdesc = caitem.xdesc("xitem = '"+xitem+"'")
+          end event
+        end field
+		
+		field colorname
+          attrib local
+          display const
+			caption Color Name
+		event after
+            set colorname = cacolor.xcolor("xcolorcode = '"+xcolorcode+"'")
+          end event
+        end field
+		
+		
+
+        field xlong
+          width 75
+		  height 3
+        end field
+
+        field Add
+          event before
+				
+				set xitem=#trim(xitem)
+				set xcolorcode=#trim(xcolorcode)
+				set xordernumso=#trim(xordernumso)
+				set xbatch=#trim(xbatch)
+				set xorderrow=#trim(xorderrow)				
+				
+				set xqtyordmtr = xqtymor  
+				  
+			set itemrow=#sql("select xrow from modetail where xbatch='"+xbatch+"' and xitem='"+xitem+"' and xorderrow='"+xorderrow+"'")
+			set item=#sql("select xitem from modetail where xbatch='"+xbatch+"' and xitem='"+xitem+"' and xcolorcode='"+xcolorcode+"' and xordernumso='"+xordernumso+"' and xorderrow='"+xorderrow+"'")
+			
+			set poqty=#sql("select xqtyord from oporddetailso where xordernum='"+xordernumso+"' and xitem='"+xitem+"' and xcolorcode='"+xcolorcode+"' and xorderrow='"+xorderrow+"'")
+			set xunitsel = caitem.xunitsel("xitem = '"+xitem+"'")
+			set xpornum=opordheaderso.xpornum("xordernum ='"+xordernumso+"'")
+			if xitem .eq. item
+				error "This item is already added "+itemrow
+			else if xunitsel .eq. ""
+				error "Cannot Proceed--Unit is Blank"	
+			else if xqtymor > poqty .and. xordernumso .ne. ""
+				error "Batch Quantity is greater than SO Quantity "+poqty
+			end if
+			
+          end event		
+
+
+          event after
+			
+           	set temp = #spsql(zabsp_MO_validateAfterDetailMO,#id,#user,xbatch,xorderrow,xitem,xqtymor,xrow,xpercent,xordernumso,"Add")
+			//set temp=#sesql("update oporddetailso set xbatch='"+xbatch+"' where xordernum='"+xordernumso+"' and xitem='"+xitem+"' and xcolorcode='"+xcolorcode+"' and xorderrow='"+xorderrow+"'")			
+			set temp=#spsql(sp_piupdateSOPO,#id,#user,xbatch,"modetail")
+			
+			set xrow=0
+			action show
+          end event
+        end field
+
+        field update
+          event before
+					  
+			set itemrow=#sql("select xrow from modetail where xbatch='"+xbatch+"' and xitem='"+xitem+"' and xorderrow='"+xorderrow+"'")
+			set item=#sql("select xitem from modetail where xbatch='"+xbatch+"' and xitem='"+xitem+"' and xcolorcode='"+xcolorcode+"' and xordernumso='"+xordernumso+"' and xorderrow='"+xorderrow+"'")
+			
+			set poqty=#sql("select xqtyord from oporddetailso where xordernum='"+xordernumso+"' and xitem='"+xitem+"' and xcolorcode='"+xcolorcode+"' and xorderrow='"+xorderrow+"'")
+			set xunitsel = caitem.xunitsel("xitem = '"+xitem+"'")
+			set xpornum=opordheaderso.xpornum("xordernum ='"+xordernumso+"'")
+			
+			
+			if xqtymor .gt. poqty .and. xordernumso .ne. ""
+				error "Batch Quantity is greater than SO Quantity "+poqty
+			
+			else if xunitsel .eq. ""
+				error "Cannot Proceed--Unit is Blank"					
+			end if	  
+          end event				
+          event after
+           	set temp = #spsql(zabsp_MO_validateAfterDetailMO,#id,#user,xbatch,xorderrow,xitem,xqtymor,xrow,xpercent,xordernumso,"Add")
+			//set temp=#sesql("update oporddetailso set xbatch='"+xbatch+"' where xordernum='"+xordernumso+"' and xitem='"+xitem+"' and xcolorcode='"+xcolorcode+"' and xorderrow='"+xorderrow+"'")			
+			set temp=#spsql(sp_piupdateSOPO,#id,#user,xbatch,"modetail")
+			action show
+          end event
+        end field
+
+        field delete
+          event before
+			set batch=xbatch
+			set orderrow = xorderrow
+			set item = xitem
+			set qtymor = xqtymor
+			set row = xrow
+			set percent = xpercent
+			set ordernumso=xordernumso
+			//set temp=#sesql("update oporddetailso set xbatch='' where xordernum='"+xordernumso+"' and xitem='"+xitem+"' and xcolorcode='"+xcolorcode+"' and xorderrow='"+xorderrow+"'")
+          end event
+          event after
+           	set temp = #spsql(zabsp_MO_validateAfterDetailMO,#id,#user,batch,orderrow,item,qtymor,row,percent,ordernumso,"Delete")
+			set temp=#spsql(sp_piupdateSOPO,#id,#user,batch,"modetail")
+			action show
+          end event
+        end field
+
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "moheader"
+            form.searchbutton.value = "Find xbatch=?"
+          }
+          return result
+        }//xcomposition#:xseason#:xfabrictype#:xfabriccolor#
+	   //:xprcstype#:xfabricfinish#:xwidth#:xgsm#:xstyle#:xstylename#:xcordref#:xccontract#:xhscode#:xldref#:xqtydel#:xorderrow#)
+        function pickItem(link,colorcode,qtydel,orderrow,sono){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+			document.one.xcolorcode.value=colorcode.text
+            document.one.xqtymor.value=qtydel.text
+            document.one.xorderrow.value=orderrow.text
+			document.one.xordernumso.value=sono.text
+          }else{
+            document.one.xitem.value=link.innerText
+			document.one.xcolorcode.value=colorcode.innerText
+            document.one.xqtymor.value=qtydel.innerText
+            document.one.xorderrow.value=orderrow.innerText
+			 document.one.xordernumso.value=sono.innerText
+          }
+		  return false
+		 }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

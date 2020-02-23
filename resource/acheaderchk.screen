@@ -1,0 +1,228 @@
+screen acheaderchk
+
+  sidebar list one,list detail
+  sections form one,  jscript myscript
+
+   list one
+    caption "Prepared Voucher"
+    table acheader
+    order xvoucher desc
+	 select "xstatusjv='Balanced' and xstatus='Open'"
+    rows 5
+    objects  xvoucher attrib(link "login?screen=acheaderchk&command=Show&xvoucher=?"), ~
+             xdate,
+
+   // headers "Line No","Acc Code","Description","Sub Code","Description","Debit","Credit"//,"Amt"
+  end list
+  
+  
+  
+  
+  
+  list detail
+    caption "Detail List"
+    table acdetail
+    order xvoucher,xrow
+    fixed xvoucher
+    rows 50
+    objects  xrow attrib(link "login?screen=acdetailg&command=Show&xvoucher=?&xrow=?"), ~
+             xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)),~
+			 xsub,subdesc equals((select xorg from acsubview where zid=acdetail.zid and xsub=acdetail.xsub and xacc=acdetail.xacc)),xdebit,xcredit
+
+    totals "","","","","Total",sum,sum
+
+    headers "Line No","Acc Code","Description","Sub Code","Description","Debit","Credit"
+  end list
+
+
+  form one
+    caption "Voucher Check Header"
+    table acheader
+    primarykey xvoucher
+    order xvoucher
+    //select "xstatusjv='Balanced' and xstatus='Open' and xper>0"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Update,Clear,*next,Detail, Top,Previous,Next, Bottom,Checked,"<p>",~//Add,Delete,
+            xtrn,xvoucher,xdate,xref,xwh,xwhdesc,xsub display(h),xyear display(const),xper display(const),~
+            xstatusjv,xlong,xtype display(hide),xlcno display(h),xstatus display(const),~
+			xpreparer  display(hide),preparer  display(const)
+
+//	field xvoucher
+//		display text
+//		pick xvoucherother
+//	end field
+
+	field xtrn
+		display combo
+		pick "select xtrn from xtrn where xtypetrn='GL Voucher'"
+	end field
+
+    field xwh
+      display const
+	  caption Division Code
+      default #wh
+    end field
+	
+	field xstatus
+	caption Approval Status
+	end field
+
+    field xwhdesc
+      attrib local
+      caption Division Name
+      display const
+      event after
+        set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+      end event
+    end field
+	
+	field preparer
+    caption Preparer
+	attrib local
+	event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+	end event
+    end field
+
+    field xorg
+      attrib local
+      caption Customer Name
+      display const
+      event after
+        set xorg=cacus.xorg("xcus='"+xsub+"'")
+      end event
+    end field
+
+    field xlong
+      caption Header Description
+      width 60
+      height 3
+      column 1
+    end field
+
+        field xdate
+          event before
+           set xyear=#year(xdate,acdef)
+           set xper=#per(xdate,acdef)
+          end event
+        end field
+
+    field xstatusjv
+      display constant
+    end field
+
+    field xvoucher
+	//pick xvoucherother
+      event after
+		class careports(getjspReport{acvoucher,1,xvoucher,Print Voucher})
+        set globals(xvoucher)=xvoucher
+		 set globals(xstatusjv)=xstatusjv
+		set globals(xwh)=xwh
+		
+        if xstatusjv .eq. "Posted"
+          set #field(Delete.display) = "hidden"
+          set #field(Update.display) = "hidden"
+        end if
+		if xstatus .ne. "Open"
+		 set #field(Checked.display) = "hidden"
+		end if
+      end event
+    end field
+
+
+	field Checked
+             event before
+
+            end event
+            event after
+			set temp = #spsql(zabsp_apvprcs,#id,#user,#position,xvoucher,0,xstatus,"GL Approval")
+			 //set temp = #spsql(zabsp_sendmail,#id,#user,xtornum,"Director",xtwh)
+	         action show
+            end event
+    end field 
+
+    field Add
+      event before
+	    set xwh="01"
+		set xtype = ""
+		set xlcno = ""
+		set xsub = ""
+		set xoldvoucher = ""
+        set xstatusjv="Balanced"
+		//set xpreparer=pdmst.xname("xposition='"+#user+"'")
+		set xstatus="Open"
+  		set xvoucher = #trn("GL Voucher",xtrn,12)
+        class gltrn(acValidateBeforeHeader{xyear,xper})
+      end event
+    end field
+	
+	
+	field Update
+      event before
+		int xday=#sql(int,"select xday from acdef")
+		set preventry=#sql("select xpreventry from acdef")
+		int mon=#per(#date,acdef)
+		int yyy=#year(#date,acdef)
+		int daycon=#sub(#date,8,2)
+		
+		if xstatusjv .eq. ""
+		 error "Please Show First."
+		
+		else if yyy>xyear+1 .and. preventry .eq. "No"
+		error "Can not Proceed-- Previous Year voucher doesnot allow."
+		
+		else if yyy>xyear .and. xper .ne. 12 .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous Year voucher doesnot allow."
+		
+		else if yyy>xyear .and. xper .eq. 12 .and. daycon >xday .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous Year voucher doesnot allow."
+		
+		else if mon >xper .and.  daycon >xday .and. preventry .eq. "No"
+		error "Can not Proceed <--> Previous month voucher doesnot allow."
+		
+		else if mon>xper+1 .and. preventry .eq. "No"
+		error "Can not Proceed <-> Previous month voucher doesnot allow."
+		
+		else if xtrn .eq. ""
+			error "Cannot Proceed -- Please Select Transaction Code"
+		end if
+      end event
+    end field
+	
+
+    embed onsubmit="submitit(this)"
+
+    field Detail
+      embed onclick="clicked(this)"
+    end field
+
+    field Inventory
+      embed onclick="clicked(this)"
+    end field
+
+    field AR
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+    function clicked(b){
+      detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Detail"){
+          form.screen.value = "acdetailg"
+          form.searchbutton.value = "Find xvoucher=?"
+          //return false
+        }
+      }
+
+      </script>
+  end jscript
+
+end screen

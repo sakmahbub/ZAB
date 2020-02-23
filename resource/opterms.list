@@ -1,0 +1,9 @@
+     list opterms
+        table xcodes
+        order xcode
+        select "(xtype='OP Terms And Condition' and (xcode like '%"+zvalue+"%' or xlong like '%"+zvalue+"%'))"
+        searchselect "xtype='OP Terms And Condition'"
+		rows 20
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"),xlong
+                
+     end list

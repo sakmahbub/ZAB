@@ -1,0 +1,35 @@
+//Order Codes.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+
+Terms & Condition Transaction           |#classPath+"/login?screen=xcodes(xtype=Transaction Type)"
+PO Terms & Condition             	    |#classPath+"/login?screen=xcodes(xtype=PO Terms and Condition)"
+All Terms & Condition                   |#classPath+"/login?screen=zterms"
+Purchase Type              			    |#classPath+"/login?screen=xcodes(xtype=PO Type)"
+Brand                     				|#classPath+"/login?screen=xcodes(xtype=Brand)"
+//Manufacture Master              	    |#classPath+"/login?menu=caman"
+//Indentor Code                   	    |#classPath+"/login?screen=xtrn(xtypetrn=Indentor Code)"
+//Quotation Number 			            |#classPath+"/login?screen=xtrn(xtypetrn=Quotation Number)"
+//Quotation Specification      		    |#classPath+"/login?screen=xcodes(xtype=Quotation Specification)"
+Requisition Number 			  		    |#classPath+"/login?screen=xtrn(xtypetrn=Requisition Number)"
+//C&F Advance Number 			        |#classPath+"/login?screen=xtrn(xtypetrn=Advance Number)"
+Purchase Order Number         		    |#classPath+"/login?screen=xtrn(xtypetrn=PO Number)"
+PAF Number           					|#classPath+"/login?screen=xtrn(xtypetrn=PAF Number)"
+Work Requisition Number    		        |#classPath+"/login?screen=xtrn(xtypetrn=Work Requisition)"
+Work Order Number        			    |#classPath+"/login?screen=xtrn(xtypetrn=Work Order Number)"
+PO Related Transaction Codes    	    |#classPath+"/login?screen=xtrnp(xtypetrn=PO Number)"
+Work Related Transaction Codes  	    |#classPath+"/login?screen=xtrnp(xtypetrn=Work Order Number)"
+GRN Number                      		|#classPath+"/login?screen=xtrn(xtypetrn=GRN Number)"
+Quality Certificate Number              |#classPath+"/login?screen=xtrn(xtypetrn=QC Number)"
+GRN Related Transaction Codes  		    |#classPath+"/login?screen=xtrnp(xtypetrn=GRN Number)"
+PR Related Transaction Codes  		    |#classPath+"/login?screen=xtrnp(xtypetrn=Requisition Number)"
+WR Related Transaction Codes  		    |#classPath+"/login?screen=xtrnp(xtypetrn=Work Requisition)"
+//C&F Related Transaction Codes  	    |#classPath+"/login?screen=xtrnp(xtypetrn=Advance Number)"
+//Import LC Cost                	    |#classPath+"/login?screen=xcodesimplccost"
+//Insurance Company Entry         		|#classPath+"/login?screen=cains"
+//C & F Agent                      		|#classPath+"/login?screen=cacnf"
+PO To GL Interface              |#classPath+"/login?screen=potoapi"
+PO To GL Advance              |#classPath+"/login?screen=podef"
+//-------------------------------------------------------------------
+

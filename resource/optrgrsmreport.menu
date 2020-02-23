@@ -1,0 +1,16 @@
+//OP Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Achievement Report               |#classPath+"/login?screen=*spcrystal optrgachvdate(xyear=Year,xper=Period,xdate=From Date=#date,xdate=To Date=#date)"
+//RSM Wise Achievement Report      |#classPath+"/login?screen=*spcrystal optrgrsmachv(xyear=Year,xper=Period,xdate=From Date=#date,xdate=To Date=#date)"
+//RSM Wise Target Report           |#classPath+"/login?screen=*spcrystal oprsmtrg(xyear=Year,xper=Period)"
+PPO Wise Target By FM,RSM        |#classPath+"/login?screen=*ucrystal oprsmfmppotrgrsm(xyear=Year,xper=Period)"
+Target & Achivement By FM PPO        |#classPath+"/login?screen=*spcrystal optargetrsmfmppo(xyear=Year,xper=Period,xrsm=RSM)"
+//Market Information               |#classPath+"/login?screen=*spcrystal samarketinfo(xyear=Year,xrsm=From Region,xrsm=To Region)"
+//Flag Wise Product Sale           |#classPath+"/login?screen=*crystal opflagbyproduct(xdate=From Date=#date,xdate=To Date=#date,xproject=Project Flag,xitem=From Item,xitem=To Item=zzz)"
+//Monthly Sell By Cus. Category    |#classPath+"/login?screen=*crystal opactsalesbygcusdetailall(xwh=Branch,xwh=Branch,xyear=Year,xgcus=Customer Group)"
+//Branch Wise Total Outlets       |#classPath+"/login?screen=*spcrystal opinvatone(xdate=From Date=#date,xdate=To Date=#date,xwh=Branch,xwh=Branch,xitem=From Item,xitem=To Item=zzz,xtype=Type)"
+
+//-------------------------------------------------------------------
+

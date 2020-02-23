@@ -1,0 +1,20 @@
+product ZAB ERP
+
+table imtrn
+  caption "Inventory Transaction"
+  columns ztime,zutime,zauserid,zuuserid,zid,ximtrnnum, xitem,xwh,xdate,~
+          xqty,xval,xvalpost,xdocnum,xdocrow,xnote,~
+          xsign,xunit,xrate,xref,xstatusjv,xvoucher,xvatrate,xbatch,xbag,xlotno,xrow,xpiref,xcqtyuse,xissuetype,xcostrow,~
+		  xcomposition,xfabrictype,xwidth,xgsm,xfabriccolor,xprcstype,xordernum,xorderrow,~
+		  xdornum,xdorrow,xlot,xcottontype,xstatus,xcus,xsup,xmoprcs,xregi,~
+		  xserial,xrateavg,xqtybac,xtrn,xproject,xassetcode,xbinref,~
+		  xitemrow,xitemnew,xcolorcode,xgrossweight,xordernumso
+
+  primary key zid,ximtrnnum
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+end table
+

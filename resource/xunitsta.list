@@ -1,0 +1,18 @@
+     list xunitsta
+        table xcodes
+        order xcode
+        select "xtype = 'Unit of Measure'"
+        navigators alpha
+        rows 20
+        //objects  xcur attrib(link "Main?page=xcur&command=Show&xcur=?"),
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'xunitsta')"), ~
+                xlong, xprops,zactive
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

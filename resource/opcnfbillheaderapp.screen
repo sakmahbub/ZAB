@@ -1,0 +1,210 @@
+screen opcnfbillheaderapp
+
+	 sidebar list billlist,list one
+     sections form one, jscript myscript
+
+	list billlist
+      caption "Bill List"
+        table opdoheader
+        order xdornum desc
+	    select "(left(xdornum,4)='BL--' and xstatusdor<>'' and xsuperiorsp='"+#user+"') or (left(xdornum,4)='BL--' and xstatusdor<>'' and xfwh='"+#wh+"')"
+		rows 10
+        objects  xdornum attrib(link "login?screen=opcnfbillheaderapp&command=Show&xdornum=?"),xdate,xordernum,xcus, ~
+				 desc equals((select xorg from cacus where zid = opdoheader.zid and  xcus=opdoheader.xcus))
+               
+		  headers "Bill No","Date","Job Number","Customer Code","Customer Name"
+	end list
+
+	list one
+        caption "C&F Bill Detail List."
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=opcnfbilldetailapp&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = opdodetail.zid and xitem=opdodetail.xitem)),xlineamt,xcomm
+
+		headers "Line No","Item","Description","Amount","Commission %"
+		totals "","Total","",sum,""
+     end list
+
+     form one
+        caption "C&F Bill Approval Header"
+        table opdoheader
+        order xdornum desc
+		select "left(xdornum,4)='BL--' and xstatusdor<>''"
+        return "login"
+        layout 3
+        pstyle 3
+        objects ~
+               Show,Update,Clear,Detail,Approved,"<p>" ,~
+               xdornum ,xdate,xordernum display(const),xcus display(const),xorg,xstatusdor,xwh display(const),xwhdesc,xref,xstatus display(hide),~
+              xtype display(hide),xvatrate,xvatamt,xtaxamt,~
+			  xadamount  display(const),xassessval  display(text),xcommin,,~
+			  xpreparer  display(hide),preparer  display(const),xcheaker display(hide),cheaker display(const),~
+			  xmanager display(hide),manamer display(const),xdphead display(hide),dphead display(const),~
+			  xgmdf display(hide),gmdf display(const),xed display(hide),ed display(const),xnote,xsuperiorsp display(hide),xfwh display(hide)
+				
+		field xdate
+			caption Bill Date
+		end field
+		
+			field xassessval
+			caption Assessable Value
+		end field
+
+		
+        field xorg
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")
+          end event
+        end field
+	
+        field xwhdesc
+          attrib local
+          caption Division Name
+          display constant
+          event after
+            set xwhdesc = xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")//branchview.xlong("xwh = '"+xwh+"'")
+          end event
+        end field
+	
+	   field preparer
+		   attrib local
+          caption Prepare By
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+          end field
+		  
+		   field cheaker
+		    attrib local
+          caption Check By
+		  event after
+		  set cheaker=pdmst.xname("xstaff='"+xcheaker+"'")
+		  end event
+          end field
+		  
+		   field manamer
+		    attrib local
+          caption Dy. Manager
+		  event after
+		  set manamer=pdmst.xname("xstaff='"+xmanager+"'")
+		  end event
+          end field
+		  
+		   field gmdf
+		    attrib local
+          caption General Manager/Director of Finance
+		  event after
+		  set gmdf=pdmst.xname("xstaff='"+xgmdf+"'")
+		  end event
+          end field
+		  
+		  field dphead
+		  attrib local
+          caption Head Of the Department
+		  event after
+		  set dphead=pdmst.xname("xstaff='"+xdphead+"'")
+		  end event
+          end field
+		  
+		   field ed
+		    attrib local
+          caption Executive Director
+		  event after
+		  set ed=pdmst.xname("xstaff='"+xed+"'")
+		  end event
+          end field
+	
+		
+
+        field xnote
+          width 90
+          column 3
+		  height 2
+        end field
+		
+		field xstatusdor
+		caption Bill Status
+        end field
+
+        field xdornum
+		pick list xdornum
+        event after
+		class careports(getjspReport{opcnfbillrobi,2,xdornum,"",Print Bill (Robi)})
+	    class careports(getjspReport{opcnfbill,2,xdornum,"",Print Bill (Edotco)})
+		class careports(getjspReport{opcnfbillakpn,2,xdornum,"",Print Bill (AKPEN/ RANCON/ PLYWOOD)})
+		class careports(getjspReport{opcnfbillbfl,2,xdornum,"",Print Bill (BFL)})
+		class careports(getjspReport{opcnfbillother,2,xdornum,"",Print Bill (CEAT/Other)})
+		    set globals(xdornum)=xdornum
+            set globals(xordernum)=xordernum
+			set globals(xstatusdor)=xstatusdor
+			set globals(xsuperiorsp)=xsuperiorsp
+			if xsuperiorsp .ne. #user .and. xfwh .ne. #wh .and. #user .ne. "01040008"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Approved.display)="hidden"
+					set #field(xassessval.display)="constant"
+       	    end if
+	    end event
+        end field
+		
+	  field Approved
+            event before
+			if xsuperiorsp .ne. #user .and. xfwh .ne. #wh
+			error "Already Approved"
+			end if
+            end event
+            event after
+			set temp = #spsql(zabsp_apvprcs,#id,#user,xdornum,0,xstatusdor,"C&F Bill Approval")
+		//	set temp = #spsql(zabsp_sendmail,#id,#user,xporeqnum,"C&F Bill Approval","")
+	         action show
+            end event
+          end field
+
+
+		
+        field Update
+		  if xcus .eq. ""
+		  error "Please Show first"
+          end if
+		  end event
+		  event after
+		  end event
+		  
+        end field
+       
+	   embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+end form
+   
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "opcnfbilldetailapp"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

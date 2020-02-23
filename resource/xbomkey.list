@@ -1,0 +1,12 @@
+     list xbomkey
+	 caption "Boom List: "+zvalue
+        table bmbomheader 
+        order xbomkey
+        select "(xbomkey like '%"+zvalue+"%' or xcolorcode like '%"+zvalue+"%')"
+        rows 30
+        objects xbomkey attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+		xcolorcode,xdate,zactive
+     end list
+
+
+

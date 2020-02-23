@@ -1,0 +1,93 @@
+screen fadepprocs
+     caption "Depreciation Processing"
+     sections form detail, jscript myscript
+
+
+     form detail
+        caption <font color=black>"Depreciation Processing"<font>
+        //select
+         return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Clear,Process,"</b></font><p>",~
+//                xdate display(constant) attrib(local),xdumm,xyear,xper
+                xdate attrib(local),xdumm,xyear,xper
+
+        field xdumm
+          attrib lcoal
+          display constant
+          caption
+          event before
+            set xyear=#sub(xdate,0,4)
+            set xper=#sub(xdate,5,2)
+          end event
+        end field
+
+        field xyear
+          attrib lcoal
+//          display constant
+          caption Year
+        end field
+
+        field xper
+          attrib lcoal
+          caption Period
+
+        end field
+
+        field Process
+          event before
+//              set temp=#sql("select xstatusfa from fadeplog where xyear="+year+" and xper="+per+")
+//              if #result .eq. "false"
+//                error "Last Month's Depreciation Not Processed"
+//              else
+//                set temp=#sql("select xstatusfa from fadeplog where xyear="+xyear+" and xper="+xper+")
+//                if #result .eq. "true"
+//                  error "Depreciation Already Processed For This Month"
+//                end if
+//              end if
+//            end if
+          end event
+          event after
+//              class faprocs(process)
+	        set temp = #spsql(zabsp_FA_processDepreciation,#id,#user,xdate,xyear,xper)
+          end event
+        end field
+
+        field ItemSerial
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imser1"
+            form.searchbutton.value = "Find xitem=?"
+          }
+        }
+
+        function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.detail.xcode.value=link.text
+          }else{
+            document.detail.xcode.value=link.innerText
+          }
+          return false
+        }
+
+
+        </script>
+     end jscript
+
+
+end screen

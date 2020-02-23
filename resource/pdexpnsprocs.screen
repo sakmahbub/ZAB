@@ -1,0 +1,51 @@
+screen pdexpnsprocs
+  caption "Payment Processing"
+  sections form one
+ 
+  form one
+    caption "<ACRONYM>Expense Process</ACRONYM>"
+    return "login"
+    layout 2
+    pstyle 3
+
+    objects Process, xfstaff,xtstaff,xyear,xper,xempcategory,dum attrib(local) display(const)
+    
+    field dum
+      caption 
+    end field
+    
+    field xempcategory
+      caption Expense Category
+      pick "Manager Expense,Field Expense"    
+    end field
+    
+    field xdum
+      attrib local
+      display const
+      caption
+    end field
+
+    field xtstaff
+      default "z"
+    end field
+
+    field xyear
+      attrib local
+      default #sub(#date,0,4)
+    end field
+
+    field xper
+      attrib local
+      default #sub(#date,5,2)
+    end field
+
+
+    field Process
+      event after
+        set temp = #spsql(zabsp_expnsproc, #id,#user,xyear,xper,xfstaff,xtstaff,xempcategory) //#id,#user,xyear,xper,xempcategory
+      end event
+    end field
+
+  end form
+
+end screen

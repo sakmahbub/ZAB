@@ -1,0 +1,12 @@
+     list serviceitem
+        caption "Items containing: "+zvalue
+        table caitem
+        order xitem
+        select "((xitem like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%') and left(xitem,4)='SER-')"
+        searchselect "left(xitem,4)='SER-'"
+		rows 30
+        objects xitem attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xdesc,xrate
+     end list
+
+

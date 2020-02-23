@@ -1,0 +1,150 @@
+screen imtag
+
+     caption "Tag Header"
+     sidebar  list header,list one
+     sections form one, jscript myscript
+
+    list header
+        caption "<br><center><b>"Tag List"</b>"
+        table imtag
+        order xtagnum desc
+        rows 100
+        objects ~
+         xtagnum attrib(link "login?screen=imtag&command=Show&xtagnum=?"), ~
+         xdate,xwh,xstatustag
+     end list
+	 
+    list one
+        caption "<br><center><b>"Transfer Order Detail List"</b>"
+        table imtdet
+        order xtagnum,xrow
+        fixed xtagnum
+        rows 100
+        objects ~
+        xrow attrib(link "login?screen=imtdet&command=Show&xtagnum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtdet.zid and xitem=imtdet.xitem)),xqty,~
+		unit equals((select xunit from caitem where zid=imtdet.zid and xitem=imtdet.xitem))
+
+         headers "Line","Item","Description","Qty","UOM"
+     end list
+
+
+
+     form one
+        caption "Tag Entry"
+        table imtag
+        primarykey  xtagnum desc
+        order xtagnum desc
+        return "login"
+        layout 2
+        pstyle 3
+        objects Details, Add, Update, Delete,Clear,Show,*next, Top, Previous, Next, Bottom,"<p>" ,~
+        xtagnum display(trn Tag Transaction),xdate,xdatecom,xref display(hide),~
+        xwh,xwhdesc,xstatustag display(const)
+
+        field xtagnum
+          event after
+            set globals(xtagnum)=xtagnum
+			if imtag.xstatustag("xtagnum='"+xtagnum+"'") .eq. "Confirmed"
+					set #field(update.attrib)="disabled"
+					set #field(detail.attrib)="disabled"
+         			set #field(delete.attrib)="disabled"
+					set #field(Add.attrib)="disabled"
+					
+			end if 
+          end event
+        end field
+
+        field Add
+          event before
+            set xstatustag="Open"
+			if xwh .eq. ""
+				error "Cannot Proceed -- Please Choose Store"
+			end if
+          end event
+        end field
+
+        field update
+          event before
+			if xwh .eq. ""
+				error "Cannot Proceed -- Please Choose Store"
+			end if
+          end event
+		  event after
+            set temp=#sql(string,"update imtdet set xwh = '"+xwh+"', xstatustag = '"+xstatustag+"' where xtagnum='"+xtagnum+"'")
+          end event
+        end field
+
+        field xdatecom
+          display hide
+          caption Confirm Date
+        end field
+
+        field xwh
+          event after
+            set globals(xwh)=xwh
+            set globals(xstatustag)=xstatustag
+          end event
+        end field
+		
+		field xwhdesc
+			attrib local
+			display const
+			caption Store Description
+			event after
+				set xwhdesc=branchview.xlong("xcode='"+xwh+"'")
+			end event
+		end field
+
+
+        field xlong
+          height 2
+          width 30
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function confirmed(b){
+          detail="confirmed"
+        }
+        function costed(b){
+          detail="Cost"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtdet"
+            form.searchbutton.value = "Find xtagnum=?"
+            //return false
+          }
+          if (detail=="Cost"){
+            form.screen.value = "imtagcost"
+            form.searchbutton.value = "Find xtagnum=?"
+            //return false
+          }
+          if (detail=="confirmed"){
+            form.screen.value = "imtag"
+            form.searchbutton.value = "Find xtagnum=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

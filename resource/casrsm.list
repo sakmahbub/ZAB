@@ -1,0 +1,11 @@
+list casrsm
+  table carsm
+  order xrsm
+  select "(xrsm like '%"+ zvalue+"%' or xname like '%"+zvalue+"%') and (Left(xrsm,4)='RSM-') and zactive='1'"
+  rows 20
+  objects xrsm attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+               xname,xregion
+header "Code","Name","Region"
+end list
+
+

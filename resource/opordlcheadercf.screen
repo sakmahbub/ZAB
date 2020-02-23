@@ -1,0 +1,263 @@
+screen opordlcheadercf
+	
+	 sidebar list one,list terms,list dor
+     sections form one,jscript myscript
+
+     list one1
+        caption "Detail List"
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        rows 20
+        objects  xorderrow attrib(link "login?screen=opordlcdetail&command=Show&xordernum=?&xorderrow=?"), ~
+		 xitem,desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem)),~
+		 xcomposition,xwidth,xgsm,xfabrictype,xfabriccolor,xqtyord
+		  
+        totals "","","Totals","","","","","",sum
+
+        headers "Row No","Item Code","Construction","Composition","Width","GSM","Fabric Type","Color","Qty"
+     end list
+
+     list dor1
+        caption "Delivery Order For : "+xordernum
+        table opdoheader
+        order xdornum
+        fixed xordernum
+        rows 20
+        objects  xdornum attrib(link "login?screen=opdoheader&command=Show&xdornum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+     list terms1
+        caption "Work Order Terms & Condition For "+xordernum
+        table oppiterms
+        order xordernum,xrow
+        fixed xordernum
+        rows 20
+        objects  xrow attrib(link "login?screen=oppiterms&command=Show&xordernum=?&xrow=?"), ~
+                xcode,xnote //equals((select xlong from xcodes where xtype='PO Terms & Condition' and xcode=xcodes.xcode))
+
+
+//        headers "Row","Item","Description","Qty","Rate","Disc %","Disc Fixed","Line Amount"
+//	  total "Total","","","","",sum	
+     end list
+
+
+     form one
+        caption "Work Order Entry Header"
+	    table opordheader
+        order xordernum desc
+        return "login"
+      // select "xtype = 'LC'"
+		select "xtrn = 'CF--'"
+		//select "left(xpiref,2)='CF'"
+        layout 2
+        pstyle 3
+        objects Add,Update,Show,Clear,Delete,*next,Terms & Condition,Detail,Amendment,Create DO,"<p>" ,~
+          xordernum,xpidate,xtrn,xpiref,xpirefr,xcur,xcus,xorg,xbuyer,xbname,xpornum,xorigin,xadvisingbank,xadvdesc,~
+		  xlcno,xref,xlctype display(hide),xlcissuedate display(hide),xshipdate display(hide),xexpirydate display(hide),~
+		  xopenbank display(hide),xexch display(hide),~
+		  xtype display(hide),xstatusord display(const),xstatuspi display(const),xstatusbooking display(hide),zbid display(hide)
+		
+        field xpornum
+			pick
+		end field
+		
+        field xcur
+			default "USD"
+		end field
+		
+		field xlcno
+			pick list opordlc
+		end field
+		
+		field xdum
+          attrib local
+          display const
+		  caption
+        end field
+
+		field xadvdesc
+          attrib local
+          display const
+		  caption Advising Bank Name
+		  event after
+		  		set xadvdesc=cabank.xname("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xbranch("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xmadd("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xswiftcode("xbank='"+xadvisingbank+"'")
+		  end event
+        end field
+
+			
+        field xlcinfo
+          attrib local
+          display const
+          column 3
+            caption <br><FONT SIZE=4 COLOR=red><ACRONYM>LC Info</ACRONYM></font>
+        end field
+
+			
+		field xordernum
+			pick list xordernumcf
+			event after
+				class careports(getaspReport{oppiprint,1,xpiref,Print PI})
+				set globals(xordernum)=xordernum
+				if xstatuspi .ne. "Approved"
+					set #field(Create.display) = "hidden"
+				end if
+				if xstatuspi .ne. "Open"
+					//set #field(Create.display) = "hidden"
+					set #field(add.display) = "hidden"
+					//set #field(update.display) = "hidden"
+					set #field(delete.display) = "hidden"
+				end if
+			end event
+		end field
+		
+		field xstatuspi
+			default "Open"
+		end field
+		field xstatusord
+			default "Open"
+		end field
+		
+		field xtrn
+			display combo
+			pick "select xtrn from xtrn where xtypetrn='Job Order No'"
+			default "CF--"
+		end field
+		
+		field xstype
+			default "Dyeing"
+			caption Sale Type
+			pick code
+		end field
+		
+		field xpiref
+			pick 
+			width 30
+		end field
+		
+
+		field xbuyer
+			pick xcus
+		end field
+		  
+		  field xbname
+		  	attrib local
+		  	dispaly const
+		  	caption Buyer Name
+			event after
+				set xbname=cacus.xorg("xcus='"+xbuyer+"'")
+			end event
+		  end field
+
+
+		field xorg
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")+"<br>"+cacus.xmadd("xcus = '"+xcus+"'")
+          end event
+        end field
+
+          field add
+            event before
+				if xcus .eq. ""
+					error "Cannot Proceed -- Please Choose Customer"
+				
+				else if xtrn .eq. ""
+					error "Cannot Proceed -- Please Select Transaction Type" 
+				else
+				  set zbid= 0	
+				  set xtype = "Local"
+				  set xstatusord = "Open"
+				  set xstatuspi = "Open"
+				  set xstatusbooking = "Open"
+                  set trn = "CO--"
+                  set xordernum = #trn("CO Number",trn,10)   
+				 // if xtrn .ne. "PI--"
+				//	set xpiref = #trn("Job Order No",xtrn,8)
+				// end if
+				end if
+            end event
+          end field
+
+          field update
+            event before
+			  set xlineamt = xrate*xqtyord
+            end event
+          end field
+
+          field Create
+            event before
+            if xstatusord .eq. "DO Created"
+            	error "Cannot Proceed -- DO Already Created"
+            end if
+            end event
+            event after
+	            set temp = #spsql(zabsp_DO_CreateDO,#id,#user,xordernum,xpidate,xwh,xcus,xtype)
+	           // action show
+            end event
+          end field
+
+          field LC
+            embed onclick="clicked(this)"
+          end field
+
+		  
+          field Document Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Amendment
+            embed onclick="clicked(this)"
+          end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "oppiterms"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="LC Info"){
+            form.screen.value = "opordlcinfo"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Detail"){
+            form.screen.value = "opordlcdetailcf"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Amendment"){
+            form.screen.value = "oppiamend"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Print PI"){
+            form.screen.value = "*crystal oppi(xordernum=PI Number=xordernum)"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

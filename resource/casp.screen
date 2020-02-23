@@ -1,0 +1,71 @@
+screen casp
+  sections  form one
+
+  form one
+    caption "Sales Assistant"
+    table cappo
+    primarykey xsp
+    order xsp
+    select "left(xsp,4)='SA--' and xwh='"+#wh+"'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Add,Update,Show,Clear,Delete,*next,Top,Previous,Next,Bottom,"<p>" ,~
+            xsp,xname,xwh display(hide),zactive//xfm,xfmname,
+
+	field xsp
+		width 10
+		caption Sales Assistant
+		pick list capp 
+	end field
+
+	field xterritory
+      display hide
+      //pick "select xcode from xcodes where xtype='Territory' and xwh='"+xwh+"'"
+    end field
+
+    field xregion
+      attrib local
+      caption Region
+      display hide
+      event after
+        set xregion=xcodes.xregion("xtype='Territory' and xcode='"+xterritory+"'")
+      end event
+    end field
+
+    field xbrname
+      attrib local
+      caption Branch Name
+      display const
+      event after
+        set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+      end event
+    end field
+
+    field xfmname
+  	  attrib local
+  	  display const
+     	caption Field Manager Name
+      event after
+        set xfmname = casp.xname("xsp='"+xfm+"'")
+      end event
+    end field
+
+
+    field add
+      event before
+		set xwh =#wh
+	   		set xsp = #trn("Sales Representative","SA--",8)
+      end event
+    end field
+
+
+    field xorg
+	    caption Customer Name
+    end field
+
+    embed onsubmit="submitit(this)"
+
+  end form
+
+end screen

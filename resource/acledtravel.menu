@@ -1,0 +1,14 @@
+//General Ledger Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Employee Wise Travel Expense  |#classPath+"/login?screen=*jspcrystal actourstravels(xdiv=Division,xdate=From Date=#date,xdate=To Date=#date,xyear=Year,xstaff=Employee ID)"
+
+Total Travel Expense  |#classPath+"/login?screen=*jspcrystal actourstravelsall(xdiv=Division,xdate=From Date=#date,xdate=To Date=#date,xyear=Year)"
+Fuel & Repair Maintenance  |#classPath+"/login?screen=*jspcrystal accarfrm(xdiv=Division,xdate=From Date=#date,xdate=To Date=#date,xyear=Year,xstaff=Employee ID)"
+//Travel Expense 		 |#classPath+"/login?screen=*jspcrystal acledtravellsexp(xdiv=Division,xdate=From Date,xdate=To Date,xyear=Year,xtraveltype=Type,xsub=Subaccount)"
+Country Wise Travel Expense  |#classPath+"/login?screen=*jspcrystal acledtravellsexpcntry(xdiv=Division,xdate=From Date=#date,xdate=To Date=#date,xyear=Year,xcountry=Country)"
+Employee Wise Car fuel/Travel Expense  |#classPath+"/login?screen=*jspcrystal acledtravellsexpEmp(xdiv=Division,xdate=From Date=#date,xdate=To Date=#date,xacc=Account,xyear=Year,xstaff=Employee ID)"
+
+
+//actourstravelsall

@@ -1,0 +1,9 @@
+poentry.menu
+//-------------------------------------------------------------------
+option                           |action                                        |modules|models|width
+//-------------------------------------------------------------------
+Purchase Order                |#classPath+"/login?screen=poordheadercash"        |       |      |120
+Purchase Order (Bamboo)               |#classPath+"/login?screen=poordheaderbamboo"        |       |      |120
+//Transfer Exp. Product                    |#classPath+"/login?screen=imtorheadertrexp"        |       |      |120
+//Receive Exp. Product                     |#classPath+"/login?screen=imtorheaderreexp"        |       |      |120
+//-------------------------------------------------------------------

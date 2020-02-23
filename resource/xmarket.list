@@ -1,0 +1,10 @@
+     list xacc
+        table xcodes
+        order xtype,xcode
+        select "(xcode like '%"+zvalue+"%' and xtype='Market')"
+        rows 20
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xterritory
+     end list
+
+

@@ -1,0 +1,21 @@
+//OP Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Com. Inv. List                 	|#classPath+"/login?screen=*jspcrystal opcomlisting(xdate=From Date=,xdate=To Date=)"
+//Date Wise LC List          		|#classPath+"/login?screen=*viewcrystal oppilistinglc(4;in,dt,dt,st;zid,fdate,tdate,ptype;xpidate=From Date=,xpidate=To Date=,xprodtype=Product Type,xviewtype=Preview Type)"
+//Date Wise LC List          		|#classPath+"/login?screen=*viewcrystal oppilistinglc(3;in,dt,dt;zid,fdate,tdate;xpidate=From Date=,xpidate=To Date=,xviewtype=Preview Type)"
+
+Print Bill of Exchange         	|#classPath+"/login?screen=*viewcrystal opinvbillofexch(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+//Print Bill of Exchange_2         	|#classPath+"/login?screen=*jspcrystal opinvbillofexch_2(xinvnum=Commercial Invoice No=)"
+Print Beneficiary Certificate   |#classPath+"/login?screen=*viewcrystal opinvbencer(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Certificate of Origin	|#classPath+"/login?screen=*viewcrystal opinvceroforigin(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Commercial Invoice        |#classPath+"/login?screen=*viewcrystal opinvcominv(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Delivery Chalan           |#classPath+"/login?screen=*viewcrystal opinvdelcha(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Packing List             |#classPath+"/login?screen=*viewcrystal opinvplist(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Consumsion             |#classPath+"/login?screen=*viewcrystal opinvconstmlist(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+
+///Print Own Transport              |#classPath+"/login?screen=*viewcrystal opinvowntra(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+///Print Pre-Shipment Certificate 	|#classPath+"/login?screen=*viewcrystal opinvshipcert(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"xviewtype=Preview Type
+//-------------------------------------------------------------------
+

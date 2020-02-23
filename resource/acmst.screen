@@ -1,0 +1,300 @@
+screen acmst
+     caption "Chart of Accounts"
+     sidebar list one
+     sections  form one, jscript myscript
+
+     list one
+        caption "Sub Code List"
+        table acsub
+		fixed xacc
+        order xacc,xsub desc
+        rows 100
+        objects  xsub attrib(link "login?screen=acsub&command=Show&xsub=?"),xdesc
+
+        //headers none
+     end list
+   
+     form one
+        caption "Chart of Accounts"
+        table acmst
+        primarykey xacc
+        order xacc
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Top,Previous,Next,Bottom,Sub Code,"<p>",~
+               xgroup,xdum,xacc,xdesc,xacctype,xaccusage,~  
+			   xhrc5,xdesc5,~
+			   xhrc4,xdesc4,~
+			   xhrc3,xdesc3,~
+			   xhrc2,xdesc2,~
+			   xhrc1,xdesc1
+               //xanc1
+field xgroup
+pick list acgroup
+end field
+
+field xaccsource
+display text
+pick 
+default 
+end field
+		field xacctype
+			display const
+			//pick "Asset,Liability,Income,Expenditure"
+		end field
+
+        field xdesc1
+      		attrib local
+      		caption Description
+      		display const
+      		event after
+			      set xdesc1 = achrc1.xdesc("xhrc1='"+xhrc1+"'")
+      		end event
+        end field
+
+        field xdum
+      		attrib local
+      		caption
+      		display const
+        end field
+
+        field xdesc2
+      		attrib local
+      		caption Description
+      		display const
+      		event after
+			      set xdesc2 = achrc2.xdesc("xhrc2='"+xhrc2+"'")
+      		end event
+        end field
+
+        field xdesc3
+      		attrib local
+      		caption Description
+      		display const
+      		event after
+			      set xdesc3= achrc3.xdesc("xhrc3='"+xhrc3+"'")
+      		end event
+        end field
+
+        field xdesc4
+      		attrib local
+      		caption Description
+      		display const
+      		event after
+			      set xdesc4= achrc4.xdesc("xhrc4='"+xhrc4+"'")
+      		end event
+        end field
+		
+        field xhrc1
+          pick "xhrc1"
+		  display const
+          event after
+            set globals(xhrc1)=xhrc1
+          end event
+        end field
+
+        field xhrc2
+          pick "xhrc2"
+		  display const
+          event after
+            set globals(xhrc2)=xhrc2
+          end event
+        end field
+
+        field xhrc3
+          pick "xhrc3"
+		  display const
+          event after
+            set globals(xhrc3)=xhrc3
+          end event
+        end field
+
+        field xhrc4
+          pick "xhrc4"
+		  display const
+          event after
+            set globals(xhrc4)=xhrc4
+          end event
+        end field
+
+        field xhrc5
+          pick "xhrc5"
+		  display const
+        end field
+		
+        field xdesc5
+      		attrib local
+      		caption Description
+      		display const
+      		event after
+			      set xdesc5= achrc5.xdesc("xhrc5='"+xhrc5+"'")
+      		end event
+        end field
+
+        field xacc
+         event after
+          set globals(xacc)=xacc
+		  if acmst.xhrc5("xacc='"+xacc+"'") .eq. ""
+		  set #field(xdesc5.display)="hidden"
+		  set #field(xhrc5.display)="hidden"
+		  end if
+		  
+		  if acmst.xhrc4("xacc='"+xacc+"'") .eq. ""
+		  set #field(xdesc4.display)="hidden"
+		  set #field(xhrc4.display)="hidden"
+		  end if
+		  
+		  if acmst.xhrc3("xacc='"+xacc+"'") .eq. ""
+		  set #field(xdesc3.display)="hidden"
+		  set #field(xhrc3.display)="hidden"
+		  end if
+		  
+		  if acmst.xhrc2("xacc='"+xacc+"'") .eq. ""
+		  set #field(xdesc2.display)="hidden"
+		  set #field(xhrc2.display)="hidden"
+		  end if
+		  
+		  if acmst.xhrc1("xacc='"+xacc+"'") .eq. ""
+		  set #field(xdesc1.display)="hidden"
+		  set #field(xhrc1.display)="hidden"
+		  end if
+         end event
+        end field
+
+        field xdesc
+          width 40
+        end field
+
+        field xaccusage
+	        default "Ledger"
+        end field
+
+        field Sub
+          embed onclick="clicked(this)"
+        end field
+		
+		field add
+			event before
+				//if xaccusage .eq. "Ledger"
+				//	set xaccsource=""
+				//else
+				//	set xaccsource="Subaccount"
+				//end if
+			end event
+		end field
+		
+		field update
+			event before
+				//if xaccusage .eq. "Ledger"
+				//	set xaccsource=""
+				//else
+				//	set xaccsource="Subaccount"
+				//end if
+				set xacctype=acgroup.xacctype("xgroup='"+xgroup+"'")
+			end event
+		end field
+		
+
+        field Budget
+          embed onclick="budgeted(this)"
+        end field
+
+        embed onsubmit="submitit(this)"
+
+
+
+	field add
+		event before
+			if xdesc .eq. ""
+				error "Cannot Proceed -- Account Description is Blank"
+			else
+				if xacctype .eq. "Expenditure"
+					set xaccusage = "Expenditure"
+				end if
+				int num = acgroup.xnum("xgroup='"+xgroup+"'")
+				if num == 0
+					set num = 1
+				end if
+				decimal group = xgroup
+				set group = group+num
+				set xacc = group
+				set num = num+1
+				set temp = #sql("update acgroup set xnum="+num+" where xgroup='"+xgroup+"'")
+				set xacctype = acgroup.xacctype("xgroup='"+xgroup+"'")
+				set xhrc1 = acgroup.xhrc1("xgroup='"+xgroup+"'")
+				set xhrc2 = acgroup.xhrc2("xgroup='"+xgroup+"'")
+				set xhrc3 = acgroup.xhrc3("xgroup='"+xgroup+"'")
+				set xhrc4 = acgroup.xhrc4("xgroup='"+xgroup+"'")
+				set xhrc5 = acgroup.xhrc5("xgroup='"+xgroup+"'")
+			end if
+		end event
+		event after
+		//	set temp=#spsql(zabsp_AC_validateAfterAcmst,#id,#user,xgroup,xdesc)
+		end event
+	end field
+	
+	field update
+		event before
+			if xdesc .eq. ""
+				error "Cannot Proceed -- Account Description is Blank!"
+			else if xgroup .eq. ""
+				error "Cannot Proceed -- Please show first!"
+			else
+				set xacctype = acgroup.xacctype("xgroup='"+xgroup+"'")
+				set xhrc1 = acgroup.xhrc1("xgroup='"+xgroup+"'")
+				set xhrc2 = acgroup.xhrc2("xgroup='"+xgroup+"'")
+				set xhrc3 = acgroup.xhrc3("xgroup='"+xgroup+"'")
+				set xhrc4 = acgroup.xhrc4("xgroup='"+xgroup+"'")
+				set xhrc5 = acgroup.xhrc5("xgroup='"+xgroup+"'")
+			end if
+		end event
+		event after
+		//	set temp=#spsql(zabsp_AC_validateAfterAcmst,#id,#user,xgroup,xdesc)
+		end event
+	end field
+
+	field delete
+		event before
+			int num = acgroup.xnum("xgroup='"+xgroup+"'")
+			set num = num-1
+			set temp = #sql("update acgroup set xnum="+num+" where xgroup='"+xgroup+"'")
+		end event
+	end field
+	
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+	    if (detail=="Sub Code"){
+            form.screen.value = "acsub"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="budgeted"){
+            form.screen.value = "glbud"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

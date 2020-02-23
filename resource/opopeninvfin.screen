@@ -1,0 +1,313 @@
+screen opopeninvfin
+
+     //sidebar list one//,list advance
+     sections form one, jscript myscript
+
+     list one
+      caption "Detail List"
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=opdodetailtrpareditable&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,xqtyord,xqtybntr,xdiscdetamttr,xvatamttr,xnetamttr //(xlineamt+xvatamt-xdiscdetamt)
+
+        header "Line No","Product <br>Code","Qty","Bonus <br>TR","Disc <br>TR","Vat <br>TR","Net TR"
+        totals "","Totals",sum,"",sum,sum,sum
+     end list
+
+     form one
+      caption "<ACRONYM>Error Handling After Confirmed</ACRONYM>"
+      table opdoheader
+      //primarykey xdornum
+      primarykey xdornum
+      order xdornum desc
+	//fixed xdornum
+      select "left(xdornum,2) in ('DO','DT')"
+      return "login"
+      layout 6
+      pstyle 3
+      objects Show,Clear,Previous,Next,Details,Complete_Deleted,Del_With_SumNo,Del_Open_Status,Process_Single_Invoice,"<p>",~
+              xdornum,xcus display(constant),xdate display(constant),xdatedel,xpaymentterm,xroute,xsumnum,xstatusord,xstatus,~
+			xtotamt display(constant),xprime,xdocnum,xvoucher,xtotamtar,xprim,xbalprime,~
+			xcrnnum,xexpamt,xwh display(const),xinvnum,xvouch,xamount,xnetamt,xtotal,xref
+			//*Next,CHK_Replace,Repair_tr_DO,REPAIR_TR_ALL,
+
+	field xtotal
+		attrib local
+		display const
+		caption Total Inv Amt
+		event after
+			set xtotal = xnetamt-xexpamt
+		end event
+	end field
+
+	field xstatusord	  
+		caption Status Ord
+	end field
+
+
+	//field xnetamt
+         //	attrib local
+         //	display const
+         //	caption Total Net Amount
+        //	event after
+         // 		set xnetamt = xtotamt+xvatamt-xdiscamt-xexpamt //opcrnchheader.xtotamt("xcrnnum='"+xcrnnum+"'")
+        //	end event
+     	//end field
+
+		
+	field xprim
+		attrib local
+		display const
+		caption arhed Net
+		event before
+			set xprim=arhed.xprime("xvoucher='"+xdornum+"'")
+		end event
+	end field
+
+	field xbalprime
+		attrib local
+		display const
+		caption Balp_Net(Dues)
+		event before
+			set xbalprime=arhed.xbalprime("xvoucher='"+xdornum+"'")
+		end event
+	end field
+	
+	field xamount
+		attrib local
+		display const
+		caption <font color=Red size=+2>aralc Net</font>
+		//caption aralc Net
+		event before
+			set xamount=aralc.xamount("xinvnum='"+xdornum+"'")
+		end event
+	end field
+
+	field xtotamtar
+		attrib local
+		display const
+		caption arhed TP
+		event before
+			set xtotamtar=arhed.xtotamt("xvoucher='"+xdornum+"'")
+		end event
+	end field
+
+	
+	field REPAIR_TR_ALL
+          //event before
+
+          //end event
+
+          	event after
+		  set temp=#spsql(zsp_optr_Replaceall,#id,#user)
+		  //set temp=#spsql(zsp_optr_Replaceado,#id,#user,xdornum)
+          
+		end event
+    	end field
+		
+	field CHK_Replace
+       	event after
+		  set temp=#spsql(zsp_Chk_ReplaceaDo,#id,#user,xroute,xdatedel,xpaymentterm)
+		 // set temp=#spsql(zsp_optr_Replaceado,#id,#user,xdornum)      
+		end event
+    	end field
+
+	field Repair_tr_DO
+          	//event before
+
+          	//end event
+
+          	event after
+		  //set temp=#spsql(zsp_optr_Replaceall,#id,#user)
+		  set temp=#spsql(zsp_optr_Replaceado,#id,#user,xdornum)
+          
+		end event
+   end field
+	
+		field xdocnum
+			attrib local
+			display const
+			caption Imtrn docnum
+			event before
+				set xdocnum=imtrn.xdocnum("xdocnum='"+xdornum+"'")
+			end event
+		end field
+		
+		field xvoucher
+			attrib local
+			display const
+			caption artrn voucher
+			event before
+				set xvoucher=artrn.xvoucher("xvoucher='"+xdornum+"'")
+			end event
+		end field
+		
+		field xinvnum
+			attrib local
+			display const
+			caption <font color=Red size=+2>aralc invnum</font>
+			//caption aralc invnum
+			event before
+				set xinvnum=aralc.xinvnum("xinvnum='"+xdornum+"'")
+			end event
+		end field
+		
+		field xvouch
+			attrib local
+			display const
+			caption <font color=Red size=+2>aralc invnum</font>
+			//caption aralc invnum
+			event before
+				set xvouch=aralc.xvoucher("xinvnum='"+xdornum+"'")
+			end event
+		end field
+		
+		//field Confirmed
+			//set temp = #spsql(zabsp_OP_summaryProcess, #id, #user, @wh, @docnum, @sumnum,single)
+		//end field
+
+		
+        field xdornum
+			//caption Invoice Number
+			pick list opordcrnable
+
+			event after
+				set globals(xdornum)=xdornum
+			end event
+	end field
+
+
+        field Process_Single_Invoice
+             event before
+          		//set vouch=#sub(xvouch,0,2)
+				if xsumnum .eq. ""
+					error "Cannot Proceed -- Summery Number is Incarrect"
+				//else if vouch .eq. "MR"
+				//	error "Cannot Proceed -- Exist "+xvouch
+				end if
+          end event
+          event after
+              set temp = #spsql(zabsp_OP_summaryProcess,#id,#user,xwh,xdornum,xsumnum,"single")
+            action show
+          end event
+        end field
+
+      field Del_Open_Status
+          event before
+          	set vouch=#sub(xvouch,0,2)
+				if xstatusord .eq. "Open"
+					error "Cannot Proceed -- Order Status Open"
+				else if vouch .eq. "MR"
+					error "Cannot Proceed -- Exist "+xvouch
+				end if
+
+	            set temp = #sql("select xstatusjv from arhed where xvoucher='"+xdornum+"'")
+	            if temp .eq. "Confirmed"
+	              error "Cannot Proceed -- The '"+xdornum+"' is Posted To GL "
+	            end if
+          end event
+
+          event after
+          	set temp = #spsql(zsp_invoiceopen,#id,#user,xdornum)
+        	action show  
+	  	end event
+      end field
+
+    field Del_With_SumNo
+          event before
+          set vouch=#sub(xvouch,0,2)
+			//if xstatusord .eq. "Open"
+			//	error "Cannot Proceed -- Order Status Open"
+			//else 
+			if vouch .eq. "MR"
+				error "Cannot Proceed -- Exist "+xvouch
+			end if
+
+            set temp = #sql("select xstatusjv from arhed where xvoucher='"+xdornum+"'")
+            if temp .eq. "Confirmed"
+              error "Cannot Proceed -- The '"+xdornum+"' is Posted To GL "
+            end if
+          end event
+
+          event after
+          	set temp = #spsql(zsp_InvUpdateAfterCon,#id,#user,xdornum)
+        	action show  
+	  	end event
+    end field
+
+	field Complete_Deleted
+          	event before
+			if xref .eq. "zab"
+				set temp=#spsql(zsp_Delete_All_Invoice,#id,#user,xdornum,xref)
+				print "Deleted"
+			else
+					error "Cannot Proceed  --   All Rights Reserved by ZAB ERP System"
+
+			end if
+   		end event
+   end field
+
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field REPAIR_TR_ALL
+          embed onclick="clicked(this)"
+        end field
+
+      //  field Complete_Deleted
+      //    embed onclick="clicked(this)"
+      //  end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function confirmUpdate(){
+          if(confirm('Are You Confirm')){
+            alert('yes')
+            form.searchbutton.value = "Update"
+          }else{
+//            alert('no')
+            form.searchbutton.value = "Show"
+          }
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opsumprocdetaileditable"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        function pickDetail(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text;
+            document.one.xbalance.value=primebal.text;
+            document.one.xdate.value=date.text;
+          }else{
+//            var ss =eval("document.forms");
+//            alert(ss.length);
+//           if(s1.length>)1
+//              document.forms[s1.length-1].xamount.value=link.innerText
+//            else
+              document.one.xamount.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

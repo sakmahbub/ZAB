@@ -1,0 +1,15 @@
+     list stock
+        caption "Stock detail of "+xitem + " W: "+xwh
+        table imstock
+        order xitem,xwh
+        fixed xitem
+       // select "xinhand+xopalc+xopdor+xpoord+xpogrn > 0"
+        rows 20
+        objects xwh, ~
+                xavail equals(xinhand-xopalc-xopdor-xwoalc-xwokit-xtoout), ~
+                xinhand,xopord,xopalc,xopdor,~
+                xpoord,xpogrn,xtogin,xtoout,xstdcost
+
+     end list
+
+

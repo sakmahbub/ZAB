@@ -1,0 +1,167 @@
+screen arinvoice
+
+  sidebar list detail
+  sections form one,jscript myscript
+
+
+  list detail
+    caption "Detail List"
+    table acdetail
+    order xvoucher,xrow
+    fixed xvoucher
+    rows 20
+    objects  xrow attrib(link "login?screen=arinvoicedt&command=Show&xvoucher=?&xrow=?"), ~
+             xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)),~
+		 xsub,org equals((select xorg from cacus where zid=acdetail.zid and xcus=acdetail.xsub)), xdebit,xcredit// xprime
+    totals "","","","","Total",sum,sum
+
+    headers "Line No","Acc Code","Description","Supplier Code","Name","Debit","Credit"
+  end list
+
+
+  form one
+    caption "AR Invoice Header"
+     table acheader
+    primarykey xvoucher
+    order xvoucher
+    select "xper>0 and xtype='AR'"// and xlcno=''"
+    return "login"
+    layout 2
+    pstyle 3
+    
+    objects Add,Update,Delete,Show,Clear,*next,Details,Top,Previous,Next,Bottom,"<p>",~
+            xvoucher display(trn GL Voucher),xdate,xsub,xsubdesc,xyear display(const),xper display(const),xref,~
+            xstatusjv,xlong,xtrn display(hide),xtype display(hide),xlcno display(hide),xwh display(hide)
+
+
+	field xsub
+		caption Customer Code
+		pick list xcus
+	end field
+		
+    field xwh
+      display const
+      default #wh
+    end field
+
+    field xsubdesc
+      attrib local
+      caption Customer Name
+      display const
+      event after
+        set xsubdesc=cacus.xorg("xcus='"+xsub+"'")
+      end event
+    end field
+
+    field xbrname
+      attrib local
+      caption Office Name
+      display const
+      event after
+        set xbrname=xcodes.xlong("xtype='Store' and xcode='"+xwh+"'")
+      end event
+    end field
+
+    field xlong
+      caption Header Description
+      width 80
+      height 3
+      column 2
+    end field
+
+        field xdate
+          event before
+           set xyear=#year(xdate,acdef)
+           set xper=#per(xdate,acdef)
+          end event
+        end field
+
+    field xdateref
+      display constant
+    end field
+
+    field xstatusjv
+      display constant
+    end field
+
+    field xvoucher
+      event after
+        class careports(getjspReport{acvoucherar,1,xvoucher,Print Voucher})
+        set globals(xvoucher)=xvoucher
+        if xstatusjv .eq. "Posted"
+          set #field(Delete.display) = "hidden"
+          set #field(Update.display) = "hidden"
+        end if
+      end event
+    end field
+
+    field clear
+      event after
+        set #field(Details.display) = "hidden"
+        set #field(Delete.display) = "hidden"
+        set #field(Update.display) = "hidden"
+        set #field(Show.display) = "hidden"
+      end event
+    end field
+
+    field Add
+      event before
+		if xsub .eq. ""
+			error "Cannot Proceed -- Please Provide Customer Code"
+		end if
+		set xtype="AR"
+		set xlcno = ""
+        set xstatusjv="Balanced"
+		set xtrn = xvoucher_ONE
+        if xvoucher_ONE .eq. "OB--"
+          error "Cannot Proceed -- You Choose Transaction Code For Openning Balance "+xvoucher_ONE
+        end if
+        class gltrn(acValidateBeforeHeader{xyear,xper})
+      end event
+    end field
+
+
+    embed onsubmit="submitit(this)"
+
+    field Details
+      embed onclick="clicked(this)"
+    end field
+
+    field Inventory
+      embed onclick="clicked(this)"
+    end field
+
+    field AR
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+    function clicked(b){
+      detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Details"){
+          form.screen.value = "arinvoicedt"
+          form.searchbutton.value = "Find xvoucher=?"
+          //return false
+        }
+        if (detail=="Inventory Transactions"){
+          form.screen.value = "acinventory"
+          form.searchbutton.value = "Find xvoucher=?"
+          //return false
+        }
+        if (detail=="AR Transactions"){
+          form.screen.value = "acarvoucherchk"
+          form.searchbutton.value = "Find xvoucher=?"
+          //return false
+        }
+      }
+
+      </script>
+  end jscript
+
+end screen

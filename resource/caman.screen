@@ -1,0 +1,61 @@
+screen caman
+     caption "Customer master"
+     //sidebar text two,list two, text three
+     sections  form one, jscript myscript
+
+
+     form one
+        caption "Manufacture Master"
+      	table caman
+        primarykey xman
+        order xman
+        //select
+        return "login"
+        layout 2
+        pstyle 3 
+        objects Clear,Add, Update, Delete,*next,Show, Top,Bottom,Next,Previous,"<p>" ,~
+                xman,xorg,xmadd, xpadd,~
+                xemail, xphone,xmobile, xfax, xurl, ~
+                xgsup display(hide),xcontact//,xstatussup
+
+        field xman
+		Caption Manuf. ID
+        end field
+
+	field xorg
+		caption Manuf. Description
+	end field
+
+	field add
+		event before
+          		set trn = "MAN-"
+          		set xman = #trn("Manufacture Code",trn,10)
+		end event
+	end field
+ 
+       embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "opordq"
+            form.searchbutton.value = "Find xman=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

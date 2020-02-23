@@ -1,0 +1,12 @@
+ list acconveyancenum
+        table acreqheader
+        order xacreqnum
+        select "xacreqnum like '%"+zvalue+"%' and (left(xacreqnum,4)='CON-')"
+		searchselect "left(xacreqnum,4)='CON-'"
+        rows 20
+        objects xacreqnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xdate,xnote
+
+     end list
+
+

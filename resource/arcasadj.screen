@@ -1,0 +1,365 @@
+screen arcasadj
+
+     sidebar list voucherno//,list invoice,list allocation
+     sections form one,jscript myscript
+	
+	list voucherno
+    caption "GL Voucher"
+    table arhedglview
+    order xvoucher desc
+	fixed xdocnum
+
+    rows 5
+	objects  xvoucher attrib(link "login?screen=acheaderpost&command=Show&xvoucher=?"), ~
+	xdate,xstatusjv
+
+	 headers "Voucher No","Date","Voucher Status"
+	end list
+	 
+	 
+	 
+	 list invoice
+        caption "<br><center><b>"Unallocated Voucher List"</b>"
+		table arallocationarcview
+        order xcus,xvoucher
+        fixed xcus
+        select "xprime> 0 and left(xvoucher,2) not in ('RF','CR')"
+        rows 10
+        objects ~
+        xvoucher,xprime,xdate
+
+        headers "Invoice Number","Balance","Date"
+     end list
+
+     list allocation
+        caption "Allocated Voucher List" 
+        table aralcarcview
+        order xvoucher,xinvnum
+        fixed xvoucher
+        rows 10
+        objects ~
+        xinvnum attrib(link "login?screen=aralc&command=Show&xinvnum=?"), ~
+        xdate,xbalance,xamount
+		header "Invoice No","Inv Date","Invoice Balance","Allocated Amt"
+        totals "","Totals","",sum
+     end list
+
+     form one
+        caption "AR Adjustment Entry"
+        table arhed
+		primarykey xvoucher
+        order xvoucher
+        select "left(xvoucher,4)='ADAR'"
+        return "login"
+        pstyle 3
+        layout 2       
+        objects Add,Clear,Show,Update,Delete, *next,Top,Previous,Next,Bottom,Transfer To GL,"<p>" ,~//Allocate,
+                xvoucher,xdate,xtypeobj,,xcus,xorg,~
+				xwh display(hide),xbrname display(hide),xbank,xbankname,xsub,subname,xpaymenttype display(hide),~
+                xcur display(hide),xprime,xbalprime display(hide),xexch display(hide),~
+                xstatusjv display(hide),xtypeadj,xnote,xdocnum,xtypetrn display(hide),~
+                xsign display(hidden),~
+                xchgsprime display(hide),xpaymentterm display(hide),xtype display(hide),xbase display(hide)
+	
+	
+	field xdate
+		caption Adjustment Date
+		//display const
+	end field
+	
+	field xtypeobj
+		caption Adjustment Type
+		display combo
+		pick "Debit,Credit"
+		default "Credit"
+	end field		
+	
+	field xtypeadj
+		default "AR"
+	end field
+	
+	field xcur
+		default "BDT"
+	end field
+	
+	field xref
+		caption Cheque/TT/DD/P.Order/Ref.No
+	end field
+	
+	field xdateref
+		caption Cheque/TT/DD/P.Order/Ref.Date
+	end field
+	
+	field xdocnum
+		caption Voucher No
+		display const
+	end field
+
+	field xpaymenttype
+		//pick "Cheque,Cash"
+	end field
+	
+	field xprime
+		caption Total Adjustment Amount
+	end field
+
+       field xbrname
+        attrib local
+        caption Division Name
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+        field xwh
+          default "01"
+        end field
+		
+		
+        field xexch
+          default 1
+        end field
+		
+		  field xdiscprime
+         width 20
+        end field
+
+        field xvatamt
+          caption VAT Deducted by Customer
+          display text
+        end field
+
+        field xaitamt
+          caption Adv. Tax Deducted by Customer
+          display text
+        end field
+
+        field xorg
+          attrib local
+          display constant
+          caption Name
+          event after
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+	 field xbank
+	 caption Adjustment Account No
+		width 30
+			pick list xacc
+	 end field
+
+        field xbankname
+          attrib local
+          display const
+          caption Account Name
+          event after
+            set xbankname=acmst.xdesc("xacc='"+xbank+"'")
+          end event
+        end field
+		
+		field xsub
+         pick list xsubmr
+        end field
+		
+		  field subname
+          attrib local
+          display const
+          caption Sub Account Name
+          event after
+            set subname=acsubview.xorg("xacc='"+xbank+"' and xsub='"+xsub+"'")
+          end event
+        end field
+
+        field xname
+          display constant
+          event after
+          end event
+        end field
+
+        field xnote
+		height 2
+          width 40
+        end field
+
+
+        field xvoucher
+			width 15	
+			caption Adjustment Number
+			display text
+			pick list xvouchermr
+			event after    
+				set globals(xvoucher)=xvoucher
+				set globals(xcus)=xcus
+				class careports(getjspReport{armrprint,1,xvoucher,Print Credit Note})
+	     	    if xstatusjv .eq. "Confirmed"
+					set #field(add.attrib)="disabled"
+         			set #field(update.attrib)="disabled"
+					set #field(delete.attrib)="disabled"
+            	end if
+          end event
+        end field
+
+    field add
+ 	event before
+              set xstatusjv="Open"
+			  set xtypetrn = "Sale"
+		      set xtype="ADAR"
+			  if xtypeobj .eq. "Debit"
+				set xsign = "1"
+			  else 
+				set xsign = "-1"
+			  end if
+	    	  set xpaymentterm = "credit"	
+			  set ref=arhed.xref("xref='"+xref+"'")
+			  set bank=arhed.xcusbank("xcusbank='"+xcusbank+"'")
+			  set sub=acsubview.xsub("xacc='"+xbank+"' and xsub='"+xsub+"'")
+			  set sub2=#sql("select max(xsub) from acsubview where xacc='"+xbank+"'")
+			
+			if xexch ==0
+			double exch=1
+			else 
+			double exch=xexch
+			end if
+
+			if xprime == 0
+                error "Cannot Proceed -- Amount is Blank"
+			else if xcus .eq. ""
+                  error "Cannot Proceed -- Customer Invalid"
+            else if xbank .eq. ""
+                  error "Cannot Proceed -- Bank A/C Required"
+			else if sub2 .ne. "" .and. xsub .eq. ""
+				error "Please Enter Subcode"
+			else if xsub .ne. "" .and. sub .ne. xsub
+				error "Subcode does not match"
+			else if xref .ne. "" .and. ref .eq. xref .and. bank .eq. xcusbank
+					error "Cannot Proceed -- Cheque no exists"
+            else 
+		          //*********** GETTING TRN NO ****************
+					set xbase=xprime*xexch
+			        set xbalprime=xprime
+					set xdate = #date
+	            	//set year = #sub(xdate,2,2)
+      	      		set trn = "ADAR"
+            		set xvoucher = #trn("AR Transactions",trn,10)
+	            	//set xvoucher = #sub(xvoucher,0,4)+year+#sub(xvoucher,4,10)
+			end if
+		end event
+		event after
+            action Show
+			print "<font color=red size=+2>"+xvoucher+" Created.</font>"
+          end event
+        end field
+        
+		
+		field Update
+          event before
+			  if xtypeobj .eq. "Debit"
+				set xsign = "1"
+			  else 
+				set xsign = "-1"
+			  end if
+			double alcamt = #sql("select xamount from aralc where xvoucher='"+xvoucher+"'")
+			set sub=acsubview.xsub("xacc='"+xbank+"' and xsub='"+xsub+"'")
+			set sub2=#sql("select max(xsub) from acsubview where xacc='"+xbank+"'")
+			if sub2 .ne. "" .and. xsub .eq. ""
+				error "Please Enter Subcode"
+			else if xsub .ne. "" .and. sub .ne. xsub
+				error "Subcode does not match"
+			else if arhed.xstatusjv("xvoucher='"+xvoucher+"'") .ne. "Open"
+				error "Already Transfer to GL!"
+			else if alcamt > 0
+				error "Allocation already Done!"
+			end if
+			if xexch ==0
+			double exch=1
+			else 
+			double exch=xexch
+			end if
+			set xbase=xprime*xexch
+            set temp = #sql("select xinvnum from aralc where xvoucher='"+xvoucher+"'")
+            if #result .eq. "false"
+              set xbalprime=xprime
+            end if
+          end event
+          event after
+            set command = "update"
+			set temp = #spsql(zabsp_ArhedChk,#id,#user,xvoucher,xcus,command)
+            //set temp = #spsql(sp_validateAfterARcas,#id,#user,xvoucher,xcus,command)
+            action Show
+          end event
+        end field
+
+        field Transfer
+		 event before
+			if arhed.xstatusjv("xvoucher='"+xvoucher+"'") .ne. "Open"
+				error "Already Transfer to GL!""
+			end if
+            end event
+          event after  
+           set temp = #spsql(zabsp_AP_AdjustmentAPtoGL,#id,#user,xvoucher,"")
+			action show
+			//set voucher = #sql("select xvoucher from acheader where xinvnum='"+xinvnum+"'")
+		    print "<font color=red size=+1>Voucher No "+xdocnum+" Created</font>"
+          end event
+        end field
+		
+		field Auto Allocate
+          event before
+            // ********** CHECKING FOR GIVEN AMOUNT ************
+          //  class ar(arValidateBeforeAllocate{xvoucher})
+          end event
+          event after
+            set temp = #spsql(zabsp_AR_AutoCollection,#id,#user,xcus,xprime,xvoucher,xdate)
+          //  action Show
+          end event
+        end field
+		
+        field Delete
+          event before
+			if arhed.xstatusjv("xvoucher='"+xvoucher+"'") .ne. "Open"
+				error "Already Transfer to GL!"
+			end if
+          end event
+          event after
+          end event
+        end field		
+
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Allocate
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Details"){
+            form.screen.value = "arcas"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+          if (detail == "Allocate"){
+            form.screen.value = "aradjalc"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+        }
+        </script>
+     end jscript
+
+
+
+end screen

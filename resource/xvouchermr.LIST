@@ -1,0 +1,15 @@
+     list xvouchermr
+        table arhed
+        order xvoucher
+        select "left(xvoucher,2)='MR01' and xtype='MR--' "
+        navigators alpha
+        rows 10
+        objects xvoucher attrib(link "abc" embed onclick="return updateParent(this:'xvoucher')"), ~
+                xcus,xdate,xlcno
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

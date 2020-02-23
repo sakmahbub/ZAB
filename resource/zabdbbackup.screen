@@ -1,0 +1,166 @@
+screen zabdbbackup
+
+	sidebar list one
+    sections form one,jscript myscript
+
+     list one
+        caption "Last Batabase Backup Detail"
+        table zdbmgt
+        order xdate desc
+   //     fixed xpornum
+         select "xtype = 'Backup'"
+        //navigators alpha
+        //,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 10
+   //     objects  xrow attrib(link "login?screen=poorddetail&command=Show&xpornum=?&xrow=?"), ~
+		objects  xrow,~
+                zauserid,ztime,xlocation
+
+			headers "Row","User ID / Name","Backup Time","Backup Location"
+      //  headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+	 
+     form one
+        caption "Database Backup"
+        table zdbmgt
+        primarykey xrow
+        order xrow
+ //select "xempcategory='"+#wh+"' and xempstatus='Normal'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Confirm,"<p>" ,~
+                xrow attrib(row 0 1),xdate display(const),xpassword,xtype,xlocation,~
+				xorg,xlong//,zauserid display(const),
+
+		field xrow
+			display const
+		end field
+		
+		field xlocation
+			caption Type Path: D:\AZIM GROUP\AZIM DATA\DBBACKUP
+			width 60
+			column 2
+			display text
+			default "D:\AZIM GROUP\AZIM DATA\DBBACKUP"
+		end field
+
+		field xtype
+			caption Action Type
+			pick "Backup,Restore"
+			default "Backup"
+			display const
+		end field
+		
+        field xpassword
+			caption Security Key for SQLDB
+			width 15
+			default ""
+        end field
+
+		field xorg
+			caption Name of Business (Short Name)
+			width 60
+			default "AG"
+			column 2
+        end field
+		
+		field xlong
+			//caption Name of Business (Short Name)
+			column 2
+        end field
+		
+ //       field upload
+  //        event after
+  //      class bmbroker(upload)
+   //       set temp = #spsql(zabsp_fileupload,xtype,xfile)
+   //       end event
+   //     end field
+
+
+        field Confirm
+					
+          event before
+
+			//	set row = #sql(double,"select xrow from oporddetail where xordernum='"+xordernum+"' and xorderrow="+xdocrow)
+			if xpassword .ne. "SQLDB"
+				error "Cannot Proceed--Please Fill The Security Key"
+			else
+					  action Add
+				set temp = #spsql(zabsp_DB_Backup_Auto,#user,xlocation,xorg)
+					set row = #sql("select max(xrow) from zdbmgt")
+//					print row
+					set row = #sql("delete from zdbmgt where xrow='"+row+"' and xdate = '"+xdate+"'")
+			end if
+			
+          end event
+
+			event after				
+				print "<font color=blue size=+3>Successfully Accomplished </font>"
+					if xlocation .ne. ""
+						print "<font size=+2 color=red>Database - Location: "+xlocation
+					else if xlocation .eq. ""
+						print "<font color=red size=+2>Default Location:"D:\ZABSQLDB"</font>"
+					end if	
+				set xpassword = ""					
+			end event
+			
+        end field
+
+		field Adddd
+			event before
+
+			end event
+			event after
+			end after
+		end field
+		
+		field Update
+					event before
+
+					end event
+						event after
+
+						end after
+		end field
+
+        field Schedule
+          embed onclick="clicked(this)"
+        end field
+		
+        embed onsubmit="return submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Schedule"){
+            form.screen.value = "zdbmgtdef"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Cost Price"){
+            form.screen.value = "caitemcostprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Sell Price"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

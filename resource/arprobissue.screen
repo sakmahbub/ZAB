@@ -1,0 +1,145 @@
+screen arprobissue
+	
+	 sidebar list one//,list terms,list dor
+     sections form one,jscript myscript
+
+     list one
+        caption "List of PI Number "//+xvoucher
+        table arprobissue
+        order xvoucher desc
+        //fixed xvoucher
+	select "xwh='"+#wh+"'"
+        rows 20
+        objects  xvoucher attrib(link "login?screen=arprobissue&command=Show&xvoucher=?"), ~
+                xstaff,xdate,xprime//,xlineamt
+
+        headers "PI No","Staff","Date","Amount"
+	//  total "Total","","",sum,"",sum
+     end list
+
+     form one
+        caption "Problematic Issue Entry"
+	    table arprobissue
+        order xvoucher desc
+        return "login"
+        select "Left(xvoucher,2) = 'PI' and xwh='"+#wh+"'"
+        layout 3
+        pstyle 3
+        objects Add,Update,Show,*next,Previous,Next,Clear,Delete,"<p>" ,~
+			xvoucher,xstaff,xname,xdate,~
+			xprime,xtype,xwh display(hide),xremarks
+		
+
+	field xname
+		attrib local
+		caption Staff Name
+		display const
+		event after
+			set xname=pdmst.xname("xstaff='"+xstaff+"'")
+		end event
+	end field
+
+
+
+	field xtype
+          caption Issue Type
+          diplay combo
+         	pick "Cash Defalcation,Cash Dues for Date Expired Product,Cash Dues for Snatch (Hijack),Cash Dues for Product Lost,Cash Dues for Other Unsettled Issue"
+        end field
+
+			field xvoucher
+				caption PI No
+				pick list pilist
+				//event after
+				//	set globals(xvoucher)=xvoucher
+				//end event
+			end field
+
+			field xstaff
+				caption Staff ID
+			end field
+
+			field xremarks
+				width 60
+				colunm 3
+			end field
+
+   field add
+                event before
+				set xwh=#wh
+           // if xstatusord .eq. "DO Created"
+            //	error "Cannot Proceed -- DO Already Created"
+           // end if
+
+                //*********** GETTING TRN NO ****************
+		  set year = #sub(xdate,2,2)
+      	          set trn = "PI"+#wh 
+      		  set voucher = #trn("PI Number",trn,10)
+		  set xvoucher = #sub(voucher,0,4)+year+#sub(voucher,4,10)
+            end event
+            event after
+	            action show
+            end event
+          end field
+
+          field update
+            event before
+            end event
+		event after
+		end event
+          end field
+
+
+
+		  
+          field Document Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Amendment
+            embed onclick="clicked(this)"
+          end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "oppiterms"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Detail"){
+            form.screen.value = "opordlcdetail"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Amendment"){
+            form.screen.value = "oplcamend"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Print PI"){
+            form.screen.value = "*crystal oppi(xordernum=PI Number=xordernum)"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

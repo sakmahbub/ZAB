@@ -1,0 +1,12 @@
+     list xfcus
+        table cacus
+        order xcus
+        select "(xcus like '%"+zvalue+"%' or xorg like '%"+zvalue+"%')"
+        rows 10
+        objects xcus attrib(link "abc" embed onclick="return updateParent(this:'xfcus')"), ~
+                xorg
+
+        headers "Code","Name"//,"Address","Warehouse","SR","Name"
+     end list
+
+

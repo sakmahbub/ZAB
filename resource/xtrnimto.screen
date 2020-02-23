@@ -1,0 +1,52 @@
+screen xtrnimto
+
+     sidebar list one
+     sections  form one
+
+     list one
+        caption "Detail List"
+      	table xtrn
+        order xtrn
+        select "xtypetrn = 'Transfer Transaction'"
+        rows 20
+        objects  xtrn attrib(link "login?screen=xtrnimto&command=Show&xtrn=?"), ~
+                 xdesc,zactive
+     end list
+
+     form one
+        caption "Transfer Transaction"
+      	table xtrn
+        order xtrn
+        select "xtypetrn = 'Transfer Transaction'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next,Top,Bottom,"<p>" ,~
+                xtrn, xdesc,xnum, xinc display(hide),xtypetrn display(hide),zactive
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+       field add
+        event before
+          set xtypetrn="Transfer Transaction"
+        end event
+       end field
+
+       field xinc
+    		def "1"
+	     end  field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+end screen
+

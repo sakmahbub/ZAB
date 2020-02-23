@@ -1,0 +1,180 @@
+screen moreqheaderdphmulti
+
+  sidebar list imtor,list one
+	sections form one, jscript myscript
+     
+	 list imtor
+        caption "Requisition List"
+        table imtorheader
+        order xtornum desc
+		select "xstatustor='Open' and xidsup='"+#user+"' and left(xtornum,2)='SR'"
+        rows 20
+        objects  xtornum attrib(link "login?screen=moreqheaderdphmulti&command=Show&xtornum=?"), ~
+				names equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.zauserid)),~
+                xdate
+        headers "SR No","Preparer","Date"
+     end list
+              
+   list one
+        caption "<br><center><b>"Transfer Order Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=moreqdetaildph&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xprepqty,xdphqty,xunit
+
+        headers "Serial No","Item","Description","Qunatity Required","Approved Qty","Unit"
+     end list
+
+
+
+     form one
+        caption "Requisition Approved By Dept. Head"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+	//	fixed xtornum
+		//select "xstatustor='Open' and xtwh='"+#wh+"'"
+		select "left(xtornum,2)='SR'"
+		return "login"
+        pstyle 3
+        layout 2
+        objects Show,Clear,Detail,Approved,Update,~//Add,Delete,
+        xtornum ,~
+        xdate,xdatecom display(hide),~
+        xfwh,xfbrname,xtwh display(const),xtbrname,xref,xstatustor,xregi display(const),xlong,xpreparer display(hide)//,xdocrow,xordernum display(hide),xpiref display(hide)
+				
+		field xdocrow
+			caption Recipe Row
+		end field
+		
+		field xstatustor
+			display const
+		end field
+		
+		field xregi
+		pick list xcardept
+			caption Car No/Department Name
+			event before
+			end event
+		end field
+		
+		field xtwh
+		event before
+		set xtwh=#wh
+		end event
+        end field
+		
+       field xfbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+		caption Requisition No.
+		pick list xtornum
+          event after
+			set global(xtornum)=xtornum
+			set global(xdocrow)=xdocrow
+           // class careports(getaspReport{imtranissueprint,1,xtornum,Print Transfer Challan})
+			if xstatustor .eq. "Confirmed"
+              set #field(Check.display)="hidden"
+              set #field(Confirm.display)="hidden"
+			end if
+           end event
+        end field
+
+        field xlong
+		caption Note
+          height 3
+          width 110
+          column 2
+        end field
+
+
+		
+		 field Approved
+            event before
+
+            end event
+            event after
+			set dph=pdmst.xstaff("xposition='"+#user+"'")
+	         // set temp = #spsql(zabsp_Store_Reqn_Approved,#id,#user,xtornum,xstatustor)
+			 set temp =  #sql("update imtorheader set xstatustor='Approved_DPH' where xtornum='"+xtornum+"'")
+			 set temp =  #sql("update imtorheader set xdphead='"+dph+"' where xtornum='"+xtornum+"'")
+			 set temp = #spsql(zabsp_sendmail,#id,#user,xtornum,"Director",xtwh)
+	         action show
+            end event
+          end field
+		
+        field update
+          event before
+		  if xfwh .eq. ""
+				error "Please select Branch/Store for Requisition Product"
+			end if
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+        
+		field Select
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+
+        function clicked(b){
+          but=b.value
+        }
+
+        function submitit(form){
+        //  if (but=="Select Item For Requisition"){
+        //    form.screen.value = "moreqdetaildph"
+        //    form.searchbutton.value = "Find xtornum=?"
+        //  }
+          if (but=="Detail"){
+            form.screen.value = "moreqdetaildphmulti"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickRecipe(link,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xmoprcs.value=link.text
+            document.one.xdocrow.value=row.text
+          }else{
+            document.one.xmoprcs.value=link.innerText
+            document.one.xdocrow.value=row.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+
+
+end screen

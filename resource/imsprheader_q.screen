@@ -1,0 +1,293 @@
+screen imsprheader_q
+
+  sidebar list one,list prlist
+	sections form one,list srlist, jscript myscript
+
+              
+    list one
+        caption "<br><center><b>"SPR Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        select "left(xtornum,3)='SPR'"
+		rows 250
+        objects ~
+        xrow,~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+		partno equals((select xtheircode from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyreq,xqtypor,xunit
+
+        headers "Serial No","Item","Description","Part No","Quantity Required","Allocation Qty","Purchase Unit"
+     end list
+	 
+    list prlist
+      caption "PR List"
+         table poreqheader
+        order xporeqnum desc
+		fixed xtornum
+		select "left(xporeqnum,2)='PR'"
+		rows 50
+        objects  xporeqnum attrib(link "login?screen=poreqheader_q&command=Show&xporeqnum=?"), xdate,xtype
+               
+		  headers "Requisition No","Date","Purchase Type"
+	end list
+	
+	 list srlist
+        caption "SR List"
+        table imtorheader
+        order xtornum desc
+		select "left(xtornum,2)='SR' and xsrnum='"+xtornum+"'"
+        rows 30
+        objects  xtornum  attrib(link "login?screen=moreqheader_q&command=Show&xtornum=?"),~// ,xdate,xbatch,~
+                 xdate,xstatustor,xidsupdesc equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xidsup)),~
+				 xidsupdesc2 equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xsuperior2))
+				 //xidsupdesc3 equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xsuperior3))
+        headers "Requisition No","Date","SR Status","Approver","OR >>>>>> Approver"
+    end list
+
+
+
+     form one
+        caption "Store Purchase Requisition(SPR) Query"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+		select "left(xtornum,3)='SPR'""
+        return "login"
+        pstyle 3
+        layout 3
+		objects	Show,Clear,Top,Next,Previous,Bottom,"<p>",~
+        xtornum,xdate display(const),xdatecom display(hide),xdatereq display(const),~
+        xfwh display(const),xfbrname,xref display(const),xtwh display(hide),xtbrname,xregi  display(const),xshift  display(const),~
+		xstatusrec display(hide),xidsup display(hide),xsuperior2 display(hide),xsuperior3 display(hide),xstatustor,~
+		xtitem  display(const),xreqtype  display(const),xlong  display(const),~
+		xnote display(const),,,~
+		signatorysec display(const),,,~
+		xpreparer display(hide),preparer display(const),~		
+		xsignatory1 display(hide),signatory1  display(const),~
+		xsignatory2 display(hide),signatory2 display(const),~
+		xsignatory3 display(hide),signatory3 display(const),~
+		xsignatory4 display(hide),signatory4 display(const),~
+		xsignatory5 display(hide),signatory5 display(const),~
+		xsignreject display(hide),signreject display(const),~
+		xcurposition display(const)
+				
+		field xdate
+			caption Requisition Date
+		end field
+		
+		field xdatereq
+			caption Required By Date
+		end field
+		
+		field xreqtype
+			//caption Shift Name
+			pick "Purchase Requisition,Service Requisition"
+			default "Purchase Requisition"
+		end field
+		
+		field xshift
+			caption Shift Name
+			pick code Shift Name
+		end field
+		
+		field xcurposition
+		caption Current Position
+		attrib local
+		event after
+		set xcurposition=pdmst.xname("xposition='"+xidsup+"'")+" <> "+pdmst.xname("xposition='"+xsuperior1+"'")+" <> "+pdmst.xname("xposition='"+xsuperior2+"'")
+		end event
+		end field
+		
+		field xstatustor
+		caption SPR Status
+		display const
+		end field
+		
+		field xstatusreq
+		caption PR Status
+		display const
+		end field
+		
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		//column 2
+		end field
+		
+		field xdum
+			display const
+			attrib local
+			caption
+		end field
+		
+		field xregi
+		pick list xcardept
+			caption Department Name
+			event before
+			end event
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+
+		field xfwh
+		pick list xwh
+		default #wh
+		event before
+		end event
+        end field
+		
+		field xtwh
+		default #wh
+		event before
+		end event
+        end field
+		
+		  field appname
+        attrib local
+        caption Approved Person
+        display const
+        event after
+          set appname=pdmst.xname("xposition='"+xidsup+"'")
+        end event
+       end field
+		
+       field xfbrname
+        attrib local
+        caption Store Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Store Name
+        display hide
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	field xnote
+      caption Reject Note
+	display const
+    end field
+
+        field xtornum
+		caption SPR No.
+		pick list sprno
+          event after
+			set global(xtornum)=xtornum
+			set global(xdocrow)=xdocrow
+			class careports(getReport{imsprprint;2;in,st;zid,tornum;xtornum;View SPR Status})
+           end event
+        end field
+
+        field xlong
+		caption Justification
+          height 2
+          width 50
+          //column 2
+        end field
+		
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+        
+		field Select
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+
+        function clicked(b){
+          but=b.value
+        }
+
+        function submitit(form){
+          if (but=="Detail"){
+            form.screen.value = "imsprdetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickRecipe(link,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xmoprcs.value=link.text
+            document.one.xdocrow.value=row.text
+          }else{
+            document.one.xmoprcs.value=link.innerText
+            document.one.xdocrow.value=row.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+
+
+end screen

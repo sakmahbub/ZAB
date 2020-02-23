@@ -1,0 +1,89 @@
+screen xcodescomponant
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xtype,xcode
+        select "xtype='Componant Type'"
+        rows 20
+        objects  xcode attrib(link "login?screen=xcodescomponant&command=Show&xtype=?&xcode=?"),~
+                xprops,zactive
+
+        //headers none
+     end list
+
+     form one
+
+     caption "<ACRONYM>Componant Type</ACRONYM>"
+        table xcodes
+        order xtype,xcode
+        select "xtype='Componant Type'"
+        return "login"
+        layout 2
+        pstyle  3
+        objects Show,Clear,Add, Update, Delete,*next,~
+                Top, Bottom,"<p>" ,~
+                xtype,xcode width(50),~
+                xprops,zactive,xlong
+
+        field xtype
+          display const
+          caption Type
+          default "Componant Type"
+        end field
+
+        field xprops
+          display combo
+          pick "Addition,Deduction"
+          default "Addition"
+        end field
+
+        field xlong
+          width 40
+          height 2
+          //column 2
+        end field
+
+        field add
+          event before
+            set xtype="Componant Type"
+          end event
+        end field
+
+        field Budget
+          embed onclick="clicked(this)"
+        end field
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+    	    if (detail=="Budget"){
+            form.screen.value = "acbudget"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

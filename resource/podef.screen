@@ -1,0 +1,116 @@
+screen podef
+
+     sidebar list one
+     sections  form one, jscript myscript
+
+     list one
+        caption "PO to GL Advance"
+        table podef
+        order xtype
+        rows 60
+        objects  xtype attrib(link "login?screen=podef&command=Show&xtype=?&xgitem=?"),~
+				 xgitem  attrib(link "login?screen=podef&command=Show&xtype=?&xgitem=?"),~
+                 xaccdr,desc equals((select xdesc from acmst where zid=podef.zid and xacc=podef.xaccdr)),~
+				 xacccr,desc equals((select xdesc from acmst where zid=podef.zid and xacc=podef.xacccr))
+				 
+		header "Division","Group","Debit Account Code","Description","Credit Account Code","Description"
+
+     end list
+
+
+     form one
+        caption "PO to GL Advance:"
+      	table podef
+        primarykey xtype
+        order xtype,xgitem
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Update, Delete,Show,*next,Top,Previous,Next,Bottom,"<p>" ,~
+               xtype,xdum,xgitem,,xaccdr,xdrdesc,xacccr,xdesc, //
+
+   
+		field xtype
+		display combo
+		//pick "select xlong from xcodes where xtype='Branch' and zactive=1 and xtypeobj='Store'"
+		pick "01,02,03,04,05,99"
+          caption Division
+        end field
+		
+		
+        field xaccdr
+		display text
+		pick list xacc
+          caption Debit Account
+        end field
+
+        field xdum
+          attrib local
+		  display const
+          caption Name
+		  event before
+          set xdum=xcodes.xlong("xtype='Branch' and zactive=1 and xtypeobj='Store' and xcode='"+xtype+"'")
+		  end event
+        end field
+		
+		   field xacccr
+		display text
+		pick list xacc
+          caption Credit Account
+        end field
+		
+        field xdesc
+          attrib local
+          caption Credit Account Description
+          display const
+          event after
+            set xdesc=acmst.xdesc("xacc='"+xacccr+"'")
+          end event
+        end field
+
+        field xdrdesc
+          attrib local
+          caption Debit Account Description
+          display const
+          event after
+            set xdrdesc=acmst.xdesc("xacc='"+xaccdr+"'")
+          end event
+        end field
+
+        field xgcus
+          pick code Customer Group
+        end field
+
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	    if (detail=="Return"){
+            form.screen.value = "caitem"
+            form.searchbutton.value = "Find xitem=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

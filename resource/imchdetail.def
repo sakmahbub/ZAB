@@ -1,0 +1,14 @@
+product ZAB
+
+table imchdetail
+  caption "Chalan Entry Detail"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+  ximtrnnum,xrow,xitem,xqtyord,xunit,xrate,xlineamt,xvatrate,xpacking,xcost,xpacking,xcartoon,xbatch,xmrp
+
+  primary key zid,ximtrnnum,xrow
+  foreign key
+        zid references zbusiness.zid
+        zid,ximtrnnum references imchheader.zid,ximtrnnum
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+end table

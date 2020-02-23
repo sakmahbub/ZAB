@@ -1,0 +1,174 @@
+screen fatrnl
+
+     sections form one,list one,  jscript myscript
+
+     list one
+        table fatrn
+        order xvoucher
+        //fixed xvoucher
+        select "xtype='Estimated Life Trn'"
+        //navigators alpha,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 5
+        objects  xvoucher attrib(link "login?screen=fato&command=Show&xvoucher=?"),xcode,xdate,xdiv,xsec,xproj
+
+        //headers none
+     end list
+
+
+
+     form one
+        caption "Estimated Life"
+        table fatrn
+	  primarykey xvoucher
+        order xvoucher
+        select "xtype='Estimated Life Trn'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update,Delete,*next, Top, Previous, Next, Bottom,"<p>" ,~
+        xvoucher attrib(search) display(trn Estimated Life Trn),xdate,~
+        xcode,xname,~
+        xyear display(hide),xper display(hide),xrelife,~
+        xlong,xtype display(hide),xaction display(hide),xstatusjv display(const)
+
+        field xlong
+          width 50
+        end field
+
+        field xname
+          event after
+            set xname=famst.xname("xcode='"+xcode+"'")
+          end event
+          attrib local
+          display constant
+        end field
+
+        field xcode
+          pick list famst
+        end field
+
+        field add
+          event before
+              set xstatusjv=""
+	          set xyear = #sub(xdate,0,4)
+              set xper = #sub(xdate,5,2)
+              set xcat = famst.xcat("xcode='"+xcode+"'")
+              set action=xtrn.xaction("xtypetrn='Estimated Life Trn' and xtrn='"+xvoucher_ONE+"'")
+              set xaction = action
+              set xtype=xtrn.xdesc("xtypetrn='Estimated Life Trn' and xtrn='"+xvoucher_ONE+"'")
+              int year=#sub(xdate,0,4)
+              int per=12+#sub(xdate,5,2)-#prop(xlocals.xprops("xtypelocal='Module' and xname='gl'"),"offset")
+              if per<=12
+                set xper=per
+                set xyear=year-1
+              else
+                set xper=per-12
+                set xyear=year
+              end if
+              set temp=#sql("select xyear from fadeplog where xyear="+xyear+" and xper="+xper+")
+              if #result .eq. "true"
+                error "Cannot Add--Pls Delete Log File Before Addition"
+              end if
+              if xcode .eq. ""
+                error "Please Insert Asset Code"
+              else
+                set asset = #sql("select xcode from famst where xcode='"+xcode+"'")
+                if #result .eq. "false"
+                  error "Wrong Item Code"
+                end if
+                if famst.xstatusfa("xcode='"+xcode+"'") .eq. "Disposal"
+                  error "Asset Is Already Disposed"
+                end if
+              end if
+          end event
+
+          event after
+            int liferemain=xrelife-famst.xliferemain("xcode='"+xcode+"'")
+            set liferemain=famst.xliferemain("xcode='"+xcode+"'")+liferemain
+            buffer famst
+            move famst=famst(xcode)
+            set famst.xliferemain=liferemain
+            update famst(xcode)
+          end event
+        end field
+
+        field update
+          event before
+            set temp=#sql("select xyear from fadeplog where xyear="+xyear+" and xper="+xper+")
+            if #result .eq. "true"
+              error "Cannot Add--Pls Delete Log File Before Addition"
+            end if
+            int liferemain=xrelife-famst.xliferemain("xcode='"+xcode+"'")
+            set liferemain=famst.xliferemain("xcode='"+xcode+"'")+liferemain
+            buffer famst
+            move famst=famst(xcode)
+            set famst.xliferemain=liferemain
+            update famst(xcode)
+          end event
+        end field
+
+        field delete
+          event before
+            set temp=#sql("select xyear from fadeplog where xyear="+xyear+" and xper="+xper+")
+            if #result .eq. "true"
+              error "Cannot Add--Pls Delete Log File Before Addition"
+            end if
+            int liferemain = 0
+            set liferemain = fatrn.xliferemain("xvoucher='"+xvoucher+"'")-famst.xliferemain("xcode='"+xcode+"'")
+            buffer famst
+            move famst=famst(xcode)
+            set famst.xliferemain = liferemain
+            update famst(xcode)
+          end event
+        end field
+
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Enter
+          embed onclick="clicked(this)"
+        end field
+
+        field DespatchAdd
+          embed onclick="desadd(this)"
+        end field
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function desadd(b){
+          b.value = "Top"
+          detail="desadd"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "opordcus"
+            form.searchbutton.value = "Find xcus=?"
+            //return false
+          }
+	    if (detail=="desadd"){
+            form.screen.value = "cadel"
+            form.searchbutton.value = "Find xcus=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

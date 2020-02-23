@@ -1,0 +1,30 @@
+screen pdsign
+
+     //sidebar list one
+     sections form one
+	
+	
+	 	list one
+        caption "Detail List"
+        table apvprcs
+        order xrow
+        rows 20
+        objects  xrow attrib(link "login?screen=apvprcs&command=Show&xrow=?"), ~
+             xtypetrn,xposition,xdesignation,xstatus
+        //header "Line No","Componant Type","Amount","Transaction Type"
+
+     end list
+
+     form one
+        caption "Default Signatory Setting"
+	    table pdsign
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Update,Show,Top,Clear,"<p>" ,~
+           xsignatory1,xsignatory2,xsignatory3,xsignatory4,xsignatory5,xsignatory6,~
+		xsignatory7,xsignatory8,xsignatory9,xsignatory10
+
+     end form
+
+end screen

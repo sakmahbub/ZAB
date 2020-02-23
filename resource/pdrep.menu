@@ -1,0 +1,20 @@
+//HR Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Absent Detail		   	   |#classPath+"/login?screen=*crystal pdabsent(xyear=Year,xper=Period,xstaff=From Employee,xstaff=To Employee)"
+Employee Listing                 |#classPath+"/login?menu=pdmstrep"
+Loan & Advance Checking	   	   |#classPath+"/login?screen=*crystal pdloantrn(xstaff=From Employee,xstaff=To Employee,xyear=Year,xper=Period)"
+//Transaction Listing              |#classPath+"/login?menu=pdtrnrep"
+Salary And Statements (Regular)  |#classPath+"/login?menu=pdbalrep"
+//Salary And Statements (Non Reg)|#classPath+"/login?menu=pdbalnrrep"
+//Service Charge                   |#classPath+"/login?menu=pdschgrep"
+//Bonus                            |#classPath+"/login?menu=pdbonusrep"
+//Variance Report      		   |#classPath+"/login?screen=*crystal pdvariance(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//Monthly Salary Statment		   |#classPath+"/login?screen=*crystal pdsalarysheet(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//Reconcilation Report     	   |#classPath+"/login?screen=*crystal pdreconciliation(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//Tax Assessment   			   |#classPath+"/login?screen=*crystal pditassesment(xyear=Year,xstaff=From ID,xstaff=To ID,xempcategory=Employee Category)"
+//Tax Assessment (NBR)   |#classPath+"/login?screen=*crystal pditassesmentnbr(xyear=Year,xstaff=From ID,xstaff=To ID,xempcategory=Employee Category)"
+//Tax Summary            |#classPath+"/login?screen=*crystal pditsummary(xyear=Year,xempcategory=Employee Category)"
+//OT Statement      		   |#classPath+"/login?screen=*crystal pdotstmt(xyear=Year,xstaff=Employee ID=)"
+

@@ -1,0 +1,18 @@
+
+
+
+product ZAB ERP
+
+table whcusview
+  caption "WH View"
+  columns zid,xwh,xorg,xterritory
+  primary key zid,xwh,xorg,xterritory
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view whcusview(zid,xwh,xorg,xterritory)~
+                  as  select a.zid,a.xcus,a.xorg,a.xterritory from cacus a WHERE a.xtype in ('Customer','Buyer') ~
+				  union all ~
+				  select zid,xcode,xlong,xtypeobj from xcodes where xtype='Branch' and xtypeobj='Store' and xlong<>''
+end table

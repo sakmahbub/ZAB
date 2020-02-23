@@ -1,0 +1,103 @@
+screen pdemptransfer
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Detail List"
+        table pdemptransfer
+        order xstaff,xrow
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdemptransfer&command=Show&xstaff=?&xrow=?"), ~
+                 xfdept,xtdept,xfpos,xtpos
+
+        header "Line No","Componant Type","Amount","Transaction Type"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Employee Transfer For EID "+xstaff+"</ACRONYM>"
+	      table pdemptransfer
+        order xstaff,xrow
+        fixed xstaff
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Update, Delete,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~
+          xrow attrib(row 0 1),xdate,xfdept,xtdept,xfpos,xtpos
+
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+
+        field xfdept
+          event before
+            set xfdept=pdmst.xdeptname("xstaff='"+xstaff+"'")
+          end event
+          pick code Department Name
+        end field
+
+        field xtdept
+          pick code Department Name
+        end field
+
+        field xfpos
+          event before
+            set xfpos=pdmst.xposition("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+        field add
+          event before
+            int lastnum = 0
+            int length = 0
+            set lastnum = xcodes.xnum("xtype='Department Name' and xcode='"+xtdept+"'")+1
+            set length = xcodes.xlength("xtype='Department Name' and xcode='"+xtdept+"'")
+            set xtpos=xtdept+'/'+#padl(lastnum,length,0)
+            set temp = #sql("update xcodes set xnum="+lastnum+" where xtype='Department Name' and xcode='"+xtdept+"'")
+            set temp = #sql("update pdmst set xdeptname='"+xtdept+"' where xstaff='"+xstaff+"'")
+            set temp = #sql("update pdmst set xposition='"+xtpos+"' where xstaff='"+xstaff+"'")
+          end event
+        end field
+
+        field update
+          event before
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdmst"
+            form.searchbutton.value = "Find xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

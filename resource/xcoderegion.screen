@@ -1,0 +1,114 @@
+screen xcoderegion
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xtype,xcode
+        select "xtype='Region'"
+	fixed xtype
+        rows 20
+        objects  xcode attrib(link "login?screen=xcoderegion&command=Show&xtype=?&xcode=?"),~
+                 xtrcode,xarea
+
+        headers "Name of Region","R_Code","Zone"
+     end list
+
+
+     form one
+
+	caption "Region (ALL Depot)"
+        table xcodes
+        order xtype,xcode
+        select "xtype='Region'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Update,*next,~
+                Next,Previous,"<p>" ,~
+                xcode width(50),xtrcode,xtargetshare,xarea display(constant),~
+                zactive display(hide),xtype
+		
+	field xcode
+		pick list xregion
+		caption Name of Region
+	end field
+
+	field xtrcode
+		caption Code of Region
+	end field
+
+	//field xarea
+		caption Zone
+	//end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+        field xtype
+          display hide
+          caption Type
+          default "Region"
+        end field
+
+        field xprops
+          display combo
+          pick "Addition,Deduction"
+          default "Addition"
+        end field
+
+        field xlong
+          width 40
+          height 2
+          //column 2
+        end field
+
+        field add
+          event before
+		set xwh=#wh
+            set xtype="Region"
+          end event
+        end field
+
+        field Budget
+          embed onclick="clicked(this)"
+        end field
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+    	    if (detail=="Budget"){
+            form.screen.value = "acbudget"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

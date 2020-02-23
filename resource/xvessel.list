@@ -1,0 +1,16 @@
+     list xcountry
+        table xcodes
+        order xcode
+        select "xtype = 'Vessel'"
+        navigators alpha //,group xrank "select xcode from xcodes where xtype = 'Vessel'"
+        rows 10
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'xvessel')")
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

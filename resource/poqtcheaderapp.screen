@@ -1,0 +1,233 @@
+screen poqtcheaderapp
+
+     sidebar list qtc,list grn,list reqapp//,list one
+     sections form one, jscript myscript
+
+   
+	
+	list grn
+        caption "Quality Certificate Detail List"
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=pogrndetail&command=Show&xgrnnum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where zid=pogrndetail.zid and  xitem=pogrndetail.xitem)),xqtygrn,xunitpur
+
+        headers "Row","Item","Description","Qty","Unit"
+     end list
+	 
+	   list reqapp
+        caption "Last 5 Approved Quality Certificate"
+        table pogrnappview
+       // order xporeqnum desc
+	    order xdateapp desc
+		select "xposition='"+#user+"'"
+		rows 5
+       objects xgrnnum attrib(link "abc" embed onclick="return pickItem(this)"),~
+	   xdate attrib(name xdate#),xdesc attrib(name xdesc#),xregi attrib(name xregi#),xdateapp attrib(name xdateapp#)
+       headers "QC No","Date","Division","Car/Other","Approved Date"
+     end list
+	 
+	   list qtc
+        caption "Quality Certificate List"
+        table pogrnheader
+        order xgrnnum
+       // fixed xgrnnum
+	   select "left(xgrnnum,4)='QC--' and xstatusgrn='Recommended' and xsuperiorsp='"+#user+"'"
+        rows 20
+        objects  xgrnnum attrib(link "login?screen=poqtcheaderapp&command=Show&xgrnnum=?"), ~
+                 xdate 
+		headers "Quality Certificate No","Date"
+	end list
+
+	 list one
+        caption "Work Order List"
+        table pogrnheader
+        order xpornum
+        fixed xgrnnum
+        rows 20
+        objects  xpornum attrib(link "login?screen=poqualitycertifi&command=Show&xpornum=?"), ~
+                 xdate
+
+
+        headers "Work Order No.","Date"
+     end list
+
+     form one
+        caption "Quality Certificate Approval"
+        table pogrnheader
+        order xgrnnum desc
+        return "login"
+		select "left(xgrnnum,4)='QC--'"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Update,Invoice Cost,~
+                Approved,"<p>" ,~//Detail,
+                xgrnnum,xdate,xcus display(const),xorg,xwh display(const),xwhdesc,~
+                xstatusgrn display(const),xinvnum,xref display(hide),~
+				xpornum display(hide),~
+				xvoucher display(hide),zauserid display(hide),prepr,xregi display(const),~
+				xnote display(const),xnote1,xstatusjv display(hide),xlcno display(hide),xsuperiorsp display(hide)
+				
+		field xgrnnum
+		pick list qtcnum
+		caption QC Number
+		evevnt after
+		set globals(xsuperiorsp)=xsuperiorsp
+		if xsuperiorsp .ne. #user //"Confirmed" 
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Approved.display)="hidden"
+       		  end if
+    		  if pogrnheader.xlcno("xgrnnum='"+xgrnnum+"'") .eq. "" 
+		         	set #field(Invoice.display)="hidden"
+       		  end if
+		end event
+        	width 18
+        end field
+		  
+		  field xinvnum
+			caption Ref No
+		  end field
+		  
+		  field xwh
+			//display text
+			//pick list xwh
+          end field
+		  
+		   field xregi
+			caption Car / Other
+          end field
+		  
+		field xwhdesc
+			attrib local
+			display const
+			caption Store Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+        field xlcinfo
+          attrib local
+          display const
+          column 3
+            caption <br><FONT SIZE=4 COLOR=red><ACRONYM>LC Info</ACRONYM></font>
+        end field
+
+ 		  field xorg
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+		  
+		    field prepr
+		  	attrib local
+		  	dispaly const
+		  	caption Preparer
+		  	event after
+		  		set prepr=pdmst.xname("xposition='"+zauserid+"'")
+		  	end event
+		  end field
+
+
+        field update
+          event before
+          end event
+        end field
+
+	field transfer
+	event after
+		set temp = #sql("update imtrn set xwh='"+xwh+"' where xdocnum='"+xgrnnum+"'")
+		set temp = #sql("update pogrnheader set xwh='"+xwh+"' where xgrnnum='"+xgrnnum+"'")
+
+	end event
+	end field
+
+        field xnote
+		caption Inspection Report(Preparer)
+          width 50
+          column 4
+        end field
+		
+		  field xnote1
+		caption Inspection Report(Head of the Department)
+          width 50
+          column 4
+        end field
+
+        field xgrnnum
+           event after
+		    class careports(getjspReport{poqtc,1,xgrnnum,View Quality Certificate})
+              set globals(xgrnnum) = xgrnnum
+           end event
+        end field
+
+        field Approved
+           event before
+            if xstatusgrn .eq. "Confirmed"
+              error "Cannot Proceed - GRN Already Confirmed"
+			else if xwh .eq. ""
+              error "Cannot Proceed - Store is Blank"
+			  else
+			  set dphead=pdmst.xstaff("xposition='"+#user+"'")
+            end if    
+           end event
+           event after
+			 set temp = #spsql(zabsp_DATETIME_Update,#id,#user,xgrnnum,"pogrnheader","xdatedph","xdphead","xstatusgrn","xgrnnum","Confirmed")
+			   set temp = #sql("Update pogrnheader set xsuperiorsp='' where xgrnnum='"+xgrnnum+"'")
+              action show
+           end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "poqtcdetail"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Amendment"){
+            form.screen.value = "opdcamend"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Invoice Cost"){
+            form.screen.value = "pogrncost"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		  function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xgrnnum.value=link.text
+          }else{
+            document.one.xgrnnum.value=link.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+end screen

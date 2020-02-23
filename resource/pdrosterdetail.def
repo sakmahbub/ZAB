@@ -1,0 +1,16 @@
+product ZAB ERP
+
+table pdrosterdetail
+  caption "PD Roster Header"
+
+  columns ztime,zutime,zauserid,zuuserid,zid,xroster,xrow,xgroup,xdeptname,xstaff,~
+			xshift,xyearperdate,xdate,xshiftimin,xshiftimout,xstatus,xnote
+
+  primary key zid,xroster,xyearperdate,xstaff,xshift
+
+  foreign key
+        zid references zbusiness.zid
+		 zid,xroster references pdrosterheader.zid,xroster
+  end foreign key
+
+end table

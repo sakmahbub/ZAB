@@ -1,0 +1,18 @@
+     list xacc
+        table acmstview
+        order xacc
+		linksql select xdesc from acmstview
+        select "(xacc like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%')"
+
+        rows 20
+        objects xacc attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xdesc,xhrc1,xhrc1desc,xhrc2,xhrc2desc,xhrc3,xhrc3desc,xacctype
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        headers "Account Code","Description","Level 1","Level 1 Description","Level 2","Level 2 Description","Level 3","Level 3 Description","Account Type"
+     end list
+
+

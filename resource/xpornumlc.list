@@ -1,0 +1,14 @@
+     list xpornumlc
+        caption "Items containing: "+zvalue
+        table polistview
+        order xpornum
+        select "(xpornum like '%"+zvalue+"%' or xdate like '%"+zvalue+"%') and xtype='LC' and xlcno=''"
+        searchselect "xtype='LC' and xlcno=''"
+		rows 20
+        objects xpornum attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdate,xtornum,xporeqnum,xcus,xorg,xlcno
+				
+		headers "PO No","Date","Requisition No","PR No","Supplier ID","Supplier Name","LC No"		
+     end list 
+
+

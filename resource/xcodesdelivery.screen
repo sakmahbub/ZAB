@@ -1,0 +1,66 @@
+screen xcodesdelivery
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xtype,xcode
+        select "xtype='Delivery Location'"
+        rows 50
+        objects  xcode attrib(link "login?screen=xcodesdelivery&command=Show&xtype=?&xcode=?"),~
+                xlong,zactive
+
+        //headers none
+     end list
+
+     form one
+
+     caption "Delivery Location Master"
+        table xcodes
+        order xcode
+        select "xtype='Delivery Location'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next,~
+                Top,Previous,Next, Bottom,"<p>" ,~
+                xtype display(hide),~
+                xcode width(10),~
+                xlong,zactive//xmadd,
+
+		field xcode
+		caption Location Code
+		end field
+		
+		field xlong
+		caption Delivery Location
+		 width 60
+         height 3
+        end field
+		
+	   field xtypeobj
+		caption Store Type
+		pick "Store,Virtual Store"
+        end field
+        
+
+        field add
+          event before
+		  set dl=xcodes.xlong("xtype='Delivery Location' and xlong='"+xlong+"'")
+		  if xlong .eq. ""
+			error "Please add Delivery Location!"
+		  else if xlong .eq. dl
+		    error "Location Already Added!"
+		  else
+           set xtype="Delivery Location"
+		   set xcode = #trn("Delivery Location","DL--",6)
+		  end if
+         end event
+        end field
+
+
+     end form
+
+
+end screen

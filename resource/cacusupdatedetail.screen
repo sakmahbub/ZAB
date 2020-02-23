@@ -1,0 +1,246 @@
+screen cacusupdatedetail
+     
+     sections  form one,jscript myscript
+//     sidebar list one	-Special_Discount,Special_Rate,*next,Top,Previous,Next,Bottom,Project Flag,Credit Info
+
+  list one
+    caption "Discount List"
+    table cacusdisc
+    order xcus,xitem
+    fixed xcus
+    rows 20
+    objects  xitem attrib(link "login?screen=cacusdisc&command=Show&xcus=?&xitem=?"), ~
+             desc equals((select xdesc from caitem where zid=cacusdisc.zid and xitem=cacusdisc.xitem)),xdisc
+	headers "Item","Description","Discount"
+  end list
+  
+  form one
+     form one
+        caption "Customer Master (Update) for: "+xcus
+      	table cacus
+        primarykey xcus
+        order xcus
+	  fixed xcus	
+//        select "left(xcus,2)='"+#wh+"'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Update,Show,Back,Special_Discount,*next,Special_Bonus,Credit Info,"<p>" ,~ //Special_Rate,
+                xorg,xmadd,xcontact,xterritory,xgcus,xsp display(const),xspname,xmarket,xroute,~
+                xphone,xpaymentterm,~
+		    xinvtoinvcr display(hide),xcrterms display(hide),xcrlimit display(hide),~ //xcrused display(hide),~
+		    xdateeff display(hide),xdateexp display(hide),~
+		    xref display(hide),~
+                xallowcrinv display(hide),xallbndisc display(hide),xdisc,~
+                // hide
+                xstatuscus display(hide),xfax display(hide),xemail display(hide),xwh display(hide)
+	field xstatuscus
+		default "Open"
+	end field
+
+       field xcus
+		event after
+	     	      if xpaymentterm .eq. "Cash"
+		         	set #field(Credit.display)="hidden"
+       	      end if
+			set globals(xcus)=xcus
+		end event
+	    end field
+	
+	    field xterritory
+		pick "select xcode from xcodes where xtype='Territory' and zactive='1' and xwh='"+#wh+"'"
+	    end field
+ 	
+	    field xnote
+		weight 90
+		height 2
+		column 2
+	    end field
+ 	
+	    field xdateeff
+		default "2999-01-01"
+	    end field
+
+	    field xdateexp
+		default "2999-01-01"
+	    end field
+
+	    field xdum
+		attrib local
+		caption 
+		display const
+	    end field
+
+	    field xsp
+		attrib local
+		caption MIO Code
+		display const
+		event after
+			set xsp = cappo.xsp("xterritory='"+xterritory+"' and zactive = 1")
+		end event
+	    end field
+
+	    field xspname
+		attrib local
+		caption MIO Name
+		display const
+		event after
+			set xspname = cappo.xname("xsp='"+xsp+"'")
+		end event
+	    end field
+
+	    field xsoname
+		attrib local
+		caption Sales Officer Name
+		display const
+		event after
+			set xsoname = cappo.xname("xsp='"+xso+"'")
+		end event
+	    end field
+
+	    field xprjname
+		attrib local
+		caption Project Name
+		display const
+		event after
+			set xprjname = xcodes.xlong("xtype='Project Flag' and xcode='"+xproject+"'")
+		end event
+	    end field
+
+		field xwh
+            default #wh
+           end field
+
+          field xmarket
+		//display const
+            pick "select xcode from xcodes where xtype='Market' and xwh='"+#wh+"'"
+          end field
+
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+        set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+
+
+    field add
+      event before
+        if xgcus .eq. ""
+          error "Cannot Proceed -- Please Choose Customer Group"
+        else if xorg .eq. ""
+          error "Cannot Proceed -- Customer Description is Blank"
+        //*********** GETTING TRN NO ****************
+        else
+	  	  //set xsp=cappo.xsp("xterritory='"+xterritory+"'")	
+	  	  set xstatuscus="Open"	
+ 	  	  set xallowcrinv="No"
+	  	  set xallbndisc="No"
+          set trn = #wh+"--"
+          set xcus = #trn("Customer Code",trn,10)
+        end if
+      end event
+    end field
+
+    field update
+        event before
+	 	if xterritory .eq. ""
+	    		error "Cannot Proceed -- Plesae Choose Territory"
+		else
+	  		set xsp=cappo.xsp("xterritory='"+xterritory+"'")	
+		end if
+	end event
+    end field	
+
+    field xcrused1
+  	  attrib local
+  	  display hide
+    	caption Credit Given
+      event after
+		set xcrused=cacreditview.xcrused("xcus='"+xcus+"'")
+      end event
+    end field
+
+
+    field xorg
+    	caption Customer Name
+    end field
+
+    field Back
+        embed onclick="clicked(this)"
+    end field
+
+    field Special_Discount
+        embed onclick="clicked(this)"
+    end field
+
+	
+    field Special_Rate
+        embed onclick="clicked(this)"
+    end field
+
+    field Project
+        embed onclick="clicked(this)"
+    end field
+
+    field Credit
+        embed onclick="clicked(this)"
+    end field
+
+    field Special_Bonus
+        embed onclick="clicked(this)"
+    end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Back"){
+            form.screen.value = "cacusupdateheader"
+            form.searchbutton.value = "Find xcus=?"
+          }
+          if (but == "Special_Discount"){
+            form.screen.value = "cacusdiscupdate"
+            form.searchbutton.value = "Find xcus=?"
+          }
+
+          if (but == "Special_Rate"){
+            form.screen.value = "cacuspriceupdate"
+            form.searchbutton.value = "Top"
+          }
+
+          if (but == "Special_Bonus"){
+            form.screen.value = "cacusbonusup"
+            form.searchbutton.value = "Find xcus=?"
+          }
+
+	if (but=="Project Flag"){
+            form.screen.value = "cacuspjdetailupdate"
+            form.searchbutton.value = "Find xcus=?"
+          }	
+          if (but == "Credit Info"){
+            form.screen.value = "cacuscreditupdate"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

@@ -1,0 +1,31 @@
+//HR Reports.menu
+//-------------------------------------------------------------------
+option                             |action
+//-------------------------------------------------------------------------
+//Absent Detail		   	     |#classPath+"/login?screen=*crystal pdabsent(xyear=Year,xper=Period,xstaff=From Employee,xstaff=To Employee)"
+//Salary Sheet 			     |#classPath+"/login?screen=*jspcrystal pdfacsalaryshtforall(xempcategory=Employee Category,xyear=Year,xper=Period,xsign1=First Signatory,xsign2=Second Signatory)"
+Salary Sheet 			     |#classPath+"/login?screen=*jspcrystal pdfacsalaryshtforall(xempcatefac=Employee Category,xdeptname=Department Name,xyear=Year,xper=Period)"
+Bonus Sheet 			     |#classPath+"/login?screen=*jspcrystal pdbonussht(xempcatefac=Employee Category,xyear=Year,xper=Period,xnote=Note)"
+Pay Slip                          |#classPath+"/login?screen=*jspcrystal pdselfpayslip(xstaff=Employee ID,xyear=Year,xper=Period)"
+Employee Listing                   |#classPath+"/login?menu=pdmstrep"
+Loan & Advance Checking	   	     |#classPath+"/login?screen=*jspcrystal pdloantrn(xstaff=From Employee,xstaff=To Employee)"
+Transaction Listing                |#classPath+"/login?menu=pdtrnrep"
+Search Emp By Joining Date 	     |#classPath+"/login?screen=*jspcrystal pdDOJCheck(xper=Month,xyear=Year)"
+//-----
+Pay Advice By Employee  	     |#classPath+"/login?screen=*jspcrystal pdpayadvicebyemp(xstaff=From Employee,xstaff=To Employee,xyear=Year,xper=Period)"
+Pay Advice By Employee With Bonus  |#classPath+"/login?screen=*jspcrystal pdpayadvicebyempB(xstaff=From Employee,xstaff=To Employee,xyear=Year,xper=Period)"
+//-----
+
+//Salary Sheet With Bonus		     |#classPath+"/login?screen=*jspcrystal pdfacbonussht(xyear=Year,xper=Period,xsign1=First Signatory,xsign2=Second Signatory)"
+//Salary Sheet Without Over Time     |#classPath+"/login?screen=*jspcrystal pdwosaleove(xyear=Year,xper=Period,xsign1=First Signatory,xsign2=Second Signatory)"
+//-----
+//Only Bonus Sheet			     |#classPath+"/login?screen=*jspcrystal pdfacbonusshtonly(xyear=Year,xper=Period,xsign1=First Signatory,xsign2=Second Signatory)"
+//Only Over Time Sheet		     |#classPath+"/login?screen=*jspcrystal pdovtime(xyear=Year,xper=Period,xsign1=First Signatory,xsign2=Second Signatory)"
+//-----
+//Salary Transfer Letter to Bank     |#classPath+"/login?screen=*jspcrystal pdfacbankletter(xbank=Bank,xyear=Year,xper=Period,xsign1=First Singnatory,xdesig1=First Desgingation,xsign2=Second Singnatory,xdesig2=Second Desgingation,xyesno=Over Time,xyesno=Bonus)"
+//Bonus Transfer Letter to Bank      |#classPath+"/login?screen=*jspcrystal pdbonusbnklt(xbank=Bank,xyear=Year,xper=Period,xsign1=First Singnatory,xdesig1=First Desgingation,xsign2=Second Singnatory,xdesig2=Second Desgingation)"
+//Over Time Transfer Letter to Bank  |#classPath+"/login?screen=*jspcrystal pdovbnklt(xbank=Bank,xyear=Year,xper=Period,xsign1=First Singnatory,xdesig1=First Desgingation,xsign2=Second Singnatory,xdesig2=Second Desgingation)"
+//Tax Assessment   			   |#classPath+"/login?screen=*crystal pditassesment(xyear=Year,xstaff=From ID,xstaff=To ID,xempcategory=Employee Category)"
+//Tax Assessment (NBR)   |#classPath+"/login?screen=*crystal pditassesmentnbr(xyear=Year,xstaff=From ID,xstaff=To ID,xempcategory=Employee Category)"
+//Tax Summary            |#classPath+"/login?screen=*crystal pditsummary(xyear=Year,xempcategory=Employee Category)"
+//OT Statement      		   |#classPath+"/login?screen=*crystal pdotstmt(xyear=Year,xstaff=Employee ID=)"

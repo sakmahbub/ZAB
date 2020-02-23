@@ -1,0 +1,11 @@
+     list xproject
+        table projectallview
+        order xcode
+		 select "(xcode like '%"+zvalue+"%' or xlong like '%"+zvalue+"%')"
+         searchselect "xtype='Project'"
+		rows 20
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+			xlong	
+     end list
+
+

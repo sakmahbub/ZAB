@@ -1,0 +1,149 @@
+screen cacusbuyer
+
+     //sidebar list one,lst two
+     sections  form one, jscript myscript
+	
+
+     form one
+        caption "Buyer Master"
+      	table cacus
+        primarykey xcus
+        order xcus
+        select "xtype in ('Buyer','Both')"
+        return "login"
+        layout 2
+        pstyle 3 
+        objects Show,Clear,*next,Add,Update,Delete,*next, Top,Previous,Next,Bottom,"<p>" ,~ //Update,Agreement Products,Terms & Condition,Transfer,
+                xcus,xorg,xmadd,~
+                xemail, xphone,xmobile, xfax, xurl, ~
+                xgsup,xcontact,xstatuscus display(hide),xtype display(hide),xvatrate,xalias display(hide),xnum display(hide)//,xcode,xsupcat
+
+	field xstatuscus
+		default "Open"
+	end field
+	
+		 
+	field xcus
+		caption Buyer Code
+		pick list xbuyer
+	 event after
+		 set globals(xcus)=xcus
+		 //class careports(getReport{supplierlist;1;in;zid;xcus;View Supplier List})
+		 //class careports(getReport{supplier;2;in,st;zid,xcus;xcus;View Supplier})
+	 end event
+    end field
+
+    field xgsup
+		caption Buyer Group
+		pick code Supplier Group
+    end field
+   
+		
+		field Transfer
+		 event before
+		if xcode .eq. ""
+		    error "Please Select Concern Name!"
+		else if xcus .eq. ""
+		    error "Please Select From Item"
+		else
+		 print "Party Transferred"
+		end if
+		end event
+          event after
+            set temp = #spsql(zabsp_Master_Data_Transfer,#id,#user,xcode,xcode,xcus,xcus,"Party Transfer")
+          end event
+        end field
+
+    field add
+      event before
+	  set org=#sql("select xorg from cacus WHERE xorg='"+xorg+"' and xtype='Buyer'")
+        if xgsup .eq. ""
+          error "Cannot Proceed -- Please Choose Buyer Group"
+        else if xorg .eq. ""
+          error "Cannot Proceed -- Party Description is Blank"
+		 else if org .eq. xorg
+          error "Cannot Proceed -- Party Already Exists" 
+        //*********** GETTING TRN NO ****************
+        else
+			set xtype="Buyer"
+			set xstatuscus="Open" 
+			set xallowcrinv="No"
+			set xallbndisc="No"
+			 set xcus = #trn("Party Code","PAR-",10)
+
+        end if
+      end event
+    end field
+	
+	
+	  field Update
+      event before
+        if xcus .eq. ""
+          error "Cannot Proceed -- Please Choose Buyer Group"
+        else if xorg .eq. ""
+          error "Cannot Proceed -- Company name is Blank"
+
+        //*********** GETTING TRN NO ****************
+			//else
+			//set xtype="Buyer"
+        end if
+      end event
+    end field
+
+
+field delete 
+	event before
+	  
+       set sup=acdetail.xsub("xcus='"+xcus+"'")
+	   if xcus .eq. sup
+	   error "Can not delete record"
+	   end if
+	   end event
+end field
+
+   field Agreement
+        embed onclick="clicked(this)"
+    end field
+
+	
+    field Terms
+        embed onclick="clicked(this)"
+    end field
+ 
+       embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+         <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "casup"
+            form.searchbutton.value = "Find xcus=?"
+          }
+          if (but == "Agreement Products"){
+            form.screen.value = "casupitem"
+            form.searchbutton.value = "Find xcus=?"
+          }
+
+          if (but == "Terms & Condition"){
+            form.screen.value = "casupterms"
+			form.searchbutton.value = "Find xcus=?"
+            //form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,12 @@
+     list xmsg
+        table caclause
+        order xmsgtype,xcode
+        fixed xmsgtype
+        select "(xcode like '%"+zvalue+"%' or xlong like '%"+zvalue+"%')"
+        navigators alpha
+        rows 20
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'xcode')"), ~
+                xlong
+     end list
+
+

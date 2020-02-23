@@ -1,0 +1,15 @@
+//Administration.menu
+//---------------------------------------------------------------------------------------
+option                  |action                                          
+//---------------------------------------------------------------------------------------
+Scheduling Backup           |#classPath+"/login?screen=zdbschedulebackup" 
+Scheduling Cleanup           |#classPath+"/login?screen=zdbschedulecleanup"       
+//Sales Dash Board   		|#classPath+"/login?screen=opdashboard"			 |ac     |      |sales.png|180
+//Sales Dash Board   		|#classPath+"/login?screen=opdashboard"	
+//File Uplod   |#classPath+"/login?menu=fupload" 
+//Send SMS                |#classPath+"/login?screen=opsms"     |ar     |      |150
+//Invoice Entry (Admin)            |#classPath+"/login?screen=opdoheaderadmin"
+//Error Handling                   |#classPath+"/login?menu=invupdate"
+//Error Reports           |#classPath+"/login?menu=errorreport"     
+//-------------------------------------------------------------------
+

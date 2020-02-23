@@ -1,0 +1,18 @@
+     list pdotleave
+        caption "OT Hour"
+        table pdotview
+        order xstaff
+        select "(xstaff like '%"+zvalue+"%')"
+        rows 10
+        objects xstaff attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                name equals((select xname from pdmst where zid=pdotview.zid and xstaff=pdotview.xstaff)),~
+                xdate,xothours
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        headers "Emp ID","Emp Name","Date","OT Hours"
+     end list
+
+

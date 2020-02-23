@@ -1,0 +1,122 @@
+screen pdotabsdetail
+
+    sidebar list emp,list otabs
+    sections form one,jscript myscript
+
+  	list emp
+        caption "Employee List of Department : "+xdeptname
+        table pdmst
+        order xdeptname,xstaff
+        //fixed xdeptname
+		select "xdeptname = '"+xdeptname+"'"
+        rows 20
+        objects  xstaff attrib(link "abc" embed onclick="return pickItem(this)"), ~
+				 xname,xdesignation
+
+        header "Staff ID","Name","Designation"
+
+     end list
+
+  	list otabs
+        caption "OT and Absent Entry Detail"
+        table pdotabsdetail
+        order xyear,xper,xstaff
+        fixed xyear,xper
+        rows 20
+        objects  xstaff attrib(link "login?screen=pdotabsdetail&command=Show&xyear=?&xper=?&xstaff=?"), ~
+				 name equals((select xname from pdmst where zid=pdotabsdetail.zid and xstaff=pdotabsdetail.xstaff)),~
+                 xothours,xdayssalded
+
+        header "Staff","Name","OT Hour","Absent Days"
+
+     end list
+
+
+     form one
+        caption "OT and Absent Entry Detail"
+	    table pdotabsdetail
+        order xyear,xper,xstaff
+        fixed xyear,xper
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Update,Delete,Clear,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~
+				xstaff,xname,xothours,xdayssalded
+
+
+        field xname
+          attrib local
+          caption Name
+          display const
+		  event after
+			set xname=pdmst.xname("xstaff='"+xstaff+"'")
+		  end event
+        end field
+
+        field xnote
+          width 80
+          height 2
+          column 2
+        end field
+
+        field add
+          event before
+//            if xtype .eq. "P.F. for both Employee and Eployer"
+//              double basic = #sql(double,"select sum(xamount) from pdsalarydetail where xstaff='"+xstaff+"' and xtype='Basic'")
+//              set xamount = basic*20
+//              set xamount = xamount/100
+            end if
+
+          end event
+        end field
+
+        field update
+          event before
+            set typetrn = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+            if typetrn .eq. "Addition"
+              set xsign=1
+            else
+              set xsign = -1
+            end if
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdotabsheader"
+            form.searchbutton.value = "Find xyear=?&xper=?"
+            //return false
+          }
+        }
+        function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xstaff.value=link.text
+          }else{
+            document.one.xstaff.value=link.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

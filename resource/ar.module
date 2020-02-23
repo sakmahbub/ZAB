@@ -1,0 +1,11 @@
+//ar.module
+module AR
+     caption "Accounts Receivable"
+     description ""
+
+     transactions AR Transactions
+     codes
+//     properties offset=0;bs=20;pl=60;placcount="Profit & Loss Appropriation Account"
+end module
+
+

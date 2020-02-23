@@ -1,0 +1,9 @@
+//Operation Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Sales Reports                    |#classPath+"/login?menu=operrepsales"
+Ledger & Ageing Reports          |#classPath+"/login?menu=operrepled"
+Inventory Reports                |#classPath+"/login?menu=operrepim"
+//-------------------------------------------------------------------
+

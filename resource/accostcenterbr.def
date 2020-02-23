@@ -1,0 +1,20 @@
+product ZAB ERP
+
+table accostcenterbr
+  caption "AR TO GL View"
+  columns zid,xcode,xlong
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view accostcenterbr (zid,xcode,xlong) ~
+                  as select zid,xcode,xlong ~
+                  from xcodes where xtype='Cost Center' and xhrc1='11' 
+
+		 
+
+
+end table

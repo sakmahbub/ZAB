@@ -1,0 +1,14 @@
+     list prnno
+        caption "Purchase Returned List"</b>"
+        table imtorheader
+        order xtornum
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4) in ('PRN-'))"
+		searchselect "left(xtornum,4) in ('PRN-')"
+        rows 10
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xordernum,xgrnnum
+		 
+		 headers "PRN List", "Date", "Ref","GRN No"
+     end list
+
+

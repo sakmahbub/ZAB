@@ -1,0 +1,109 @@
+screen imcogs
+
+     sidebar  list imtoglsr,list imtoglsales
+     sections form one,jscript myscript
+	
+      list imtoglsales
+        caption "Pending COGS Sales"
+        table imconsumptionview
+		select "xtrn in ('Sales')"	
+        rows 200
+        objects xdate,xtrn,xgitem,xaccdr,xnote,xacccr,xdesc,xprime// gitem  attrib(link "login?screen=imaveragecost&command=Show&ximtrnnum=?"),xdate
+		headers "Date","Transaction","Item Group","Debit Acc","Description","Credit Acc","Description","Amount"
+	total "","","Total", "","","","","",sum
+	end list
+	
+      list imtoglsr
+        caption "Pending COGS Sales Return"
+        table imconsumptionview
+		select "xtrn in ('Sales Return')"	
+        rows 200
+        objects xdate,xtrn,xgitem,xaccdr,xnote,xacccr,xdesc,xprime// gitem  attrib(link "login?screen=imaveragecost&command=Show&ximtrnnum=?"),xdate
+		headers "Date","Transaction","Item Group","Debit Acc","Description","Credit Acc","Description","Amount"
+	total "","","Total", "","","","","",sum
+	end list
+
+     form one
+        caption "COGS Transfer To GL"
+        table imtrn
+        primarykey ximtrnnum
+        order ximtrnnum
+        return "login"
+        pstyle 3
+        layout 2
+        objects Clear,Transfer to GL,"<p>" ,~
+                xstartdate,xenddate,xdate,xtrn
+
+        field xppname
+		attrib local
+		caption Delivery Name
+		display const
+		//pick list capp
+		event after
+			set xppname=cappo.xname("xpp='"+xpp+"'")
+		end event
+        end field
+
+
+        field xtroute
+		attrib local
+		caption To Route
+		display text
+		default "z"
+		pick list xroute
+        end field
+		
+		field xdate
+		caption GL Date
+        end field
+		
+        field xtrn
+          caption IM Transaction Code
+          display combo
+		  pick "Sales,Sales Return"
+          //pick "select xtrn from xtrn where xtypetrn = 'Inventory Transaction'"
+        end field
+
+
+
+        field Transfer
+		event before
+		if xtrn .eq. ""
+		error "Please select transaction type!"
+		end if
+		end event
+        event after
+                set temp = #spsql(zabsp_IM_transferIMltoGL,#id,#user,xstartdate,xenddate,xdate,xtrn)
+        end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "opsumprocdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

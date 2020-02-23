@@ -1,0 +1,10 @@
+Receipts And Adjustment.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Sales Return Allocation (NPL)	   |#classPath+"/login?screen=arcasreturn"	 |ac     |      |150
+//Sales Return Allocation (NCH)	   |#classPath+"/login?screen=arcasreturnnch"	 |ac     |      |150
+//Sales Return Allocation (NAC)    |#classPath+"/login?screen=arcasreturnnac"	 |ac     |      |150
+//Sales Return Allocation (RBB)    |#classPath+"/login?screen=arcasreturnrbb"	 |ac     |      |150
+//-------------------------------------------------------------------
+

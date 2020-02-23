@@ -1,0 +1,90 @@
+screen cagiftitem
+
+     caption "Gift Item"
+     sidebar list one
+     sections  form one, jscript myscript
+
+     list one
+        caption "Gift List"
+        table cagiftitem
+        order xitem,xqty
+        fixed xitem
+        rows 20
+        objects  xgiftitem attrib(link "login?screen=cagiftitem&command=Show&xgiftitem=?&xgiftitem=?"), ~
+		     desc equals((select xdesc from caitem where caitem.zid=cagiftitem.zid and caitem.xitem=cagiftitem.xgiftitem)),~
+                 xdateeff,xdateexp,xqtybonus,xwh
+
+	  headers "Code","Description","Effictive Date","Expiry Date","Gift Item Qty","Brach Code"
+     end list
+
+     form one
+        caption "Gift Item "+xitem
+        table cagiftitem
+        primarykey xitem,xgiftitem
+        order xitem,xgiftitem
+        fixed xitem
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add, Clear, Update, Delete,Show,*next,Return, Top, Bottom,"<p>" ,~
+                xwh,xdumy,xgiftitem,xdesc,xdateeff,xdateexp,xqty,xqtybonus
+
+        field xdesc
+          attrib local
+          caption Grif Item Description
+          display const
+          event after
+            set xdesc = caitem.xdesc("xitem='"+xgiftitem+"'")
+          end event
+        end field
+
+	  field xdumy
+	    atrrib local
+	    caption Branch Description
+	    display const
+	    event after
+		set xdumy=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+	    end event
+	  end field
+
+        field xqty
+          caption Quantity Applicable
+        end field
+
+	  field xqtybonus
+	    caption Gift Item Quantity
+	  end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	    if (detail=="Return"){
+            form.screen.value = "caitem"
+            form.searchbutton.value = "Find xitem=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,82 @@
+screen potermsadmin
+
+     sidebar list one
+     sections form one,  jscript myscript
+
+     list one
+        caption "PO Detail List For "+xpornum
+        table poterms
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow attrib(link "login?screen=potermsadmin&command=Show&xpornum=?&xrow=?"), ~
+                xcode,xnote //equals((select xlong from xcodes where xtype='PO Terms & Condition' and xcode=xcodes.xcode))
+
+
+//        headers "Row","Item","Description","Qty","Rate","Disc %","Disc Fixed","Line Amount"
+//	  total "Total","","","","",sum	
+     end list
+
+
+     form one
+        caption "Terms & Condition For "+xpornum
+        table poterms
+        order xpornum,xrow
+        fixed xpornum
+        //select
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add, Update, Delete,Clear, Show,*next,Return,Top, Previous, Next, Bottom,"<p>",~
+                xrow attrib(row 0 1),xcode,xnote
+                
+        embed onsubmit="return submitit(this)"
+
+        field xcode
+        	caption Terms Code
+        	pick list xterms
+        end field
+        
+        field xnote
+        	captoin Terms & Condition
+        end field
+        
+	    field add
+	    	event before
+        		set xnote=xcodes.xlong("xtype='PO Terms & Condition' and xcode='"+xcode+"'")
+	    	end event
+	    end field
+	    
+	    field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "poordheadercashadmin"
+            form.searchbutton.value = "Find xpornum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

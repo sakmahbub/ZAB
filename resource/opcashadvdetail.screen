@@ -1,0 +1,191 @@
+screen opcashadvdetail
+
+     sidebars list reqlist,list one
+     sections form one, jscript myscript
+
+       list reqlist
+    	caption "Item List For JOB No "+xordernum
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        select "(xlineamt-xadamount)<>0"
+        rows 20
+        objects xorderrow attrib(name xorderrow#),xitem attrib(link "abc" embed onclick="return pickItem(this:xlineamt#:xunit#:xorderrow#)"),~
+        desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem)),~
+        (xlineamt-xadamount) attrib(name xlineamt#),xunit attrib(name xunit#)
+        
+       totals "","Total","",sum,""
+	   header "Line No","Item Code","Description","Amount","Unit"
+     end list
+	 
+	 
+	 
+	 list one
+        caption "Advance Against JOB Detail List."
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=opcashadvdetail&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xlineamt
+
+		headers "Line No","Item","Description","Amount"
+		totals "","Total","",sum
+     end list
+
+
+     form one
+        caption "Advance Against JOB Detail For : "+xporeqnum
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+               Add,Update,Delete,Show,Clear,*next, Return,Top, Previous, Next, Bottom,~
+                xrow attrib(row 0 1),xunitpur display(hide),xdum,~
+                xitem,xdesc,xqtyreq display(hide),xqtyapv display(hide),xrate display(hide),xlineamt,xadjustment display(hide),xdocrow,xnote,xqtypor display(hide)//xep display(hide)
+
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+		
+		 field xlineamt
+          caption Total Amount
+        end field
+		
+		 field xqtyreq
+         default 1
+        end field
+		
+		field xitem
+		 caption Cost Code
+       pick list costitem
+        end field
+		
+		 field xunitpur
+		  caption Unit
+		  pick
+        end field
+		
+		 field xdocrow
+        attrib readonly
+        end field
+		
+		 field xdum
+		 attrib local
+		display const
+          caption
+        end field
+		
+		 field xlineamt
+          caption Amount
+        end field
+		
+		 field xrow
+        event after
+		if xstatusreq .ne. ""
+		set #field(Update.display)="hidden"
+		set #field(Add.display)="hidden"
+		set #field(Delete.display)="hidden"
+		end event
+        end field
+		
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+
+        field add
+          event before
+            set xunit = caitem.xunitpur("xitem='"+xitem+"'")
+            set xqtyapv=xqtyreq
+			set xqtypor=0
+			set xrate=1
+			set xadjustment=0
+			//set xlineamt=xqtyapv*xrate
+			set xunitpur=#trim(xunitpur)
+          end event
+          event after
+		 // set temp=#sql("Update oporddetail set xadamount='"+xlineamt+"' where xordernum='"+xordernum+"' and xorderrow='"+xdocrow+"'")
+		  set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xporeqnum,xordernum,xdocrow,xrow,"opcashadvdetail")
+          end event
+        end field
+
+        field update
+          event before
+			set xunitpur=#trim(xunitpur)
+			//set xlineamt=xqtyapv*xrate
+          end event
+          event after
+		// set temp =  #sql("update poreqheader set xep='"+ep+"' where xporeqnum='"+xporeqnum+"'")
+		  set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xporeqnum,xordernum,xdocrow,xrow,"opcashadvdetail")
+          end event
+        end field
+		
+		field delete
+          event before
+		set poreqnum=xporeqnum
+		set ordernum=xordernum
+		set docrow=xdocrow
+		set row=xrow
+          end event
+          event after
+		  //set temp=#sql("Update oporddetail set xadamount=0 where xordernum='"+ordernum+"' and xorderrow='"+docrow+"'")
+		  set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,poreqnum,ordernum,docrow,row,"opcashadvdetail")
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+  jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcashadvheader"
+            form.searchbutton.value = "Find xporeqnum=?"
+          }
+          return result
+        }
+		
+	  function pickItem(link,amt,unit,orderrow){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+            document.one.xlineamt.value=amt.text
+            document.one.xunitpur.value=unit.text
+            document.one.xdocrow.value=orderrow.text
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xlineamt.value=amt.innerText
+            document.one.xunitpur.value=unit.innerText
+            document.one.xdocrow.value=orderrow.innerText
+          }
+          return false
+        }
+		
+		
+        </script>
+     end jscript
+	 
+ end screen

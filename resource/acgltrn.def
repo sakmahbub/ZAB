@@ -1,0 +1,9 @@
+product ZAB ERP
+
+table acgltrn
+  caption "Signatory One"
+  columns zid,xtypetrn,xtrn,xdesc
+
+  sql create view acgltrn(zid,xtypetrn,xtrn,xdesc) ~
+    as select zid,xtypetrn,xtrn,xdesc from xtrn where xtypetrn='GL Voucher'
+end table

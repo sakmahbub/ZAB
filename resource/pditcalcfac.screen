@@ -1,0 +1,65 @@
+screen pditcalcfac
+
+     //sidebar text two,list two, text three
+     sections form one
+
+
+     form one
+        caption "IT Calculation Factory"
+        table
+        order
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Process,"<p>" ,~
+          xtype,xyear,xper,xwh,xfstaff,xtstaff
+
+	    field xwh
+		default #wh
+	    end field
+		
+          filed xyear
+            caption Tax Year
+          end field
+
+          filed xper
+            caption Tax Period
+          end field
+
+          filed xcode
+            display combo
+            caption Income TAX Code
+            default "Income Tax"
+            pick code PD Transaction Type
+          end field
+
+          field xtype
+            caption Process Type
+            display combo
+            default "Trial Run"
+            pick "Trial Run,Final Run"
+          end field
+
+          field xfstaff
+            attrib local
+            display text
+            caption From Staff
+            pick list xstaff
+          end field
+
+          field xtstaff
+            attrib local
+            display text
+            caption To Staff
+            pick list xstaff
+          end field
+
+          field Process
+            event after
+              set temp = #spsql(zabsp_PRCS_ITCalculationFactory,#id,xwh,#user,xtype,xfstaff,xtstaff,xyear,xper)
+            end event
+          end field
+
+     end form
+
+end screen

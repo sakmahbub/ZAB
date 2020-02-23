@@ -1,0 +1,18 @@
+product ZAB
+
+table opmrktvolsale
+  caption "Actual Sales Detail"
+  columns ztime,zutime,zauserid,zuuserid,zid
+
+  sql create view opmrktvolsale(zid,xdate,xwh,xrsm,xfm,xitem,xdesc,xalias,xmarket,xrate,xqtyord,xqty) ~
+	as select hd.zid,hd.xdate,hd.xwh,hd.xrsm,hd.xfm,dt.xitem,ca.xdesc,ca.xalias,cu.xmarket,dt.xrate,dt.xqtyord,isnull(temptable.xqtyord,0) as xqty ~
+	from opdoheader hd ~
+	inner join opdodetail dt on hd.zid=dt.zid and hd.xdornum=dt.xdornum ~
+	inner join caitem ca on dt.zid=ca.zid and dt.xitem=ca.xitem ~
+  	inner join cacus cu on hd.zid=cu.zid and hd.xcus=cu.xcus ~
+	left join ~
+	(select ch.zid,ch.xdate,ch.xordernum,cd.xitem,cd.xqtyord from opcrnheader ch ~
+	inner join opcrndetail cd on ch.zid=cd.zid and ch.xcrnnum=cd.xcrnnum) temptable on temptable.zid=hd.zid and ~
+ 	hd.xdornum=temptable.xordernum and temptable.xitem=dt.xitem
+
+end table

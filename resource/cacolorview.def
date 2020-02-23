@@ -1,0 +1,17 @@
+product ZAB ERP
+
+table cacolorview
+  caption "Color View"
+  columns zid,xcolorcode,xcolorcat,xcolorsubcat,xbcolor
+  primary zid,xcolorcode
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view cacolorview (zid,xcolorcode,xcolorcat,xcolorsubcat,xbcolor)~
+                  as select zid,xcolorcode,(select cacolor.xcolorcat from cacolor where cacolor.xcolorcode=cacolordetail.xcolorcode and cacolor.zid=cacolordetail.zid), ~
+				   (select cacolor.xcolorsubcat from cacolor where cacolor.xcolorcode=cacolordetail.xcolorcode and cacolor.zid=cacolordetail.zid), ~
+		  xbcolor ~	
+                  from cacolordetail
+
+end table

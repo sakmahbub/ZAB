@@ -1,0 +1,119 @@
+screen xcodeshift
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xtype,xcode desc
+        select "xtype='Shift'"
+        rows 50
+        objects  xcode attrib(link "login?screen=xcodeshift&command=Show&xtype=?&xcode=?"),~
+                xshiftimin,xattimecon,xshiftimout,xemptimeout,zactive
+
+        headers "Shift Name","In Time","In Penalty Time","Out Time","Out Penalty Time","Active?"
+     end list
+
+     form one
+
+     caption "<ACRONYM>Shift Entry</ACRONYM>"
+        table xcodes
+        order xtype,xcode
+        select "xtype='Shift'"
+		//fixed xtype
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update, Delete,*next,~
+                Top,Previous,Next,Bottom,"<p>" ,~
+                xtype,xcode width(50),~
+                xlong,xshiftimin,xattimecon,xshiftimout,xemptimeout,xtargetshare,zactive
+
+        field xtype
+          display hide
+          caption Type
+          default "Shift"
+		  event before
+		  //print #time
+		  end event
+        end field
+		
+  field xcode
+    pick list xcodeall
+  end field		
+
+	field xdesc
+	  display const
+	  attrib local
+	  caption Descirption
+	  event after
+	    set xdesc=achrc1.xdesc("xhrc1='"+xhrc1+"'")
+	  end event
+	end field
+
+        field xtargetshare
+		caption Calculate Attendance Before Minute(s)
+        end field
+		
+        field xattimecon
+		caption In Penalty Time
+        end field	
+
+        field xemptimeout
+		caption Out Penalty Time
+        end field			
+		
+		
+        field xprops
+          display combo
+          pick "Addition,Deduction"
+          default "Addition"
+        end field		
+
+        field xlong
+          width 40
+          height 2
+          //column 2
+        end field
+
+        field add
+          event before
+            set xtype="Shift"
+          end event
+        end field
+
+        field Budget
+          embed onclick="clicked(this)"
+        end field
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+    	    if (detail=="Budget"){
+            form.screen.value = "acbudget"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

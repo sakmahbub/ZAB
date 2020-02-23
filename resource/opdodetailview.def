@@ -1,0 +1,32 @@
+product ZAB ERP
+
+table opdodetailview
+  caption "AR Report View"
+  columns zid,xdornum,xdate,xcus,xstatusord,xref,xnote,xwh,xdesc,xstatusar,xtotamt,~
+          xdisc,xdiscf,xdatecom,xait,xamount,xsp,xtotvat,xaitamt,xdiscamt,xfm,xsm,xrsm,~
+          xrow,xitem,xlong,xvatrate,xvatamt,~
+          xqtyord,xunit,xrate,xlineamt,xqtybonus,xpricerow,xgitem,xpp,xdoctype
+
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view opdodetailview(zid,xdornum,xdate,xcus,xstatusord,xref,xnote,xwh,xdesc,xstatusar,xtotamt,~
+                                 xdisc,xdiscf,xdatecom,xait,xamount,xsp,xtotvat,xaitamt,xdiscamt,xfm,xsm,xrsm,~
+                                 xrow,xitem,xlong,xvatrate,xvatamt,~
+                                 xqtyord,xunit,xrate,xlineamt,xqtybonus,xpricerow,xgitem,xpp,xdoctype,xdiscdetamt) ~
+                                 as select a.zid,a.xdornum,a.xdate,a.xcus,a.xstatusord,a.xref,a.xnote,a.xwh,~
+                                 (select xlong from xcodes where xtype='Branch' and zid=a.zid and xcode=a.xwh),~
+                                 a.xstatusar,a.xtotamt,~
+                                 a.xdisc,a.xdiscf,a.xdatecom,a.xait,a.xamount,a.xsp,a.xvatamt,a.xaitamt,a.xdiscamt,a.xfm,a.xsm,a.xrsm,~
+                                 b.xrow,b.xitem,b.xlong,b.xvatrate,b.xvatamt,b.xqtyord,b.xunit,b.xrate,b.xlineamt,b.xqtybonus,b.xpricerow,~
+                                 (select xgitem from caitem where zid=b.zid and xitem=b.xitem), a.xpp,b.xdoctype,b.xdiscdetamt ~
+                                 from opdoheader a join opdodetail b on a.zid=b.zid and a.xdornum=b.xdornum 
+
+
+
+
+end table

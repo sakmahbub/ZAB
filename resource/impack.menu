@@ -1,0 +1,8 @@
+impack.menu
+//-------------------------------------------------------------------
+option                           |action                                        |modules|models|width
+//-------------------------------------------------------------------
+Packing Entry Header                |#classPath+"/login?screen=impackhdr"        |       |      |120
+//Transfer Exp. Product                    |#classPath+"/login?screen=imtorheadertrexp"        |       |      |120
+//Receive Exp. Product                     |#classPath+"/login?screen=imtorheaderreexp"        |       |      |120
+//-------------------------------------------------------------------

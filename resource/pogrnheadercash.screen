@@ -1,0 +1,111 @@
+screen pogrnheadercash
+     caption "MRR/GRN Header"
+     sidebar list detail,list one
+     sections form one, jscript myscript
+
+     list detail
+        caption "GRN Detail List For "+xgrnnum
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrndetail&command=Show&xpornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where caitem.zid=pogrndetail.zid and caitem.xitem=pogrndetail.xitem)),~
+                 xqtygrn,xrate,xlineamt
+
+
+        headers "Row","Item","Description","Qty","Rate","Line Amount"
+    	  total "Total","","",sum,"",sum
+     end list
+
+     list one
+        caption "PO List"
+        table poordheader
+        order xpornum
+        fixed xpornum
+        rows 20
+        objects  xpornum attrib(link "login?screen=poordheadercash&command=Show&xpornum=?"), ~
+                 xlcissuedate
+
+
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+     form one
+        caption "MRR/GRN Header"
+        table pogrnheader
+        order xgrnnum desc
+        return "login"
+        layout 4
+        pstyle 3
+        objects ~
+                Show,Clear,Add, Update, Delete, *next, Top, Previous, Next, Bottom,*next,Detail,ConfirmMRR,"<p>" ,~
+                xgrnnum attrib(search) display(trn MRR Number),~
+                xdate,xsup,xorg,~
+                xstatusgrn,xref,xnote,xpornum display(hide)
+
+        field xorg
+          attrib local
+          caption Supplier Name
+          diplay constant
+          event after
+            set xorg = casup.xorg("xsup = '"+xsup+"'")
+          end event
+        end field
+
+      field xnote
+          width 50
+          column 4
+        end field
+
+        field xgrnnum
+           event after
+              set globals(xgrnnum) = xgrnnum
+           end event
+        end field
+
+        field ConfirmMRR
+           event before
+            if xstatusgrn .eq. "Confirmed"
+              error "Already Confirmed"
+            end if    
+           end event
+           event after
+     //         class pojamuna(confirmgrn{xgrnnum,xdate,xdiv,xsec,xproj})
+           	set temp = #spsql(zabsp_PO_confirmGRN,#id,#user,xgrnnum,xdate,xstatusgrn) 	
+           end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+        field Amendment
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "pogrndetailcash"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

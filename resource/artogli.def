@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table artogli
+  caption "AR To AC Interface"
+  columns  ztime,zutime,zauserid,zuuserid, zid,~
+           xtrn,xgcus,xacc,xdeptname
+
+  primary key zid, xtrn,xgcus
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

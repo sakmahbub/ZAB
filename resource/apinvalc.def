@@ -1,0 +1,24 @@
+product ZAB
+
+table apinvalc
+  caption "AP Allocation View"
+  columns  ztime,zutime,zid,xvoucher,xcus,xdate,xprime
+  primary key zid, xvoucher
+  foreign key
+        zid references zbusiness.zid
+        zid,xvoucher references arhed.zid,xvoucher
+  end foreign key
+  sql create view apinvalc (zid, xvoucher,xsub,xdate,xprime)~
+                 as SELECT d.zid,d.xvoucher,d.xsub,h.xdate,ABS(d.xprime)-ISNULL(temptable.xamount,0) ~
+			  FROM acdetail d ~
+			  INNER JOIN acheader h ON d.zid=h.zid and d.xvoucher=h.xvoucher ~
+			  LEFT JOIN (SELECT a.xinvnum,SUM(a.xamount)AS xamount ~
+					 FROM apalc a ~
+					 INNER JOIN acdetail d ON a.zid=d.zid AND a.xvoucher=d.xvoucher AND a.xrow=d.xrow ~
+					 WHERE LEFT(d.xvoucher,4)='PM--' AND d.xprime>0 ~
+					 GROUP BY a.xinvnum) temptable ON temptable.xinvnum=d.xvoucher ~
+			  WHERE LEFT(D.xvoucher,4)='AP--' AND d.xprime<0 
+
+
+
+end table

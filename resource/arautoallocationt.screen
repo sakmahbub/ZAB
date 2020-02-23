@@ -1,0 +1,113 @@
+screen arautoallocationt
+
+    sections form one,jscript myscript
+
+     form one
+        caption "MR Auto Allocation For :<br>"+xpp
+        table arhed
+        primarykey xvoucher
+        order xvoucher
+//        select "xsign>0 and xbalprime>0 and xdate>=dateadd(d,-7,'"+#date+"')"
+        select "(xsign>0 and xbalprime>0) and (xpaymentterm='Credit' or (xdate>=dateadd(d,-7,'"+#date+"') and xpaymentterm='Cash'))"
+//        select "(xsign>0 and xbalprime>0)"
+        fixed xpp
+        return "login"
+        pstyle 3
+        layout 2
+        objects Return,Clear,Show,Top,Previous,Next,Bottom,Allocate,"<p>" ,~
+                xvoucher,xdate,xcus,xorg,xwh display(const),xbrname,xref,xstatusjv,~
+                xprime,xbalprime attrib(readonly),~//xvatrate,xait,~
+                xsign display(hidden),xnote
+
+       field xref
+        event after
+          set xref = aralc.xvoucher("xinvnum='"+xvoucher+"'")
+        end event
+       end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+        field xorg
+          attrib local
+          display constant
+          caption Name
+          event after
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+        field xnote
+          width 80
+          column 2
+        end field
+
+        field xlong
+          caption Header Description
+          width 50
+        end field
+
+        field xstatusjv
+           display constant
+        end field
+
+
+        field xvoucher
+	   width 15	
+         event after
+          set globals(xvoucher)=xvoucher
+         end event
+        end field
+
+        field Allocate
+          event after
+            set temp = #spsql(sp_AutoMRAllocation,#id,#user,xvoucher,6)
+          end event
+        end field
+
+        field Update
+          event before
+            set temp = #sql("select xinvnum from aralc where xinvnum = '"+xvoucher+"'")
+            if #result .eq. "true"
+              error "Cannot Proceed Already Allocated"
+            end if
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Return"){
+            form.screen.value = "arautoallocationhedt"
+            form.searchbutton.value = "Find xpp=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

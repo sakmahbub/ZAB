@@ -1,0 +1,13 @@
+product ZAB
+
+table cacolor
+  caption "Color Master"
+  columns ztime, zutime,zauserid,zuuserid,zid,~
+  xcolorcode,xcolor,xcolorcat,xcolorsubcat,xlong,xcolortype,zactive,zapproved,xcolorfmate
+  
+  primary key zid,xcolorcode
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

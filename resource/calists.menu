@@ -1,0 +1,22 @@
+//Customer Lists.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+-Customers
+Customer List                    |#classPath+"/login?screen=*crystal cacuslist(xcus=Customer=000,xcus=Customer=zzz)"
+Alphabetical List                |#classPath+"/login?screen=*crystal cacuslista(xcus=From Customer=A,xcus=From Customer=Z)"
+Customer Price List              |#classPath+"/login?screen=*crystal oppricelist(xcus=From Customer=000,xcus=To Customer=zzz)"
+-Suppliers
+Supplier List                    |#classPath+"/login?screen=*crystal casuplist(xsup=From Supplier=000,xsup=To Supplier=zzz)"|common
+Alphabetical List                |#classPath+"/login?screen=*crystal casuplista(xsup=From Supplier= ,xsup=To Supplier=zzz)"|common
+Supplier List by Product         |#classPath+"/login?screen=*crystal posuplist(xitem=From Item=000,xitem=To Item=zzz)"|common
+Supplier Price List              |#classPath+"/login?screen=*crystal popricelist(xsup=From Supplier=000,xsup=To Supplier=zzz)"|common
+-Items
+Item Master List                 |#classPath+"/login?screen=*crystal caitem(xitem=From Item=0,xitem=To Item=zzz)"
+Item list by Group               |#classPath+"/login?screen=*crystal caitemg(xgitem=From Item Group,xgitem=To Item Group)"
+-Codes
+Codes List	                     |#classPath+"/login?screen=*crystal cacodelist"
+Transaction Codes List           |#classPath+"/login?screen=*crystal catrnlist"
+
+//-------------------------------------------------------------------
+

@@ -1,0 +1,11 @@
+//General Ledger Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Cross Year account ledger 		 |#classPath+"/login?screen=*viewcrystal acleddailyall(6;in,st,dt,dt,st,st;zid,wh,fdate,tdate,acc,sub;xdiv=Plant/ Office,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xviewtype=Report View)"
+Cross Year Sub-code Trial balance |#classPath+"/login?screen=*viewcrystal actblsubdateall(4;in,st,dt,dt;zid,wh,fdate,tdate;xdiv=Plant/ Office,xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Test Ledger Date Wise		 	 |#classPath+"/login?screen=*viewcrystal acleddailytest(8;in,st,dt,dt,st,st,in,st;zid,wh,fdate,tdate,acc,sub,year,status;xdiv=Plant/ Office,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xyear=Year,xstatusjvrep=Status,xviewtype=Report View)"
+Test Trial Balance          	 |#classPath+"/login?screen=*viewcrystal actbldatetest(6;in,st,dt,dt,in,st;zid,wh,fdate,tdate,year,status;xdiv=Plant/Office,xdate=From Date=#date,xdate=To Date=#date,xyear=Year=,xstatusjvrep=Status,xviewtype=Report View)"
+
+Budget Listing |#classPath+"/login?screen=*viewcrystal acbudgetlisting(5;in,st,st,in,in;zid,wh,acc,year,per;xdiv=Plant/ Office,xacc=Account=,xyear=Year=,xper=Period=,xviewtype=Report View)"
+Budget Reconciliation |#classPath+"/login?screen=*viewcrystal acbudgetreconsolation(5;in,st,st,in,in;zid,wh,acc,year,per;xdiv=Plant/ Office,xacc=Account=,xyear=Year=,xper=Period=,xviewtype=Report View)"

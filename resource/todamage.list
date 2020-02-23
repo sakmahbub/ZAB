@@ -1,0 +1,14 @@
+     list todamage
+        caption "Transfer Order/ Damage List"</b>"
+        table imtorheader
+        order xtornum
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4) in ('TO--','DAM-'))"
+		searchselect "left(xtornum,4) in ('TO--','DAM-')"
+        rows 10
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xordernum
+		 
+		 headers "TO/ Damage List", "Date", Ref
+     end list
+
+

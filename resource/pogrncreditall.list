@@ -1,0 +1,14 @@
+
+     list pogrncreditall
+        table pogrnheader
+        order xgrnnum
+        select "(xgrnnum like '%"+zvalue+"%' and xstatusjv = 'Open' and xstatusgrn='Confirmed')"
+        searchselect "xstatusjv = 'Open' and xstatusgrn='Confirmed'"
+		navigators alpha
+        rows 10
+        objects xgrnnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xpornum,xcus,xwh,xdate,xref
+
+     end list
+
+

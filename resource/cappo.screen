@@ -1,0 +1,204 @@
+screen cappo
+  sidebar list one	
+  sections form one, jscript myscript
+
+     list one
+      caption "SRO List"
+        table cappo
+        order xsp desc
+	  select "left(xsp,4)='SRO-'"	
+        rows 40
+        objects  xsp attrib(link "login?screen=cappo&command=Show&xsp=?"), ~
+                 xname,xcrlimit//xterritory,field equals((select xfield from cafm where xfm=cappo.xfm)),~
+		     //region equals((select xregion from carsm where xrsm=cappo.xrsm)),~
+		     //area  equals((select xarea from casm where xsm=cappo.xsm))
+
+		
+
+        header "SRO Code","Name","Credit Limit" //"Territory","Field","Region","Zone"
+        //totals "","Totals","","","","","","",sum,sum,sum,sum
+     end list
+
+  form one
+    caption "SRO Master Entry:"
+    table cappo
+    primarykey xsp
+    order xsp
+    select "left(xsp,4)='SRO-'"	
+    return "login"
+    layout 2
+    pstyle 3
+    objects Add,Update,Show,Clear,Delete,*next,Top,Previous,Next,Bottom,"<p>",~
+            xsp,xname,~//xterritory,xfield,xwh,xbrname,xfm,xfmname,xrsm,xrsmname,~
+		//xsm,xsmname,
+		xcrlimit,xphone,xdateeff,xdateexp,xnote,zactive
+
+    field xdateeff
+      caption Activation Date
+	default "2999-01-01"
+    end field
+	
+  field xdateexp
+      caption Inactivation Date
+	default "2999-01-01"
+    end field
+	
+	 field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+    field xfmname
+      attrib local
+      caption FM name
+      display const
+	event after
+		class careports(getjspReport{SROList,1,xwh,Print SRO List (Active)})
+		class careports(getjspReport{SROList_Inactive,1,xwh,Print SRO List (Inactive)})
+		set xfmname=cafm.xname("xfm='"+xfm+"'")
+	end event
+    end field
+
+    field xsmname
+      attrib local
+      caption SM Name
+      display const
+	event after
+		set xsmname=casm.xname("xsm='"+xsm+"'")
+	end event
+    end field
+
+    field xrsmname
+      attrib local
+      caption RSM name
+      display const
+	event after
+		set xrsmname=carsm.xname("xrsm='"+xrsm+"'")
+	end event
+    end field
+
+    field xbrname
+      attrib local
+      caption Branch Name
+      display const
+	event after
+		set xbrname=branchview.xlong("xcode='"+xwh+"'")
+	end event
+    end field
+
+    field xterritory
+      caption Territory
+      display text
+      pick list xterritory
+    end field
+
+    field xsm
+      caption Sales Manager
+      display const
+      event before
+        //set xsm= #sql("select xsm from cafm where xfm='"+xfm+"'")
+      end event
+    end field
+
+    field xrsm
+      caption Regional Sales Manager
+      display const
+      event before
+        //set xrsm = #sql("select xrsm from cafm where xfm='"+xfm+"'")
+      end event
+    end field
+
+    field xfm
+      caption Field Manager
+		display const
+      //display combo
+      //pick list cafm
+    end field
+
+    field xsp
+		pick list caspmsoall
+      default "SRO-"
+      caption SRO Code
+      //display trn Sales Representative
+      //event after
+      //  set globals(xsm)=xsm
+      //  set globals(xrsm)=xrsm
+      //  set globals(xfm)=xfm
+      //end event
+    end field
+
+    field add
+      event before
+      	set sp = cappo.xsp("xterritory='"+xterritory+"' and zactive ='"+1+"'") 
+		set cappo=cappo.xname("xname='"+xname+"'")
+      	if cappo .eq. xname .or. xname .eq. ""
+			error "Name is Blank or Exists!"
+		//if #result .eq. "true"
+		//	error "Cannot Proceed -- Provided Territory Already Has A "+sp
+		//else if xterritory .eq. ""
+		//	error "Cannot Proceed -- Please Provide Territory Name"
+		//else if xfield .eq. ""
+		//	error "Cannot Proceed -- Please Select Field"
+		//else if xwh .eq. ""
+		//	error "Cannot Proceed -- Please Provide Branch Name"
+		else
+			//set xwh=cappo.xwh("xterritory='"+xterritory+"'")
+			set xfm=cafm.xfm("xfield='"+xfield+"' and zactive="1"")
+			set xrsm=cafm.xrsm("xfield='"+xfield+"'") 
+			set xsm=#sql("select xsm from carsm where xrsm='"+xrsm+"'")
+  			set xsp = #trn("Sales Representative","SRO-",8)
+		end if
+      end event
+    end field
+
+    field update
+      event before
+      	set sp = cappo.xsp("xterritory='"+xterritory+"' and xsp<>'"+xsp+"' and zactive ='"+1+"'")
+		set cappo=cappo.xname("xname='"+xname+"'")
+      	if xname .eq. ""
+			error "Name is Blank!"
+      	//if #result .eq. "true"
+		//	error "Cannot Proceed -- Provided Territory Already Has A "+sp
+		//else if xterritory .eq. ""
+		//	error "Cannot Proceed -- Please Provide Territory Name"
+		//else if xfield .eq. ""
+		//	error "Cannot Proceed -- Please Select Field"
+		else
+			//set xwh=cappo.xwh("xterritory='"+xterritory+"'")
+			set xfm=cafm.xfm("xfield='"+xfield+"' and zactive="1"")
+			set xrsm=cafm.xrsm("xfield='"+xfield+"'") 
+			 set xsm=#sql("select xsm from carsm where xrsm='"+xrsm+"'")
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field FM
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var ret
+    function clicked(b){
+      ret=b.value
+      }
+      function submitit(form){
+        if (ret=="FM"){
+          form.screen.value = "cafm"
+          form.searchbutton.value = "Find xsm=?"
+          form.searchbutton.value = "Find xrsm=?"
+          form.searchbutton.value = "Find xfm=?"
+          //return false
+        }
+      }
+      </script>
+  end jscript
+
+end screen

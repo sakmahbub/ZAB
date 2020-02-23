@@ -1,0 +1,15 @@
+product ZAB
+
+table imserial
+
+  caption "Serial Master"
+  columns ztime,zutime,zauserid,zuuserid,zid,xserial,xitem,xrow,xqty,~
+          xdate, xdateinv,xdateclaim,xdateexp,xdatedel,xdaterec,xstatus, ~
+          xqtycom,xprime
+          
+  primary key zid,xserial,xitem,xrow
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

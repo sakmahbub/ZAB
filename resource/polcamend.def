@@ -1,0 +1,15 @@
+product ERP on the Net
+
+table polcamend
+  caption "Ammendment"
+  columns ztime,zutime,zid,~
+          xpornum,xamendno,xdate,xnote,xapprover,xmlcno
+
+
+  primary key zid,xpornum,xamendno
+  foreign key
+        zid references zbusiness.zid
+        zid,xpornum references poordheader.zid,xpornum
+  end foreign key
+
+end table

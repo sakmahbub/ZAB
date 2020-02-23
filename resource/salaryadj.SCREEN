@@ -1,0 +1,221 @@
+screen salaryadj
+
+//     sidebar list allocation
+     sections form one, jscript myscript
+
+     list allocation
+        caption "Allocated Voucher List"
+        table aralc
+        order xvoucher,xinvnum
+        fixed xvoucher
+        rows 10
+        objects ~
+        xinvnum attrib(link "login?screen=aralc&command=Show&xinvnum=?"), ~
+        xdate,xamount
+        totals "","Totals","",sum
+		header "MR No","Date","Deposit Amount"
+     end list
+
+     form one
+        caption "Salary Adjustment Entry"
+        table arhed
+	    primarykey xvoucher 	
+        order xvoucher
+        select "left(xvoucher,2)='SA' and xwh='"+#wh+"'"
+        return "login"
+        pstyle 3
+        layout 2    
+        objects Add,Show,Clear,Delete,*next,Update,Top,Previous,Next,Bottom,Confirm,"<p>" ,~
+                xvoucher,xbsn display(hide),xdate,xwh display(hide),~
+                xprime,xbalprime display(hide),xbank display(hide),xbankname,xref,xdateref,~
+                xstatusjv display(hide),xdocnum display(hide),~
+                xsign display(hidden),xdeptname display(hide),xcus display(hide),xorg,~
+                xtype display(hide),xnote display(hide),xpaymenttype display(hide),xsp display(hide),xfm display(hide),xrsm display(hide),xsm display(hide)
+
+		field xref
+			width 40
+		end field
+		
+		field xpaymenttype
+			caption Deposit Type
+			pick "Cash,Cheque,DD,TT,MT,PO,MR"
+		end field
+		
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+        field xwh
+          default #wh
+        end field
+
+        field xvatamt
+          caption VAT paid by Customer
+          display text
+        end field
+
+        field xaitamt
+          caption AIT paid by Customer
+          display text
+        end field
+
+        field xorg
+          attrib local
+          display hide
+          caption Name
+          event after
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+        field xbankname
+          attrib local
+          display const
+          caption
+          event after
+            set xbankname=acmst.xdesc("xacc='"+xbank+"'")
+          end event
+        end field
+
+        field xname
+          display constant
+          event after
+          end event
+        end field
+
+        field xlong
+          caption Header Description
+          width 50
+        end field
+
+
+        field xvoucher
+	   	  width 15	
+          event after
+            set globals(xvoucher)=xvoucher
+            set globals(xcus)=xcus
+     	      if xstatusjv .eq. "Confirmed"
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+            end if
+     	      if xstatusjv .eq. "Open"
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(confirm.display)="hidden"
+            end if
+          end event
+        end field
+
+        field add
+          event before
+          	set xcus = "97--000001"
+            set xstatusjv="Prepared"
+			set xtype="NPL"
+				set field=#sql("select xfield from cappo where xsp='"+xsp+"' and zactive="1"")
+				set fm=#sql("select xfm from cafm where xfield='"+field+"' and zactive="1"")
+				set region=#sql("select xregion from cafm where xfm='"+fm+"' and zactive="1"")
+				set rsm=#sql("select xrsm from carsm where xregion='"+region+"' and zactive="1"")
+				set sm=#sql("select xsm from carsm where xregion='"+region+"' and zactive="1"") 
+			if xprime == 0
+              error "Cannot Proceed -- Amount is Blank"
+            //else if xpaymenttype .eq. ""
+              //error "Cannot Proceed -- Please Choose Deposit Type"
+            //else if xbank .eq. ""
+              //error "Cannot Proceed -- Please Choose Bank"
+            else
+	      //*********** GETTING TRN NO ****************
+            	set year = #sub(xdate,2,2)
+      	    	set trn = "SA"+xwh
+            	set xvoucher = #trn("AR Transactions",trn,10)
+	            set xvoucher = #sub(xvoucher,0,4)+year+#sub(xvoucher,4,10)
+
+            end if
+          end event
+          event after
+				set temp=#sql("update arhed set xfm='"+fm+"' where xvoucher='"+xvoucher+"'")
+				set temp=#sql("update arhed set xrsm='"+rsm+"' where xvoucher ='"+xvoucher+"'")
+				set temp=#sql("update arhed set xsm='"+sm+"' where xvoucher='"+xvoucher+"'")
+				//set temp =#sql("update arhed set xstatusjv='Open' where xvoucher='"+xvoucher+"'")
+        	action show
+          end event
+        end field
+
+        field Update
+          event before
+				set field=#sql("select xfield from cappo where xsp='"+xsp+"' and zactive="1"")
+				set fm=#sql("select xfm from cafm where xfield='"+field+"' and zactive="1"")
+				set region=#sql("select xregion from cafm where xfm='"+fm+"' and zactive="1"")
+				set rsm=#sql("select xrsm from carsm where xregion='"+region+"' and zactive="1"")
+				set sm=#sql("select xsm from carsm where xregion='"+region+"' and zactive="1"")
+            //set xstatusjv="Open"
+            end if
+          end event
+          event after
+				set temp=#sql("update arhed set xfm='"+fm+"' where xvoucher='"+xvoucher+"'")
+				set temp=#sql("update arhed set xrsm='"+rsm+"' where xvoucher ='"+xvoucher+"'")
+				set temp=#sql("update arhed set xsm='"+sm+"' where xvoucher='"+xvoucher+"'")
+				//set temp =#sql("update arhed set xstatusjv='Open' where xvoucher='"+xvoucher+"'")
+        		action show
+          end event
+        end field
+        
+        field Confirm
+        	event before       		
+				//set xstatusjv="Open"
+				//set field=#sql("select xfield from cappo where xsp='"+xsp+"' and zactive="1"")
+				//set fm=#sql("select xfm from cafm where xfield='"+field+"' and zactive="1"")
+				//set region=#sql("select xregion from cafm where xfm='"+fm+"' and zactive="1"")
+				//set rsm=#sql("select xrsm from carsm where xregion='"+region+"' and zactive="1"")
+				//set sm=#sql("select xsm from carsm where xregion='"+region+"' and zactive="1"")
+			end event
+			event after
+				//set temp=#sql("update arhed set xfm='"+fm+"' where xvoucher='"+xvoucher+"'")
+				//set temp=#sql("update arhed set xrsm='"+rsm+"' where xvoucher ='"+xvoucher+"'")
+				//set temp=#sql("update arhed set xsm='"+sm+"' where xvoucher='"+xvoucher+"'")
+				set temp =#sql("update arhed set xstatusjv='Open' where xvoucher='"+xvoucher+"'")
+        		action show
+        	end event
+        end field
+        
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Allocate
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Details"){
+            form.screen.value = "arcastrn"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+          if (detail == "Allocate"){
+            form.screen.value = "ardepositalc"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+        }
+        </script>
+     end jscript
+
+
+
+end screen

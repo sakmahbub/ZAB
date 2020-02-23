@@ -1,0 +1,12 @@
+product ZAB
+
+table opproducttarget
+  caption "Product Wise Target"
+  columns ztime,zutime,zid,zauserid,zuuserid,xitem,xdesc,xyear,xper,xqty
+
+  primary key zid, xyear,xper,xitem
+  foreign key
+        zid references zbusiness.zid
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+end table

@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table imoldstockrsvlog
+  caption "Old Stock Reservation"
+  columns  ztime,zutime,zauserid,zuuserid,zid,xwh,xitem,xqty,xdate//,xyearperdate
+
+  primary key xdate,xwh,xitem
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

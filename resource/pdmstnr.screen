@@ -1,0 +1,253 @@
+screen pdmstnr
+
+    sidebar list detail
+    sections form one, jscript myscript
+
+  	list detail
+        caption "Detail List"
+        table pdsalarydetail
+        order xstaff,xrow
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdsalarydetailnr&command=Show&xstaff=?&xrow=?"), ~
+                 xtype,xamount,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdsalarydetail.xtype))
+
+        header "Line No","Componant Type","Amount","Transaction Type"
+
+     end list
+
+  	list inv
+        caption "Investment Detail"
+        table pdinvdetail
+        order xstaff,xrow
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdinvdetailnr&command=Show&xstaff=?&xrow=?"), ~
+                 xtype,xamount
+
+        header "Line No","Investment Type","Amount"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Personnel Info (Non Register)</ACRONYM>"
+        table pdmst
+        order xstaff
+        select "left(xstaff,4)='CID-'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete, *next,Top, Previous, Next, Bottom,~
+                *next,Salary Detail,"<p>" ,~
+                xstaff,xname attrib(search),xmadd,xpadd,xlocation display(hide),xdeptname,xdesc,xposition,xdesignation,~
+                xbirthdate,xdatejoin,xdatecom,xenddate,xsex,xmstat,xdistrict,xbank,xacc,~
+                xtin,xinvamt,xempstatus,xempcategory// display(const)
+
+
+          field xempcategory
+		          pick "Casual,Contract"
+              event after
+                if xempcategory .eq. "Casual"
+  		          	set #field(Salary.display)="hidden"
+                end if
+              end event
+          end field
+
+          field xlocation
+		          pick "Casual,Contract"
+          end field
+
+          field xstaff
+            display trn Staff ID
+            default "CID-"
+    	      event after
+      	      set globals(xstaff)=xstaff
+          	end event
+          end field
+
+          field xposition
+            attrib search
+            pick
+          end field
+
+          field xhaccomodation
+            display combo
+            pick "Yes,No"
+            default "No"
+          end field
+
+          field xbank
+            display combo
+          end field
+
+          field xacc
+            pick
+          end field
+
+          field xdesc
+            attrib local
+            display const
+            caption Department Name
+            event after
+              set xdesc = xcodes.xlong("xtype='Department Name' and xcode='"+xdeptname+"'")
+            end event
+          end field
+
+          field xamount
+            caption Opening Balance of PF
+          end field
+
+          field xdeduction
+            caption Total Deduction
+          end field
+
+          field xenddate
+            default "2999-01-01"
+          end field
+
+          field xdatecom
+            default "2999-01-01"
+          end field
+
+          field xsalaryinfo
+            attrib local
+            display const
+            caption <font color=red size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salary Info</font>
+            column 2
+          end field
+
+          field xhdeduction
+            attrib local
+            display const
+            caption <font color=red size=+1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Deductions</font>
+            column 2
+          end field
+
+       field xempstatus
+      		caption Service Status
+		      default "Normal"
+      		pick "Normal,Closed,On Hold"
+       end field
+
+        field xgrade
+//          display combo
+          pick select xgrade from pdgrade
+        end field
+
+        field xdum
+          attrib local
+          display const
+          caption
+        end field
+
+        field xdum2
+          attrib local
+          display const
+          caption
+        end field
+
+        field xdum3
+          attrib local
+          display const
+          caption
+        end field
+
+        field Search
+          event before
+            class picase(PDSearch())
+          end event
+        end field
+
+        field add
+          event before
+          end event
+          event after
+         //   class pdsheraton(validateAftermst)
+          end event
+        end field
+
+        field update
+          event before
+//		set xempcategory="Contract & Services"
+          end event
+          event after
+         //   class pdsheraton(validateAftermst)
+          end event
+        end field
+
+
+        field Tax
+          event after
+            class pdsheraton(TaxCalculation)
+          end event
+        end field
+
+        field Salary
+          embed onclick="clicked(this)"
+        end field
+
+        field Investment
+          embed onclick="clicked(this)"
+        end field
+
+        field Employee
+          embed onclick="clicked(this)"
+        end field
+
+
+
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	    if (detail=="Salary Detail"){
+            form.screen.value = "pdsalarydetailnr"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Investment Detail"){
+            form.screen.value = "pdinvdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+  	     if (detail=="Employee Transfer"){
+            form.screen.value = "pdemptransfer"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        function pickAccount(link,name,rank){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xstaff.value=link.innerText
+            document.one.xname.value=name.innerText
+            document.one.xrank.value=rank.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

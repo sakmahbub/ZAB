@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table casupitem
+  caption "Customer Discount"
+  columns ztime,zutime,zauserid,zuuserid,zid,xsup,xitem,xrate,xdateeff,xdateexp,xnote
+        
+          
+  primary key zid, xsup,xitem
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xsup references casup.zid,xsup
+		zid,xitem references caitem.zid,xitem
+  end foreign key
+end table

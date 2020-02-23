@@ -1,0 +1,155 @@
+screen moreqsr
+
+  caption "Transfer Order Entry Header"
+     	sidebar list one,list reqlist
+	sections form one, jscript myscript
+     
+	  list one
+        caption "SR Detail List For "+xtornum
+        table imtordetail
+        order xtornum,xrow desc
+        rows 25
+		fixed xtornum
+        objects ~
+        xrow,~// attrib(link "login?screen=moreqdetaildph&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xbrand,~
+        xqtyreq,xqtycom,xqtyalc,xqtypor,xunit
+
+		totals "","","Total","",sum,sum,sum,sum,""
+		
+        headers "Serial No","Item","Description","Brand","Quantity Required","Available","Issue","PO Qty","UOM",
+     end list
+
+	  list reqlist
+      caption "Purchase Requisition List"
+         table poreqheader
+        order xporeqnum desc
+		fixed xtornum
+		select "left(xporeqnum,2) in ('PR','JN')"
+        objects  xporeqnum attrib(link "login?screen=poreqsr&command=Show&xporeqnum=?"), xdate,xtype
+               
+		  headers "Requisition No","Date","Purchase Type"
+	end list
+	
+
+     form one
+        caption "Store Requisition (SR) Status"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+	//	select "xstatustor='Open' and xidsup='"+#user+"'"
+        return "login"
+        pstyle 3
+        layout 3
+        objects Show,Clear,~
+        "<p>" ,~
+        xtornum,xdate display(const),xregi display(const),xtwh display(const),xtbrname,xpreparer display(hide),xstatustor display(const),preparer display(const),~
+		xdphead display(hide),dphead  display(const),xsofficer display(hide),sofficer  display(const),xdirector display(hide),~
+		director  display(const)
+
+       
+
+
+	   field xtornum
+		caption Requisition No.
+          event after
+			set globals(xtornum)=xtornum
+           // class careports(getjspReport{poreqprint,1,xtornum,View Requisition})
+           end event
+        end field
+		
+		 field xtwh
+		caption Division
+        end field
+		
+		 field xregi
+		caption Car / Department
+        end field
+		
+		 field xstatustor
+		caption Requisition Status
+        end field
+		  
+		  field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	   	field preparer
+		   attrib local
+          caption Preparer
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+          end field
+		  
+		  field dphead
+		  attrib local
+          caption Head Of The Department
+		  event after
+		  set dphead=pdmst.xname("xstaff='"+xdphead+"'")
+		  end event
+          end field
+		  
+		   field sofficer
+		  attrib local
+          caption Store Officer
+		  event after
+		  set sofficer=pdmst.xname("xstaff='"+xsofficer+"'")
+		  end event
+          end field
+		  
+		    field director
+		    attrib local
+          caption Executive Director / Director
+		  event after
+		  set director=pdmst.xname("xstaff='"+xdirector+"'")
+		  end event
+          end field
+	   
+	   
+        embed onsubmit="submitit(this)"
+
+       field Detail
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+      jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+
+        function clicked(b){
+          but=b.value
+        }
+
+        function submitit(form){
+        //  if (but=="Select Item For Requisition"){
+        //    form.screen.value = "moreqdetaildph"
+        //    form.searchbutton.value = "Find xtornum=?"
+        //  }
+          if (but=="Detail"){
+            form.screen.value = "moreqdetaildph"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xtornum.value=link.text
+          }else{
+            document.one.xtornum.value=link.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+
+
+end screen

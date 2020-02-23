@@ -1,0 +1,22 @@
+product ZAB ERP
+
+table moheader
+  caption "Production Header"
+
+  columns  ztime,zutime,zauserid,zuuserid,zid,xbatch,xdate,xcus,~
+          xitem,xlong,xqtyprd,xqtycom,~
+          xbomkey,xwh,xwhcomp,xsup,~
+          xdatereq,xdatesch,xdatebom,xdaterel,xdatekit,xdatecom,xdateund,~
+          xstatusmor,xordernum,xdateexp,~
+		  moref,xmotime,xqtymor,xshift,xline,xitemraw,xqtyreq,xqtyalc,xqtymix,~
+		  xfwh,xtwh,xmoprcs,xunit,xtrn,xpiref,xnote,xdornum,xfabriccolor,xfabrictype,~
+		  xstatusreq,xlot,xbeamwidth,xwire,xtotalbeam,xpirefr,xbomnum,xqty,xcolorcode,xponum,xamount,xmachine,xfastness,xbcolor,xlotno,xitemsup
+		  
+  primary key zid, xbatch
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table
+

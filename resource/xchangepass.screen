@@ -1,0 +1,34 @@
+screen xchangepass
+
+     sidebar list one
+     sections form one
+
+     list one
+        caption "Business Users"
+        table xusers
+        order zemail
+        select "zemail='"+#user+"'"
+        rows 20
+        objects  zemail attrib(link "login?screen=xchangepass&command=Show&zemail=?"), ~
+                  xpassword, xaccess,zactive,xlastlogdate
+
+        totals "","Totals",sum
+
+        //headers none
+     end list
+
+
+     form one
+        caption "<ACRONYM>Change Password</ACRONYM>"
+	      table xusers
+        order zemail
+        select "zemail='"+#user+"'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Update,"<p>" ,~
+          zemail, xname,xpassword
+
+     end form
+
+end screen

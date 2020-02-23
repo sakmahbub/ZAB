@@ -1,0 +1,19 @@
+product ZAB ERP
+
+table salesbymarketview
+caption "Sales by Market"
+
+  sql create view salesbymarketview(zid,zorg,xdate,xmarket,xcus,xorg,xwh,xlong,xsm,xrsm,xfm,xsp,xlineamt,xvatamt,xdiscamt) ~
+	AS SELECT zb.zid,zb.zorg,ophd.xdate,ca.xmarket,ophd.xcus,ca.xorg,ophd.xwh,xc.xlong,ophd.xsm,ophd.xrsm,ophd.xfm,ophd.xsp,~
+	(SUM(ophd.xtotamt)-ISNULL(Sum(temptable.xlineamt),0)) AS xlineamt,~
+	(SUM(ophd.xvatamt)-ISNULL(SUM(temptable.xvatamt),0)) AS xvatamt,~
+	(SUM(ophd.xdiscamt)-ISNULL(SUM(temptable.xdiscamt),0)) AS xdiscamt FROM opdoheader ophd ~
+	INNER JOIN zbusiness zb ON zb.zid=ophd.zid ~
+	INNER Join xcodes xc ON ophd.zid=xc.zid and xc.xtype='Branch' and xc.xcode=ophd.xwh ~
+	INNER JOIN cacus ca ON ca.zid=ophd.zid and ca.xcus=ophd.xcus ~
+	LEFT JOIN ~
+	(SELECT ch.zid,ca.xmarket,ch.xcrnnum,ch.xordernum,sum(ch.xtotamt) as xlineamt,sum(ch.xvatamt) as xvatamt,SUM(ch.xdiscamt)as xdiscamt ~
+ 	From opcrnheader ch INNER JOIN cacus ca ON ch.zid=ca.zid AND ch.xcus=ca.xcus Group By ch.zid,ca.xmarket,ch.xcrnnum,ch.xordernum)~
+	temptable ON ophd.zid=temptable.zid  AND ophd.xdornum=temptable.xordernum AND ca.xmarket=temptable.xmarket ~
+	GROUP BY zb.zid,zb.zorg,ophd.xdate,ca.xmarket,ophd.xwh,xc.xlong,ophd.xcus,ophd.xsm,ophd.xrsm,ophd.xfm,ophd.xsp,ca.xorg
+end table

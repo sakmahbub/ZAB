@@ -1,0 +1,23 @@
+screen apdef
+     caption "AP Defaults"
+     //sidebar text two,list two, text three
+     sections form one
+
+
+     form one
+        caption "<h3>AP Defaults</h3>"
+	      table apdef
+        //order xcus
+        //select
+        return "login"
+        layout 2
+        objects Clear,Add, Update, Delete,"<p>" ,~
+          xyear,xper,xoffset,xaccGL,xscale
+          field xname
+            caption Credit Manager
+            width 50
+            column 3
+          end field
+     end form
+
+end screen

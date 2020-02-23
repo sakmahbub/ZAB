@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table pdcalenderheader
+  caption "PD Calender"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xyear,xlocation,xstatus,xshift,xdayname
+
+  primary key zid,xyear,xshift
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

@@ -1,0 +1,194 @@
+screen opdocashadvheader
+
+	 sidebar list detail, list ordlc,list ordsm,list dc
+     sections form one, jscript myscript
+
+     list detail
+        caption "DO Detail List For "+xdornum
+        table opdodetail
+        order xdornum,xdocrow
+        fixed xdornum
+        rows 20
+        objects  xdorrow attrib(link "login?screen=opdodetail&command=Show&xdornum=?&xdorrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where caitem.zid=opdodetail.zid and caitem.xitem=opdodetail.xitem)),~
+               xfabriccolor,xshipmode,xqtydel
+
+        headers "Row","Item","Description","Color","Delivery Mode","Qty"
+    	  total "Total","","","","",sum
+     end list
+
+     list ordlc
+        caption "Customer Order LC"
+        table opordheader
+        order xordernum
+        fixed xordernum
+		select "xtype='LC'"
+        rows 20
+        objects  xordernum attrib(link "login?screen=opordlcheader&command=Show&xordernum=?"), ~
+                 xpiref,xpidate,xcus,org equals((select xorg from cacus where zid=opordheader.zid and xcus=opordheader.xcus))
+
+        headers "Row No","PI No","PI Date","Customer Code","Name"
+     end list
+
+     list ordsm
+        caption "Sample Order"
+        table opordheader
+        order xordernum
+        fixed xordernum
+		select "xtype='Sample'"
+        rows 20
+        objects  xordernum attrib(link "login?screen=opordsmheader&command=Show&xordernum=?"), ~
+                 xpiref,xpidate,xcus,org equals((select xorg from cacus where zid=opordheader.zid and xcus=opordheader.xcus))
+
+        headers "Row No","PI No","PI Date","Customer Code","Name"
+     end list
+
+     list dc
+        caption "Delivery Chalan For : "+xdornum
+        table opdcheader
+        order xdornum,xdocnum
+        fixed xdornum
+        rows 20
+        objects  xdocnum attrib(link "login?screen=opdcheader&command=Show&xdocnum=?"),~
+                 xdate
+                 
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+     form one
+        caption "DO Header"
+        table opdoheader
+        order xdornum desc
+		//select "xtype in('LC','Sample')"
+        return "login"
+        layout 3
+        pstyle 3
+        objects ~
+               Show,Update,Clear,Detail,Confirm,"<p>" ,~
+               xdornum ,xdate,xpiref,xpidate,xcus display(const),xorg,xwh,xwhdesc,xstatusdor,xref,xstatus display(hide),~
+               xordernum display(const),xnote,xtype display(hide),xstatusmor display(const),xvoucher display(const)
+				
+		field xdate
+			caption DO Date
+		end field
+		
+        field xpiref
+          attrib local
+          caption PI No
+          diplay constant
+          event after
+            set xpiref = opordheader.xpiref("xordernum = '"+xordernum+"'")
+          end event
+        end field
+
+		
+        field xpidate
+          attrib local
+          caption PI Date
+          diplay constant
+          event after
+            set xpidate = opordheader.xpidate("xordernum = '"+xordernum+"'")
+          end event
+        end field
+
+		
+        field xorg
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")
+          end event
+        end field
+	
+        field xwhdesc
+          attrib local
+          caption Store
+          display constant
+          event after
+            set xwhdesc = xcodes.xlong("xtype='Store' and xcode='"+xwh+"'")//branchview.xlong("xwh = '"+xwh+"'")
+          end event
+        end field
+	
+        field Add
+          event before
+			set xstatusdor="Open"
+			set xstatusmor="Open"
+          	set trn = "DO--"
+            set xinvnum = #trn("DO Number",trn,10)
+          end event
+        end field
+		
+
+        field xnote
+          width 30
+//          column 3
+        end field
+
+        field xdornum
+           event after
+		    set globals(xdornum)=xdornum
+              set globals(xordernum)=xordernum
+			  set globals(xstatusdor)=xstatusdor
+				 set primeamount=#sql(double,"select sum(xqtydel) from opdodetail where xdornum='"+xdornum+"'")
+			// print primeamount
+				if xstatusdor .eq. "Confirmed"
+						set #field(Confirm.display) = "hidden"
+						set #field(Update.display) = "hidden"
+						else if xdornum .eq. ''
+						set #field(Confirm.display) = "hidden"
+						set #field(Update.display) = "hidden"
+						else if primeamount .le. 0.0
+						set #field(Confirm.display) = "hidden"
+					//	set #field(Update.display) = "hidden"
+						
+				end if
+				
+				class careports(getjspReport{opbill,1,xdornum,Print Bill})
+				class careports(getjspReport{opchallan,1,xdornum,Print Challan})
+				class careports(getjspReport{opgatepass,1,xdornum,Print Gate Pass})
+           end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+          field Confirm
+            event before
+				if xwh .eq. ""
+					error "Cannot Proceed -- Please Choose Store "
+				end if
+            end event
+            event after
+				set temp = #spsql(zabsp_OP_confirmDO,#id,#user,xdornum,xordernum,xdate,xwh,xcus,xtype,"opdoheader")
+	            action show
+            end event
+          end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "opdocashadvdetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

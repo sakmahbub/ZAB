@@ -1,0 +1,120 @@
+screen pdcalenderdetail
+     sidebar list trn
+	 sections form one,jscript myscript
+
+	list trn
+        caption "Holiday Detail"
+        table  pdcalenderdetail
+        order xyear,xyearperdate
+        fixed xyear,xshift
+		rows 365
+        objects xyearperdate attrib(link "login?screen=pdcalenderdetail&command=Show&xyear=?&xyearperdate=?"),xshift,~
+				 xdate,xdesc,xhdaytype,xnote
+        header "YPD","Shift","DATE","Day","Govt. Holiday","Remarks"
+     end list
+
+     form one
+        caption "<ACRONYM>"+xshift+" Shift Holiday Calender "+xyear+"</ACRONYM>"
+	    table pdcalenderdetail
+        order xyear,xyearperdate
+        fixed xyear,xshift
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Delete,*next,Return,Top,Next,Previous,Bottom,~ //Update,
+          xdate,xdesc display(const),xhdaytype,xyearperdate display(const),xnote
+		  
+        field xyearperdate
+		caption
+		  event before
+		    set globals(xyearperdate)=xyearperdate
+			//if xyearperdate .ne. "0"
+			//set xdate=#sub(xyearperdate,0,4)+"-"+#sub(xyearperdate,4,2)+"-"+#sub(xyearperdate,6,2)
+			//end if
+		  end event
+        end field
+		
+        field xdesc
+			caption Day Name
+        end field
+
+        field xhdaytype
+			caption
+        end field		
+
+        field xnote
+		width 40
+		column 2
+		height 2
+        end field		
+
+        field xdate
+          event before
+            set year = #sub(xdate,0,4)
+            set per = #sub(xdate,5,2)
+            set day = #sub(xdate,8,2)
+			//set xyearperdate=#sub(xdate,0,4)+#sub(xdate,5,2)+#sub(xdate,8,2)
+          end event
+        end field
+
+        field add
+          event before
+            set year = #sub(xdate,0,4)
+            if year <> xyear
+              error "Cannot Proceed"
+			  else
+			  set xyearperdate=#sub(xdate,0,4)+#sub(xdate,5,2)+#sub(xdate,8,2)
+            end if
+          end event
+		  event after
+		   set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xshift,"",xyear,xyearperdate,"pdcalenderdetail")
+		   action show
+		  end event
+        end field
+		
+	    field update
+          event before
+            set year = #sub(xdate,0,4)
+            if year <> xyear
+              error "Cannot Proceed"
+			  else
+			  set xyearperdate=#sub(xdate,0,4)+#sub(xdate,5,2)+#sub(xdate,8,2)
+            end if
+          end event
+		  event after
+		   set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xshift,"",xyear,xyearperdate,"pdcalenderdetail")
+		   action show
+		  end event
+        end field	
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Return"){
+            form.screen.value = "pdcalenderheader"
+            form.searchbutton.value = "Find xyear=?&xshift=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

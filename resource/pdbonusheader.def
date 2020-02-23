@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table pdbonusheader
+  caption "Bonus Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xtype,xqtybonus,xamount
+
+  primary key zid,xtype
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

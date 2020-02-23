@@ -1,0 +1,206 @@
+screen opordjobheaderother
+		
+	 sidebar list one,list do	
+     sections form one,jscript myscript
+
+   list one
+        caption "Detail List"
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        rows 20
+        objects  xorderrow attrib(link "login?screen=opordjobdetailother&command=Show&xordernum=?&xorderrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem)),xlineamt
+
+        totals "Total","","",sum
+
+        headers "Row","Item Code","Description","Line Amt"
+     end list
+
+
+     list doss
+        caption "DO Detail List For Order No: "+xordernum
+        table opdoheader
+        order xordernum,xdornum
+        fixed xordernum
+        rows 20
+        objects  xdornum attrib(link "login?screen=opdoheader&command=Show&xdornum=?"), ~
+                 xdate
+
+		  //headers "Row","Item","Description","Qty"//,"Rate","Line Amount"
+    	  //total "Total","","",sum//,"",sum
+     end list
+
+
+     form one
+        caption "JOB Order Header(Other)"
+	      table opordheader
+        order xordernum
+        return "login"
+		select "xtype='Other'"
+        layout 4
+        pstyle 3
+        objects Add,Update,Delete,Show,Clear,Detail,Top,Next,Previous, Bottom,"<p>" ,~//Create DO,
+          xordernum,xinvnum,xdate,xstatusord display(const),xconsignment,xcus,xorg,xcur,xsteamer,xdateeff display(hide),xwh,xwhdesc,xexch,xpiref display(hide),~
+		  xpidate display(hide),xtype display(hide),~
+		  xmawb display(hide),xdatemwab display(hide),xlcno,xlcdate,xdateassest,xprimetotamt,xbilloflad,xdatebilloflad,xdaterel,xata,xbillofexch,~
+		  xdatebillofexch,xpornum,xdateporec,xexportno,xexportdate,xdateeta,xvendor display(hide),~
+		  xcweight display(hide),xlong,xstype
+
+
+
+          field xorg
+            caption  Customer Name
+            display const
+            attrib local
+			event after
+				set xorg = cacus.xorg("xcus = '"+xcus+"'")
+			end event
+          end field
+
+          field xconsignment
+			display area
+			weidth 40
+			//column 2
+          end field
+		  
+		    field xstype
+			caption Job Type
+          display combo
+		  pick "Export,Import"
+          end field
+		  
+		   field xsteamer
+			display area
+			weidth 40
+			//column 2
+          end field
+		  
+		   field xwh
+			display text
+			pick list xwh
+			default #wh
+          end field
+
+		field xwhdesc
+			attrib local
+			display const
+			caption Division Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+          field xrem
+            width 50
+          end field
+		  
+		   field xbillofexch
+          caption B/E No.
+          end field
+		  
+		   field xbillofexch
+          caption B/E No.
+          end field
+		  
+		field xprimetotamt
+           caption Invoice Value
+        end field
+		  
+		 field xpornum
+		 caption PI /PO No.
+           pick
+          end field
+		  
+		   field xdateporec
+		 caption PI /PO Date
+           pick
+          end field
+		  
+		   field xdaterel
+          caption Goods dispatched/Cleared On
+          end field
+		  
+		     field xbilloflad
+          caption B/L Number
+          end field
+		  
+		     field xdatebilloflad
+          caption B/L Date
+          end field
+		  
+		field xlcno
+//            column 
+            width 20
+          end field
+		  
+		field xlong
+            column 2
+            width 70
+			height 2
+          end field
+
+          field xordernum
+            event after
+              set globals(xordernum) = xordernum
+            end event
+          end field
+
+          field add
+              event before
+			  if xcus .eq. ""
+			  error "Please select Customer ID"
+			  else
+				  set xtype="Other"
+				  set xstatusord="Open"
+                  set trn = "JOB-"
+				  set year = #sub(xdate,0,4)
+				 set ordernum = #trn("JOB Number",trn,10)   
+				 set xordernum= #sub(ordernum,0,4)+year+#sub(ordernum,6,10)
+              end event
+          end field
+
+          field update
+            event before
+			 set xtype="Other"
+			 set xstatusord="Open"
+            end event
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Create
+            event before
+            end event
+            event after
+	            set temp = #spsql(zabsp_DO_CreateDO,#id,#user,xordernum,xdate,xwh,xcus)
+	            action show
+            end event
+          end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "opordjobdetailother"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

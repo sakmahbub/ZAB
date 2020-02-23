@@ -1,0 +1,192 @@
+screen poreqdetjn
+
+
+	 sidebar list reqlist,list one
+     sections form one,  jscript myscript
+
+      list reqlist
+        caption "Store Requisition Detail List"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+		select "((xqtyreq-xqtyalc)-xqtycom)-xqtypor>0"
+        rows 20
+        objects  xrow attrib(name xrow#),xitem attrib(link "abc" embed onclick="return pickItem(this:xrow#:xbrand#:xqtyreq#)"),~
+               desc equals((select xdesc from caitem where zid = imtordetail.zid and xitem=imtordetail.xitem)),~
+		xbrand attrib(name xbrand#),(((xqtyreq-xqtyalc)-xqtycom)-xqtypor) attrib(name xqtyreq#),xunit attrib(name xunit#)
+//		xqtyalc attrib(name xqtyreq#),xunit attrib(name xunit#)
+	  headers "Serial No","Item","Name","Brand","Requisition Qty","Unit",
+     end list
+	 
+	list one
+        caption "Job Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=poreqdetjn&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xbrand,xunitpur,xqtyreq
+
+
+        headers "Line No","Item","Description","Brand","Unit","Qty Req"
+     end list
+
+
+     form one
+        caption "Job Detail For "+xporeqnum
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        //select
+        layout 2
+        pstyle 3
+        return "login"
+        objects Add,Update,Show,Clear,Delete,*next,Complete,Top, Previous, Next, Bottom,"<p>",~//Update, 
+                xrow attrib(row 0 1),xunitpur display(const), xitem, xdesc display(const),~
+				xqtyapv,xqtyreq display(hide),xdocrow,xqtypor display(hide),xqtyord display(hide),xbrand,xspecification//,xdatereq
+
+        embed onsubmit="return submitit(this)"
+
+		field xrow
+		  event after
+		   if xstatusreq .ne. "Open"
+			//  set #field(Update.display)="hidden"
+			  //set #field(Delete.display)="hidden"
+			  //set #field(Add.display)="hidden"
+			  end if
+		   end event
+		end field
+		
+		
+	field xqtyapv
+		caption Qty
+	end field
+	
+	field xdocrow
+		attrib readonly
+	end field
+	
+	field xbrand
+		display text
+		pick
+	end field
+
+	field xdum
+		caption.
+		attrib local
+		display const
+	end field
+
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+        
+	field xitem
+		attrib readonly
+		pick //list xitempo
+	end field
+
+        field Add
+          event before
+		  set xqtyreq=xqtyapv
+		  set xqtypor=0
+		  set xqtyord=0
+		  set xunitpur=caitem.xunit("xitem='"+xitem+"'")
+		  set xbrand=#trim(xbrand)
+		  double poqty=#sql("select ((xqtyreq-xqtyalc)-xqtycom) from imtordetail where xtornum='"+xtornum+"' and xrow='"+xdocrow+"' ")
+		  double prqty=#sql("select sum(xqtypor) from imtordetail where xtornum='"+xtornum+"' and xrow='"+xdocrow+"'")
+          double poqty2=prqty+xqtyreq
+		  if poqty<poqty2
+		  error "Qty exceed"
+		  end if
+		  end event
+          
+		  event after
+          set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xporeqnum,xtornum,xdocrow,xrow,"poreqdet")
+		  // set temp=#sql("Update imtordetail set xqtypor='"+xqtyapv+"' where xtornum='"+xtornum+"' and xrow='"+xdocrow+"'")
+            action show
+          end event
+        end field
+
+        field update
+          event before
+		  set xqtyreq=xqtyapv
+		 double poqty=#sql("select ((xqtyreq-xqtyalc)-xqtycom) from imtordetail where xtornum='"+xtornum+"' and xrow='"+xdocrow+"' ")
+		//  double prqty=#sql("select sum(xqtypor) from imtordetail where xtornum='"+xtornum+"' and xrow='"+xdocrow+"'")
+        //  double poqty2=prqty+xqtyreq
+		  if poqty<xqtyreq
+		  //error "Qty exceed"
+		  end if
+          end event
+          event after
+		//	 set temp=#sql("Update imtordetail set xqtypor='"+xqtyapv+"' where xtornum='"+xtornum+"' and xrow='"+xdocrow+"'")
+			set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xporeqnum,xtornum,xdocrow,xrow,"poreqdet")
+            action show
+          end event
+        end field
+		
+		  field delete
+          event before
+			set tornum=xtornum
+			set poreqnum=xporeqnum
+			set docrow=xdocrow
+			set row=xrow
+          end event
+          event after
+			// set temp=#sql("Update imtordetail set xqtypor=0 where xtornum='"+tornum+"' and xrow='"+docrow+"'")
+           set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,poreqnum,tornum,docrow,row,"poreqdet")
+          end event
+        end field
+
+         field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "poreqhedjn"
+            form.searchbutton.value = "Find xporeqnum=?"
+          }
+          return result
+        }
+		   function pickItem(link,row,brand,rqty){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+			document.one.xdocrow.value=row.text
+			document.one.xbrand.value=brand.text
+			document.one.xqtyapv.value =rqty.text
+          }else{
+            document.one.xitem.value=link.innerText   
+			document.one.xdocrow.value=row.innerText
+			document.one.xbrand.value=brand.text
+			document.one.xqtyapv.value =rqty.innerText	
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

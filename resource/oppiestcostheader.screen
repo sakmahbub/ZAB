@@ -1,0 +1,137 @@
+screen oppiestcostheader
+
+     sidebar list one,list two
+     sections form one,  jscript myscript
+    
+	
+	list one
+        caption "Processes For: "+xordernum+"<br> PI No: "+xpiref
+        table oppiestcostheader
+        order xordernum,xrow
+        fixed xordernum
+        rows 20
+        objects  xrow attrib(link "login?screen=oppiestcostheader&command=Show&xordernum=?&xrow=?"),xmoprcs, ~
+                 xdate,xfabriccolor
+
+        headers "Row No","Process Name","Date","Color"
+     end list
+              
+              
+     list two
+        caption "Extimated Cost for PI: "+xpiref+"<br> Process: "+xmoprcs
+        table oppiestcostdetail
+        order xordernum,xrow,xitemrow
+        fixed xordernum,xrow
+        rows 20
+        objects  xitemrow attrib(link "login?screen=oppiestcostdetail&command=Show&xordernum=?&xrow=?&xitemrow=?"),xitem, ~
+                 desc equals((select xdesc from caitem where zid=oppiestcostdetail.zid and xitem=oppiestcostdetail.xitem)),~
+                 xqtyord,xrate,xlineamt,xnote
+
+        totals "","Total","","","",sum,""
+
+        headers "Row No","Item","Description","Extimated Qty","Rate","Amount","Note"
+     end list
+              
+     form one
+        caption "Estimated Cost Entry Header For "+xpiref
+        table oppiestcostheader
+        order xordernum,xrow
+        fixed xordernum
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add,Update,Show,Clear,Delete,Cost Entry,Complete,~
+                xrow attrib(row 0 1),xmoprcs,xdate,xfabriccolor
+				
+		field xfabriccolor
+			//pick "select xfabriccolor from opfabriccolorview where xordernum='"+xordernum+"'"
+			pick "select distinct xfabriccolor from oporddetail where xordernum='"+xordernum+"'"
+		end field
+		
+		field xdate
+			caption Recipe Setting Date
+		end field
+		
+		field xmoprcs
+			event after
+				set globals(xrow)=xrow
+			end event
+		end field
+		
+		field xdum
+			attrib local
+			display const
+			caption 
+		end field
+		
+		field xdesc
+			attrib local
+			display const
+			caption Description
+			event after
+				set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xunit
+			attrib local
+			display const
+			caption Unit
+			event after
+				set xunit=caitem.xunit("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		
+       embed onsubmit="return submitit(this)"
+
+        field Cost
+          embed onclick="clicked(this)"
+        end field
+
+        field Required
+          embed onclick="clicked(this)"
+        end field
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Cost Entry"){
+            form.screen.value = "oppiestcostdetail"
+            form.searchbutton.value = "Top"
+          }
+          if (but == "Required Test & Parameter"){
+            form.screen.value = "mohprcsreqtest"
+            form.searchbutton.value = "Top"
+          }
+          if (but == "Complete"){
+            form.screen.value = "oppiheader"
+            form.searchbutton.value = "Find xordernum=?"
+          }
+              but = ''
+              return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

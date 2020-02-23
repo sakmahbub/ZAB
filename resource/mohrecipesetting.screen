@@ -1,0 +1,317 @@
+screen mohrecipesetting
+
+//giash   sidebar list one,list moprcs, list two
+     sidebar list moprcs, list two
+     sections form one,list recipe,list test,jscript myscript
+
+	 list one
+        caption "Select Process From Estimated Cost: "+xordernum+"<br> PI No: "+xpiref
+        table oppiestcostheader
+        order xordernum,xrow
+        fixed xordernum
+        rows 20
+        objects  xrow attrib(link "abc" embed onclick="return pickItem(this:xmoprcs#:xfabriccolor#)"),xmoprcs attrib(name xmoprcs#), ~
+                 xfabriccolor attrib(name xfabriccolor#)
+
+        //headers "Row No","Process Name","Date","Color"
+     end list
+              
+     list moprcs
+        caption "Selected Processes for Batch "+xbatch
+        table mohrecipesetting
+        order xbatch,xrow
+        fixed xbatch
+        rows 100
+        objects  xrow,xmoprcs attrib(link "login?screen=mohrecipesetting&command=Show&xbatch=?&xrow=?"), ~
+                 xdate,xfabriccolor,xprcstype,xstatusrec
+
+        headers "Row No","Process Name","Date","Color","Process","Process Type"
+     end list
+              
+     list two
+        caption "Recipe for <br>Batch "+xbatch+" Process "+xmoprcs+" (Color: "+xfabriccolor+") Process: "+xprcstype+""
+        table mohrecipesettingdetail
+        order xbatch,xrow,xitemrow
+        fixed xbatch,xrow
+        rows 100
+        objects  xitemrow,xitem,~ //attrib(link "login?screen=mohrecipesettingdetail&command=Show&xbatch=?&xrow=?&xitemrow=?"), ~
+                 desc equals((select xdesc from caitem where zid=mohrecipesettingdetail.zid and xitem=mohrecipesettingdetail.xitem)),~
+                 xqtymix,xqtyadd,unit equals((select xunitsel from caitem where zid=mohrecipesettingdetail.zid and xitem=mohrecipesettingdetail.xitem))
+
+        //totals "","Totals","","",sum,sum,""
+
+        headers "Row No","Item","Description","Recipe Qty","Add. Qty","Unit"
+     end list
+
+	 list recipe
+        caption "Detail List For: "+xbatch
+        table modetail
+        order xbatch,xrow
+        fixed xbatch
+        rows 40
+        objects xrow attrib(link "login?screen=mohrecipesetting&command=Show&xbatch=?&xrow=?"), ~
+				xitem,desc equals((select xdesc from caitem where caitem.zid=modetail.zid and caitem.xitem=modetail.xitem)),~
+				xfabriccolor,xprcstype,xfabrictype,xqtymor,~
+				unit equals((select xunitsel from caitem where caitem.zid=modetail.zid and caitem.xitem=modetail.xitem))
+
+        headers "Line No","Item","Description","Fabric Color","Process Type","Fabric Type","Order Qty","Unit"
+	    total "","","","Total","","",sum
+     end list
+	 
+     list test
+        caption "Required Test for Batch "+xbatch+" Process "+xmoprcs+" (Color: "+xfabriccolor+") Process: "+xprcstype+""
+        table mohprcsreqtest
+        order xbatch,xrow,xitemrow
+        fixed xbatch,xrow
+        rows 20
+        objects  xrow ,xcode,xnote
+		headers "Row No","Code","Test Name"
+      end list
+	 
+      form one
+        caption "Recipe For "+xbatch+" PI No: "+xpiref
+        table mohrecipesetting
+        order xbatch,xrow
+        fixed xbatch
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add,Update,Show,Clear,*next,*next,*next,Delete,*next,*next,Next,Previous,Required Test & Parameter,Recipe Setting,Additional QTY Entry,Complete,~
+                xrow attrib(row 0 1),xmoprcs ,xdate,xusecolor display(hide),xfabriccolor,xstatusprcs display(hide),~
+				xwh display(hide),xstatusrec,xprcstype,xtype display(hide),xdocrow
+				
+		field xrow
+			event after
+				Set moname=#trim(xmoprcs)
+				set globals(xbatch)=xbatch
+				set globals(xrow)=xrow
+				set globals(moname)=moname
+				set globals(xfabriccolor)=xfabriccolor
+				set globals(xprcstype)=xprcstype
+				//set globals(xdocrow)=xdocrow				
+			end event
+		end field	
+		
+		field xdocrow
+			event after
+				set qtymix=#sql(double,"select ISNULL(sum(xqtymix),0) from mohrecipesettingdetail where zid='"+#id+"' and xbatch='"+xbatch+"' and xmoprcs='"+xmoprcs+"' and xrow='"+xrow+"'")
+				set qtyadd=#sql(double,"select ISNULL(sum(xqtyadd),0) from mohrecipesettingdetail where zid='"+#id+"' and xbatch='"+xbatch+"' and xmoprcs='"+xmoprcs+"' and xrow='"+xrow+"'")
+				set qtyreq=#sql(double,"select ISNULL(sum(xqtyreq),0) from mohrecipesettingdetail where zid='"+#id+"' and xbatch='"+xbatch+"' and xmoprcs='"+xmoprcs+"' and xrow='"+xrow+"'")
+				double qtymix= qtymix
+				double qtyreq= qtyreq
+				double qtyadd= qtyadd
+				set type=mohrecipesetting.xtype("xbatch='"+xbatch+"' and xrow='"+xrow+"'")
+				if qtymix .lt. 0.0001
+							set #field(Additional.display) = "hidden"
+				else if  qtyreq .ge. qtymix .and. type .ne. "First Process"
+				//set #field(Recipe.display) = "hidden"
+			//	else if qtymix+qtyadd-qtyreq .gt. 0.0001
+			//				set #field(Additional.display) = "hidden"
+				end if
+				//print xordernum
+//giash					set globals(xdocrow)=xdocrow
+//giash					set globals(xmoprcs)=xmoprcs
+			end event
+		end field
+		
+		field xprcstype
+			display combo
+			pick "select xprcstype from opfabriccolorview where xordernum='"+xordernum+"'"
+		end field
+		
+		field xfabriccolor
+			pick "select distinct xfabriccolor from opfabriccolorview where xordernum='"+xordernum+"'"
+			//pick "select xfabriccolor from oporddetail where xordernum='"+xordernum+"'"
+		end field
+				
+		field xmoprcs1
+			display text
+			attrib readonly
+			pick
+		end field
+				
+		field xdocrow
+			caption Estimated Cost Row
+			attrib readonly
+		end field
+				
+		field xstatusrec
+			caption Production Process Type
+			display combo
+			pick "Normal,Reprocess"
+			default "Normal"	
+		end field
+		
+		field xdate
+			caption Planning Date
+		end field
+		
+		field xmoprcs
+			event after
+				//set globals(xrow)=xrow
+				//set globals(xmoprcs)=xmoprcs
+			end event
+		end field
+		
+		field xdum
+			attrib local
+			display const
+			caption 
+		end field
+		
+		field xdesc
+			attrib local
+			display const
+			caption Description
+			event after
+				set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xunit
+			attrib local
+			display const
+			caption Unit
+			event after
+				set xunit=caitem.xunit("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field add
+			event before
+			set prcs=#sql("select xprcstype from opfabriccolorview where xordernum='"+xordernum+"' and xprcstype='"+xprcstype+"' and xfabriccolor='"+xfabriccolor+"'")
+		  	if prcs .ne. xprcstype
+				error "Cannot Proceed -- Color and Process doesn't match"
+			end if	
+				if xmoprcs .eq. moheader.xmoprcs("xbatch='"+xbatch+"'")
+					set xtype="First Process"
+				else 
+					set xtype=""
+				end if
+				if xusecolor .eq. "Yes"
+					if xfabriccolor .eq. ""
+					//	error "Cannot Proceed -- Please Choose Fabric Color"
+					end if
+				end if 
+				if xfabriccolor .ne. ""
+					set xusecolor = "Yes"
+				else 
+					set xusecolor = "No"
+				end if
+			if xcodes.xtypeobj("xtype='Production Process' and xcode='"+xmoprcs+"'") .eq. "Pretreatment"
+				set xfabriccolor = ""
+			end if
+          		set xstatusprcs = "Open"
+				set xwh=moheader.xwh("xbatch='"+xbatch+"'")
+          	end event
+
+			event after
+
+	            //action show
+			end event
+		end field
+		
+		field update
+			event before
+			set prcs=#sql("select xprcstype from opfabriccolorview where xordernum='"+xordernum+"' and xprcstype='"+xprcstype+"' and xfabriccolor='"+xfabriccolor+"'")
+		  	if prcs .ne. xprcstype
+				error "Cannot Proceed -- Color and Process doesn't match"
+			end if			
+				if xmoprcs .eq. moheader.xmoprcs("xbatch='"+xbatch+"'")
+					set xtype="First Process"
+				else 
+					set xtype=""
+				end if
+				set xwh=moheader.xwh("xbatch='"+xbatch+"'")
+				if xcodes.xtypeobj("xtype='Production Process' and xcode='"+xmoprcs+"'") .eq. "Pretreatment"
+					set xfabriccolor = ""
+			end if
+			end event
+			
+		end field
+
+		
+		field Confirm
+			event before
+			end event
+			event after
+	            //set temp = #spsql(zabsp_MO_confirmMixing,#id,#user,xbatch,xdate)
+			end event
+		end field
+
+		
+       embed onsubmit="return submitit(this)"
+
+        field Recipe
+          embed onclick="clicked(this)"
+        end field
+
+        field Additional
+          embed onclick="clicked(this)"
+        end field
+
+        field Required
+          embed onclick="clicked(this)"
+        end field
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Recipe Setting"){
+            form.screen.value = "mohrecipesettingdetail"
+            form.searchbutton.value = "Clear"
+          }
+          if (but == "Additional QTY Entry"){
+            form.screen.value = "mohrecipesettingdetailadd"
+            form.searchbutton.value = "Top"
+          }
+          if (but == "Required Test & Parameter"){
+            form.screen.value = "mohprcsreqtest"
+            form.searchbutton.value = "Top"
+          }
+          if (but == "Complete"){
+            //form.screen.value = "moheader"
+            form.screen.value = "moheaderrecipe"
+            form.searchbutton.value = "Find xbatch=?"
+          }
+              but = ''
+              return result
+        }
+		
+        function pickItem(link,moprcs,fabrcolor){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xdocrow.value=link.text
+            document.one.xmoprcs.value=moprcs.text
+            document.one.xfabriccolor.value=fabrcolor.text
+          }else{
+            document.one.xdocrow.value=link.innerText
+            document.one.xmoprcs.value=moprcs.innerText
+            document.one.xfabriccolor.value=fabrcolor.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+end screen
+
+
+
+

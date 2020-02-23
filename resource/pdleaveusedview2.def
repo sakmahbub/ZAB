@@ -1,0 +1,39 @@
+
+product ZAB ERP
+
+table pdleaveusedview
+  caption "Available Leave View"
+  columns zid,xvoucher,xrow,xyear,xper,xdate,xstaff,xtype,xamount,xpercent,xqty,xtrntype,xlong,xposition
+
+  primary key zid,xvoucher,xrow
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdleaveusedview (zid,xstaff,xtypeleave,xday,xuse,xavailable) ~
+	AS SELECT CASE WHEN m.xsex=l.xdesc THEN m.zid ~
+						WHEN l.xdesc='' THEN m.zid END AS zid ~
+			,CASE WHEN m.xsex=l.xdesc THEN m.xstaff ~
+						WHEN l.xdesc='' THEN m.xstaff END AS xstaff ~
+			,CASE WHEN m.xsex=l.xdesc THEN l.xtypeleave ~
+						WHEN l.xdesc='' THEN l.xtypeleave END AS xtypeleave ~
+			,CASE WHEN m.xsex=l.xdesc THEN l.xday ~
+						WHEN l.xdesc='' THEN l.xday END AS xday ~
+			,CASE WHEN m.xsex=l.xdesc THEN SUM(ISNULL(temptable.xday, 0)) ~
+						WHEN l.xdesc='' THEN SUM(ISNULL(temptable.xday, 0)) END AS xuse ~
+			,CASE WHEN m.xsex=l.xdesc THEN SUM(l.xday - ISNULL(temptable.xday, 0)) ~
+						WHEN l.xdesc='' THEN SUM(l.xday - ISNULL(temptable.xday, 0)) END AS xavailable ~
+FROM dbo.pdmst m ~
+LEFT OUTER JOIN dbo.pdleave l ON m.zid = l.zid ~
+LEFT OUTER JOIN ~
+	(SELECT zid ~
+				,xstaff ~
+				,xtypeleave ~
+				,SUM(ISNULL(xday, 0)) AS xday ~
+ 	FROM pdleaveheader ~
+ 	GROUP BY zid,xstaff,xtypeleave) temptable ON temptable.zid = m.zid AND temptable.xtypeleave = l.xtypeleave AND temptable.xstaff = m.xstaff ~
+GROUP BY m.zid, m.xstaff, l.xtypeleave, l.xday, m.xsex, l.xdesc
+
+
+end table

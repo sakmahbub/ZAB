@@ -1,0 +1,14 @@
+//Query.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Store Requisition (SR) Status        	|#classPath+"/login?screen=moreqheader_q"        |       |      |120
+Store Purchase Requisition (SPR) Status |#classPath+"/login?screen=imsprheader_q"        |       |      |120
+Purchase Requisition (PR) Status        |#classPath+"/login?screen=poreqheader_q"        |       |      |120
+Purchase Order (PO) Status        		|#classPath+"/login?screen=poordheader_q"        |       |      |120
+Goods receipts Note (GRN) Status        |#classPath+"/login?screen=pogrnsr"        		 |       |      |120
+Inspection Status        				|#classPath+"/login?screen=imtorheaderinsp_q"    |       |      |120
+Payment Authorization status			|#classPath+"/login?screen=appayment_q"    		 |       |      |120
+PRN Status        						|#classPath+"/login?screen=imtorheaderprn_q"     |       |      |120
+LC Status        						|#classPath+"/login?screen=poordlcinfo_q"        |       |      |120
+Voucher Status        					|#classPath+"/login?screen=acheader_q"        	 |       |      |120

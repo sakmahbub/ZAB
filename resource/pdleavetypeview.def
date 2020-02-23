@@ -1,0 +1,26 @@
+product ZAB ERP
+
+table pdleavetypeview
+  caption "Leave Type View"
+  columns zid,xgrnnum,xvoucher,xsup,xdate,xrow,xitem,xqtygrn,xunitpur,xrate,xlong,xlineamt,xpornum,xstatusgrn,xwh
+
+  primary key zid,xgrnnum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdleavetypeview (zid,xstaff,xtypeleave) ~
+                  as select zid,xstaff, xtypeleave from pdleaveasigne group by zid,xstaff,xtypeleave ~
+				union all ~
+				select a.zid,b.xstaff,a.xcode from xcodes a join pdmst b on a.zid=b.zid ~
+				where a.xtype='Leave Type' and a.zactive=1 and a.xtypeobj='Yes'
+
+				  
+end table
+
+
+
+
+
+

@@ -1,0 +1,101 @@
+screen pdinvdetail
+
+    sidebar list inv
+    sections form one,jscript myscript
+
+  	list inv
+        caption "Investment Detail"
+        table pdinvdetail
+        order xyear,xstaff,xrow
+        fixed xyear,xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdinvdetail&command=Show&xyear=?&xstaff=?&xrow=?"), ~
+                 xtype,xamount
+
+        header "Line No","Investment Type","Amount"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Investment Detail For "+xstaff+"</ACRONYM>"
+	      table pdinvdetail
+        order xyear,xstaff,xrow
+        fixed xyear,xstaff
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add,Update,Delete,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~
+          xrow attrib(row 0 1),xdum,xtype,xamount,xnote,xsign display(hide)
+
+
+        field xtype
+          caption Investment Type
+          pick code Investment Type
+        end field
+
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+        field xnote
+          width 80
+          height 2
+          column 2
+        end field
+
+        field add
+          event before
+//            if xtype .eq. "P.F. for both Employee and Eployer"
+//              double basic = #sql(double,"select sum(xamount) from pdsalarydetail where xstaff='"+xstaff+"' and xtype='Basic'")
+//              set xamount = basic*20
+//              set xamount = xamount/100
+            end if
+
+          end event
+        end field
+
+        field update
+          event before
+            set typetrn = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+            if typetrn .eq. "Addition"
+              set xsign=1
+            else
+              set xsign = -1
+            end if
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdinvheader"
+            form.searchbutton.value = "Find xyear=?&xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

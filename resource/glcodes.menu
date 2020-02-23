@@ -1,0 +1,11 @@
+//cm.menu
+//---------------------------------------------------------------------------------------
+option                  |action                                          |modules|models|image|width
+//---------------------------------------------------------------------------------------
+Bank Name Entry                  |#classPath+"/login?screen=cabank"
+Plant Master                     |#classPath+"/login?screen=xcodesplant"               
+Project Master                   |#classPath+"/login?screen=xcodesproject"  
+Store                            |#classPath+"/login?screen=xcodesbranch"  
+Delivery Location Entry          |#classPath+"/login?screen=xcodesdelivery" 
+
+//-------------------------------------------------------------------

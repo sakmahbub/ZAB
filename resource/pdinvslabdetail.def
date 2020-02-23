@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table pdinvslabdetail
+  caption "PD Inv slab detail"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xyear,xrow,xslabrow,xinvslab,xinvslabfemale,xinvrate,xtinvslab
+
+  primary key zid,xyear,xrow,xslabrow
+  foreign key
+        zid references zbusiness.zid
+        zid,xyear,xrow references pdinvslab.zid,xyear,xrow
+  end foreign key
+
+end table

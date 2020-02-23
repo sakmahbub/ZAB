@@ -1,0 +1,15 @@
+     list xloanret
+        caption "Loan Return List"</b>"
+        table imtorheader
+        order xtornum desc
+		linkobjects xacc
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4)='LRE-' and xstatusloan='Open' and xtype='Loan Receive')"
+		searchselect "left(xtornum,4)='LRE-' and xstatusloan='Open' and xtype='Loan Receive'"
+        rows 10
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xordernum,xacc
+		 
+		headers "Loan Number","Date" ,"Ref","Party"
+     end list
+
+

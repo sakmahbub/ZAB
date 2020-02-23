@@ -1,0 +1,14 @@
+product ZAB
+
+table binmaster
+
+  caption "Bin Master"
+  columns ztime,zutime,zauserid,zuuserid,zid,xbinref,xwh,xarea,xrowno,xshelf,xbin,xlong,zactive
+
+          
+  primary key zid,xbinref
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

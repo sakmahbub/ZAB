@@ -1,0 +1,60 @@
+screen pdtrnprocs
+
+  sections form one
+
+  form one
+    caption "<ACRONYM>Transaction Process</ACRONYM>"
+    return "login"
+    layout 2
+    pstyle 3
+
+    objects Process,xyear,xper,xempcategory,xday //display(hide)
+
+   // field xempcategory
+		//default #wh	
+	//display combo
+	//pick "Head Office"
+    //end field
+
+    field xdum
+      attrib local
+      display const
+      caption
+    end field
+
+    field xtstaff
+      default "z"
+    end field
+	
+    field xday
+      default 0
+	  caption Day Before Process
+    end field	
+
+    field xyear
+      attrib local
+      default #sub(#date,0,4)
+    end field
+
+    field xper
+      attrib local
+      default #sub(#date,5,2)
+    end field
+
+
+    field Process
+	event before
+	if xyear < 1
+		error "Please select year!"
+	else if xper < 1
+		error "Please select Period!"
+	end if
+	end event
+      event after		
+		set temp = #spsql(zabsp_Pd_TransactionEntry,#id,#user,xempcategory,xyear,xper,xday) 
+      end event
+    end field
+
+  end form
+
+end screen

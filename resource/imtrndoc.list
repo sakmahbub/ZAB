@@ -1,0 +1,13 @@
+list imtrndoc
+        caption "Search Results for Doc No : "+zvalue
+        table imstock
+        order xitem
+        select "xwh='Factory' and xitem like '%"+zvalue+"%' or  xdesc like '%"+zvalue+"%'"
+        rows 15
+
+        objects  xitem attrib(link "abc" embed onclick="return updateParent(this:'');return false"),~
+                 xdesc,xavail
+
+     end list
+
+

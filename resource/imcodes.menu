@@ -1,0 +1,32 @@
+//imcodes.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Transaction Codes              |#classPath+"/login?screen=xtrn(xtypetrn=Inventory Transaction)"
+Transaction Codes                |#classPath+"/login?screen=xtrnimtrn"
+Inventory Transaction	         |#classPath+"/login?screen=xtrnp(xtypetrn=Inventory Transaction)"
+Tag Transaction                  |#classPath+"/login?screen=xtrn(xtypetrn=Tag Transaction)"
+//Loan Nature                      |#classPath+"/login?screen=xcodesloan"
+Store Type                       |#classPath+"/login?screen=xcodes(xtype=Store Type)"
+Issue Area                       |#classPath+"/login?screen=xcodes(xtype=Issue Area)"
+Store Tag                        |#classPath+"/login?screen=imstoretag"  
+//DC Related Transaction Codes   |#classPath+"/login?screen=xtrnp(xtypetrn=DC Number)"
+Transfer Transaction Code      |#classPath+"/login?screen=xtrn(xtypetrn=Transfer Transaction)"
+//Related Codes Transfer         |#classPath+"/login?screen=xtrnp(xtypetrn=Transfer Transaction)"
+//Transaction Codes Tag          |#classPath+"/login?screen=xtrn(xtypetrn=Tag Transaction)"
+//IM To GL Interface Table         |#classPath+"/login?screen=imtogli"
+
+//-------------  Codes  ------------
+//Item Groups                      |#classPath+"/login?screen=xcodes(xtype=Item Group)"
+//Item Group Parameters            |#classPath+"/login?screen=xcodesp(xtype=Item Group)"
+//Item Class                       |#classPath+"/login?screen=xcodes(xtype=Item Class)"
+//Count                            |#classPath+"/login?screen=xcodes(xtype=Count)"
+//Warehouses                       |#classPath+"/login?screen=xcodes(xtype=Warehouse)"
+//ABC Codes                        |#classPath+"/login?screen=xcodes(xtype=ABC Code)"
+//Supercession Code                |#classPath+"/login?screen=xcodes(xtype=Supercession Code)"
+//Units of Measure                 |#classPath+"/login?screen=xcodes(xtype=Unit of Measure)"
+//Reorder Class                    |#classPath+"/login?screen=xcodes(xtype=Reorder Class)"
+//Item Code                        |#classPath+"/login?screen=xtrn(xtypetrn=Item Code)"
+Issue Type                     	   |#classPath+"/login?screen=xcodes(xtype=Issue Type)"
+//-------------------------------------------------------------------
+

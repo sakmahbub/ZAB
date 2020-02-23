@@ -1,0 +1,10 @@
+//MIS Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Sales Reports                    |#classPath+"/login?menu=misrepsales"
+Ledger & Ageing Reports          |#classPath+"/login?menu=misrepled"
+Inventory Reports                |#classPath+"/login?menu=misrepim"
+Flag Wise Product Sale           |#classPath+"/login?screen=*crystal opflagbyproduct(xdate=From Date=#date,xdate=To Date=#date,xproject=Project Flag,xitem=From Item,xitem=To Item=zzz)"
+//-------------------------------------------------------------------
+

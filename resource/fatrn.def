@@ -1,0 +1,17 @@
+product ZAB ERP
+
+table fatrn
+  caption "Fixed Asset Transaction"
+  columns ztime,zutime,zid,zauserid,zuuserid,xvoucher,xcode,~
+  xdeptname,xsec,xtdeptname,xtsec,~
+  xyear,xper,xdate,~
+  xval,xlong,xrelife,xstatusjv,xcat,xtype,xdocnum
+
+  primary key zid, xvoucher
+  foreign key
+        zid references zbusiness.zid
+        zid,xcode references famst.zid,xcode
+  end foreign key
+
+
+end table

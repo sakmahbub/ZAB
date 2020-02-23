@@ -1,0 +1,72 @@
+screen opsumproctransit
+
+    sections form one,jscript myscript
+
+     form one
+        caption "Summary Process For Transit"
+        table opdoheader
+        primarykey xroute,xpaymentterm
+        order xroute,xpaymentterm
+        //select "xwh='"+#wh+"' and xstatusord='On Transit'"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Clear,Process,"<p>" ,~
+                xfroute,xtroute,xdatedel,xwh display(const)
+
+        field xfroute
+		attrib local
+		caption From Route
+		display text
+		pick list xroute
+        end field
+
+
+        field xtroute
+		attrib local
+		caption To Route
+		display text
+		default "z"
+		pick list xroute
+        end field
+
+	field xwh
+		default #wh
+	end field
+
+        field Process
+          event after
+            set temp = #spsql(zabsp_PRCS_summaryProcessTrnasit,#id,#user,#wh,xdatedel,xfroute,xtroute)
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "opsumprocdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

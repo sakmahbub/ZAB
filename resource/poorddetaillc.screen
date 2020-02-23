@@ -1,0 +1,271 @@
+screen poorddetaillc
+
+
+     sidebar list one//,list costdetail
+     sections form one,  jscript myscript
+
+     list one
+        caption "PO Detail List For "+xpornum
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow attrib(link "login?screen=poorddetaillc&command=Show&xpornum=?&xrow=?"),~
+                xitem,desc equals((select xdesc from caitem where zid=poorddetail.zid and  xitem=poorddetail.xitem)),~
+				xserial,~
+				xqtypur,xunitpur,xrate,xlineamt,xbase
+
+        headers "Row","Item","Description","Part No","Quantity","Unit","Rate","Line Amount","Line Amount(BDT)"
+	  total "","Total","","","","",sum,sum,sum
+     end list
+
+  list cost
+    caption "Item Detail List"
+    table lcitemcost
+    order xpornum,xrow,xcostrow
+    fixed xpornum,xrow
+    rows 20
+    objects  xrow attrib(link "login?screen=lcitemcost&command=Show&xpornum=?&xrow=?"), ~
+             xaccdr,descdr equals((select xdesc from acmst where acmst.zid=lcitemcost.zid and acmst.xacc=lcitemcost.xaccdr)),~
+				 //xacccr,descdr equals((select xdesc from acmst where acmst.zid=lcitemcost.zid and acmst.xacc=lcitemcost.xacccr)),~
+				 xprime,xtype
+	total "","","Total",sum			 
+	headers "Line No","Cost Code","Description","Amount","Cost Type"
+  end list
+  
+  	list costdetail
+		caption "Item Wise Opening Cost Detail"
+		table lcitemcostview
+		order xserial,xrow
+		 fixed xpornum,xserial
+		rows 50
+		objects  xrow,~// attrib(link "login?screen=lcitemcost&command=Show&xlcno=?&xrow=?"), ~
+				 xserial,xaccdr,xdes1,xacccr,xdes2,xprime,xvoucher,xstatusjv
+
+		totals "","","Total","","","",sum,"",""
+
+		headers "Line No","Part No","Debit Account","Description","Credit Account","Description","Amount","Voucher No","Voucher Status"
+	end list
+
+     form one
+        caption "PO Detail For :"+xpornum
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        layout 2
+        pstyle 3
+        return "login"
+        objects Add,Show,Clear,Update, Delete,*next,Complete,Top, Previous, Next, Bottom,"<p>",~  //Cost Detail,
+                xrow attrib(row 0 1),xunitpur display(const),xitem,xdesc display(const),xserial,~
+				xqtypur,xrate,xlineamt display(const),xbase display(const),~//xprimebuyer display(const),xbuyeramt,~
+				xnote,xqtygrn display(hide)
+
+        embed onsubmit="return submitit(this)"
+
+		field xrow
+          event after
+			set globals(xrow)=xrow
+          end event
+        end field
+
+
+	field xbase
+		caption LC Amount (BDT)
+	end field
+	
+	field xlineamt
+		caption LC Amount (LC Currency)
+	end field
+	
+	field xqtypur
+	end field
+	
+	field xttamount
+		caption Other Amount (Other Currency)
+	end field
+
+	field xttbuyer
+		caption Other Amount (Invoice Currency)
+	end field
+
+	field xttbase
+		caption Other Amount (BDT)
+	end field
+
+	field xprimebuyer
+		caption LC Amount (Invoice Currency)
+	end field
+	
+	field xmenufacture
+		caption Manuf. ID.
+		pick list caman
+	end field
+	
+	field xmodelyear
+	display text
+	end field
+
+	field xdum
+		caption.
+		attrib local
+		display const
+	end field
+
+		field xorigin
+		display combo
+		pick "select xcode from xcodes where xtype='Origin' and zactive=1"
+		caption COUNTRY OF ORIGIN
+		width 70
+        end field
+	
+
+	field xorg
+		attrib local
+        	display const
+        	caption Manuf. Description
+        	event after
+        		set xorg=caman.xorg("xman='"+xmenufacture+"'")
+        	end event
+	end field
+
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+        
+	field xitem
+		//pick list xitempo
+	end field
+
+	field xrate
+            caption Unit Price
+    end field
+	
+		field xbuyeramt
+            caption Invoice Amount
+    end field
+	
+        field xnote
+          width 70
+          column 2
+        end field
+
+        field xqtydel
+//          display constant
+        end field
+
+        field Add
+          event before
+			set chassis=#sql("select xserial from carinfo where xserial='"+xserial+"'")
+			if chassis .eq. xserial .and. xserial .ne. ""
+			error "Cannot Proceed -- Part No already Exists"
+			else if xqtypur == 0
+				error "Cannot Proceed -- Qty is 0"
+			else if xrate == 0
+				error "Cannot Proceed -- Rate is 0"
+			else
+            set xunitpur = caitem.xunit("xitem='"+xitem+"'")
+            set xcfpur = caitem.xcfpur("xitem='"+xitem+"'")
+            set xspecification = caitem.xspecification("xitem='"+xitem+"'")
+			set xhscode = caitem.xhscode("xitem='"+xitem+"'")
+ 
+		//   set xrate = caitem.xrate("xitem='"+xitem+"'")
+         //   set xcfpur = caitem.xcafpur("xitem='"+xitem+"'")
+            set xqtygrn = 0.00
+			set xdisc=0
+			set xdiscf=0
+			end if
+          end event
+          event after
+           set temp = #spsql(zabsp_PO_validateAfterDetailPO,#id,#user,xpornum,xdate,xrow,xitem,xqtypur,xrate,0,0)
+
+		   set temp = #spsql(zabsp_Update_LC_Currency,#id,#user,xlcno,xpornum,xrow,"LC Currency")
+		   //set temp = #spsql(zabsp_car_info_Update,#id,#user,xpornum,xrow,"","")
+		   //set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xpornum,xlcno,0,xrow,"poorddetaillc")
+            action show
+          end event
+        end field
+
+        field update
+          event before
+             set xunitpur = caitem.xunit("xitem='"+xitem+"'")
+            set xcfpur = caitem.xcfpur("xitem='"+xitem+"'")
+			set xspecification = caitem.xspecification("xitem='"+xitem+"'")
+			set xhscode = caitem.xhscode("xitem='"+xitem+"'")
+			set xdisc=0
+			set xdiscf=0
+
+          //  set xcfpur = caitem.xcfpur("xitem='"+xitem+"'")
+          end event
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailPO,#id,#user,xpornum,xdate,xrow,xitem,xqtypur,xrate,0,0)
+			set temp = #spsql(zabsp_Update_LC_Currency,#id,#user,xlcno,xpornum,xrow,"LC Currency")
+			//set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xpornum,xlcno,0,xrow,"poorddetaillc")
+            // set temp = #spsql(zabsp_car_info_Update,#id,#user,xpornum,xrow,"","")
+			//set temp = #spsql(zabsp_Update_LC_Currency,#id,#user,xlcno,xpornum,xrow,"GRN Currency")
+			action show
+          end event
+        end field
+		
+		 field delete
+          event before
+            set pornum = xpornum
+            set row = xrow
+			set chassisno = xserial
+			set date= xdate
+			set item = xitem
+			set qtypur = xqtypur
+			set rate=xrate
+          end event
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailPO,#id,#user,pornum,date,row,item,qtypur,rate,0,0)
+            set temp = #spsql(zabsp_car_info_Update,#id,#user,pornum,row,"Delete",chassisno)
+			action show
+          end event
+        end field
+
+         field Complete
+          embed onclick="clicked(this)"
+        end field
+
+         field Cost
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "poordlcinfo"
+            form.searchbutton.value = "Find xpornum=?"
+          }
+          if (but == "Cost Detail"){
+            form.screen.value = "lcitemcost"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

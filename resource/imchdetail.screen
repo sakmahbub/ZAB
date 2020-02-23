@@ -1,0 +1,133 @@
+screen imchdetail
+
+     caption "Transfer Order Detail"
+     sidebar list one,list price
+     sections  form one, jscript myscript
+
+    list one
+        caption "<br><center><b>"Transfer Order Detail List"</b>"
+        table imchdetail
+        order ximtrnnum,xrow
+        fixed ximtrnnum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=imchdetail&command=Show&ximtrnnum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imchdetail.zid and xitem=imchdetail.xitem)),~
+        xqtyord,xrate,xpacking,xcartoon
+
+        headers "Serial No","Product Code","Product Name","Qunatity Ordered","Trade Price","Packing Size","Cartoon"
+     end list
+
+     list price
+        caption "Old Cost List: "+xitem
+        table caitemprice
+        order xitem,xyearperdate
+        //fixed xitem
+        select "zactive='1' and xitem='"+xitem+"' and xcost>0"
+        rows 20
+        objects  xcost attrib(link "abc" embed onclick="return pickPrice(this:xvatrate#)"), ~
+                 xvatrate attrib(name xvatrate#),xdate
+
+	  header "Old Cost","Old Vat","Date"
+        totals "","Totals",sum,"",sum
+		
+     end list
+
+
+
+     form one
+        caption "Chalan Entry Detail For "+ximtrnnum
+        table imchdetail
+        primarykey ximtrnnum,xrow
+        order ximtrnnum,xrow
+        fixed ximtrnnum
+        return "login"
+        pstyle 3
+        layout 2
+        objects Clear,Show,Add,Update,Delete,~
+        *next,Return,  Top,Previous,Next, Bottom,"<p>" ,~
+        xrow attrib(row 0 1;search),xunit,xitem,xdesc,xqtyord,~
+        xrate display(const),xlineamt display(hide),xvatrate display(hide),~
+        xcost display(hide),xpacking display(hide),xcartoon display(hide)
+
+        field xrow
+          event after
+            set status = imchheader.xstatus("ximtrnnum='"+ximtrnnum+"'")
+            if status .eq. "Confirmed"
+              set #field(confirm.display)="hidden"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+          end event
+        end field
+
+
+        field xdesc
+          caption Product Name
+          attrib local
+          display const
+          event after
+            set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+
+	  	
+        field add
+          event before
+          	if xqtyord == 0
+          		error "Cannot Proceed -- Qty is Blank"
+          	end if
+            set xunit = caitem.xunit("xitem = '"+xitem+"'")
+            set xrate = caitem.xrate("xitem = '"+xitem+"'")
+            set xcost = caitem.xcost("xitem = '"+xitem+"'")
+            set xlineamt = xqtyord*xrate
+            set xvatrate = caitem.xvatamt("xitem = '"+xitem+"'")
+            set xpacking = caitem.xpacking("xitem = '"+xitem+"'")
+            set xcartoon = caitem.xcartoon("xitem = '"+xitem+"'")
+            set xcartoon = xqtyord/xcartoon
+          end event
+        end field
+
+        field update
+          event before
+            set xunit = caitem.xunit("xitem = '"+xitem+"'")
+            set xrate = caitem.xrate("xitem = '"+xitem+"'")
+            set xcost = caitem.xcost("xitem = '"+xitem+"'")
+            set xlineamt = xqtyord*xrate
+            set xvatrate = caitem.xvatamt("xitem = '"+xitem+"'")
+            set xpacking = caitem.xpacking("xitem = '"+xitem+"'")
+            set xcartoon = caitem.xcartoon("xitem = '"+xitem+"'")
+            set xcartoon = xqtyord/xcartoon
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Return"){
+            form.screen.value = "imchheader"
+            form.searchbutton.value = "Find ximtrnnum=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

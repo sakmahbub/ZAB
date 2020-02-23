@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table userstore
+  caption "Users Store"
+  columns ztime, zutime,zauserid,zuuserid, zid,~
+          zemail,xwh,xposition,xlong
+  primary key zid,zemail,xwh
+  foreign key
+        zid references zbusiness.zid
+		zid,zemail references xusers.zid,zemail
+  end foreign key
+  list xaccess, zactive,xlastlogdate
+end table

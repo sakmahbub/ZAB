@@ -1,0 +1,122 @@
+screen pomrrdetail
+     caption "GRN Detail For "+xgrnnum
+//     sidebar
+     sections form one, list one,  jscript myscript
+
+     list one
+        caption "MRR Detail List"
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        //select none
+        //navigators alpha
+        //,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrndetail&command=Show&xgrnnum=?&xrow=?"), ~
+                xitem,xdesc,xqtydel,xunit,xrate
+
+
+        headers "Row","Item","Description","Qty","Unit","Rate"
+     end list
+
+
+     form one
+        caption "MRR D<ACRONYM>etail</ACRONYM> F<ACRONYM>or</ACRONYM> "+xgrnnum
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add,Update, Delete,Clear, Show, *next,Return,Top, Previous, Next, Bottom,"<p>",~
+                xrow attrib(row 0 10;search),~
+                xitem,xdesc,xqtydel,xunit,xrate,xprime display(constant),xbase display(constant),xlong,xpornum display(hide),~
+                xqtygrn display(hide)
+
+        embed onsubmit="return submitit(this)"
+
+        field xrow
+          event after
+            set globals(xgrnnum)=xgrnnum
+            set globals(xrow)=xrow
+          end event
+        end field
+
+        field xqtydel
+          caption Delivered Qty.
+        end field
+
+        field xlong
+          width 70
+          column 3
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        field Container
+          embed onclick="clicked(this)"
+        end field
+
+        field add
+          event before
+            set xqtygrn = xqtydel
+            if xunit .eq. "lbs"
+              double mtqty = 0.00
+              set mtqty = xqtyord/2.2
+              set xqtymt = mtqty/1000
+            else
+              set xqtymt = xqtyord
+            end if
+          end event
+        end field
+
+        field update
+          event before
+            set xqtygrn = xqtydel
+          end event
+          event after
+       //     class posssteel(UpdateGrDetailAfter{xpornum,xrow,xgrnnum})
+          end event
+        end field
+
+        field delete
+          event after
+       //     class posssteel(UpdateGrDetailAfter{xpornum,xrow})
+          end event
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "pomrrheader"
+            form.searchbutton.value = "Find xgrnnum=?"
+          }
+          if (but=="Container"){
+            form.screen.value = "pogrncontainer"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

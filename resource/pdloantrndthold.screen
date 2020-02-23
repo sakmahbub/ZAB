@@ -1,0 +1,118 @@
+screen pdloantrndthold
+
+	 sidebar list schedule
+  sections form one,jscript myscript
+	
+	 list schedule
+    caption "Schedule Detial List "+xvoucher
+    table pdloantrndt
+    order xvoucher,xrow
+    fixed xvoucher
+    rows 100
+    objects xrow attrib(link "login?screen=pdloantrndthold&command=Show&xvoucher=?&xrow=?"), ~
+            xdate,xschamt,xamount,xstatusloan //,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdsalarydetail.xtype))
+
+	  totals "","",sum,sum,""
+
+    header "Line No","Installment Date","Monthly Installment","Balance","Loan Status"
+
+  end list
+	
+  form one
+    caption "<ACRONYM>Loan & Advance Hold Details "+xvoucher+"</ACRONYM>"
+    table pdloantrndt
+    order xvoucher,xrow
+    fixed xvoucher
+//	select "xamount>0"
+	//select "xstatusloan<>'Confirmed'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Clear,Update,*next, Top, Previous, Next, Bottom,Return,Confirm,~//,DeleteAdd,
+            xrow attrib(row 0 1),xdate,xyear display(const),xper display(const),xschamt display(const),xamount display(const),xstatusloan//,xstatusprcs
+
+    field xrow
+      event before
+        set status = pdloantrn.xstatus("xvoucher='"+xvoucher+"'")
+        if status .eq. "Close" .or. status .eq. "Continue"
+          set #field(add.display)="hide"
+       //   set #field(update.display)="hide"
+          set #field(delete.display)="hide"
+        end if
+      end event
+    end field
+
+    feild xstatusloan
+		caption Hold Status
+      display combo
+	  pick "Hold,Continue, "
+    end field
+	
+	 feild xamount
+      caption Balance Amount
+    end field
+	
+	 feild xstatusprcs
+      caption Loan Status
+    end field
+	
+    field Add
+      event before
+        set xyear=#sub(xdate,0,4)
+        set xper=#sub(xdate,5,2)
+      end event
+    end field
+
+    field Update
+      event before
+	  set status=pdloantrndt.xstatusloan("xvoucher='"+xvoucher+"' and xrow='"+xrow+"'")
+	  if status .eq. "Confirmed"
+		error "Hold status already Confirmed"
+		end if
+        set xyear=#sub(xdate,0,4)
+        set xper=#sub(xdate,5,2)
+		
+      end event
+	  event after
+		//set temp=#spsql(zabsp_Loan_hold,#id,#user,xvoucher,xstatusloan)
+		set xrow=0
+	  end event
+    end field
+	   
+	field Confirm
+            event before
+            end event
+            event after
+			set temp=#spsql(zabsp_Loan_hold,#id,#user,xvoucher,xstatusloan)
+			//	set temp = #sql("Update pdloantrndt set xstatusprcs='Confirmed' where xvoucher='"+xvoucher+"' and xrow='"+xrow+"'")
+	            action show
+            end event
+          end field
+	
+	
+    embed onsubmit="submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+
+    function clicked(b){
+      detail="clicked"
+    }
+    function submitit(form){
+      if (detail=="clicked"){
+        form.screen.value = "pdloantrnhold"
+        form.searchbutton.value = "Find xvoucher=?"
+        //return false
+      }
+    }
+    </script>
+  end jscript
+
+end screen

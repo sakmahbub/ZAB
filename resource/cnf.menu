@@ -1,0 +1,23 @@
+//op.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+JOB Entry (Robi)                        |#classPath+"/login?screen=opordjobheader" 
+JOB Entry (Other)                       |#classPath+"/login?screen=opordjobheaderother" 
+Advance For JOB                         |#classPath+"/login?screen=opcashadvheader" 
+Pay Order For JOB                         |#classPath+"/login?screen=oppayorderadvheader" 
+Adjustment against Advance              |#classPath+"/login?screen=opadvadjheader"
+Advance/Pay order Approved For JOB      |#classPath+"/login?screen=opcashadvheaderapp" 
+Adjustment Approval against Advance     |#classPath+"/login?screen=opadvadjheaderapp" 
+//C&F Advance Adjustment                  |#classPath+"/login?screen=opcashadvheaderadj"
+Bill Entry                              |#classPath+"/login?screen=opcnfbillheader" 
+C&F Bill Approval                       |#classPath+"/login?screen=opcnfbillheaderapp"
+Bill Date Update                         |#classPath+"/login?screen=opcnfbilldateupdate"  
+//Cost Master                 |#classPath+"/login?screen=caitemcost"
+//Cost group                 |#classPath+"/login?screen=xcodes(xtype=Cost Group)"
+//Customers Master                 |#classPath+"/login?menu=cacus" 
+ 
+Reports                                 |#classPath+"/login?menu=cnfreports"
+C&F Codes & Parameter                |#classPath+"/login?menu=cnfcodes" 
+//-------------------------------------------------------------------
+

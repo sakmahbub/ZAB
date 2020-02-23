@@ -1,0 +1,181 @@
+opcnfbillheaderscreen opcnfbillheader
+
+	 sidebar list one
+     sections form one, jscript myscript
+
+   list one
+        caption "C&F Bill Detail List."
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=opcnfbilldetail&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = opdodetail.zid and xitem=opdodetail.xitem)),xlineamt,xcomm
+
+		headers "Line No","Item","Description","Amount","Commission %"
+		totals "","Total","",sum,""
+     end list
+
+     form one
+        caption "C&F Bill Entry Header"
+        table opdoheader
+        order xdornum desc
+		//select "xtype in('LC','Sample')"
+        return "login"
+        layout 3
+        pstyle 3
+        objects ~
+               Add,Show,Update,Delete,Clear,Detail,Confirm,Top,Next,Previous,Bottom,"<p>" ,~
+               xdornum ,xdate,xordernum,xcus display(const),xorg,xstatusdor,xwh,xwhdesc,xref,xstatus display(hide),~
+              xtype display(hide),xvatrate,xait,xtaxrate,xadamount,xvoucher display(const),xassessval,xcommin,xvatamt,xtaxamt,~
+			  xnote
+				
+		field xdate
+			caption Bill Date
+		end field
+		
+			field xcommin
+			caption Commission Fixed/Min
+		end field
+		
+		field xassessval
+			caption Assessable Value
+		end field
+
+		
+        field xorg
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")
+          end event
+        end field
+	
+        field xwhdesc
+          attrib local
+          caption Division Name
+          display constant
+          event after
+            set xwhdesc = xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")//branchview.xlong("xwh = '"+xwh+"'")
+          end event
+        end field
+	
+		
+
+        field xnote
+          width 90
+          column 2
+		  height 2
+        end field
+		
+		field xstatusdor
+		caption Bill Status
+        end field
+
+        field xdornum
+		pick list xdornum
+           event after
+		    set globals(xdornum)=xdornum
+              set globals(xordernum)=xordernum
+			  set globals(xstatusdor)=xstatusdor
+				 set primeamount=#sql(double,"select sum(xqtydel) from opdodetail where xdornum='"+xdornum+"'")
+			// print primeamount
+				if xstatusdor .ne. ""
+						set #field(Confirm.display) = "hidden"
+						set #field(Update.display) = "hidden"						
+				end if
+				class careports(getjspReport{opcnfbillrobi,2,xdornum,"",Print Bill (Robi)})
+				class careports(getjspReport{opcnfbill,2,xdornum,"",Print Bill (Edotco)})
+				class careports(getjspReport{opcnfbillakpn,2,xdornum,"",Print Bill (AKPEN/ RANCON/ PLYWOOD)})
+				class careports(getjspReport{opcnfbillbfl,2,xdornum,"",Print Bill (BFL)})
+				class careports(getjspReport{opcnfbillother,2,xdornum,"",Print Bill (CEAT/Other)})
+			//	class careports(getjspReport{opgatepass,2,xdornum,"",Print Gate Pass})
+           end event
+        end field
+		
+		field Confirm
+            event before
+				set amt=#sql("select sum(xlineamt) from opdodetail where xdornum='"+xdornum+"'")
+				set preparer=pdmst.xstaff("xposition='"+#user+"'")
+				set superior=pdmst.xsuperiorcnfbl("xposition='"+#user+"'")
+				if xstatusdor .ne. ""
+					error "Cannot Proceed -- Already Confirmed"
+				else
+				if amt<1
+				error "Cannot Proceed -- Add Detail first"
+				end if
+            end event
+            event after
+			 set temp=#sql("Update opdoheader set xpreparer='"+preparer+"' where xdornum='"+xdornum+"'")
+			 set temp =#sql("update opdoheader set xsuperiorsp='"+superior+"' where xdornum='"+xdornum+"'")
+	         set temp =#sql("update opdoheader set xstatusdor='Open' where xdornum='"+xdornum+"'")
+			 set temp = #spsql(zabsp_sendmail,#id,#user,xdornum,"C&F Bill Approval","")
+	            action show
+            end event
+          end field
+
+
+		
+        field Add
+          event before
+		  if xordernum .eq. ""
+		  error "Please Select JOB No."
+		  else
+			set xstatusdor=""
+			set xcus=opordheader.xcus("xordernum='"+xordernum+"'")
+			set xwh=opordheader.xwh("xordernum='"+xordernum+"'")
+			set year = #sub(xdate,0,4)
+          	set trn = "BL--"
+            set dornum =#trn("Bill Number",trn,10)
+			set xdornum =#sub(dornum,0,4)+year+#sub(dornum,6,10)
+          end if
+		  end event
+		  event after
+		  set temp = #spsql(zabsp_OP_billdetail_Add,#id,#user,xdornum,xordernum,xcus)
+		  end event
+		  
+        end field
+		
+		   field Update
+          event before
+		  if xstatusdor .ne. ""
+		  error "Bill Already Confirmed"
+		  else
+          end if
+		  end event
+		  event after
+		  end event
+		  
+        end field
+       
+	   embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+end form
+   
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "opcnfbilldetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

@@ -1,0 +1,14 @@
+PD Codes & Parameter.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Department                       |#classPath+"/login?screen=xcodesdept"
+Designation                      |#classPath+"/login?screen=xcodes(xtype=Designation)"
+Grade			               |#classPath+"/login?screen=xcodes(xtype=Grade)"
+//Blood Group                      |#classPath+"/login?screen=xcodes(xtype=Blood Group)"
+//District                         |#classPath+"/login?screen=xcodes(xtype=District)"
+//Leave Master                     |#classPath+"/login?screen=pdleave"
+//Leave Type                       |#classPath+"/login?screen=xcodes(xtype=Leave Type)"
+//Area		                     |#classPath+"/login?screen=pdhrc1"
+//-------------------------------------------------------------------
+

@@ -1,0 +1,83 @@
+screen pdroster
+
+//   sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        caption "Leave Master"
+        table pdroster
+        order xyearperdate
+        rows 20
+        objects xtypeleave attrib(link "login?screen=pdrosterhd&command=Show&xtypeleave=?"),~
+                xdesc,xday,xdaymonth
+
+     end list
+
+     form one
+        caption "<ACRONYM>Roaster Entry</ACRONYM>"
+        table pdroster
+        order xyearperdate,xposition
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete, *next,Top, Previous, Next, Bottom,"<p>" ,~
+                xdate,xposition,xshift,xdatefrom,xtimein,xdateto,xtimeout,xstatus,xdesc,~
+
+                xyearperdate display(hide),xstaff display(hide)
+
+        field xdate
+          event before
+            set year = #sub(xdate,0,4)
+            set per = #sub(xdate,5,2)
+            set day = #sub(xdate,8,2)
+            set xyearperdate = year+per+day
+          end event
+        end field
+
+        field xshift
+          display combo
+          pick "select xshift from pdshift"
+        end field
+
+        field add
+          event before
+            set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+          end event
+        end field
+
+        field update
+          event before
+            set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdrosterdt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

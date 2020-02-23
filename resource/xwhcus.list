@@ -1,0 +1,9 @@
+     list xwhcus
+        table whcusview
+        order xwh
+        rows 20
+        objects xwh attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xorg,xterritory
+     end list
+
+

@@ -1,0 +1,189 @@
+screen poreqquotdetailadmin
+
+     sidebars list one
+     sections form detail, jscript myscript
+
+     list one
+        caption "Quotation Detail For: "+caitem.xdesc("xitem='"+xitem+"'")
+        table poreqquotdetail
+        order xporeqnum,xrow,xqotrow
+        fixed xporeqnum,xrow
+        rows 20
+        objects  xqotrow attrib(link "login?screen=poreqquotdetailadmin&command=Show&xporeqnum=?&xrow=?&xqotrow=?"), ~
+                 xspec,xquotation1,xquotation2,xquotation3,xquotation4,xquotation5
+
+
+        //headers "Line No","Item","Description","Unit","Qty Req"
+     end list
+
+
+     form detail
+        caption "Quotation Detail For: "+xporeqnum
+        table poreqquotdetail
+		primarykey xporeqnum,xrow
+        order xporeqnum,xrow,xqotrow
+        fixed xporeqnum,xrow
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add, Update, Delete,Show,Clear,*next, Return,Top, Previous, Next, Bottom,~
+                xqotrow attrib(row 0 1),xspec,xquotation1,xquotation2,xquotation3,xquotation4,xquotation5
+        
+field xqotrow
+	caption Serial
+end field
+
+field xquotation1
+	column 2
+	width 52
+end field
+        
+field xquotation2
+	column 2
+	width 52
+end field
+        
+field xquotation3
+	column 2
+	width 52
+end field
+field xquotation4
+	column 2
+	width 52
+end field
+field xquotation5
+	column 2
+	width 52
+end field
+        
+
+        
+
+        
+		field xdum1
+			attrib local
+			display const
+			caption
+		end field
+		
+		field xdum2
+			attrib local
+			display const
+			caption
+		end field
+		
+		field xdum3
+			attrib local
+			display const
+			caption
+		end field
+		
+		field xrow
+        	event before
+			if xstatusreq .ne. "Open"
+			// set #field(Add.display)="hidden"
+            //  set #field(Update.display)="hidden"
+			//   set #field(Delete.display)="hidden"
+             end if
+			end event
+        end field
+        
+		
+		
+		field xitem
+        	pick list xitem
+        end field
+	
+		field xdatereq
+			default #date
+			  	caption Required Date
+        end field
+
+
+        field xdum
+        	attrib local
+        	display const
+        	caption 
+        end field
+        
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+        
+  //       field xcfpur
+  //      	attrib local
+  //      	display const
+  //      	caption Pack Size
+  //      	event after
+  //      		set xcfpur=caitem.xcfpur("xitem='"+xitem+"'")
+  //      	end event
+  //      end field
+        
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+
+        field add
+          event before
+		  set spec=xcodes.xcode("xcode='"+xspec+"'")
+		  if spec .ne. xspec
+		  error "Specification Not found"
+		  end if
+          end event
+          event after
+          end event
+        end field
+		
+		field update
+          event before
+		  set spec=xcodes.xcode("xcode='"+xspec+"'")
+		  if spec .ne. xspec
+		  error "Specification Not found"
+		  end if
+          end event
+          event after
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        field Quotation
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "poreqdetailserviceadmin"
+            form.searchbutton.value = "Find xporeqnum=?&xrow=?"
+          }
+          return result
+        }
+
+        </script>
+     end jscript
+
+
+end screen

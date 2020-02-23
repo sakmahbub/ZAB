@@ -1,0 +1,145 @@
+screen pdtrndetailnr
+
+   // sidebar list detail
+    sections form one,jscript myscript
+
+  	list detail
+        caption "Detail List"
+        table pdtrndetail
+        order xvoucher,xrow
+        fixed xvoucher
+        rows 20
+        objects  xrow attrib(link "login?screen=pdtrndetail&command=Show&xvoucher=?&xrow=?"), ~
+                xtype,xamount
+
+        header "Line No","Transaction Type","Amount"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Transaction Detail For Trn No<br></ACRONYM>"+xvoucher
+	      table pdtrndetail
+        order xvoucher,xrow
+        fixed xvoucher
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~
+          xrow attrib(row 0 1),xtype,xposition,xname,xempcategory,xamount,xpercent,xqty,xarrear,xadjustment,xothours,~
+          xtrntype,xnote,xsign display(hide),xstaff display(hide)
+
+        field xposition
+          pick list xpositioncnt
+        end field
+
+        field xempcategory
+          pick "Contract,Casual"
+//          display const
+//          default "Contract & Services"
+        end field
+
+        field xname
+          attrib local
+          display const
+          caption Name
+          event after
+            set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+        field xtrntype
+          attrib local
+          display const
+          caption Transaction Type
+          event after
+            set xtrntype = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+          end event
+        end field
+
+        field xqty
+          caption Times of Basic
+        end field
+
+        field xpercent
+          caption % of Basic
+        end field
+
+        field xtype
+          caption Transaction Type
+          pick cod PD Transaction Type //"select xcode from pdnormaltrntype"
+        end field
+
+        field add
+          event before
+            set typetrn = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+            if typetrn .eq. "Addition"
+              set xsign=1
+            else
+              set xsign = -1
+            end if
+            set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+            if xposition .ne. ""
+              set  xempcategory = pdmst.xempcategory("xposition='"+xposition+"'")
+            end if
+          end event
+          event after
+            class pdsheraton(validateAfterTrnDetail{xvoucher,xrow,xtype,xamount,xpercent,xqty,xstaff,xempcategory})
+          end event
+        end field
+
+        field update
+          event before
+            set typetrn = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+            if typetrn .eq. "Addition"
+              set xsign=1
+            else
+              set xsign = -1
+            end if
+            set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+            if xposition .ne. ""
+              set  xempcategory = pdmst.xempcategory("xposition='"+xposition+"'")
+            end if
+          end event
+          event after
+            class pdsheraton(validateAfterTrnDetail{xvoucher,xrow,xtype,xamount,xpercent,xqty,xstaff,xempcategory})
+          end event
+        end field
+
+        field delete
+          event before
+            class pdsheraton(validateBeforeTrnDetail{xvoucher,xrow,xempcategory,xpercent,xtype,xposition,xstaff})
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdtrnheadernr"
+            form.searchbutton.value = "Find xvoucher=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

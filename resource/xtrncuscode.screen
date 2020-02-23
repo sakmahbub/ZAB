@@ -1,0 +1,52 @@
+screen xtrncuscode
+
+     sidebar list one
+     sections  form one
+
+     list one
+        caption "Detail List"
+      	table xtrn
+        order xtrn
+        select "xtypetrn = 'Customer Code'"
+        rows 20
+        objects  xtrn attrib(link "login?screen=xtrncuscode&command=Show&xtrn=?"), ~
+                 xdesc,zactive
+     end list
+
+     form one
+        caption "Customer Code"
+      	table xtrn
+        order xtrn
+        select "xtypetrn = 'Customer Code'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next,Top,Previous,Next,Bottom,"<p>" ,~
+                xtrn, xdesc,xwh,xbrname, xnum, xinc display(hide),xtypetrn display(hide),zactive
+
+        field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+       field add
+        event before
+          set xtypetrn="Customer Code"
+        end event
+       end field
+
+       field xinc
+    		def "1"
+	     end  field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+end screen
+

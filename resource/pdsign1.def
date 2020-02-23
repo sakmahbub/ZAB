@@ -1,0 +1,10 @@
+product ZAB ERP
+
+table pdsign1
+  caption "Signatory One"
+  columns zid,xstaff,xname,xdeptname,xposition,xsignature
+
+  sql create view pdsign1(zid,xstaff,xname,xdeptname,xposition,xsignature,xsignatory,zemail) ~
+    as select a.zid,a.xstaff,a.xname,a.xdeptname,a.xposition,a.xsignature,a.xsignatory,b.zemail from pdmst a ~
+	left join xusers b on a.zid=b.zid and a.xposition=b.xposition
+end table

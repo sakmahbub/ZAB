@@ -1,0 +1,28 @@
+//pdleave.menu
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+option                  		|action                                          	|modules	|models	|width
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+
+
+Leave Type                      |#classPath+"/login?screen=xcodesleave"
+//Leave Master                  |#classPath+"/login?screen=pdleave"
+Leave Plan Master               |#classPath+"/login?screen=pdlplanehd"
+Calendar                  		|#classPath+"/login?screen=pdcalenderheader"          |ca        	|   		|100
+Staff Weekend (Declared)        |#classPath+"/login?screen=pdholidayprcs"
+Leave Process                  	|#classPath+"/login?screen=pdleaveproc"         |ca        	|   		|100
+Leave Assign(Manually)          |#classPath+"/login?screen=pdleaveassignm"         |ca        	|   		|100
+
+//Leave Type                        |#classPath+"/login?screen=xcodes(xtype=Leave Type)"
+//OT Entry                			|#classPath+"/login?screen=pdotheader"        			|ca        	|   		|100
+//Suspend Entry             		|#classPath+"/login?screen=pdsuspendheader"        		|ca        	|   		|100
+//OT Leave Entry               		|#classPath+"/login?screen=pdotleaveheader"        	|ca        	|   		|100
+//Reports                   		|#classPath+"/login?menu=pdleaverep"                   |ca        	|   		|100
+//Leave Application Entry      		|#classPath+"/login?screen=pdleaveentryhd"            |ca        	|   		|100
+//Leave Application Entry      		|#classPath+"/login?screen=pdleaveentry"            |ca        	|   		|100
+//Leave Confirmation           		|#classPath+"/login?screen=pdleaveconfirm"           	|ca        	|   		|100
+//Apply By Staff            		|#classPath+"/login?screen=pdleaveapply"               	|ca        	|   		|100
+//Attendance Entry          		|#classPath+"/login?screen=pdathd"               		|ca        	|   		|100
+//Roster Entry              		|#classPath+"/login?screen=pdroster"               	|ca        	|   		|100
+//-------------------------------------------------------------------
+

@@ -1,0 +1,480 @@
+screen poordheadercashwospr
+
+     sidebar list poreject,list one,list grn, list poterms
+     sections form one,jscript myscript
+
+	list poreject
+        caption "Rejected PO List"
+        table poordheader
+        order xpornum desc
+       select "zauserid='"+#user+"' and xstatus in ('Rejected')"
+	   rows 25
+        objects xpornum attrib(link "login?screen=poordheadercashwospr&command=Show&xpornum=?"), ~
+               xdate,xstatus,xnote1
+        headers "PO /WO No","Date","Status","Reject Note"
+     end list	 
+
+	 list one
+        caption "PO Detail List For "+xpornum
+        table poorddetailview
+        order xpornum,xrow
+        fixed xpornum
+        //select none
+        rows 350
+        objects  xrow,~// attrib(link "login?screen=poorddetailcash&command=Show&xpornum=?&xrow=?"),~
+                xitem,xdesc,~// equals((select xdesc from caitem where zid=poorddetail.zid and  xitem=poorddetail.xitem))
+				partno equals((select xtheircode from caitem where zid=poorddetailview.zid and xitem=poorddetailview.xitem)),~
+				xqtypur,xunitpur,unitiss equals((select xunit from caitem where zid=poorddetailview.zid and xitem=poorddetailview.xitem)),~
+				cfpur equals((select xcfpur from caitem where zid=poorddetailview.zid and xitem=poorddetailview.xitem)),~
+				xrate,xlineamt
+				
+        headers "Row","Item","Description","Part No","Qty","Purchase Unit","Issue Unit","Purchase Conversion Factor","Rate","Line Amount"  //"Qty Per Unit","Issue Unit",
+	  total "Total","","","","","","","","",sum	
+     end list
+
+     list grn
+        caption "GRN For : "+xpornum
+        table pogrnheader
+        order xgrnnum desc
+        fixed xpornum
+		select "xpornum<>''"
+        rows 30
+        objects  xgrnnum attrib(link "login?screen=pogrnheader&command=Show&xgrnnum=?"),~
+                 xdate,xstatusgrn
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+	
+	
+	
+     list poterms
+        caption "Terms & Condition For "+xpornum
+        table poterms
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow attrib(link "login?screen=poterms&command=Show&xpornum=?&xrow=?"), ~
+                xcode,xnote
+     end list
+
+     form one
+        caption "PO Header"
+		primarykey xpornum
+        table poordheader
+        order xpornum desc
+		select "left(xpornum,2) in ('WO','PO') "//and zauserid='"+#user+"'
+        return "login"
+        layout 3
+        pstyle 3
+        objects	Add,Update,Delete,*Next,*Next,*Next,Show,Clear,*Next,*Next,*Next,~
+				Top,Next,Previous,Bottom,*next,Detail,Terms & Condition,Confirm,"<p>",~ //Dismiss,
+          xpornum,xdate,xshipdate,~
+          xcus,xcusdesc display(const),xtype,xlcno display(const),~
+          xprime display(hide),xdeliloc,xdelilocdesc,xsign display(hide),~
+		  xregi display(hide),,xwh,xwhdesc,xporeqnum,xtwh display(hide),~
+		  xcur,xexch,xvatrate,xvatamt display(hide),xdisc,xdiscf,xtransport,~
+		  xpreparer display(hide),xstatus,preparer,xnote1,~
+		  xsignreject display(hide),signreject display(const),xrem,xstatuspor display(const),~
+		  xpkey display(hide) attrib(local)
+		
+		
+//----------------Declare Local Field--------------------
+		
+		field xpreparer
+		caption Preparer
+		  //attrib local
+		  event after
+		  set xpreparer=poordheader.xpreparer("xpornum='"+xpornum+"'")
+		  end event
+        end field
+		
+		field xsignreject
+		  //attrib local
+		  event after
+		  set xsignreject=poordheader.xsignreject("xpornum='"+xpornum+"'")
+		  end event
+        end field
+		
+		
+		field xporeqnum
+		  attrib local
+		  pick
+		  attrib readonly
+		  event before
+		  set xporeqnum=poordheader.xporeqnum("xpornum='"+xpornum+"'")
+		  end event
+        end field
+		
+		field xlcno
+		  //attrib local
+		  event after
+		  set xlcno=poordheader.xlcno("xpornum='"+xpornum+"'")
+		  end event
+        end field
+		
+	field xnote1
+      caption Reject Note
+	  display const
+		  attrib local
+		  event after
+		  set xnote1=poordheader.xnote1("xpornum='"+xpornum+"'")
+		  end event
+    end field
+		
+		
+//--------------End ------------------------ 		
+
+		
+    field xdelilocdesc
+      attrib local
+	  display const
+      caption Delivery Location
+      event after
+        set xdelilocdesc=deliveylocview.xlong("xcode='"+xdeliloc+"'")
+      end event
+    end field
+		
+        field xwh
+			caption Store/Plant
+		end field
+		
+		field xwhdesc
+			attrib local
+			display const
+			caption Store/Plant Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+		
+			field xtransport
+			caption Freight Cost
+			end field
+		
+			field xstatus
+			caption Approval Status
+			event after
+			//if xstatus .ne. "Approved"
+			//set xstatus="CPO"
+			//end if
+			end event
+		end field
+		
+		field xdate
+			caption Purchase Date
+		end field
+		
+		field xshipdate
+			caption Expected Delivery Date 
+		end field		
+		
+		field xcus
+			caption Supplier ID
+			pick list casup
+		end field
+		
+		
+		field xtype
+			display combo
+			caption Purchase Type
+			pick "Cash,CS,LC,Direct PO"
+		end field
+		
+		field xtypeobj
+			display combo
+			caption Product Type
+			pick code PO Type
+		end field
+		
+        field xpaymentterm
+		caption Payment Term
+        	pick "Credit,Cash"
+        end field
+        
+		  field xcusdesc
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xcusdesc=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+		  
+		  field preparer
+		  	attrib local
+		  	dispaly const
+		  	caption Preparer
+		  	event after
+		  		set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  	end event
+		  end field
+
+		  
+		field xrem
+		column 1
+		height 2
+		weight 50
+		end field
+		
+		field xnote
+		column 1
+		caption Note to CPO
+		end field
+		
+	field xnote1
+      caption Reject Note
+		display const
+    end field
+	
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		
+		field show
+		event after
+          set xpkey=xpornum
+		  end event
+        end field
+
+
+          field xpornum
+          //  pick list poord
+			event after
+             class careports(getReport{poprint;2;in,st;zid,pornum;xpornum;View/Print PO})
+			// class careports(getjspReport{prletter,1,xpornum,Print Advance Letter})
+			 class careports(getReport{powisegrndetail;2;in,st;zid,xpornum;xpornum;View/Print GRN})
+			 class careports(getReport{pocsprint;2;in,st;zid,reqnum;xporeqnum;Print Comparative Statement})
+			 class careports(getReport{prletter;2;in,st;zid,reqnum;xporeqnum;View Cash Advance Request})
+              set globals(xpornum)=xpornum
+              set globals(xporeqnum)=xporeqnum
+			 if poordheader.xstatuspor("xpornum='"+xpornum+"'") .ne. "Open" 
+					set #field(update.attrib)="disabled"
+					set #field(detail.attrib)="disabled"
+         			set #field(delete.attrib)="disabled"
+         			set #field(create.display)="hidden"
+					set #field(Confirm.display)="hidden"
+					set #field(terms.display)="hidden"
+       		  end if
+			 if poordheader.xstatus("xpornum='"+xpornum+"'") .ne. "Open" .and. poordheader.xstatus("xpornum='"+xpornum+"'") .ne. "Rejected" 
+					set #field(update.attrib)="disabled"
+					set #field(detail.display)="hidden"
+         			set #field(delete.attrib)="disabled"
+         			set #field(create.display)="hidden"
+					set #field(Confirm.display)="hidden"
+					set #field(terms.display)="hidden"
+       		  end if
+			if poordheader.xstatus("xpornum='"+xpornum+"'") .eq. "Dismissed"
+					set #field(Dismiss.display)="hidden"
+			end if
+			
+			if xpornum .ne. ""
+			set #field(add.attrib)="disabled"
+			end if  
+			 if xtype .ne. "LC" 
+		         	set #field(LC.display)="hidden"
+       		  end if
+            end event
+          end field
+
+          field xstatusord
+		     caption PO Status
+            default "Open"
+            display const
+          end field
+		  
+		  field Dismiss
+            event before
+			double qtygrn=#sql(double,"select sum(xqtygrn) from poorddetail where xpornum='"+xpornum+"'")
+			double grnno=#sql(double,"select count(xgrnnum) from pogrnheader where xpornum='"+xpornum+"' and xstatusgrn<>'Dismissed'")
+			double grnnodt=#sql(double,"select count(xgrnnum) from pogrndetail where xpornum='"+xpornum+"'")
+			if xpornum .eq. ""
+				error "Please Select Purchase Order!"
+			else if poordheader.xstatus("xpornum='"+xpornum+"'") .eq. "Dismissed"
+				error "Already Dismissed!"
+			else if grnno>0 .or. grnnodt>0 //qtygrn>0 .or.
+				error "Can not Proceed -- GRN Already Created!"
+			end if
+			end event
+			event after
+				set temp =  #spsql(zabsp_Dismissed_Request,#id,#user,#position,"",xpornum,"PO Dismissed")
+				action show
+			end event
+			end field
+
+
+        field add
+        event before
+		set lcno=lcinfo.xlcno("xlcno='"+xlcno+"'")
+		set backdate=#sql("select xdateexp from acdef")
+		set backentry=#sql("select xbacklock from acdef")
+		
+		if xcus .eq. ""
+		  error "Cannot Proceed -- Please Choose Supplier!"
+		//else  if xporeqnum .eq. ""
+		 // error "Cannot Proceed -- Please Choose PR No!"
+		else if xlcno .ne. "" .and. xlcno .ne. lcno
+				error "LC Does not Exist!"
+		else if xtype .eq. ""
+				error "Select Purchase Type!"
+		else if backentry .eq. "No" .and. xdate .le. backdate
+			 error "Back Lock Entry does not allow!"
+		else
+				  set xpreparer=pdmst.xstaff("xposition='"+#position+"'")
+				  ////set xtype=poreqheader.xtype("xporeqnum='"+xporeqnum+"'")
+				  set xregi=poreqheader.xregi("xporeqnum='"+xporeqnum+"'")
+				  set xstaff=poreqheader.xpreparer("xporeqnum='"+xporeqnum+"'")
+			    ////set xwh=#sql("select xfwh from imtorheader where xtornum=(select xtornum from poreqheader where xporeqnum='"+xporeqnum+"')")
+				////set xtwh=#sql("select xtwh from imtorheader where xtornum=(select xtornum from poreqheader where xporeqnum='"+xporeqnum+"')")
+				  set xsign = 1	
+        	      set xstatuspor = "Open"
+				  set xstatus="Open"
+        	      set xpornum = #trn("PO Number","PO--",10)
+		    	//set xpornum = #sub(xpornum,0,4)+year+#sub(xpornum,4,6)
+              end if
+            end event
+          end field
+
+          field update
+            event before
+			set backdate=#sql("select xdateexp from acdef")
+			set backentry=#sql("select xbacklock from acdef")
+
+			//print backdate
+			//print backentry
+			set lcno=lcinfo.xlcno("xlcno='"+xlcno+"'")
+              set xyear = #sub(xdate,0,4)
+              set xper = #sub(xdate,5,2)
+			  //action show
+			if xpkey .ne. xpornum
+				error "Please press show first!"
+			else if xcus .eq. ""
+				error "Please Show first."
+			else if xlcno .ne. "" .and. xlcno .ne. lcno
+				error "LC Does not Exist!"
+			else if backentry .eq. "No" .and. xdate .le. backdate
+			 error "Back Lock Entry does not allow!"
+			else if xshipdate .lt. #date
+				error "Expected Delivery Date Invalid !"
+			else if poordheader.xpreparer("xpornum='"+xpornum+"'") .ne. xpreparer
+			   error "Please Show first."
+			else if poordheader.xstatus("xpornum='"+xpornum+"'") .ne. "Open" .and. poordheader.xstatus("xpornum='"+xpornum+"'") .ne. "Rejected"
+				error "Can not Proceed-- Already Approved!"
+			end if
+            end event
+            event after
+			set temp=#spsql(zabsp_Update_GRNRate,#id,#user,xpornum,"poordheader")
+            end event
+          end field
+		
+		  field Confirm
+            event before
+			double qtypur=#sql("select sum(xqtypur) from poorddetail where xpornum='"+xpornum+"'")
+			double lineamt=#sql("select SUM(xlineamt) from poorddetail where xpornum='"+xpornum+"'")
+			set status=#sql("select xstatus from poordheader where xpornum='"+xpornum+"'")
+			if xpornum .eq. ""
+			error "Please Select Purchase Order!"
+			else if qtypur .lt. 0.01
+			error "Purchase Qty is 0!"
+			else if lineamt .lt. 0.01
+				error "PO Cost is 0!"
+			else if poordheader.xstatus("xpornum='"+xpornum+"'") .ne. "Open" .and. poordheader.xstatus("xpornum='"+xpornum+"'") .ne. "Rejected" 
+				error "PO Already Confirmed!"
+			end if
+			end event
+			event after
+			set temp =  #spsql(zabsp_Confirmed_Request,#id,#user,#position,0,xpornum,"POConfirm")
+			//set temp =#spsql(zabsp_sendmail,#id,#user,xpornum,"CPO","")
+			action show
+			//end if
+			end event
+			end field
+		
+		
+          field Create GRN
+            event before
+			 set xtype=poreqheader.xtype("xporeqnum='"+xporeqnum+"'")
+            //  set temp = #sql("select xrow from poorddetail where xpornum='"+xpornum+"'")
+             // if xstatuspor .eq. "GRN Created"
+            //    error "Cannot Proceed - GRN already created"
+           //   else if temp .eq. ""
+           //     error "Cannot Proceed - Detail Not Exists"
+           //   end if
+                        	
+     	 end event
+            event after
+              set temp = #spsql(zabsp_PO_createGRN,#id,#user,xpornum,xdate,xwh,xcus,xvatrate,xait,xdisc,xdiscf,8)
+		   action show
+            end event
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field LC
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+		  
+          field Confirm
+            embed onclick="clicked(this)"
+          end field
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetailcashwospr"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="LC Info"){
+            form.screen.value = "poordlcinfo"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "poterms"
+            form.searchbutton.value = "Top"
+          }
+		   if (detail=="Confirm"){
+           if(confirm('Are You Confirm ?')){
+			form.searchbutton.value = "Confirm"
+			}else{
+			form.searchbutton.value = "Show"
+			}
+          }
+            return false
+        }
+		
+	 function pickItem(link){//,type
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+			//document.one.xtype.value=type.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+			//document.one.xtype.value=type.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+ end screen

@@ -1,0 +1,14 @@
+     list insp
+        caption "Inspection List"</b>"
+        table imtorheader
+        order xtornum desc
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4) in ('INSP'))"
+		searchselect "left(xtornum,4) in ('INSP')"
+        rows 10
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xordernum,xgrnnum
+		 
+		 headers "Inspection List", "Date", "Ref","GRN No"
+     end list
+
+

@@ -1,0 +1,178 @@
+screen imtorheaderre
+     caption "Receive Chalan Entry Header"
+     	sidebar list one
+	sections form one, jscript myscript
+
+   list one
+        caption "<br><center><b>"Receive Chalan Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 20
+        objects ~
+        xrow attrib(link "login?screen=imtordetailre&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyord
+
+        headers "Serial No","Item","Description","Qunatity Ordered"//,"Quantity Delivered"
+     end list
+
+
+
+     form one
+        caption "Receive Chalan (Header)"
+        table imtorheader
+        primarykey xtornum
+        order xtornum desc
+        select "xtwh='"+#wh+"'"// and xstatustor<>'Confirmed'"
+		return "login"
+        pstyle 3
+        layout 3
+        objects Details, Clear,Show,~
+        *next, Top,Previous,Next,Bottom,Receive,"<p>" ,~
+        xtornum display(trn Transfer Transaction),~
+        xdate  display(constant),xdum,xdatecom,~
+        xfwh display(constant),xfbrname,xref,xtwh display(constant),xtbrname,xvatchno,xlong display(hide),xstatustor display(constant)
+
+       field xfbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+	field xdum
+		attrib local
+		caption Receive Date
+		display const
+	end field
+
+       field xtbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+			//defualt "TO-"
+          event after
+            class careports(getReport{imtranissueprint,1,xtornum,Print Transfer Challan})
+            class careports(getReport{imtranreceprint,1,xtornum,Print Receive Challan})
+            set globals(xtornum)=xtornum
+            if xstatustor .eq. "Transfered"
+              set #field(transfer.display)="hidden"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+		  set #field(xdatecom.display)="hidden"
+            end if
+            if xstatustor .eq. "Confirmed"
+              set #field(transfer.display)="hidden"
+              set #field(receive.display)="hidden"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+		  set #field(xdum.display)="hidden"
+            end if
+            if xstatustor .eq. "" .or. xstatustor .eq. "Open"
+              set #field(receive.display)="hidden"
+		  set #field(xdatecom.display)="hidden"
+            end if
+            if xtornum .ne. ""
+              //set #field(transfer.display)="hidden"
+              //set #field(receive.display)="hidden"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+          end event
+        end field
+
+
+        field add
+          event before
+		if xfwh .eq. ""
+			error "Cannot Proceed -- Please Select From Branch"
+		else if xtwh .eq. ""
+			error "Cannot Proceed -- Please Select To Branch"
+		end if
+	        set xstatustor="Open"
+          end event
+        end field
+
+        field xdate
+          caption Transfer Date
+        end field
+
+        field xdatecom
+          display constant
+          caption Receive Date
+        end field
+
+
+        field xlong
+          height 3
+          width 110
+          column 2
+        end field
+
+
+     //      field Transfer
+    //        event before
+    //          if xstatustor .ne. "Open"
+   //            error "Cannot Proceed -- TO Already Confirmed"
+  //          end if
+  //        end event
+ //         event after
+//            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,8)
+//           // action Show
+//         end event
+//        end field
+
+        field Receive
+          event before
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Transfered"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          //set xwh=#wh
+	end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,8)
+           action Show
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtordetailre"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

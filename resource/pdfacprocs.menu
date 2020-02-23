@@ -1,0 +1,10 @@
+//Process.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Salary Process                   |#classPath+"/login?screen=pdfacprocs"
+Bonus Process          		   |#classPath+"/login?screen=pdfacbonusprocs"
+//Variance Process                 |#classPath+"/login?screen=pdvariance"
+//IT Summary Process               |#classPath+"/login?screen=pditsummary"
+//-------------------------------------------------------------------
+

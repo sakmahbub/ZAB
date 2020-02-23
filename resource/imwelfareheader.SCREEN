@@ -1,0 +1,262 @@
+screen imwelfareheader
+
+     sidebar list one
+     sections form one, jscript myscript
+     
+     list one
+        caption "Detail List"
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=opdodetailtender&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=opdodetail.zid and xitem=opdodetail.xitem)),~
+                 xqtyord,xrate,xdiscdetamt,xvatamt,xlineamt,(xlineamt+xvatamt-xdiscdetamt)
+
+        header "Line No","Product <br>Code","Product <br>Name","Qty","Rate","Disamt","Vat <br>Amt","TP","Net <br> Amt "
+        totals "","Totals","","","",sum,sum,sum,sum
+     end list
+
+
+
+     form one
+     
+      caption "Welfare Header"
+      table opdoheader
+      primarykey xdornum
+      order xdornum desc
+      select "xwh='"+#wh+"' and left(xdornum,2)='DW'"
+      return "login"
+      layout 3
+      pstyle 3
+      objects Add,Show,Clear,Update,Delete,*next,~
+              *next,Details,Top,Previous,Next,Bottom,Confirmed,"<p>",~
+              xdornum,xdate ,xdatedel,xcrlimit,xcus,xorg,~
+              xdeltime,xsp,xname,xpaymentterm,xroute,xstatusord,xpornum,xdatepo,xstatusar display(hide),~
+		  xdatedue display(hide),xref display(hide),xpp display(hide),xalias,~
+		  xprime display(hide),xamount display(hide),xavlperc display(hide),xvatrate display(hide),xwh,~	
+		  xdatecom display(hide),xdisc display(hide),xdiscf display(hide),xait display(hide),xproject display(hide),~
+		  xyear display(hide),xper display(hide),xtype display(hide),xstatus display(hide),xexpamt
+
+
+	field xcrlimit
+        attrib local
+        display const
+        caption Credit Available
+        event after
+        	if xpaymentterm .eq. "Credit"
+          		set xcrlimit = cacreditview.xbalance("xcus='"+xcus+"'")
+          	else 
+          		set xcrlimit = 0
+          	end if
+          //if xcrlimit<0
+          //	set xcrlimit=0
+          //end if
+        end event
+      end field
+
+field xpornum
+	caption Order No
+end field
+
+field xdatepo
+	caption Order Date
+	default "2999-01-01"
+end field
+
+field xdate
+	caption Invoice Date
+end field
+
+field xdeltime
+	caption Delivary Shift
+	default "Any Time"
+end field
+
+field xdornum
+	pick list opordcrn
+end field
+field xitem
+	pick list xitemnpl
+end field
+
+    field xdatedue
+		default "2999-01-01"
+	end field
+
+
+      field xwh
+        display hide
+        default #wh
+      end field
+
+      field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+      end field
+
+
+      field xdum1
+        attrib local
+        display const
+        caption
+      end field
+
+      field xorg
+        attrib local
+        display const
+        caption Customer Name
+        event after
+          set xorg=cacus.xorg("xcus='"+xcus+"'")
+//          set xorg=<font size=+2 color=red>cacus.xorg("xcus='"+xcus+"'")</font>
+        end event
+      end field
+
+      field xname
+        attrib local
+        display const
+        caption MIO Name
+        event after
+          set xname=cappo.xname("xsp='"+xsp+"'")
+        end event
+      end field
+
+      field xalias
+        attrib local
+        display hide
+        caption Name Of Delivery Man
+        event after
+          set xalias=cappo.xname("xsp='"+xpp+"'")
+        end event
+      end field
+
+      field xpaymentterm
+        display const
+      end field
+
+      field xnote
+        width 40
+        height 3
+      end field
+
+      field xcus
+         event after
+            	class careports(getReport{opbilltender,1,xdornum,Print Single Invoice})
+		class careports(getReport{opinvproductsumten,2,xwh,xsumnum,Print Product Wise Sum})
+            //class careports(getReport{opchalan,1,xdornum,Print Single Challan})opinvproductsumten.rpt
+            //class careports(getReport{opbill-3,2,xsumnum,xroute,Print Multiple Invoice})
+            //class careports(getReport{opchalan-2,2,xdate,xsumnum,Print Multiple Challan})
+            set globals(xdornum)=xdornum
+     	      if xstatusord .eq. "Confirmed"
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Confirmed.display)="hidden"
+       	      end if
+          end event
+        end field
+		
+	field Confirmed
+         event after
+			set temp = #spsql(zabsp_ConfirmDT,#id,#user,#wh,xdornum)
+			action show
+          end event
+     end field
+
+        field add
+          event before
+          	set custype = cacus.xpaymentterm("xcus='"+xcus+"'") 
+	            if xcus .eq. ""
+      	        error "Cannot Proceed -- Please Choose Customer"
+			else if xdate .lt. #date
+				error "Cannot Proceed -- Invoice On Previous Date Not Allowed"
+			else if xdatedel .lt. #date
+				error "Cannot Proceed -- Delivery on Previous Date Not Allowed"
+			//else if xdeltime .eq. ""
+			//	error "Cannot Proceed -- Please Select Delivery Time"
+			else if xsp .ne. cappo.xsp("xsp='"+xsp+"' and xwh='"+#wh+"'")
+				error "Cannot Proceed -- MIO Belongs To Different Depot"
+			end if
+				set xtotamt = 0
+				set xvatamt = 0
+				set xdiscamt = 0
+				set xprime = 0
+	    		set xyear = #sub(xdate,0,4)
+	 	   		set xper = #sub(xdate,5,2)
+				set xtype = "NPL"
+				set xsp = cacus.xsp("xcus='"+xcus+"'")
+				set xwh=#wh
+        	    //*********** GETTING INFO FROM CACUS ****************
+
+	            set xwh=cacus.xwh("xcus='"+xcus+"'")
+      	    	set xstatusord = "Open"
+            	set xstatusar = "Open"
+            	set xstatus = "Open"
+
+	            //*********** GETTING TRN NO ****************
+				set customer = cacus.xcus("xcus='"+xcus+"'")
+				if #result .eq. "true"
+            			set year = #sub(xdate,2,2)
+		            	set trn = "DW"+#wh
+            			set xdornum = #trn("DO Number",trn,10)
+		            	set xdornum = #sub(xdornum,0,4)+year+#sub(xdornum,4,10)
+				end if
+
+          end event
+		event after
+			action show
+		end event
+        end field
+
+
+        field update
+          event before
+		if xdate .lt. #date
+			error "Cannot Proceed -- Invoice On Previous Date Not Allowed"
+		else if xsp .ne. cappo.xsp("xsp='"+xsp+"' and xwh='"+#wh+"'")
+			error "Cannot Proceed -- MIO Belongs To Different Depot"
+		end if
+            set xwh=cacus.xwh("xcus='"+xcus+"'")
+    		set xyear = #sub(xdate,0,4)
+   		set xper = #sub(xdate,5,2)
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field New
+          embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "imwelfaredetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+
+        </script>
+     end jscript
+
+end screen

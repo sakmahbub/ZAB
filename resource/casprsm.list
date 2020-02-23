@@ -1,0 +1,10 @@
+list casprms
+  table carsm
+  order xrsm
+  select "(xrm like '%"+zvalue+"%' or xname like '%"+zvalue+"%') and (xwh='"+#wh+"')"
+  rows 10
+  objects xrsm attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+               xname,xwh
+end list
+
+

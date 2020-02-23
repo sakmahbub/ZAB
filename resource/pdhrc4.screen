@@ -1,0 +1,86 @@
+screen pdhrc4
+     caption "GL Group 1"
+     sidebar list four,list five
+     sections form one,jscript myscript
+
+	list four
+        caption "List of "+xhrc3
+        table pdhrc4
+        order xhrc1,xhrc2,xhrc3,xhrc4
+        fixed xhrc1,xhrc2,xhrc3
+        rows 20
+        objects  xhrc4 attrib(link "login?screen=pdhrc4&command=Show&xhrc1=?&xhrc2=?&xhrc3=?&xhrc4=?"),xdesc
+     end list
+
+	list five
+        caption "List of "+xhrc4
+        table achrc5
+        order xhrc1,xhrc2,xhrc3,xhrc4,xhrc5
+        fixed xhrc1,xhrc2,xhrc3,xhrc4
+        rows 20
+        objects  xhrc5,xdesc
+     end list
+
+
+
+     form one
+        caption "Territory of "+xhrc1
+        table pdhrc4
+        primarykey xhrc1, xhrc2, xhrc3,xhrc4
+        order xhrc1,xhrc2,xhrc3,xhrc4
+        fixed xhrc1,xhrc2,xhrc3
+        return "LogIn"
+        layout 2
+        pstyle 3
+        objects Back to FM Area,*next, ~
+               Show,Clear,Add, Update, Delete,*next,Top,Bottom,"<p>" ,~
+               xhrc4 width(20),xdesc width(50)
+
+        field xhrc4
+	    caption Territory
+          event after
+            set globals(xhrc4)=xhrc4
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Back
+          embed onclick="clicked(this)"
+        end field
+
+        field Level
+          embed onclick="grouped(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but = ""
+        function clicked(b){
+          but = "clicked"
+        }
+        function grouped(b){
+          but = "grouped"
+        }
+        function submitit(form){
+          if (but == "clicked"){
+            form.screen.value = "pdhrc3"
+            form.searchbutton.value = "Find xhrc1=?&xhrc2=?&xhrc3=?"
+
+          }
+          if (but == "grouped"){
+            form.screen.value = "pdhrc5"
+            form.searchbutton.value = "Find xhrc1=?&xhrc2=?&xhrc3=?&xhrc4=?"
+
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

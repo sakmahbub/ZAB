@@ -1,0 +1,61 @@
+screen pdprocsdate
+  caption "Payment Processing"
+  sections form one
+
+  form one
+    caption "<ACRONYM>Date Wise Salary Process</ACRONYM>"
+    return "login"
+    layout 2
+    pstyle 3
+
+    objects Process,xfstaff,xtstaff,xfdate,xtdate,xempcategory,xdaterec//display(hide)
+
+   field xdaterec
+	display hide
+	attrib local
+	event before
+	set xdaterec=#sql("select xdaterec from zabsysdateview")
+	//set xyear=#sub(xdaterec,0,4)
+	//set xper=#sub(xdaterec,5,2)
+	end event
+    end field
+
+    field xdum
+      attrib local
+      display const
+      caption
+    end field
+	
+    field xfstaff
+	  pick list xstaff
+	  width 7
+    end field	
+	
+    field xtstaff
+      default "z"
+	  pick list xstaff
+	  width 7
+    end field
+
+    field xyear
+      attrib local
+    //  default #sub(#date,0,4)
+    end field
+
+    field xper
+      attrib local
+    //  default #sub(#date,5,2)
+    end field
+
+
+    field Process
+      event after
+		//set xempcategory="AKK Head Office"		
+		set temp = #spsql(sp_salaryprocess_DateWise,#id,#user,xfstaff,xtstaff,xfdate,xtdate,xempcategory) 
+		//#id,#user,xyear,xper,xempcategory
+      end event
+    end field
+
+  end form
+
+end screen

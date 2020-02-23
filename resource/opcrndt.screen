@@ -1,0 +1,155 @@
+screen opcrndt
+     caption "Sales Return Entry - Detail"
+     sidebar list order,list one
+     sections form one,jscript myscript
+
+
+     list order
+    	caption "Item List For Order No "+xordernum
+        table opdodetail
+        order xdornum,xrow
+        //fixed xdornum
+        select "xdornum='"+xordernum+"'"
+        rows 20
+        objects xitem attrib(link "abc" embed onclick="return pickItem(this:xunit#:xrate#:xqtyord#:xvatrate#)"),~
+        desc equals((select xdesc from caitem where zid=opdodetail.zid and xitem=opdodetail.xitem)),~
+                xunit attrib(name xunit#),xrate attrib(name xrate#),~
+                xqtyord attrib(name xqtyord#),xvatrate attrib(name xvatrate#)
+        header "Item Code","Description","Unit","Rate","Qty","Vat"
+     end list
+
+     list one
+	      caption "List For Sales Return Adjustment No "+xcrnnum
+        table opcrndetail
+        order xcrnnum,xrow
+        fixed xcrnnum
+        rows 20
+        objects xrow attrib(link "login?screen=opcrndetail&command=Show&xcrnnum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where caitem.zid=opcrndetail.zid and caitem.xitem=opcrndetail.xitem)),~
+                xqtyord,xrate,xlineamt
+
+        totals count,"","Totals",sum,"",sum
+        header "Line No","Item Code","Description","Qty Ordered","Rate","Line Amount"
+     end list
+
+
+     form one
+        caption "<ACRONYM>Details For Sales Return<br> "+xcrnnum+""
+        table opcrndetail
+        primarykey xcrnnum,xrow
+        order xcrnnum,xrow
+        fixed xcrnnum
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Return,Show,Clear,Add, Update, Delete, *next,Top,Previous,Next, Bottom,~
+                xrow attrib(row 0 1;search),xunit,~
+                xitem, xdesc display(const),~
+                xqtyord,xrate attrib(readonly),~
+                xlineamt display(const), xlong,xvatrate attrib(readonly),xvatamt
+
+      field xdesc
+        attrib local
+        display const
+        caption Description
+        event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        end event
+      end field
+
+
+      field xqtyord
+      caption Quantity Returned
+      end field
+
+        field xlong
+      //    width 50
+          height 3
+//        column 2
+        end field
+
+  	  field xitem
+	  	  event after
+  		    set statusord = opcrnheader.xstatusord("xcrnnum='"+xcrnnum+"'")
+	  	    set statusar = opcrnheader.xstatusar("xcrnnum='"+xcrnnum+"'")
+	        if statuscrn .eq. "Confirmed" .or. statusar .eq. "Confirmed"
+			      set #field(add.display)="hidden"
+    		  	set #field(update.display)="hidden"
+		    	  set #field(delete.display)="hidden"
+    		  end if
+	   	  end event
+	    end field
+
+        field add
+          event before
+            
+            class oppharma(validateBeforeDetailCRN({xcrnnum}))
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterDetailCRN,#id,#user,xcrnnum,xrow,xqtyord,xrate,xvatrate,xitem)
+            action Show
+          end event
+        end field
+
+        field update
+          event before
+            class oppharma(validateBeforeDetailCRN({xcrnnum}))
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterDetailCRN,#id,#user,xcrnnum,xrow,xqtyord,xrate,xvatrate,xitem)
+            action Show
+          end event
+        end field
+
+        field xdesc
+          event before
+            set xdesc = ""+caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcrnhd"
+            form.searchbutton.value = "Find xcrnnum=?"
+          }
+          return result
+        }
+        function pickItem(link,unit,rate,qtyord,vat){
+
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xunit.value=unit.innerText
+            document.one.xrate.value=rate.innerText
+            document.one.xqtyord.value=qtyord.innerText
+            document.one.xvatrate.value=vat.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+
+end screen

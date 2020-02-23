@@ -1,0 +1,27 @@
+
+product ZAB ERP
+
+table pdbalview
+  caption "Balance View"
+  columns zid,xstaff,xname,xdesignation,xcode,xdeptname,xyear,xper,xtype,xamount,~
+          xtrntype,xbank,xacc,xadjustment,xarrear,xothours,xposition,xempcategory,~
+          xdatejoin,xenddate,xcomtype,xlocation,xdaysdedvar,xsign
+
+  primary key zid,xyear,xper,xstaff
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdbalview (zid,xstaff,xname,xdesignation,xdeptname,xcode,xyear,xper,xtype,~
+                  xamount,xtrntype,xbank,xacc,xadjustment,xarrear,xsign,xothours,xposition,xempcategory,~
+                  xdatejoin,xenddate,xcomptype,xlocation,xdaysdedvar) ~
+                  as select a.zid,a.xstaff,b.xname,b.xdesignation,b.xdeptname,~
+                  (select xlong from xcodes where xtype='Department Name' and a.zid=xcodes.zid and xcode=b.xdeptname), ~
+                  a.xyear,a.xper,a.xtype,a.xamount,~
+                  (select xprops from xcodes where xtype='PD Transaction Type' and a.zid=xcodes.zid and xcode=a.xtype),~
+                  b.xbank,b.xacc,a.xadjustment,a.xarrear,a.xsign,a.xothours,a.xposition,a.xempcategory,b.xdatejoin,b.xenddate,~
+            		  (select xlong from xcodes where xcodes.zid=a.zid and xtype='PD Transaction Type' and xcode=a.xtype),~
+                  isnull(b.xlocation,''),isnull(a.xdaysdedvar,0) ~
+                  from pdbal a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff
+end table

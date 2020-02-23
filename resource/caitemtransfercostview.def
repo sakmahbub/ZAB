@@ -1,0 +1,26 @@
+
+product ZAB ERP
+
+table caitemtransfercostview
+  caption "Credit Limit View"
+  columns zid,xwh,xitem,xcostrow,xqty,xcost,xqtydel,xbalance
+
+  primary key zid,xitem,xrow
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view caitemtransfercostview (zid,xwh,xitem,xcostrow,xqty,xcost,xqtydel,xbalance) ~
+                  as select a.zid,b.xcode,a.xitem,a.xrow,~
+                  isnull((select sum(xqty) from imtrn where zid=a.zid and xitem=a.xitem and xrate=a.xcost and xsign>0 and xwh=b.xcode),0),~
+                  a.xcost,~
+                  isnull((select sum(xqty) from imtrn where zid=a.zid and xitem=a.xitem and xrate=a.xcost and xsign<0 and xwh=b.xcode),0),~
+                  isnull((select sum(xqty) from imtrn where zid=a.zid and xitem=a.xitem and xrate=a.xcost and xsign>0 and xwh=b.xcode),0)-isnull((select sum(xqty) from imtrn where zid=a.zid and xitem=a.xitem and xrate=a.xcost and xsign<0 and xwh=b.xcode),0) ~
+                  //from caitem a join xcodes b on b.xtype='Branch' and a.zid=b.zid
+                  from caitemcostprice a join xcodes b on b.xtype='Branch' and a.zid=b.zid
+
+
+
+
+end table

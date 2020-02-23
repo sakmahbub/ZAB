@@ -1,0 +1,12 @@
+ list cacolor
+        table cacolor
+        order xcolorcode
+			
+        select "(xcolorcode like '%"+zvalue+"%' or xcolorcat like '%"+zvalue+"%' or xcolorsubcat like '%"+zvalue+"%' )"
+		
+        rows 20
+        objects xcolorcode attrib(link "abc" embed onclick="return updateParent(this:'xcolorcode')"),~
+                xcolorcat,xcolorsubcat,xcolortype,xcolorfmate
+		 header "Color Code","Color Category","Color Sub Category","Color Type","Color Format"
+     end list
+

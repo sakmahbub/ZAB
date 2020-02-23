@@ -1,0 +1,13 @@
+//im.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+
+Color Master 				 |#classPath+"/login?screen=cacolor"
+Color Category 				 |#classPath+"/login?screen=xcodes(xtype=Color Category)"
+Color Sub Category 				 |#classPath+"/login?screen=xcodes(xtype=Color Sub Category)"
+Color Type 				 |#classPath+"/login?screen=xcodes(xtype=Color Type)"
+
+Color Detail Report    |#classPath+"/login?screen=*viewcrystal colormasterrpt(2;in,st;zid,colorcode;xcolorcode=Color Code, xviewtype=Report View)"
+//-------------------------------------------------------------------
+

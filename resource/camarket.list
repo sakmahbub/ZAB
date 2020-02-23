@@ -1,0 +1,9 @@
+     list camarket
+        table xcodes
+        //order xsp desc
+        select "(xcode like '%"+zvalue+"%' and xtype='Market')"// and xwh='"+#wh+"')"
+        rows 200
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"),xwh
+     end list
+
+

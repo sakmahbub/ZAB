@@ -1,0 +1,36 @@
+product ZAB ERP
+
+table pdweekendview
+  caption "PD Attendance View"
+  columns zid,xstaff,xposition,xyearperdate,xdate,xstatus,xnote,xtimein,xtimeout
+  primary key zid,xstaff,xposition,xyearperdate,xdate,xstatus,xnote,xtimein,xtimeout
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdweekendview (zid,xstaff,xposition,xyearperdate,xdate,xstatus,xnote,xnote1,xtimein1,xtimeout1,xstatusel,xstatuslate,xemplate,xempearly,xdayname,xworktime,xspec,xadminid,xsid) ~
+            as Select a.zid,a.xstaff,a.xposition,b.xyearperdate,b.xdate,'Weekend',CASE when isnull(xhdaytype,'')='1' then isnull(xnote,'') else '' END,'',NULL,NULL,'','','','',DATENAME(weekday,b.xdate),'00:00:00','',isnull(a.xadminid,''),isnull(a.xsid,'') ~
+			from pdmst a join pdcalenderdetail b on a.zid=b.zid where isnull(b.xshift,'General')='General' ~
+			and a.xstaff not in (select xstaff from pdrosterdetail where zid=a.zid and xnote='Weekend' and month(xdate)=month(b.xdate) and year(xdate)=year(b.xdate)) ~
+			and b.xdate not in (select pl.xdate from pdleavedetail pl join pdleaveheader p2 on pl.zid=p2.zid and pl.xyearperdate=p2.xyearperdate where pl.zid=a.zid AND pl.xstaff=a.xstaff AND pl.xtypeleave='Tour' and p2.xstatus='Confirmed') ~
+			UNION ALL ~
+			Select a.zid,a.xstaff,a.xposition,b.xyearperdate,b.xdate,'Weekend','','',NULL,NULL,'','','','',DATENAME(weekday,b.xdate),'00:00:00','',isnull(a.xadminid,''),isnull(a.xsid,'') ~
+			from pdrosterdetail b join pdmst a on a.zid=b.zid and a.xstaff=b.xstaff where b.xnote='Weekend'	~
+			and b.xdate not in (select pl.xdate from pdleavedetail pl join pdleaveheader p2 on pl.zid=p2.zid and pl.xyearperdate=p2.xyearperdate where pl.zid=a.zid AND pl.xstaff=a.xstaff AND pl.xtypeleave='Tour' and p2.xstatus='Confirmed') ~
+			UNION All ~
+			Select a.zid,a.xstaff,a.xposition,b.xyearperdate,b.xdate,'Weekend',CASE when isnull(xhdaytype,'')='1' then isnull(xnote,'') else '' END,'',NULL,NULL,'','','','',DATENAME(weekday,b.xdate),'00:00:00','',isnull(a.xadminid,''),isnull(a.xsid,'') ~
+			from pdmst a join pdcalenderdetail b on a.zid=b.zid where isnull(b.xshift,'General')='General' and isnull(b.xhdaytype,'')='1' and isnull(a.xhdayapp,'')='1' ~
+			and a.xstaff in (select xstaff from pdrosterdetail where zid=a.zid and xnote='Weekend'  and month(xdate)=month(b.xdate) and year(xdate)=year(b.xdate)) ~
+			and b.xdate not in (select xdate from pdrosterdetail where zid=a.zid and xnote='Weekend'  and xdate = b.xdate and xstaff=a.xstaff) ~ 
+			and b.xdate not in (select pl.xdate from pdleavedetail pl join pdleaveheader p2 on pl.zid=p2.zid and pl.xyearperdate=p2.xyearperdate where pl.zid=a.zid AND pl.xstaff=a.xstaff AND pl.xtypeleave='Tour' and p2.xstatus='Confirmed')
+			and b.xdate not in (select xdate from pdrosterdetail where zid=a.zid and xstaff=a.xstaff and xnote='Weekend')
+			
+			//Select a.zid,a.xstaff,a.xposition,b.xyearperdate,b.xdate,'Weekend','','',NULL,NULL,'','','','',DATENAME(weekday,b.xdate),'00:00:00','',isnull(a.xadminid,''),isnull(a.xsid,'') ~
+			//from pdmst a join pdcalenderdetail b on a.zid=b.zid where isnull(b.xshift,'General')='General' ~
+			//and a.xstaff not in (select xstaff from pdrosterdetail where zid=a.zid and xnote='Weekend') ~
+			//and b.xdate not in (select pl.xdate from pdleavedetail pl join pdleaveheader p2 on pl.zid=p2.zid and pl.xyearperdate=p2.xyearperdate where pl.zid=a.zid AND pl.xstaff=a.xstaff AND pl.xtypeleave='Tour' and p2.xstatus='Confirmed') ~
+			//UNION ALL ~
+			
+			
+  end table

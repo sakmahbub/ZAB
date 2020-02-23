@@ -1,0 +1,281 @@
+screen opdoheaderedit
+
+     sidebar list one,list inv
+     sections form one, jscript myscript
+
+     list one
+        caption "Detail List"
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 10
+        objects  xrow,xitem,desc equals((select xdesc from caitem where zid=opdodetail.zid and xitem=opdodetail.xitem)),~
+                 xqtyord,xrate,xvatrate,xvatamt,xlineamt
+
+        header "Line No","Item Code","Description","Qty","Rate","Vat Rate","Vat Amt","Line Amt"
+        totals "","Totals","","","",sum,sum,sum
+     end list
+
+     list inv
+        caption "Invoice Amount"
+        table opdoheader
+        order xdornum
+        fixed xdornum
+        rows 2
+        objects  xdornum,(xtotamt+xvatamt-xdiscamt),xdiscamt,xvatamt,xtotamt
+
+        header "Invoice No","<font size=+1 color=red>Net Amount</font>","Discount","VAT","Trade Price"
+     end list
+
+     form one
+      caption "Invoice Header"
+      table opdoheader
+      primarykey xdornum
+      order xdornum desc
+      select "xwh='"+#wh+"'"
+      return "login"
+      layout 4
+      pstyle 3
+      objects ~
+              Show,Clear,Update, Delete,*next,Details,Top,Previous,Next,Bottom,Confirm,~
+              "<p>",~
+              xdornum,xdate,xcus,xorg display(const),~
+              xsp,xname,xpp,xalias,~
+              xpaymentterm,xstatusord display(text),xstatusar display(text),xdatedue,xref,~   //xdum1,~
+              
+		  // hide
+		  xamount display(hide),xavlperc display(hide),xvatrate display(hide),xwh display(hide),~	
+		  xdatecom display(hide),xdisc display(hide),xdiscf display(hide),xait display(hide),xproject display(hide),~
+		  xyear display(hide),xper display(hide),xtype display(hide)
+
+		  //xnetamt,~//xtotamt display(hide),xvatamt display(hide),xdiscamt display(hide),~
+
+field xdornum
+	pick list opordcrn
+	event after
+            set globals(xdornum)=xdornum
+	end event
+end field
+field xitem
+	pick list xitemnpl
+end field
+
+    field xdatedue
+		default "2999-01-01"
+	end field
+
+	field xsp
+        caption PPO
+      end field
+
+      field xpp
+	      caption SPR
+      end field
+
+      field xwh
+        display hide
+        default #wh
+      end field
+
+      field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+      end field
+
+
+      field xdum
+        attrib local
+        display const
+        caption
+      end field
+
+      field xdum1
+        attrib local
+        display const
+        caption
+      end field
+
+      field xorg
+        attrib local
+        display const
+        caption Customer Name
+        event after
+          set xorg=cacus.xorg("xcus='"+xcus+"'")
+        end event
+      end field
+
+      field xname
+        attrib local
+        display const
+        caption PPO Name
+        event after
+          set xname=cappo.xname("xsp='"+xsp+"'")
+        end event
+      end field
+
+      field xalias
+        attrib local
+        display const
+        caption SPR Name
+        event after
+          set xalias=cappo.xname("xsp='"+xpp+"'")
+        end event
+      end field
+
+      field xamount
+        caption Advance
+      end field
+
+      field xdatecom
+        caption Ledger Date
+      end field
+
+      field xstatusar
+        caption Post To Ledger
+      end field
+
+      field xnote
+        width 40
+        height 3
+      end field
+
+        field add
+          event before
+				
+            if xcus .eq. ""
+              error "Cannot Proceed -- Please Choose Customer"
+		else if xdate .lt. #date
+			error "Cannot Proceed -- Invoice On Previous Date Not Allowed"
+		else
+			set xtotamt = 0
+			set xvatamt = 0
+			set xaitamt = 0
+			set xdisc = 0
+			set xdiscamt = 0
+	    		set xyear = #sub(xdate,0,4)
+ 	   		set xper = #sub(xdate,5,2)
+			set xtype = "NPL"
+            //*********** GETTING INFO FROM CACUS ****************
+
+	            set xwh=cacus.xwh("xcus='"+xcus+"'")
+      	      set xstatusord = "Open"
+            	set xstatusar = "Open"
+
+	            //*********** GETTING TRN NO ****************
+			set customer = cacus.xcus("xcus='"+xcus+"'")
+			if #result .eq. "true"
+            		set year = #sub(xdate,2,2)
+//		            set trn = xtrn.xtrn("xtypetrn='DO Number' and xwh='"+xwh+"' and left(xtrn,2)='DO'")
+		            set trn = "DO"+#wh
+            		set xdornum = #trn("DO Number",trn,10)
+		            set xdornum = #sub(xdornum,0,4)+year+#sub(xdornum,4,10)
+			end if
+            end if
+          end event
+          event after
+            set com = "add"
+            set temp = #spsql(sp_validateAfterHeaderDOPj,#id,#user,xdornum,xdate,xcus,com)
+            action Show
+          end event
+        end field
+
+        field update
+          event before
+            set xwh=cacus.xwh("xcus='"+xcus+"'")
+    		set xyear = #sub(xdate,0,4)
+   		set xper = #sub(xdate,5,2)
+          end event
+          event after
+            set com = "update"
+            set temp = #spsql(sp_validateAfterHeaderDOPj,#id,#user,xdornum,xdate,xcus,com)
+            action Show
+          end event
+        end field
+
+        field Confirm
+          event before
+            set temp = #sql("select xrow from opdodetail where xdornum='"+xdornum+"'")
+            if #result .eq. "false"
+              error "Cannot Proceed -- Detail Not Exists"
+            end if
+          end event
+          event after
+             if xstatusord .eq. "Open" .or. xstatusar .eq. "Open"
+             set temp = #spsql(sp_DoProcess,#id,#user,#wh,xdate,xdate,xdornum,xdornum)
+//               set temp = #spsql(sp_confirmDO,#id,#user,xdornum,xdate,xwh,8)
+             end if
+             if xstatusar .eq. "Open"
+               set temp = #sql("update opdoheader set xdatecom='"+xdatecom+"' where xdornum='"+xdornum+"'")
+//               set temp = #spsql(sp_transferOPtoAR,#id,#user,xdornum,xdate,xwh,xsp,xcus,xtotamt,xvatrate,xait,xdisc,xdiscf)
+             end if
+//             action Show
+          end event
+        end field
+
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print_Challan
+          embed onclick="clicked(this)"
+        end field
+
+        field Print_Bill
+          embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function confirmUpdate(){
+          if(confirm('Are You Confirm')){
+            alert('yes')
+            form.searchbutton.value = "Update"
+          }else{
+//            alert('no')
+            form.searchbutton.value = "Show"
+          }
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opdodetailedit"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        function pickDetail(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text;
+            document.one.xbalance.value=primebal.text;
+            document.one.xdate.value=date.text;
+          }else{
+//            var ss =eval("document.forms");
+//            alert(ss.length);
+//           if(s1.length>)1
+//              document.forms[s1.length-1].xamount.value=link.innerText
+//            else
+              document.one.xamount.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

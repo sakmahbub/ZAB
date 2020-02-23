@@ -1,0 +1,11 @@
+//Master Setup.menu
+//---------------------------------------------------------------------------------------
+option                  |action                                          |modules|models
+//---------------------------------------------------------------------------------------
+Item Master             |#classPath+"/login?screen=caitem"                 |
+Item Group              |#classPath+"/login?screen=xcodes(xtype=Item Group)"
+Transaction Codes                |#classPath+"/login?screen=xtrn(xtypetrn=Inventory Transaction)"
+Units of Measurements            |#classPath+"/login?screen=xcodes(xtype=Unit of Measure)"
+Warehouses                       |#classPath+"/login?screen=xcodes(xtype=Warehouse)"
+//-------------------------------------------------------------------
+

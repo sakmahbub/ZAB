@@ -1,0 +1,263 @@
+screen pogrnlcheader
+     caption "MRR/GRN Header"
+     sidebar list one,list detail,list lccost,list invcost
+     sections form one, jscript myscript
+
+     list one
+        caption "LC No :"+xmlcno
+        table poordheader
+        order xmlcno
+        fixed xpornum
+        rows 20
+        objects  xmlcno attrib(link "login?screen=poordheader&command=Show&xmlcno=?"), ~
+                 xdate//,xpiref,xdate
+
+
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+     list detail
+        caption "Invoice Detail"
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        //select none
+        //navigators alpha
+        //,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrnlcdetail&command=Show&xgrnnum=?&xrow=?"), ~
+                xitem,xdesc,xqtydel,xqtyinport,xqtygrn,xrate
+
+
+        headers "Row","Item","Description","Qty Shipped","Quantity in Clearing","Act. Quantity Received","Rate"
+     end list
+
+     list lccost
+        caption "LC Cost"
+        table pogrncost
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrncost&command=Show&xgrnnum=?&xrow=?"), ~
+                xcostcode,xcost
+
+
+        headers "Row","Code","Cost"
+        total "","Total",sum
+     end list
+
+     list invcost
+        caption "Invoice Cost"
+        table pogrninvcost
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrninvcost&command=Show&xgrnnum=?&xrow=?"), ~
+                xcostcode,xcost
+        headers "Row","Code","Cost"
+     end list
+
+     form one
+        caption "I<ACRONYM>nvoice</ACRONYM> H<ACRONYM>eader</ACRONYM>"
+        table pogrnheader
+        order xinvnum desc
+        return "login"
+        select "xtype='LC Status'"
+        layout 2
+        pstyle 3
+        objects ~                                                                     //Commercial Invoice,Packing List,
+                Show,Clear,Update, *next,Top,  Next, Previous,Bottom,~
+                *next,Detail,Invoice Cost,LC Cost,*next,Transfer To LTR,Confirm,"<p>" ,~
+                xinvnum,xref,~
+                xcur,xexch,xprimetotamt,xbasetotamt,~
+                xcertci,xcertpl,xcertco,xdate,xshipdate,xnoofcontainer,xshippedqty,xportship,xshipline,xvessel,xvoyage,~
+                xblno,xblrcvd,xdateeta,xexptimeofarv,xclrstartdate,xclrstartnote,xclrenddate,xclrendnote,xnote,xsup display(hide),xorg display(hide),~
+                //xheader,~
+                xstatusgrn display(hide),xpiref display(hide),xtype display(hide),~
+                xstatusap display(hide),~
+                xstatusjv display(hide),xstatustor display(hide),~
+                xgrnnum attrib(search) display(hide),xpornum display(hide)
+                 //xinspectiondate,xshipdatenote,  //trn GRN Number
+
+          field xheader
+            attrib local
+            display const
+            column 2
+            caption &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+            <FONT SIZE=4 COLOR=red><ACRONYM>For Administrative Use</ACRONYM></font>
+          end field
+
+          field xprimetotamt
+            caption Invoice Amount In Foreign Currency
+          end field
+
+          field xbasetotamt
+            caption Invoice Amount In Tk (Base Currency)
+          end field
+
+        field xnote
+          caption Comment
+        end field
+
+        field xstatusjv
+          caption LTR Status
+        end field
+
+        field xstatustor
+          caption Purchase Status
+        end field
+
+        field xstatusgrn
+          caption GRN Status
+        end field
+
+        field xref
+          caption LTR Reference No
+        end field
+
+        field xshippedqty
+          attrib local
+          display const
+          caption Shipped Quantity
+          event after
+            set xshippedqty = #sql ("select sum(xqtydel) from pogrndetail where xgrnnum = '"+xgrnnum+"'")
+          end event
+        end field
+
+        field xprimetotamt
+          caption Invoice Amount
+        end field
+
+
+        field xdate
+          caption Invoice Date
+        end field
+
+        field xnote
+          width 50
+         // column 4
+        end field
+
+        field xgrnnum
+           event after
+              set xorg = casup.xorg("xsup='"+xsup+"'")
+              set globals(xgrnnum) = xgrnnum
+              set globals(xinvnum) = xinvnum
+              set globals(xpornum) = xpornum
+           end event
+        end field
+
+        field update
+          event before
+            set xbasetotamt = xprimetotamt*xexch
+          end event
+          event after
+            class posssteel(updatePoHeaderAfter{xgrnnum,xcur,xexch,pgrnheader,pgrndetail})
+            class posssteel(updateCost{xgrnnum,pogrninvcost})
+          end event
+        end field
+
+        field Transfer
+           event before
+            if xref .eq. ""
+              error " Cannot Proceed--Pls Enter LTR Reference No"
+            end if
+           end event
+           event after
+             class posssteel(TransferToAPSingle{pogrnheader,xgrnnum,-1})
+             class posssteel(TransferToACLTR)
+           end event
+        end field
+
+        field Confirm
+           event before
+            if xstatusgrn .eq. "Confirmed"
+//              error "Already Confirmed"
+            end if
+           end event
+           event after
+             class posssteel(ConfirmGRNSingle{xgrnnum,xdate,xwh,Single})
+             class posssteel(TransferToACPurchase)
+           end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+        field Container
+          embed onclick="clicked(this)"
+        end field
+
+        field LC
+          embed onclick="clicked(this)"
+        end field
+
+        field Invoice
+          embed onclick="clicked(this)"
+        end field
+
+        field Packing
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "pogrnlcdetail"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="LC Cost"){
+            form.screen.value = "pogrncost"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Invoice Cost"){
+            form.screen.value = "pogrninvcost"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Commercial Invoice"){
+              var link =  "login?screen=*crystal+pocominv(xinvnum=Invoice No=xinvnum)&option=Print+Commercial+Invoice&menu=*none*&xinvnum="+form.xinvnum.value+""
+
+              var width = 240
+              var left = 760
+              if (screen){
+                left = screen.width-width
+              }
+              var param = "toolbar=no,location=no,directories=0,status=0,menubar=0,scrollbars=1,center=0,alwaysRaised=yes,resizable=yes,height=200,width="+width+",top=0,left="+left
+              window.open(link,"StockStatus",param)
+          }
+          if (button=="Packing List"){
+              var link =  "login?screen=*crystal+popackinglist(xinvnum=Invoice No=xinvnum)&option=Print+Packing+List&menu=*none*&xinvnum="+form.xinvnum.value+""
+
+              var width = 240
+              var left = 760
+              if (screen){
+                left = screen.width-width
+              }
+              var param = "toolbar=no,location=no,directories=0,status=0,menubar=0,scrollbars=1,center=0,alwaysRaised=yes,resizable=yes,height=200,width="+width+",top=0,left="+left
+              window.open(link,"StockStatus",param)
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

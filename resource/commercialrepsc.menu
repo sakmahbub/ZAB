@@ -1,0 +1,11 @@
+//OP Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Print Commercial Invoice        |#classPath+"/login?screen=*viewcrystal opinvsccominv(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Report View)"
+Print Delivery Chalan           |#classPath+"/login?screen=*viewcrystal opinvscdelcha(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Report View)"
+Print Packing List             |#classPath+"/login?screen=*viewcrystal opinvscplist(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Report View)"
+Print Own Transport              |#classPath+"/login?screen=*viewcrystal opinvscowntra(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Report View)"
+	//Print Pre-Shipment Certificate 	|#classPath+"/login?screen=*jspcrystal opinvshipcert(xinvnum=Commercial Invoice No=)"
+//-------------------------------------------------------------------
+

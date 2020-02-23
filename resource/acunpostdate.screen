@@ -1,0 +1,33 @@
+screen acunpostdate
+
+     caption "UnPosting"
+     sections form one,  jscript myscript
+
+
+
+     form one
+        caption "UnPosting"
+        return "login"
+        layout 2
+	  pstyle 3 
+
+        objects UnPost,"<p>" ,~
+                 xdate
+
+ 
+	field unpost
+         event before
+            set temp = #spsql(sp_acUnPostdate,#id,#user,xdate)
+         end event
+       end field
+
+        embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+     end jscript
+
+
+
+end screen

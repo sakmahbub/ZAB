@@ -1,0 +1,81 @@
+screen pdleave
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        caption "Leave Master"
+        table pdleave
+        order xtypeleave
+        rows 20
+        objects xtypeleave attrib(link "login?screen=pdleave&command=Show&xtypeleave=?"),~
+                xdesc,xday,xdaymonth
+
+     end list
+
+     form one
+        caption "<ACRONYM>Leave Setup</ACRONYM>"
+        table pdleave
+        order xtypeleave
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete, *next,Top, Previous, Next, Bottom,"<p>" ,~
+                xtypeleave,xdesc,xday,xdaymonth,xper,xlastday
+
+
+        field add
+          event after
+            set temp = #spsql(sp_updateLeaveMaster,#id,xtypeleave,xdaymonth)
+          end event
+        end field
+
+        field update
+          event after
+//            print "b"+#id+" "+xtypeleave+" "+xdaymonth
+//            set temp = #spsql(sp_updateLeaveMaster,xtypeleave,xdaymonth)
+           // set temp = #spsql(sp_updateLeaveMaster,#id,xtypeleave,xdaymonth)
+//            set date = #sesql("select dateadd(day,"+xdaymonth+",'2007-12-31')")
+//            set xper = #sesql("select month(date)")
+//            print
+//            set xlastday = #sesql("select day(date)")
+              class pdsheraton(updateLeaveMaster{xtypeleave,xdaymonth})
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail="clicked"
+        }
+        function service(b){
+          detail="service"
+        }
+        function education(b){
+          detail="education"
+        }
+        function training(b){
+          detail="training"
+        }
+        function payment(b){
+          detail="payment"
+        }
+        function submitit(form){
+
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

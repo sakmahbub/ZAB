@@ -1,0 +1,58 @@
+screen pdbonusdetail
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Detail List"
+        table pdbonusdetail
+        order xtype,xrow
+        fixed xtype
+        rows 20
+        objects  xrow attrib(link "login?screen=pdabs&command=Show&xtype=?&xrow=?"), ~
+                xbonusslab,xbonusrate
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Bonus Slab Entry Detail</ACRONYM>"
+	      table pdbonusdetail
+        order xtype,xrow
+        fixed xtype
+        return "login"
+        layout 4
+        pstyle 3
+        objects Clear,Add, Update, Delete,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~
+          xrow attrib(row 0 1),xbonusslab,xbonusrate,xamount
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdbonusheader"
+            form.searchbutton.value = "Find xtype=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,18 @@
+
+
+
+product ZAB ERP
+
+table oporddetailsoview
+  caption "Ac Approval View"
+  columns zid,xordernumso,xpornum,xcus,xdatedel,xorderrow,xitem,xtheircode,xcolorcode,xbcolor,xbatch,xqtyord,xqtymor,xavail,xstatusso,xtype,xqtydel,xstatusord,xstatusdor
+  primary key zid,xordernumso,xpornum,xcus,xdatedel,xorderrow,xitem,xtheircode,xcolorcode,xbcolor,xbatch,xqtyord,xqtymor,xavail,xstatusso,xtype,xqtydel,xstatusord,xstatusdor
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view oporddetailsoview (zid,xordernumso,xpornum,xcus,xdatedel,xorderrow,xitem,xtheircode,xcolorcode,xbcolor,xbatch,xqtyord,xqtymor,xavail,xstatusso,xtype,xqtydel,xstatusord,xstatusdor)~
+as select h.zid,h.xordernum,h.xpornum,h.xcus,h.xdatedel,d.xorderrow,d.xitem,(select xtheircode from caitem where zid=d.zid and xitem=d.xitem),d.xcolorcode,d.xbcolor,isnull(d.xbatch,''),d.xqtyord,isnull(d.xqtymor,0),(d.xqtyord-isnull(d.xqtymor,0)),h.xstatusso,h.xtype,d.xqtydel,h.xstatusord,h.xstatusdor ~
+from oporddetailso d join opordheaderso h on d.zid=h.zid and d.xordernum=h.xordernum 
+				  
+end table

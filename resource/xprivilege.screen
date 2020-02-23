@@ -1,0 +1,70 @@
+screen xprivilege
+
+     sidebar list one
+     sections form one, jscript myscript
+
+
+     list one
+        caption "<ACRONYM>User Privilege</ACRONYM>"
+        table xprivilege
+        order zemail,zscreen,xfields
+        fixed zemail
+        rows 20
+        objects  zscreen,xfields attrib(link "login?screen=xprivilege&command=Show&zemail=?&zscreen=?&xfields=?"), ~
+                 xoption,xtype
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+     form one
+        caption "User Privilege"
+        table xprivilege
+        primarykey zemail,zscreen,xfields
+        order zemail,zscreen,xfields
+        fixed zemail
+        return "login"
+        pstyle 3
+        layout 4
+        objects Show, Add, Update, Delete,*next,Return, Top,Previous,Next,Bottom,"<p>" ,~
+                zscreen,xfields,xoption,xtype
+
+        embed onsubmit="return submitit(this)"
+
+        field xoption
+          display combo
+          pick "text,hidden,constant"
+        end field
+
+        field xtype
+          display combo
+          pick "button,field"
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "xusers"
+            form.searchbutton.value = "Find zemail=?"
+          }
+        }
+        </script>
+     end jscript
+end screen

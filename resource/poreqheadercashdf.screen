@@ -1,0 +1,191 @@
+screen poreqheadercashdf
+	
+     sidebars list reqlist,list one,list reqapp
+     sections form one, jscript myscript	  
+	 
+	    list reqlist
+      caption "Requisition List"
+         table poreqheader
+        order xporeqnum desc
+		select "xstatusreq in ('Approved_EP','Approved_CPO') and xtype='Cash' and xstatus ='Open' and xwh='"+#wh+"' and xfwh='02'"
+		rows 10
+        objects  xporeqnum attrib(link "login?screen=poreqheadercashdf&command=Show&xporeqnum=?"), xdate,xtype,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Purchase Type","Division Code","Name"
+	end list
+	 
+	 
+	  list reqapp
+        caption "Last 5 Approved Requisition"
+        table poreqappview
+       // order xporeqnum desc
+	    order xdateapp desc
+		select "xposition='"+#user+"' and left(xporeqnum,4) in ('PR--','JN--') and xtype='Cash'"
+		rows 5
+       objects xporeqnum attrib(link "abc" embed onclick="return pickItem(this)"),~
+	   xdate attrib(name xdate#),xdesc attrib(name xdesc#),xdateapp attrib(name xdateapp#)
+       headers "Requisition No","Date","Division","Approved Date"
+     end list
+	 
+	 
+	 list one
+        caption "Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=poreqdetail&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and  xitem=poreqdetail.xitem)),xqtyreq,xqtyapv,xunitpur,xrate,xlineamt
+
+		totals "","","Total","","","","",sum
+        headers "Line No","Item","Description","Qty Req","Qty Apv","UOM","Rate","Amount"
+     end list
+
+
+     list po
+        caption "PO For : "+xreqnum
+        table poordheader
+        order xpornum desc
+        fixed xporeqnum
+        rows 10
+        objects  xpornum attrib(link "login?screen=poordheadercash&command=Show&xpornum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+     form one
+		caption "Advance Approval Header"
+        table poreqheader
+        order xporeqnum desc
+		 select "xstatusreq<>'Open' and xtype='Cash'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Show,Clear,Update,*Next,Top, Previous, Next, Bottom,Approved,"<p>",~//Create_PO,Details,
+                xporeqnum,xdate display(const),xsup display(hide),xorg display(hide),xqotnum display(hide),xstatusreq display(const),xnote,xtype display(hide)
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+          
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+		pick list xporequmprjn
+        	width 15
+          event after
+		  class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+		  class careports(getjspReport{prletter,1,xporeqnum,View Cash Advance Request})
+		 // class careports(getjspReport{poquotcomp,1,xporeqnum,Print Comparative Statement}) 
+		 //  class careports(getjspReport{poquotana,1,xporeqnum,Print Quotation})
+		  //class careports(getboReport{1371,1,xporeqnum,Print Requisition})
+            set globals(xporeqnum)=xporeqnum
+			 set globals(xstatusreq)=xstatusreq
+			  if xstatusreq .eq. "PO Created"
+		         	//set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			//set #field(Confirm.display)="hidden"
+       	      end if
+          end event
+        end field
+
+         field Approved
+            event before
+			set xsuperior=pdmst.xsuperiorsp("xposition='"+#user+"'")
+            end event
+            event after
+		    if #wh .eq. "GMDF"
+			set temp =  #sql("update poreqheader set xsuperiorsp='"+xsuperior+"' where xporeqnum='"+xporeqnum+"'")
+			set temp = #spsql(zabsp_DATETIME_Update,#id,#user,xporeqnum,"poreqheader","xdategm","xgmdf","xstatusreq","xporeqnum","Approved")
+			set wh=imtorheader.xfwh("xporeqnum='"+xporeqnum+"'")
+	        set temp =  #sql("update poreqheader set xwh='"+wh+"' where xporeqnum='"+xporeqnum+"'")
+	        set temp =  #sql("update poreqheader set xstatus='Approved For PO' where xporeqnum='"+xporeqnum+"'")
+	        action show
+           end if
+		   end event
+          end field
+
+
+		field update
+			event before
+			if xstatusreq .eq. ""
+			error "Please Show first"
+			end if
+		//	if xqotnum .ne. ""
+		//	set xsup=poquotheader.xsup("xqotnum='"+xqotnum+"'")
+		//	else if xsup .ne. ""
+		//	set xqotnum=poquotheader.xqotnum("xsup='"+xsup+"' and xporeqnum='"+xporeqnum+"'")
+		//	end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poreqdetailcash"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		    function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table oppromoheader
+  caption "Promotion Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xpromono,xconsignment,xnote,xdateeff,xdateexp
+	  
+
+
+
+  primary key zid,xpromono
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

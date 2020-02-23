@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table imtogli
+  caption "IM To GL Interface"
+  columns  ztime,zutime,zauserid,zuuserid, zid,~
+           xtrn,xgitem,xacc,xacccr
+
+  primary key zid,xtrn,xgitem
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

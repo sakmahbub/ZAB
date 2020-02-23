@@ -1,0 +1,12 @@
+//po.module
+module PO
+     caption "Purchase Order & Receiving"
+     description "You need to convert requisitions from sales, factory or other ~
+                  departments into purchase orders on your suppliers, monitor ~
+                  deliveries, inspect and record goods receipts and alert ~
+                  beneficiaries informed of the status of your purchase orders."
+
+     transactions Requisition, Purchase Order, Goods Receipt Note
+     codes
+end module
+

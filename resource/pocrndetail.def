@@ -1,0 +1,17 @@
+product ZAB ERP
+
+table pocrndetail
+  caption "Sales Return Details"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+			xcrnnum,xrow, xitem, ~
+          xqtygrn,xqtyord,xrate,xunit,xlineamt,xlong,xgrnnum,~
+		  xvatrate,xserialnum,xoldrate,xref
+
+  primary key zid, xcrnnum,xrow
+  
+  foreign key
+        zid references zbusiness.zid
+        zid,xcrnnum references pocrnheader.zid,xcrnnum
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+end table

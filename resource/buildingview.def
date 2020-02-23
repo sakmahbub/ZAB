@@ -1,0 +1,20 @@
+product ZAB ERP
+
+table buildingview
+  caption "Building View"
+  columns zid,xtype,xlong,xcode
+
+  primary key zid,xcode
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+	sql CREATE VIEW buildingview(zid,xtype,xlong,xcode,xmadd,xphone,xfax,xemail,xbuilding,xproject,xname,zactive) ~
+	AS ~
+	SELECT a.zid,b.xtype,b.xlong,b.xcode,b.xmadd,b.xphone,b.xfax,b.xemail,b.xcode,b.xwh,p.xlong,b.zactive ~
+	FROM zbusiness a JOIN xcodes b ON a.zid=b.zid left join projectallview p on p.zid=b.zid and p.xcode=b.xwh ~
+	WHERE b.xtype='Building'
+
+	end table
+

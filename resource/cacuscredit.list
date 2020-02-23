@@ -1,0 +1,13 @@
+list cacuscredit
+  table cacus
+  order xcus
+  select "((xcus like '%"+zvalue+"%' or xorg like '%"+zvalue+"%') and xwh='"+#wh+"' and xpaymentterm='Credit' and xstatuscus='Open')"
+  rows 20
+  objects xcus attrib(link "abc" embed onclick="return updateParent(this:'xcus')"), ~
+          xorg,xmadd,xsp,name equals((select xname from cappo where zid=cacus.zid and xsp=cacus.xsp))
+
+  header "Customer Code","Customer Name","Address","PPO Code","PPO Name"
+        
+end list
+
+

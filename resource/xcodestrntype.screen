@@ -1,0 +1,126 @@
+screen xcodestrntype
+
+     sidebar list one,list two
+     sections form one, jscript myscript
+
+     list one
+	 caption "Addition"
+        table xcodes
+        order xtype,xcode
+        select "xtype='PD Transaction Type' and xprops<>'deduction'"
+        rows 20
+        objects  xcode attrib(link "login?screen=xcodestrntype&command=Show&xtype=?&xcode=?"),~
+                xprops,zactive
+
+        //headers none
+     end list
+	 
+	    list two
+		caption "Deduction"
+        table xcodes
+        order xtype,xcode
+        select "xtype='PD Transaction Type'  and xprops='deduction'"
+        rows 20
+        objects  xcode attrib(link "login?screen=xcodestrntype&command=Show&xtype=?&xcode=?"),~
+                xprops,zactive
+
+        //headers none
+     end list
+
+     form one
+
+        caption "<ACRONYM>Transaction Type</ACRONYM>"
+        table xcodes
+        order xtype,xcode
+        select "xtype='PD Transaction Type'"
+        return "login"
+        layout 2
+        pstyle  3
+        objects Show,Clear,Add, Update, Delete,*next,~
+                Top, Previous, Next, Bottom,"<p>" ,~
+                xtype,xcode width(50),~
+                xprops,xlong,xacc,xaccdesc,zactive,xdum
+
+	field xdum
+	  attrib local
+	  caption
+	  display const
+	end field
+	
+	field xcode
+	event after
+	if xprops .ne. "deduction"
+	set #field(xacc.display)="hidden"
+    set #field(xaccdesc.display)="hidden"
+	end if
+	end event
+	end field
+	
+
+
+        field xtype
+          display const
+          caption Type
+          default "PD Transaction Type"
+        end field
+
+        field xprops
+          display combo
+          pick "Addition,Deduction"
+          default "Addition"
+        end field
+
+        field xlong
+          display combo
+          caption Addition Type
+          pick "Main Componant-Addition,Main Componant-Deduction,Normal,Bonus & Other Charges,Loan"
+          default "Normal"
+        end field
+		
+	field xaccdesc
+      attrib local
+      caption Account Description
+      display const
+      event after
+        set xaccdesc=acmst.xdesc("xacc='"+xacc+"'")
+      end event
+    end field
+		
+
+        field add
+          event before
+            set xtype="PD Transaction Type"
+          end event
+        end field
+
+        field Budget
+          embed onclick="clicked(this)"
+        end field
+        embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+    	    if (detail=="Budget"){
+            form.screen.value = "acbudget"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

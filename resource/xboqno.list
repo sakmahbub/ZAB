@@ -1,0 +1,12 @@
+     list xboqno
+        table pmconstaskheader
+        order xhrc1
+        select "(xhrc1 like '%"+zvalue+"%' or xtaskname like '%"+zvalue+"%')"
+        rows 20
+        objects xhrc1 attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xtaskname
+
+		headers "BOQ NO","Task Name"
+     end list
+
+

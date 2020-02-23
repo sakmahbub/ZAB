@@ -1,0 +1,23 @@
+product ZAB ERP
+
+table arallocation
+
+  caption "AP Allocation View"
+  columns  ztime,zutime,zid,xvoucher,xsup,xdate,xdatedue,xcur,xexch,xprime,xinvnum
+
+  primary key zid, xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xvoucher references aphed.zid,xvoucher
+  end foreign key
+
+  sql create view arallocation (zid,xinvnum,xvoucher,xrow,xacc,xsub,xdate,xref,xprime,xallocation) ~
+                  as select a.zid,a.xinvnum, a.xvoucher,a.xrow,a.xacc,a.xsub,c.xdate,c.xref,a.xprime,~
+                  cast(isnull((SELECT SUM(acalc.xamount) FROM acalc WHERE acalc.xalcnum = a.xvoucher AND acalc.xalcrow = a.xrow),0) as numeric(18,2)) ~
+                  from acdetail a join acheader c on a.zid=c.zid and a.xvoucher=c.xvoucher join acmst b on a.zid=b.zid and a.xacc=b.xacc ~
+                  where a.xprime>0 and b.xaccusage='AR'
+                 
+end table
+
+

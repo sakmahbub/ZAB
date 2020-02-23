@@ -1,0 +1,24 @@
+
+product ZAB ERP
+
+table potoglview
+  caption "Po Item Group View"
+  columns zid,xgrnnum,xgsup,xprime,xdate,xgitem,xstatusjv
+
+  primary key zid,xgrnnum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view potoglview (zid,xgrnnum,xgsup,xprime,xdate,xgitem,xstatusjv) ~
+                  as select zid,xgrnnum,~
+                  (select xgsup from casup where xsup=(select xsup from pogrnheader where pogrnheader.xgrnnum=pogrndetail.xgrnnum and pogrnheader.zid=pogrndetail.zid)),~
+                  xprime,~
+                  (select xdate from pogrnheader where pogrnheader.xgrnnum=pogrndetail.xgrnnum and pogrnheader.zid=pogrndetail.zid),~
+                  (select xgitem from caitem where caitem.xitem=pogrndetail.xitem and caitem.zid=pogrndetail.zid),~
+                  (select xstatusjv from pogrnheader where pogrnheader.xgrnnum=pogrndetail.xgrnnum and pogrnheader.zid=pogrndetail.zid) ~
+                  from pogrndetail
+
+
+end table

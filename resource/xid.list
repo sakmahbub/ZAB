@@ -1,0 +1,17 @@
+     list xid
+        table crmst
+        order xid
+        //select none
+        navigators alpha,group xrank "select xcode from xcodes where xtype = 'Rank'"
+        rows 10
+        objects xid attrib(link "abc" embed onclick="return updateParent(this:'xid')"), ~
+                xcrew,xrank,xfirst,xmiddle,xlast,xjstat,xvessel
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

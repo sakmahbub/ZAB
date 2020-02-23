@@ -1,0 +1,481 @@
+screen opordlcheaderpilcadmin
+	
+	 sidebar  list pi,list pitaglc//list one,list terms,list dor
+     sections form one,jscript myscript
+
+
+	list pi
+        caption "LC UnTag PI List For Customer : "+xcus
+        table opordheader
+        order xordernum
+        fixed xcus
+	    select "xtype <> 'Sample' and xpilinkso='Confirmed' and xlcno=''"
+        rows 1000
+        objects  xordernum attrib(link "login?screen=opordlcheaderpilcadmin&command=Show&xordernum=?"),~
+                 xpidate,xpiref,xcus,desc equals((select xorg from cacus where xcus=opordheader.xcus))
+        headers "PI No.","PI Date","PI Ref.","Cus ID","Name"
+     end list
+
+ list pitaglc
+        caption "PI List For LC : "+xlcno
+        table opordheader
+        order xordernum
+        fixed xlcno	
+		select "xlcno='"+xpkey+"'"		
+        rows 100
+        objects  xordernum attrib(link "login?screen=opordlcheaderpilcadmin&command=Show&xordernum=?"),~
+                 xpidate,xpiref,xcus,desc equals((select xorg from cacus where xcus=opordheader.xcus))
+        headers "PI No.","PI Date","PI Ref.","Cus ID","Name"
+     end list
+
+
+     list one
+        caption "Detail List"
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        rows 20
+        objects  xorderrow attrib(link "login?screen=opordlcdetailup&command=Show&xordernum=?&xorderrow=?"), ~
+		 xitem,desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem)),~
+		 xcolorcode,xqtyord
+		  
+        totals "","","Totals","",sum
+		headers "Row No","Item Code","Description","Color Code","Qty"
+        //headers "Row No","Item Code","Construction","Composition","Width","GSM","Fabric Type","Color","Qty"
+     end list
+
+     list dor
+        caption "Delivery Order For : "+xordernum
+        table opdoheader
+        order xdornum
+        fixed xordernum		
+        rows 20
+        objects  xdornum attrib(link "login?screen=opdobulkheader&command=Show&xdornum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+     list terms
+        caption "PI Terms & Condition For "+xordernum
+        table oppiterms
+        order xordernum,xrow
+        fixed xordernum
+        rows 20
+        objects  xrow attrib(link "login?screen=oppiterms&command=Show&xordernum=?&xrow=?"), ~
+                xcode,xnote //equals((select xlong from xcodes where xtype='PI Terms & Condition' and xcode=xcodes.xcode))
+
+
+//        headers "Row","Item","Description","Qty","Rate","Disc %","Disc Fixed","Line Amount"
+//	  total "Total","","","","",sum	
+     end list
+	 
+	
+	 
+
+
+     form one
+        caption "PI Link For LC " +xpkey
+	    table opordheader
+        order xordernum
+        return "login"
+		fixed xcus
+        select "xtype <> 'Sample' and xpilinkso= 'Confirmed'"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Update,*next,Return,"<p>" ,~//Detail,Modify,Amendment,Top,Next,Previous,Bottom
+          xordernum,xpidate display(const),xpiref display(const),xlcno,xtrn display(hide),xcur,xexch,xcus display(const),xorg display(const),xbuyer display(const),xbname,,xadvisingbank display(const),xaddesc,xopenbank display(const),~//xpornum
+		  xopdesc display(const),xshipmode display(const),xprodtype display(hide),xdelivery display(hide),xdeldate display(hide),xdatedel display(const),xhscode display(const),xorigin display(const),xport display(const),~
+		  
+		  xlctype display(hide),xlcissuedate display(hide),xshipdate display(hide),xexpirydate display(hide),~
+		  xtype display(hide),xstatusord display(const),xstatuspi display(const),xstatusbooking display(hide),~
+		  xpirefr display(hide),xstatusdor display(const),xsrnum display(hide),xpilinkso display(const),xponum display(const)
+		
+       field xdeldate
+	    caption Delivery Date		
+		pick		
+	   end field
+	   
+	   field xpilinkso
+		default "Open"
+	   end field
+	   
+	   field xprodtype
+		caption Product Type
+		//display combo
+		//pick code Product Type
+	     //pick "select xcode from xcodes where xtype = 'Payment Terms'"	
+		
+	   end field
+	   
+	   
+	   
+	   
+	   field xorigin
+		display const
+		caption Country Of Origin
+		Default "Bangladesh"
+	   end field
+
+	    field xstatusdor
+		  caption Delivery Status
+		//display combo
+		//pick "Open,Confirmed,Cancel"
+		Default "Open"
+	   end field
+	   
+	    field xdelivery
+		caption Delivery
+		//display combo
+		//pick "Ex Factory,FOB,CIF"
+		Default "Bangladesh"
+	   end field
+	   
+	   field xshipmode
+		caption Payment Terms
+		display const//combo		
+			pick code Payment Terms		
+	   end field
+	   
+	   
+	   field xport
+		display const
+		Default "Bangladesh"
+	   end field
+	   
+	   field xcus
+			caption Customer ID
+			pick list cacus
+		end field
+	   
+	   field xbuyer			
+			//pick list cabuyer
+		end field
+	   
+	  
+        field xpornum
+			pick
+		end field
+		
+        field xcur
+			default "USD"
+		end field
+		
+		field xlcno
+			caption LC/SC No.
+			pick list opordlc
+		end field
+		
+		field xopenbank
+		caption LC Opening Bank
+          //display const
+		 // event after
+		  //	set xopenbank =lcinfo.xopenbank("xlcno='"+xlcno+"'")
+		  //end event
+        end field
+		
+		
+		field xdum
+          attrib local
+          display const
+		  caption
+        end field
+
+		field xdum2
+          attrib local
+          display const
+		  caption
+        end field
+		
+		 field xopdesc
+		  	attrib local
+		  	display const
+		  	caption Bank Name
+		  	event after				
+		  		set xopdesc=cabank.xname("xbank='"+xopenbank+"'")+"<br>"+cabank.xbranch("xbank='"+xopenbank+"'")+"<br>"+cabank.xmadd("xbank='"+xopenbank+"'")+"<br>"+cabank.xswiftcode("xbank='"+xopenbank+"'")
+		  	end event
+		  end field
+		  
+		   field xaddesc
+		  	attrib local
+		  	display const
+		  	caption Bank Name
+		  	event after				
+		  		set xaddesc=cabank.xname("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xbranch("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xmadd("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xswiftcode("xbank='"+xadvisingbank+"'")
+		  	end event
+		  end field
+
+		
+
+			
+        field xlcinfo
+          attrib local
+          display const
+          column 3
+            caption <br><FONT SIZE=4 COLOR=red><ACRONYM>LC Info</ACRONYM></font>
+        end field
+
+			
+		field xordernum		
+			pick //list xordernumlc
+			caption PI No			
+			//set globals(xlcno)=xlcno	
+			event before
+				if xpilinkso .eq. "Confirmed"
+					set #field(Add.attrib) = "disabled"
+					//set #field(Update.attrib) = "disabled"
+					set #field(Delete.attrib) = "disabled"
+					set #field(Confirm.attrib) = "hidden"
+				end if
+			end event
+						
+			event after							
+				
+				class careports(getReport{oppiprint;2;in,st;zid,invno;xordernum;Print PI})
+				//class careports(getReport{oppiBdt;2;in,st;zid,invno;xordernum;Print PI (BDT)})
+				
+				set globals(xordernum)=xordernum
+				set globals(xpkey)=xpkey
+				set globals(xlcno)=xlcno
+				set globals(xcus)=xcus				
+				if xstatuspi .ne. "Open"					
+					set #field(add.attrib) = "disabled"
+					set #field(delete.attrib) = "disabled"			
+				end if
+				
+				set cnt= #sql("select count(xorderrow) from oporddetail where xordernum='"+xordernum+"'")	
+				set #field(top.attrib) = "disabled"
+				if cnt .gt. "0"
+					set #field(delete.attrib) = "disabled"
+				end if
+				if xordernum .eq. ""
+					set #field(Modify.attrib) = "disabled"
+					set #field(delete.attrib) = "disabled"
+					set #field(update.attrib) = "disabled"
+				end if
+				if xordernum .ne. ""
+					set #field(add.attrib) = "disabled"
+				end if
+				
+				if xpilinkso .eq. "Confirmed"
+					set #field(Add.attrib) = "disabled"
+					//set #field(Update.attrib) = "disabled"
+					set #field(Delete.attrib) = "disabled"
+					set #field(Confirm.attrib) = "hidden"
+				end if
+				
+				//set #field(update.attrib) = "disabled"
+			end event
+		end field
+		
+		field xstatuspi
+			default "Open"
+		end field
+		field xstatusord
+			default "Open"
+		end field
+		
+		field xtrn
+			display hide
+			
+			//pick "select xtrn from xtrn where xtypetrn='Job Order No'"
+		end field
+		
+		field xstype
+			default "Dyeing"
+			caption Sale Type
+			pick code
+		end field
+		
+		field xpiref
+			//caption Reference
+			pick 
+			width 45
+		end field	
+
+		  
+		 field xbname
+		  	attrib local
+		  	display const
+		  	caption Buyer Name
+			event after
+				set xbname=cacus.xorg("xcus='"+xbuyer+"'")+"<br>"+cacus.xmadd("xcus = '"+xbuyer+"'")
+			end event
+		  end field
+
+
+		field xorg
+          attrib local
+          caption Name
+          display constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")+"<br>"+cacus.xmadd("xcus = '"+xcus+"'")
+          end event
+        end field
+
+          field add
+            event before
+				set mon=#sub(xpidate,5,2)
+			
+				 // print month
+			//if xpiref .eq. ""
+			    //error "Cannot Proceed - PI Reference is Blank"
+			 
+			 if xcus .eq. ""
+				error "Cannot Proceed - Please Check -Customer Number"
+		     
+			else if xadvisingbank .eq. ""
+				error "Cannot Proceed - Please Check -Advising Bank"
+			else if xcus .ne. cacus.xcus("xcus='"+xcus+"'")
+				        error "Cannot Proceed - Please Check -Customer Master"
+			else 
+				set cusshort=cacus.xalias("xcus='"+xcus+"'")
+				  set xstatusar = "Open"
+				set xstatusjv = "Open"
+				  set xtype = "LC"
+				  set xstatusord = "Open"
+				  set xstatuspi = "Open"
+				  set xstatusbooking = "Open"                
+				  set trn="CO--"
+                  set xordernum = #trn("CO Number",trn,10)	
+                  //set xpiref= 
+					//set inc=xtrn.xnum("xtrn='"+trn+"' and xtypetrn='CO Number'")
+           		  set year = #sub(xpidate,2,2)
+				  set xpiref = "GUL/"+cusshort+"/"+#sub(xordernum,4,6)+"/"+year
+					set chkpiref=#sql("select xpiref from opordheader where xpiref='"+xpiref+"'")	
+					if xpiref .eq. chkpiref
+					error "Cannot Proceed - This PI Reference Already Exist"
+					end if
+			end if
+            end event			
+          end field
+		           
+
+          field update
+            event before
+			set xlcno=lcinfo.xlcno("xlcno='"+xpkey+"'")
+			set chkpiref=#sql("select xpiref from opordheader where xordernum<>'"+xordernum+" and 'xpiref='"+xpiref+"'")
+           set chkcus=#sql("select xcus from lcinfo where xlcno='"+xlcno+"'")			
+			
+			if xpiref .eq. ""
+			    error "Cannot Proceed - PI Reference is Blank"
+			else if xpiref .eq. chkpiref
+				error "Cannot Proceed - This PI Reference Already Exist"
+			else if xcus .eq. ""
+				error "Cannot Proceed - Please Check -Customer Number"
+		    else if xcus .ne. chkcus
+				error "Cannot Proceed -- LC Customer and PI Customer Missmatch"
+			else if xadvisingbank .eq. ""
+				error "Cannot Proceed - Please Check -Advising Bank"
+			else if xcus .ne. cacus.xcus("xcus='"+xcus+"'")
+				        error "Cannot Proceed - Please Check -Customer Master"
+			else 			
+				set xopenbank=lcinfo.xopenbank("xlcno='"+xlcno+"'")				
+				set xcur=lcinfo.xcur("xlcno='"+xlcno+"'")
+				set xexch=lcinfo.xexch("xlcno='"+xlcno+"'")
+				set xstatusplanning="Approved"		
+			end if
+            end event
+			event after 
+				set temp=#spsql(sp_validateAfterOpordlcheader,#id,#user,xordernum)
+				set temp=#spsql(sp_piupdateSOPO,#id,#user,xlcno,"opordlcheader")
+				set temp=#spsql(sp_lcamtupdat,#id,#user,xlcno)
+				
+				action show
+			end event
+          end field
+		  
+		  
+		 
+		  
+		  field Confirm
+			event before
+				set checkpiso= #sql("select distinct xinvnum from opordheaderso where xinvnum='"+xordernum+"'")
+				if checkpiso .ne. xordernum
+					error "Cannot Proceed -- Please Link PI With SO"
+				end if
+			end event
+			event after
+				set temp=#sql("Update opordheader set xpilinkso='Confirmed' where zid='"+#id+"' and xordernum='"+xordernum+"'")
+				set temp=#sql("Update opordheaderso set xstatusbooking='Confirmed' where zid='"+#id+"' and xinvnum='"+xordernum+"'")				
+			action Show
+			end event
+		  end field
+
+          field LC
+            embed onclick="clicked(this)"
+          end field
+
+		  
+          field Document Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Modify
+            embed onclick="clicked(this)"
+          end field
+		  
+          field Amendment
+            embed onclick="clicked(this)"
+          end field
+		  
+		  field Return
+			embed onclick="clicked(this)"
+		  end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "oppiterms"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="LC Info"){
+            form.screen.value = "opordlcinfo"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Detail"){
+            form.screen.value = "opordlcdetailup"
+            form.searchbutton.value = "Top"
+          }
+          if (detail == "Modify"){
+            form.screen.value = "opordlcheaderup"
+            form.searchbutton.value = "Top"
+          }	
+	        if (detail=="Amendment"){
+            form.screen.value = "oppiamend"
+            form.searchbutton.value = "Top"
+          }
+		  
+		  if (detail=="Return"){
+            form.screen.value = "opordlcinfoadmin"
+            form.searchbutton.value = "Find xlcno=?"
+          }
+		  
+          if (detail=="Print PI"){
+            form.screen.value = "*crystal oppi(xordernum=PI Number=xordernum)"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

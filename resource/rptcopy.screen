@@ -1,0 +1,58 @@
+screen rptcopy
+     sidebar list rptcopy1
+     sections form one, jscript myscript
+  
+  list rptcopy1
+    caption "Report Copy"
+    table rptcopy
+    order xtypetrn,xrow
+	fixed xtypetrn
+    rows 30
+    objects  xrow attrib(link "login?screen=rptcopy&command=Show&xtypetrn=?&xrow=?"),~
+				xdesc
+    header "SL No","Report Copy"
+  end list
+
+     form one
+        caption "Reports Signatory"
+        table rptcopy
+        order xtypetrn,xrow
+		fixed xtypetrn
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Update,Clear,Delete,Next,Previous,Return,"<p>" , *next,~
+			xrow attrib(row 0 1),xdesc
+			
+   
+   field Return
+          embed onclick="clicked(this)"
+        end field
+        
+   field Report Copy
+          embed onclick="clicked(this)"
+        end field
+		
+		embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+		   if (detail == "Return"){
+            form.screen.value = "pdsignatoryrpt"
+            form.searchbutton.value = "Find xtypetrn=?"
+          }
+  	      
+        }
+        </script>
+     end jscript
+
+
+
+end screen

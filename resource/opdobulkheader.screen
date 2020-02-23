@@ -1,0 +1,392 @@
+screen opdobulkheader
+
+	 sidebar list detail, list so
+	 sections form one, jscript myscript
+     //sections form one, list pi, jscript myscript
+	 
+	 
+	 
+	 list so
+        caption "SO-Detail List"+xordernumso
+        table oporddetailsoview
+        order xordernumso        
+		fixed xordernumso
+		select "(xqtyord-xqtydel)<>0"
+        rows 20
+		objects  xorderrow , ~
+                          //    objects  xorderrow attrib(link "login?screen=oporddetailso&command=Show&xordernum=?&xorderrow=?"), ~
+		 xtheircode,xitem,desc equals((select xdesc from caitem where zid=oporddetailsoview.zid and xitem=oporddetailsoview.xitem)),~
+		xpornum, xcolorcode,xqtyord,xqtydel,descav equals((select sum(xqty*xsign) from imtrn where zid=oporddetailsoview.zid and xitem=oporddetailsoview.xitem and xcolorcode=oporddetailsoview.xcolorcode))
+		  
+        totals "","","","","Totals","",sum,sum,""
+		headers "Row No","Old Code","Item Code","Description","PO No.","Color","Order Qty","Delivery Qty","Stock Qty"
+        
+     end list
+	 
+	 
+
+
+     list pit
+        caption "PI -Detail List"+xordernum
+        table oporddetail
+        order xordernum
+        fixed xordernum
+        rows 20
+		objects  xorderrow , ~
+    //    objects  xorderrow attrib(link "login?screen=opordlcdetail&command=Show&xordernum=?&xorderrow=?"), ~
+		 xitem,desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem)),~
+		 xfabriccolor,xqtyord
+		  
+        totals "","","Totals","",sum
+		headers "Row No","Item Code","Description","Color","Qty"
+        //headers "Row No","Item Code","Construction","Composition","Width","GSM","Fabric Type","Color","Qty"
+     end list
+	 
+	 
+	 
+	 
+     list detail
+        caption "DO Detail List For "+xdornum
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow,~ //attrib(link "login?screen=opdobulkdetail&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=opdodetail.zid and xitem=opdodetail.xitem)),xcolorcode,xqtydel,~
+				 unit equals((select xunit from caitem where zid=opdodetail.zid and xitem=opdodetail.xitem)),xrate,xlineamt,xordernumso,despo equals((select xpornum from opordheaderso where zid=opdodetail.zid and xordernum=opdodetail.xordernumso))
+
+        totals "Totals","","","",sum,"","",sum,"",""
+
+        headers "Row No","Item Code","Description","Color Code","Qty","Unit","Rate","Amount","SO NO.","PO No."
+     end list
+
+     list one
+        caption "WO List"
+        table opordheader
+        order xordernum
+        fixed xordernum
+        rows 20
+        objects  xordernum attrib(link "login?screen=opordcashheader&command=Show&xordernum=?"), ~
+                 xpiref,xpidate,xcus,org equals((select xorg from cacus where zid=opordheader.zid and xcus=opordheader.xcus))
+
+        headers "Row No","PI No","PI Date","Customer Code","Name"
+     end list
+
+
+     form one
+        caption "Delivery Order Entry"
+        table opdoheader
+        order xdornum //desc
+		//select "xtype='Normal'"
+	//	fixed xdornum
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+               Show,Add,Update,Delete,Top,Next,Previous,Detail,Bottom,Confirm,Clear, "<p>" ,~
+               xdornum ,xdate,xcus,xcusdesc,xordernumso,xpornum display(const),xordernum display(const),xpiref display(const),xbuyer display(const),xbname,~
+               xwh display(text),xwhdesc,xstatusdor display(const),xcur display(hide),xexch display(hide),xtype display(hide),~
+			   xstatusord,xdeliveryto,xtruckno,xmadd,xref display(text) width(30),xnote,xstatus display(hide),~
+			   xvoucher display(const),xstatusjv display(hide),xstatusar display(hide),~
+			   xinvnum display(const),xlcno display(const),xpaymentterm, xvatrate display(hide),xvatamt display(hide),xstyleno display(const),xcontactphn display(hide),xbookingno display(hide),xbono display(hide),xstatusgl,xglvoucher display(hide)
+			   
+
+			   
+        field xpaymentterm
+			default "Credit"
+		end field
+
+       field xbname
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xbname = cacus.xorg("xcus = '"+xbuyer+"'")
+          end event
+        end field
+
+        field xwh
+			default "03"
+		end field
+		field xordernumso
+			pick list xordernumsodo
+		end field
+	
+          field xordernum
+			caption PI No.
+           event after
+			//set xordernum=opordheaderso.xinvnum("xinvnum='"+xordernumso+"'")
+             // set globals(xordernum) = xordernum
+			//  set globals(xdate) = xdate
+           end event
+        end field 
+		
+		
+	
+	field xdornum
+           event after
+		    set globals(xdornum)=xdornum
+			set globals(xcus)=xcus
+			set globals(xordernum)=xordernum 
+			  set globals(xstatusdor)=xstatusdor
+			  set globals(xstatusord)=xstatusord
+			   set globals(xvoucher)=xvoucher
+			   set globals(xordernumso)=xordernumso 
+				
+				 
+				if opdoheader.xstatusdor("xdornum='"+xdornum+"'") .eq. "Confirmed" //.or.  opdoheader.xstatusar("xdornum='"+xdornum+"'") .eq. "Confirmed"
+						set #field(Confirm.display) = "hidden"
+						set #field(Update.attrib) = "disabled"
+						set #field(Detail.display) = "hidden"
+						set #field(Delete.attrib) = "disabled"
+				end if
+				if xdornum .eq. ""
+						set #field(Confirm.display) = "hidden"
+						set #field(detail.display) = "hidden"
+						set #field(Update.attrib) = "disabled"		
+						set #field(Delete.attrib) = "disabled"		
+				end if
+				if xdornum .ne. ""
+						set #field(add.attrib) = "disabled"			
+				end if				
+				
+				class careports(getReport{opbill;2;in,st;zid,inv;xdornum;Print Bill})
+				class careports(getReport{opchallan;2;in,st;zid,inv;xdornum;Print Challan})
+				class careports(getReport{opgatepass;2;in,st;zid,inv;xdornum;Print Gate Pass})
+				//class careports(getReport{opinvdelchapar;2;in,st;zid,invno;xdornum;Print Delivery Chalan Partial})	
+				//if xstatusdor .eq. "Confirmed" .or. xstatusar .eq. "Confirmed"
+		         
+					
+					//set #field(Confirm.display)="hidden"					
+				
+					//set #field(delete.attrib) = "disabled"
+					//set #field(update.attrib) = "disabled"
+        		
+		
+           end event
+        end field
+
+				
+     	        
+	
+		field xstype
+			caption Sale Type
+			pick code
+		end field
+		
+		field xdate
+			caption DO Date
+		end field
+		
+		field xwh
+			pick list xwh
+		end field
+		
+		field xmadd
+			caption Shipping Address
+				//pick "select xmadd from cacusaddress where xtype ='Shipping' and xcus='"+xcus+"'"
+				pick list cacusadd
+				display text
+				//display combo
+		end field
+		
+        field xwhdesc
+          attrib local
+          caption Store
+          display constant
+          event after
+            set xwhdesc = branchview.xlong("xcode = '"+xwh+"'")
+          end event
+        end field
+
+        field xcus
+           event after
+              set globals(xdornum)=xdornum
+           end event
+        end field
+		
+        field xcusdesc
+        	attrib local
+        	display const
+        	caption Name
+        	event after
+        		set xcusdesc=cacus.xorg("xcus='"+xcus+"'")
+        	end event
+        end field
+	
+        field Add
+          event before
+		  set xordernumso=#trim(xordernumso)		  
+		  set xordernum=opordheaderso.xinvnum("xordernum='"+xordernumso+"'")
+		  set xpornum=opordheaderso.xpornum("xordernum='"+xordernumso+"'")
+		  set lcno =opordheader.xlcno("xordernum='"+xordernum+"'")
+		  set cino=opinvheader.xlcno("xlcno='"+lcno+"'")
+		  set sonum=opordheaderso.xordernum("xordernum='"+xordernumso+"'")
+		  set cuschk=opordheaderso.xcus("xordernum='"+xordernumso+"'")
+			if xwh .eq. ""
+				error "Cannot Proceed -- Please Choose Store "
+			//else if cino .eq. ""
+				//error "Cannot Proceed -- Please Entry Commercial Invoice "
+			else if xcus .eq. ""
+				error "Cannot Proceed -- Please Select Customer"
+			
+			else if xcus .ne. cacus.xcus("xcus='"+xcus+"'")
+				error "Cannot Proceed -- Please Check Customer Master"
+			else if xordernumso .eq. ""
+				error "Cannot Proceed -- Please Select Sales Order"
+			else if xordernumso .ne. sonum
+				error "Cannot Proceed -- Please Select Right SO Number"
+			else if xcus .ne. cuschk
+				error "Cannot Proceed -- DO Cus And SO Cus Missmatch"
+			else
+			
+				set xstatusord="Open"
+				set xtype="Normal"
+			//	ser xpaymentterm = "Cash"
+				set xstatusdor="Open"
+				set xstatusar="Open"
+				set xstatusjv="Open"
+				set xstatusgl="Open"
+				
+				//set xcus = opordheaderso.xcus("xordernum='"+xordernumso+"'")
+				set xlcno = opordheader.xlcno("xordernum='"+xordernum+"'")
+				//set xinvnum = opinvheader.xinvnum("xlcno='"+xlcno+"'")
+				set xcur="$"
+				//set xexch=opinvheader.xexch("xlcno='"+xlcno+"'")
+				set xpiref=opordheader.xpiref("xordernum='"+xordernum+"'")
+				set xstyleno=opordheaderso.xstyleno("xordernum='"+xordernumso+"'")				
+				set xcontactphn =opordheaderso.xcontactphn("xordernum='"+xordernumso+"'")
+				set xbookingno =opordheaderso.xbookingno("xordernum='"+xordernumso+"'")
+				set xbono =opordheaderso.xbono("xordernum='"+xordernumso+"'")
+				set trn = "DO--"
+				set xdornum = #trn("DO Number",trn,10)
+				
+			end if
+          end event
+		  	event after
+				set temp = #spsql(zabsp_OP_validateAfterHeaderDO,#id,#user,xdornum,"Add")
+			end event
+        end field
+
+        field Update
+		
+		event before
+			
+			set xordernumso=#trim(xordernumso)		  
+			set xordernum=opordheaderso.xinvnum("xordernum='"+xordernumso+"'")
+			set xpornum=opordheaderso.xpornum("xordernum='"+xordernumso+"'")
+			set lcno =opordheader.xlcno("xordernum='"+xordernum+"'")
+			//set cino=opinvheader.xlcno("xlcno='"+lcno+"'")		
+			set wh=branchclientview.xcode("xcode='"+xwh+"' and zactive=1")
+			set sonum=opordheaderso.xordernum("xordernum='"+xordernumso+"'")
+			set cuschk=opordheaderso.xcus("xordernum='"+xordernumso+"'")
+			
+			if xcus .eq. ""
+				error "Cannot Proceed -- Please Select Customer Code!"
+			else if xcus .ne. cacus.xcus("xcus='"+xcus+"'")
+				error "Cannot Proceed -- Please Check Customer Master"
+			else if xwh .eq. "" .or. wh .ne. xwh
+				error "Plant/Store is Blank Or Not Exists!"
+			else if xordernumso .ne. sonum
+				error "Cannot Proceed -- Please Select Right SO Number"
+			
+			else if xcus .ne. cuschk
+				error "Cannot Proceed -- DO Cus And SO Cus Missmatch"
+				
+			else if opdoheader.xstatusord("xdornum='"+xdornum+"'") .ne. "Open"
+				error "Invoice Already Confirmed"
+			
+			else
+			
+			
+			    //set xcus = opordheader.xcus("xordernum='"+xordernum+"'")
+				set xlcno = opordheader.xlcno("xordernum='"+xordernum+"'")
+				///set xinvnum = opinvheader.xinvnum("xlcno='"+xlcno+"'")
+				//set xcur=opinvheader.xcur("xlcno='"+xlcno+"'")
+				//set xexch=opinvheader.xexch("xlcno='"+xlcno+"'")
+				
+				set xpiref=opordheader.xpiref("xordernum='"+xordernum+"'")
+				set xstyleno=opordheaderso.xstyleno("xordernum='"+xordernumso+"'")				
+				set xcontactphn =opordheaderso.xcontactphn("xordernum='"+xordernumso+"'")
+				set xbookingno =opordheaderso.xbookingno("xordernum='"+xordernumso+"'")
+				set xbono =opordheaderso.xbono("xordernum='"+xordernumso+"'")
+			
+			end if
+		  end event	
+		
+			event after
+				set temp = #spsql(zabsp_OP_validateAfterHeaderDO,#id,#user,xdornum,"Update")
+			end event
+			action show 	
+        end field
+	
+		  field Delete
+			event before
+			end field
+		  end field
+		  
+		  
+		  field Confirm
+            event before
+				double prepqty=#sql("select sum(xqtydel) from opdodetail where xdornum='"+xdornum+"'")
+			   if prepqty <0.001
+			       error "Please add detail!"
+			  else if xwh .eq. ""
+					error "Cannot Proceed -- Please Choose Store "
+				
+				end if
+            end event
+            event after
+				set temp = #spsql(zabsp_OP_confirmDO,#id,#user,xdornum,xordernum,xdate,xwh,xcus,xtype)
+				set temp=#sql("update opdodetail set xstatus='Sold' where xdornum='"+xdornum+"'")
+				//set temp = #spsql(zabsp_OP_transferOPtoAR,#id,#user,xdornum,"opdocashheader")
+				//set temp = #spsql(zabsp_OP_transferOPtoGL,#id,#user,xdornum,"opdocashheader")
+	            action show
+            end event
+          end field
+
+
+        field xnote
+        //  width 72
+//          column 3
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+          field Create
+            event before
+            end event
+            event after
+	            set temp = #spsql(zabsp_DO_CreateDC,#id,#user,xordernum,xdornum,xdate,xwh,xcus,xtype)
+	            action show
+            end event
+          end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "opdobulkdetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

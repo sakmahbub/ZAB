@@ -1,0 +1,54 @@
+screen xcodesstore
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+     caption "Store Master"
+        table xcodes
+        order xtype,xcode
+        select "xtype='Store' and xtypeobj<>'Marketing'"
+        rows 100
+        objects  xcode attrib(link "login?screen=xcodesstore&command=Show&xtype=?&xcode=?"),~
+                xlong,xtypeobj,zactive
+
+        //headers none
+     end list
+
+     form one
+
+     caption "Store Master"
+        table xcodes
+        order xcode
+        select "xtype='Store' and xtypeobj<>'Marketing'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next,~
+                Top,Previous,Next, Bottom,"<p>" ,~
+                xtype display(hide),~
+                xcode width(10),~
+                xlong,xtypeobj,zactive
+
+        field xtypeobj
+			caption Store Type
+			pick "Store,Virtual Store,Office,Textile"
+        end field
+        
+        field xlong
+          width 40
+          height 2
+          //column 2
+        end field
+
+        field add
+          event before
+           set xtype="Store"
+         end event
+        end field
+
+
+     end form
+
+
+end screen

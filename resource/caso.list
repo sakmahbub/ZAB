@@ -1,0 +1,10 @@
+     list caso
+        table cappo
+        order xsp 
+        select "((xname like '%"+zvalue+"%' or xsp like '%"+zvalue+"%') and xwh='"+#wh+"' and zactive='1' and left(xsp,2)='SO')"
+        rows 10
+        objects xsp attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xname,xfm,xwh
+     end list
+
+

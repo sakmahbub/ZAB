@@ -1,0 +1,78 @@
+screen fatogl
+     caption "FA TO GL Transfer"
+     sections form detail, jscript myscript
+
+
+     form detail
+         caption <font color=black>"FA TO GL Transfer"<font>
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Process,"</b></font><p>",~
+                xdate,xyear,xper
+
+        field xdate
+          caption Transfer Date
+        end field
+
+        field xdumm
+          attrib lcoal
+          display constant
+          caption
+          event before
+            int year=#sub(xdate,0,4)
+            int per=12+#sub(xdate,5,2)-#prop(xlocals.xprops("xtypelocal='Module' and xname='gl'"),"offset")
+            if per<=12
+              set xper=per
+              set xyear=year-1
+            else
+              set xper=per-12
+              set xyear=year
+            end if
+          end event
+        end field
+
+        field Process
+          event after
+              class faprocs(makeGL)
+          end event
+        end field
+
+        field ItemSerial
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imser1"
+            form.searchbutton.value = "Find xitem=?"
+          }
+        }
+
+        function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.detail.xcode.value=link.text
+          }else{
+            document.detail.xcode.value=link.innerText
+          }
+          return false
+        }
+
+
+        </script>
+     end jscript
+
+
+end screen

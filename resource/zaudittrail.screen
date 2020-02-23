@@ -1,0 +1,31 @@
+screen zaudittrail
+
+     sidebar list one
+     sections form one
+
+     list one
+        caption "Audit Trail List"
+        table zaudittrail
+        primary key zauditid
+        order zauditid DESC
+        rows 20
+        objects  zauditid attrib(link "login?screen=zaudittrail&command=Show&zauditid=?"), ~
+                ztime,zemail,zscreen,zstatement,zaip,zpkey,zcommand
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+     form one
+        caption "Audit Trail"
+        table zaudittrail
+        order zauditid DESC
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show, Top,Previous,Next,Bottom,Delete,~
+                zauditid,zemail,zscreen,zstatement,zaip,zpkey,zcommand
+     end form
+
+end screen

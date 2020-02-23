@@ -1,0 +1,71 @@
+screen cacusbuyerupdate
+
+  sidebar list one //,list two
+  sections form one,  jscript myscript
+  
+   list one
+    caption "Buyer List"
+    table cacusbuyer
+    order xcus,xbuyer
+    fixed xcus
+    rows 20
+    objects  xrow attrib(link "login?screen=cacuspriceupdate&command=Show&xcus=?&xbuyer=?&xrow=?"),xbuyer, ~
+             desc equals((select xorg from cacus where zid=cacus.zid and xbuyer=cacus.xcus))
+	headers "Row","Buyer","Name"
+  end list
+  
+  form one
+    caption "Buyer Update "+xcus
+    table cacusbuyer
+    primary key xcus,xrow
+    order xcus,xrow,xbuyer
+    fixed xcus
+    pstyle 3
+    return "login"
+    layout 3
+    objects Add, Update, Delete,Clear,Show, *next,Return,Top,Previous,Next,Bottom,~
+	   xrow display(const) attrib(row 0 1),xbuyer,xorg
+	   
+	   
+	   
+	   
+	   
+	field xorg
+          attrib local
+          caption Name
+          display constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xbuyer+"'")
+          end event
+        end field
+	   
+	   
+	   embed onsubmit="return submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+  
+  end form
+  
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          if (but == "Return"){
+            form.screen.value = "cacus"
+            form.searchbutton.value = "Find xcus=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+  
+  
+end screen

@@ -1,0 +1,245 @@
+screen poreqheader_q
+	
+     sidebars list one,list po
+     sections form one,list spr, jscript myscript	  
+	 
+	  
+	 list one
+        caption "Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 200
+        objects  xrow,~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and  xitem=poreqdetail.xitem)),~
+				 xbrand,xqtyreq,xqtyapv,xunitpur,xrate,xlineamt
+
+		totals "","","Total","","","","","",sum
+        headers "Line No","Item","Description","Brand","Qty Req","Qty Apv","UOM","Rate","Amount"
+     end list
+	 
+  list spr
+        caption "Back to Store Purchase Requisition (SPR) No"
+        table poreqheader
+        order xtornum desc
+		fixed xporeqnum
+		select "xporeqnum <>''"
+        rows 200
+		 objects  xtornum  attrib(link "login?screen=imsprheader_q&command=Show&xtornum=?"),~
+                 xdate
+       headers "Requisition No","Date"
+     end list
+
+
+     list po
+        caption "PO For : "+xreqnum
+        table poordheader
+        order xpornum desc
+        fixed xporeqnum
+		select "xporeqnum <>''"
+        rows 30
+        objects  xpornum attrib(link "login?screen=poordheader_q&command=Show&xpornum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+     form one
+		caption "Purchase Requisition Query"
+        table poreqheader
+        order xporeqnum desc
+		select "left(xporeqnum,4) in ('JN--','PR--','DOC-')"
+		return "login"
+        layout 2
+        pstyle 3 
+		objects	Show,Clear,Top,Next,Previous,Bottom,"<p>",~
+                xporeqnum,xdate display(const),xtype display(const),xsup display(hide),xorg display(hide),~
+				xqotnum display(hide),xstatusreq display(const),xnote display(const),xtype display(hide),~
+				xfwh display(hide),xwh display(hide),~
+				xsuperiorsp display(hide),xsuperior2 display(hide),xsuperior3 display(hide),~
+				xnote1 display(const),,~
+				signatorysec display(const),,~
+				xpreparer  display(hide),preparer  display(const),~
+				xsignatory1 display(hide),signatory1  display(const),~
+				xsignatory2 display(hide),signatory2 display(const),~
+				xsignatory3 display(hide),signatory3 display(const),~
+				xsignatory4 display(hide),signatory4 display(const),~
+				xsignatory5 display(hide),signatory5 display(const),~
+				xsignreject display(hide),signreject display(const),~
+				xcurposition display(const)
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+		  
+		field xcurposition
+		caption Current Position
+		attrib local
+		event after
+		set xcurposition=pdmst.xname("xposition='"+xsuperiorsp+"'")+" <> "+pdmst.xname("xposition='"+xsuperior1+"'")+" <> "+pdmst.xname("xposition='"+xsuperior2+"'")
+		end event
+		end field
+          
+          field xnote
+            width 50
+            height 2
+          end field
+	field xnote1
+      caption Reject Note
+		  width 50
+		  height 2
+		  column 1
+    end field
+	
+	field xtype
+		caption Purchase Type
+	end field
+
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='CS Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='CS Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='CS Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='CS Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='CS Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+		pick list xporequmprjn
+        	width 15
+          event after
+		  set globals(xporeqnum)=xporeqnum
+		  class careports(getReport{poreqprint;2;in,st;@zid,@reqnum;xporeqnum;View Requisition})
+		  class careports(getReport{pocsprint;2;in,st;zid,reqnum;xporeqnum;View Comparative Statement}) 
+		  class careports(getReport{poquotana;2;in,st;zid,reqnum;xporeqnum;Print Quotation(s)})
+		  class careports(getReport{prletter;2;in,st;zid,reqnum;xporeqnum;View Cash Advance Request})
+          end event
+        end field
+		
+        embed onsubmit="return submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+	 field Approve
+          embed onclick="clicked(this)"
+     end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poreqdetailcash"
+            form.searchbutton.value = "Top"
+          }
+		 if (button=="Approve"){
+           if(confirm('Are You Confirm ?')){
+			form.searchbutton.value = "Approve"
+			}else{
+			form.searchbutton.value = "Show"
+			}
+          }
+		  
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

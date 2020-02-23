@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table acmst
+  caption "Chart of Account"
+  columns  ztime,zutime,zauserid,zuuserid,zid,xacc,xdesc,~
+            xacctype, xaccusage, xaccgroup,xhrc1,xhrc2,xhrc3,xhrc4,xhrc5,xanc1,xwh,xgroup,xaccsource,xsub
+
+  primary key zid, xacc
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table
+

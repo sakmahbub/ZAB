@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table zlogintrail
+//session id,zid,ip,email,login/logouttime,browser name,xtype(timeout/logout)
+  caption "Log in Trail"
+
+  columns zid,zsessionid,zremip,zserip,zemail,zlogintime,zlogouttime,zuseragent,xtype
+
+
+  primary key zsessionid
+
+
+end table

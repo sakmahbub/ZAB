@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table actxchallanview
+  caption "Tax Challan View"
+  columns zid,xcalltrn,xdate,xdistrict1,xbranch,xyear,xper,xchallan,xstaff,xname,xtype,xamount
+  primary key zid,xcalltrn
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view actxchallanview (zid,xcalltrn,xdate,xdistrict1,xbranch,xyear,xper,xchallan,xstaff,xname,xtype,xamount)~
+                  as Select a.zid,a.xcalltrn,a.xdate,a.xdistrict1,a.xbranch,a.xyear,a.xper,a.xchallan,a.xstaff,b.xname,a.xtype,a.xamount ~
+						from actxchallan a left join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff
+end table

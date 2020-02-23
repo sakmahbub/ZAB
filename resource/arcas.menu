@@ -1,0 +1,11 @@
+Receipts And Adjustment.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+MR Allocation                    |#classPath+"/login?screen=arcascredit" |ac      |      |150
+MR Bank Deposit                  |#classPath+"/login?screen=arcasdeposit" |ac      |      |150
+//MR Allocation (NCH)     |#classPath+"/login?screen=arcascreditnch" |ac     |      |150
+//MR Allocation (NAC) 		   |#classPath+"/login?screen=arcascreditnac" |ac     |      |150
+//MR Allocation (RBB) 		   |#classPath+"/login?screen=arcascreditrbb" |ac     |      |150
+//-------------------------------------------------------------------
+

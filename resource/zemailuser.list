@@ -1,0 +1,10 @@
+     list zemailuser
+        table userview
+        order zemail
+        select "(zemail like '%"+zvalue+"%' or xname like '%"+zvalue+"%')"
+        rows 20
+        objects zemail attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xposition,xname,xdeptname,zactive,xaccess,xrole
+     end list
+
+

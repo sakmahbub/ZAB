@@ -1,0 +1,107 @@
+screen pdtaxchallan
+     caption "Tax Challan"
+     sidebar list point
+     sections form one
+
+	list point
+        caption "Tax Challan List"
+        table pdtaxchallan
+        order xrow
+        rows 20
+//		objects  xrow attrib(link "login?screen=pdtaxchallan&command=Show&xrow=?"), ~
+        objects  xrow,xchallan attrib(link "login?screen=pdtaxchallan&command=Show&xchallan=?&xrow=?"), ~
+                xdate,xper,xyear,xyearcombo,xamount
+	  header "SL","Challan","Challan Date","Period","Year","Financial Year","Amount"
+	   Total "","","","","",sum
+      end list
+
+//	    objects  xrow attrib(link "login?screen=acdetailhobr&command=Show&xvoucher=?&xrow=?"), ~
+ //            xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)), xprime
+	  
+     form one
+		caption "<ACRONYM>Tax Challan</ACRONYM>"
+		table pdtaxchallan
+		order xchallan
+		return "login"
+		layout 2
+		pstyle 3
+		objects Add,Update, Delete, Show,Clear,*next, Top, Previous, Next, Bottom,~
+      	  xchallan,xdate,xempcategory,xamount,xyear,xper,xnote//xbank,xyearcombo,xpercombo,
+	
+	field xyear
+	  caption Challan Year
+	end field
+
+	field xyearcombo
+	  caption Financial Year
+	end field
+
+	field xpercombo
+	  caption Financial Month
+	end field
+	
+	field xdate
+	  caption Challan Date
+	end field
+
+	field xbankname
+	 // caption Year
+	 default "Bangladesh Bank, Dhaka"
+	end field
+	
+	field xnote
+	  caption Remarks
+	  column 2
+	end field
+
+        field Add
+          event before
+		//	set xper = #sub(xdate,5,2)	
+		//	set xyear = #sub(xdate,0,4)	
+			if xbankname .eq. ""
+				set xbankname ="Bangladesh Bank, Dhaka"
+			else
+				set xbankname = xbankname
+			end if
+		
+			end event
+			event after
+					print "<font color=blue size=+3>Challan No: "+xchallan+", "Amount": "+xamount+" </font>"
+				action show
+			end event
+        end field
+	
+    end form
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var but
+      var result
+
+      function clicked(b){
+        but = b.value
+      }
+      function submitit(form){
+        result = true
+        if (but == "Return"){
+          form.screen.value = "acheaderexplc"
+          form.searchbutton.value = "Find xvoucher=?"
+        }
+        but = ''
+        return result
+      }
+      function pickSub(link,desc){
+        if (navigator.appName.indexOf("Netscape") >= 0){
+          document.one.xinvnum.value=link.text
+          document.one.xbalance.value=primebal.text
+          document.one.xdate.value=date.text
+        }else{
+          document.one.xsub.value=link.innerText
+          document.one.xdesc.value=desc.innerText
+        }
+        return false
+      }
+      </script>
+  end jscript
+
+end screen

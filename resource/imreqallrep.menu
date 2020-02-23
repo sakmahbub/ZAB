@@ -1,0 +1,8 @@
+//imreqallrep.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+
+Item-wise SR & Stock Issued                 |#classPath+"/login?screen=*viewcrystal imstorereqitem(6;in,st,dt,dt,st,st;zid,wh,fdate,tdate,dept,item;xwh=Store=,xdate=From date=#date,xdate=To Date=#date,xdeptcar=Dept,xitem=Item,xviewtype=Report View)"
+Date-wise SR & Stock issued                 |#classPath+"/login?screen=*viewcrystal imstorereq(5;in,st,dt,dt,st;zid,wh,fdate,tdate,dept;xwh=Store=,xdate=From date=#date,xdate=To Date=#date,xdeptcar=Dept,xviewtype=Report View)"
+View/Print SPR           					|#classPath+"/login?screen=*viewcrystal imsprprint(2;in,st;zid,tornum;xsprnum=SPR No,xviewtype=Report View)"

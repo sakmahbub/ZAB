@@ -1,0 +1,13 @@
+product ZAB
+
+table apvprcs
+  caption "Approval Process"
+  columns ztime, zutime,zauserid,zuuserid, zid,~
+  xtypetrn,xposition,xdesignation,xrow,xstatus,xdesc,zactive
+
+  primary key zid,xtypetrn,xposition
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

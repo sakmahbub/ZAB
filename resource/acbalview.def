@@ -1,0 +1,18 @@
+
+product ZAB ERP
+
+table acbalview
+  caption "Ac Bal View"
+  columns zid,xacc,xsub,xyear,xprime,xacctype,xwh,xhwh
+  primary key zid,xacc,xsub,xyear
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view acbalview (zid,xacc,xsub,xyear,xprime,xacctype,xwh,xhwh)~
+                  as select zid,xacc,xsub,xyear,xprime,~
+                  (select acmst.xacctype from acmst where acbal.xacc=acmst.xacc and acbal.zid=acmst.zid), ~
+		  xwh,xhwh ~	
+                  from acbal
+
+end table

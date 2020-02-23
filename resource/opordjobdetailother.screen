@@ -1,0 +1,125 @@
+screen opordjobdetailother
+     caption "LC Detail For "+xbblcno
+     sidebar list one
+     sections form one,  jscript myscript
+
+     list one
+        caption "Detail List"
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        rows 20
+        objects  xorderrow attrib(link "login?screen=opordjobdetailother&command=Show&xordernum=?&xorderrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem)),xlineamt
+
+        totals "Total","","",sum
+
+        headers "Row","Item Code","Description","Line Amt"
+     end list
+
+     form one
+        caption "JOB Order Detail (Other) For : "+xordernum
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        //select
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add, Update,Clear, Delete,Show,Return,"<p>",~
+                xorderrow attrib(row 0 1),xunit display(const), xitem, xdesc,xqtyord display(hide),xrate  display(hide),~
+                xqtydel display(hide),xqtydoc display(hide),xlineamt,xlong,xdoamount display(hide),xadamount display(hide)
+
+        embed onsubmit="return submitit(this)"
+
+        field xdesc
+          attrib local
+          display const
+          event after
+            set xdesc = caitem.xdesc("xitem = '"+xitem+"'")
+          end event
+        end field
+
+        field xlong
+          width 60
+          column 2
+		  height 2
+        end field
+		
+		 field xitem
+		  caption Cost Code
+       pick list costitem
+        end field
+		
+		 field xlineamt
+       caption Cost Amount
+        end field
+
+        field Add
+          event before
+		  set xqtyord=1
+		  set xdoamount=0
+		   set xadamount=0
+		   set xrate=1
+			set xunit=caitem.xunit("xitem='"+xitem+"'")
+			//set xrate=caitem.xrate("xitem='"+xitem+"'")
+			//set xlineamt=xrate*xqtyord
+            //class opjamuna(validatebeforedetaillc{xordernum})
+          end event
+          event after
+            //class opjamuna(validateafterdetaillc{xordernum})
+          end event
+        end field
+
+        field update
+          event before
+		   set xqtyord=1
+			set xunit=caitem.xunit("xitem='"+xitem+"'")
+			//set xrate=caitem.xrate("xitem='"+xitem+"'")
+		//	set xlineamt=xrate*xqtyord
+//            class opjamuna(validatebeforedetaillc{xordernum})
+          end event
+          event after
+       //     class opjamuna(validateafterdetaillc{xordernum})
+          end event
+        end field
+
+        field delete
+          event after
+//            class opjamuna(deleteafterdetaillc{xordernum})
+          end event
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "opordjobheaderother"
+            form.searchbutton.value = "Find xordernum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

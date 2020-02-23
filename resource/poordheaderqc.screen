@@ -1,0 +1,248 @@
+screen poordheaderqc
+
+     sidebar list polist,list one,list grn
+     sections form one,jscript myscript
+
+	  list polistss
+        caption "Pending WO List for SQC: "
+        table poordheader
+        order xpornum desc
+      //  fixed xpornum
+		select "(xstatuspor='Open' or xstatuspor='Partially Received') and left(xpornum,2)='WO' and xstatus='Approved'"
+        
+		rows 10
+        objects  xpornum attrib(link "login?screen=poordheaderqc&command=Show&xpornum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+	list polist
+        caption "Pending WO List for SQC: "
+        table poview
+        order xpornum desc
+		//Select "left(xpornum,2)='PO'"
+		Select "left(xpornum,2)='WO' and xwh in (select xwh from userstoreview where xposition='"+#position+"') and '"+#wh+"'<>'' and '"+#position+"'<>''"
+		rows 10
+        objects  xpornum attrib(link "login?screen=poordheaderqc&command=Show&xpornum=?"),~
+                 xdate,xtype,xorg,xporeqnum,xtornum,xlong,xregi
+      headers "PO No","PO Date","PO Type","Supplier Name","PR No","SPR No","Store/Plant","Department"
+     end list
+	
+
+	list one
+        caption "WO Detail List For "+xpornum
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+	
+        rows 20
+        objects  xrow,~ //attrib(link "login?screen=poorddetailcash&command=Show&xpornum=?&xrow=?"), ~
+               xitem,desc equals((select xdesc from caitem where  zid=poorddetail.zid and xitem=poorddetail.xitem)),~
+			   xspecification,xserial,xqtypur,xqtygrn,~
+			   (xqtypur-xqtygrn)
+
+
+        headers "Row","Item","Description","Specification","Part No","Purchase Qty","GRN Qty","Balance Qty"//,"Rate","VAT %","VAT Amount","Line Amount"
+
+	  total "Total","","","","",sum,sum,sum
+     end list
+
+     list grn
+        caption "SQC For : "+xpornum
+        table pogrnheader
+        order xgrnnum desc
+        fixed xpornum
+        rows 30
+        objects  xgrnnum attrib(link "login?screen=posqcheader&command=Show&xgrnnum=?"),~
+                 xdate,xstatusgrn
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+     form one
+        caption "Create SQC"
+		primarykey xpornum
+        table poordheader
+        order xpornum desc
+        //select "left(xpornum,2)<>'WO' and xstatus='Approved' and xtype in ('Cash','CS','Direct PO') "
+		select "left(xpornum,2)='WO' and xstatus='Approved' and xtype in ('Cash','CS','Direct PO') and xwh in (select xwh from userstoreview where xposition='"+#position+"') and '"+#wh+"'<>'' and '"+#position+"'<>''" 
+        return "login"
+        layout 2
+        pstyle 3
+		//xwh,xdesc display(const),
+        objects Show,Clear,Next,Create SQC,"<p>" ,~
+          xpornum,xdate,~
+          xcus,xorg display(const),~
+          xdisc display(hide),xdiscf display(hide),xvatrate display(hide),xait display(hide),~
+          xtype display(hide),xstatuspor display(const),xlcno display(const),xrem,~
+          xyear display(hide),xper display(hide),xporeqnum display(hide),xsign display(hide),xwh display(hide)
+
+        field xcus
+			caption Supplier Code
+			pick list casup
+		end field
+		
+        field xstatuspor
+			caption SQC Status
+		end field
+		
+		
+        field xtypeobj
+        	caption PO Type
+        	pick "Disposable,Pharmaceutical"
+        end field
+		
+        field xpaymentterm
+		caption Payment Term
+        	pick "Credit,Cash"
+        end field
+        
+	  field xorg
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+
+
+
+		field xdesc
+		  	attrib local
+		  	dispaly const
+		  	caption Store Name
+		  	event after
+		  		set xdesc=branchview.xlong("xcode='"+xwh+"'")
+		  	end event
+		  end field
+
+		  	
+          field xshipdate
+            caption Delivery Date
+          end field
+
+			field xshipto
+            caption Delivery Site
+          end field
+
+          field xtypeobj
+            caption Type
+          end field
+
+          field xpornum
+		  caption WO No.
+			//pick list poordgrn
+            event after
+			class careports(getReport{powisegrndetail;2;in,st;zid,xpornum;xpornum;Print WO})
+		    //class careports(getjspReport{powisegrndetail,1,xpornum,View GRN})
+              set globals(xpornum)=xpornum
+              set globals(xporeqnum)=xporeqnum
+		
+			if xstatuspor .eq. "Full Received" .or. xstatuspor .eq. "GRN Created"
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(create.display)="hidden"
+       		  end if
+            end event
+          end field
+
+          field xexportdate
+            caption  Export / Contact Date
+          end field
+
+          field xstatusord
+		     caption PO Status
+            default "Open"
+            display const
+          end field
+
+
+          field xrem
+         //   column 4
+         //   width 50
+          end field
+
+          field add
+            event before
+              if xwh .eq. ""
+                error "Cannot Proceed--Please Fill The Store"
+              else
+	            set xtype="Other"
+			set xsign = 1	
+        	      set xstatuspor = "Open"
+            	set xyear = #sub(xdate,0,4)
+	            set xper = #sub(xdate,5,2)
+			set year = #sub(xdate,2,2)
+        	      set xpornum = #trn("PO Number","PO--",10)
+		    	set xpornum = #sub(xpornum,0,4)+year+#sub(xpornum,4,6)
+              end if
+            end event
+          end field
+
+          field update
+            event before
+              set xyear = #sub(xdate,0,4)
+              set xper = #sub(xdate,5,2)
+            end event
+            event after
+            end event
+          end field
+
+          field Create SQC
+            event before
+              set temp = #sql("select xrow from poorddetail where xpornum='"+xpornum+"'")
+              if xstatuspor .eq. "GRN Created"
+                error "Cannot Proceed - SQC already created"
+              else if temp .eq. ""
+                error "Cannot Proceed - Detail Not Exists"
+              end if
+			end event
+			event after
+              set temp = #spsql(zabsp_PO_createGRN,#id,#user,xpornum,xdisc,xdiscf,xvatrate,xait,xdate,xwh,xcus,6)
+			  action show
+            end event
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Print
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetailcash"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "poterms"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

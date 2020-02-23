@@ -1,0 +1,32 @@
+
+product ZAB ERP
+
+table acctualsalesview
+  caption "Acctual Sales"
+
+  sql CREATE VIEW acctualsalesview(zid,zorg,xdate,xdornum,xcrnnum,xwh,xlong,xcus,xorg,xgcus,xsm,xrsm,xfm,xsp,xlineamt,xvatamt,xdiscamt) ~
+	AS SELECT zb.zid,zb.zorg,ophd.xdate,ophd.xdornum,ISNULL(temptable.xcrnnum,'') AS xcrnnum,ophd.xwh,xc.xlong,ophd.xcus,ca.xorg,ca.xgcus,~
+	ophd.xsm,ophd.xrsm,ophd.xfm,ophd.xsp,ISNULL((SUM(ophd.xtotamt)-ISNULL(Sum(temptable.xlineamt),0)),0) AS xlineamt,~
+	ISNULL((SUM(ophd.xvatamt)-ISNULL(SUM(temptable.xvatamt),0)),0) AS xvatamt,ISNULL((SUM(ophd.xdiscamt)-ISNULL(SUM(temptable.xdiscamt),0)),0) AS xdiscamt ~
+	FROM opdoheader ophd ~
+	INNER JOIN zbusiness zb ON zb.zid=ophd.zid ~
+	INNER Join xcodes xc ON ophd.zid=xc.zid and xc.xtype='Branch' and xc.xcode=ophd.xwh ~
+	INNER JOIN cacus ca ON ca.zid=ophd.zid AND ca.xcus=ophd.xcus ~
+	LEFT JOIN ~
+	(SELECT ch.zid,ch.xcrnnum,ch.xordernum,sum(ch.xtotamt) as xlineamt,sum(ch.xvatamt) as xvatamt,SUM(ch.xdiscamt)as xdiscamt ~
+ 	FROM opcrnheader ch Group By ch.zid,ch.xcrnnum,ch.xordernum)temptable ON ophd.zid=temptable.zid  AND ophd.xdornum=temptable.xordernum ~
+	GROUP BY zb.zid,zb.zorg,ophd.xdate,ophd.xdornum,temptable.xcrnnum,ophd.xwh,xc.xlong,ophd.xcus,ca.xorg,ca.xgcus,ophd.xsm,ophd.xrsm,ophd.xfm,ophd.xsp ~
+	UNION ALL ~
+	SELECT zb.zid,zb.zorg,ophd.xdate,ophd.xdornum,ISNULL(temptable.xcrnnum,'') AS xcrnnum,ophd.xwh,xc.xlong,ophd.xcus,ca.xorg,ca.xgcus,~
+	ophd.xsm,ophd.xrsm,ophd.xfm,ophd.xsp,ISNULL((SUM(ophd.xtotamt)-ISNULL(Sum(temptable.xlineamt),0)),0) AS xlineamt,~
+	ISNULL((SUM(ophd.xvatamt)-ISNULL(SUM(temptable.xvatamt),0)),0) AS xvatamt,ISNULL((SUM(ophd.xdiscamt)-ISNULL(SUM(temptable.xdiscamt),0)),0) AS xdiscamt ~
+	FROM [10.0.0.21].zabdb.dbo.opdoheader ophd ~
+	INNER JOIN [10.0.0.21].zabdb.dbo.zbusiness zb ON zb.zid=ophd.zid ~
+	INNER Join [10.0.0.21].zabdb.dbo.xcodes xc ON ophd.zid=xc.zid and xc.xtype='Branch' and xc.xcode=ophd.xwh ~
+	INNER JOIN [10.0.0.21].zabdb.dbo.cacus ca ON ca.zid=ophd.zid AND ca.xcus=ophd.xcus ~
+	LEFT JOIN ~
+	(SELECT ch.zid,ch.xcrnnum,ch.xordernum,sum(ch.xtotamt) as xlineamt,sum(ch.xvatamt) as xvatamt,SUM(ch.xdiscamt)as xdiscamt ~
+ 	FROM [10.0.0.21].zabdb.dbo.opcrnheader ch Group By ch.zid,ch.xcrnnum,ch.xordernum)temptable ON ophd.zid=temptable.zid  AND ophd.xdornum=temptable.xordernum ~
+	GROUP BY zb.zid,zb.zorg,ophd.xdate,ophd.xdornum,temptable.xcrnnum,ophd.xwh,xc.xlong,ophd.xcus,ca.xorg,ca.xgcus,ophd.xsm,ophd.xrsm,ophd.xfm,ophd.xsp
+
+end table

@@ -1,0 +1,405 @@
+screen poordheader_q
+
+     sidebar list po,list one,list grn,list polc,list pafno
+     sections form one,list poterms,list prlist,jscript myscript
+ 
+ 
+	 list one
+        caption "PO Detail List For "+xpornum
+        table poorddetailview
+        order xpornum,xrow
+        fixed xpornum
+        rows 350
+        objects  xrow,~
+                xitem,xdesc,~
+				partno equals((select xtheircode from caitem where zid=poorddetailview.zid and xitem=poorddetailview.xitem)),~
+				xqtypur,xqtyprn,xqtygrn,xunitpur,~
+				xrate,xlineamt
+				
+        headers "Row","Item","Description","Part No","Purchase Qty","PRN Qty","GRN Qty","Purchase Unit","Rate","Line Amount"
+	  total "Total","","","","","","","","",sum	
+     end list
+	 
+     list grn
+        caption "GRN For : "+xpornum
+        table pogrnheader
+        order xgrnnum desc
+        fixed xpornum
+		select "xpornum<>''"
+        rows 30
+        objects  xgrnnum attrib(link "login?screen=pogrnsr&command=Show&xgrnnum=?"),~
+                 xdate,xstatusgrn
+     end list
+	 
+	list polc
+		caption "LC Info :"
+        table poordheader
+        order xpornum desc
+		select "xlcno<>''"
+		fixed xpornum
+		rows 50
+        objects  xlcno attrib(link "login?screen=poordlcinfo_q&command=Show&xlcno=?"),xcus,~
+				desc equals((select xorg from cacus where zid=poordheader.zid and xcus=poordheader.xcus))
+               
+		  headers "LC NO","Party Code","Party Name"
+	end list
+	
+     list pafno
+        caption "PAF For : "+xpornum
+        table appaymentreqh
+        order xpafnum desc
+		select "xpornum <>''"
+        fixed xpornum
+        rows 30
+        objects  xpafnum attrib(link "login?screen=appayment_q&command=Show&xpafnum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list	
+	
+	
+     list poterms
+        caption "Terms & Condition For "+xpornum
+        table poterms
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow,xnote		
+     end list
+	 
+    list prlist
+      caption "Back to >>"
+         table poordheader
+        order xporeqnum desc
+		fixed xpornum
+		select "left(xporeqnum,2)='PR'"
+		rows 50
+        objects  xporeqnum attrib(link "login?screen=poreqheader_q&command=Show&xporeqnum=?"),~
+                  xtornum attrib(link "login?screen=imsprheader_q&command=Show&xtornum=?")
+		  headers "PR No","SPR No"
+	end list
+
+     form one
+        caption "PO/Work Order Query"
+		primarykey xpornum
+        table poordheader
+        order xpornum desc
+        return "login"
+        layout 2
+        pstyle 3
+		objects	Show,Clear,Top,Next,Previous,Bottom,"<p>",~
+          xpornum,xdate display(const),~
+          xcus display(const),xorg display(const),xtype display(const),~
+          xprime display(hide),~
+          xstatuspor display(const),~
+          xporeqnum display(const),xsign display(hide),xregi display(hide),xstaff display(hide),xstatus display(const),~
+		  xrem display(const),~
+		  xidsup display(hide),xsuperior2 display(hide),xsuperior3 display(hide),xtornum display(hide),~
+		  xnote1 display(const),,,~
+		  signatorysec display(const),,,~
+		  xpreparer display(hide),preparer display(const),~		
+		  xsignatory1 display(hide),signatory1  display(const),~
+		  xsignatory2 display(hide),signatory2 display(const),~
+		  xsignatory3 display(hide),signatory3 display(const),~
+		  xsignatory4 display(hide),signatory4 display(const),~
+		  xsignatory5 display(hide),signatory5 display(const),~
+		  xsignreject display(hide),signreject display(const),~
+		  xcurposition display(const)
+		
+		field xcurposition
+		caption Current Position
+		attrib local
+		event after
+		set xcurposition=pdmst.xname("xposition='"+xidsup+"'")+" <> "+pdmst.xname("xposition='"+xsuperior1+"'")+" <> "+pdmst.xname("xposition='"+xsuperior2+"'")
+		end event
+		end field
+		
+			field xstatus
+			caption Approval Status
+			event after
+			end event
+		end field
+		
+	field xnote1
+      caption Reject Note
+      width 50
+      height 2
+      column 1
+    end field
+		
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		//column 2
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='PO Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='PO Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='PO Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='PO Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='PO Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		
+		field xwhdesc
+			attrib local
+			display const
+			caption Store Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Store' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+		
+		field xporeqnum
+		end field
+		
+		field xdate
+			caption Purchase Date
+		end field
+		
+		
+		field xtype
+			caption Purchase Type
+		end field
+		
+		field xtypeobj
+			display combo
+			caption Product Type
+			pick code PO Type
+		end field
+		
+        field xpaymentterm
+		caption Payment Term
+        	pick "Credit,Cash"
+        end field
+        
+		  field xorg
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+			
+			field xrem
+		    column 1
+			weidth 50
+			height 2
+          end field
+		  
+		field xnote
+		column 2
+		caption Note to CPO
+		end field
+		  
+          field xshipdate
+            caption Delivery Date
+          end field
+
+
+          field xpornum
+          //  pick list poord
+			event after
+             class careports(getReport{poprint;2;in,st;zid,pornum;xpornum;View/Print PO/Work Order })
+			 class careports(getReport{imsprprint;2;in,st;zid,tornum;xtornum;View SPR Status})
+			 class careports(getReport{pocsprint;2;in,st;zid,reqnum;xporeqnum;View Comparative Statement})
+			// class careports(getjspReport{prletter,1,xpornum,Print Advance Letter})
+			// class careports(getjspReport{powisegrndetail,1,xpornum,Print GRN})
+              set globals(xpornum)=xpornum
+              set globals(xporeqnum)=xporeqnum
+			  set globals(xstatus)=xporeqnum
+		
+			 if poordheader.xstatus("xpornum='"+xpornum+"'") .eq. "Approved" 
+         			set #field(Update.attrib) = "disabled"
+         			set #field(Approve.display)="hidden"
+					set #field(Reject.display) = "hidden"
+       		  end if
+		    if poordheader.xstatus("xpornum='"+xpornum+"'") .eq. "" .or. #position .eq. ""
+			        set #field(Update.attrib) = "disabled"
+         			set #field(Approve.display)="hidden"
+					set #field(Reject.display) = "hidden"
+			end if
+		   if xidsup .ne. #position .and. xsuperior2 .ne. #position .and. xsuperior3 .ne. #position
+			   set #field(Update.attrib) = "disabled"
+			    set #field(Approve.display) = "hidden"
+				set #field(Reject.display) = "hidden"
+			end if
+			
+            end event
+          end field
+
+          field xstatusord
+		     caption PO Status
+            default "Open"
+            display const
+          end field
+		
+		  field Approve
+            event before
+			set status=#sql("select xstatus from poordheader where xpornum='"+xpornum+"'")
+			if xpornum .eq. ""
+			error "Please Select Purchase Order"
+			else if status .eq. "Approved"
+				error "PO Already Approved"
+			else if xidsup .ne. #position .and. xsuperior2 .ne. #position .and. xsuperior3 .ne. #position
+				error "Superior doesn't match."
+			else if  #position .eq. ""
+				error "Superior doesn't match."
+			end if
+			end event
+			event after
+			set temp = #spsql(zabsp_apvprcs,#id,#user,#position,xpornum,0,xstatus,"PO Approval")
+			//set temp = #spsql(zabsp_DATETIME_Update,#id,#user,xpornum,"poordheader","xdatecpo","xcpo","xstatus","xpornum","Approved")
+			action show
+			end if
+			end event
+			end field
+			
+		   field Reject
+            event before
+			set status=poordheader.xstatus("xpornum='"+xpornum+"'")
+			if status .eq. "Open" .or. status .eq. "Approved"
+				error "PO can not be reject!"
+			else if poordheader.xnote1("xpornum='"+xpornum+"'") .eq. ""
+				error "Please Write Reject Note!"
+			end if
+		   end event
+		   event after
+		   set temp =  #spsql(zabsp_Reject_Request,#id,#user,#position,0,xpornum,"PO")
+		   action show
+		   end event
+          end field
+			
+			 field update
+            event before
+			if xstatuspor .eq. ""
+			error "Please show first"
+			else if poordheader.xidsup("xpornum='"+xpornum+"'") .ne. #position .and. poordheader.xsuperior2("xpornum='"+xpornum+"'") .ne. #position .and. poordheader.xsuperior3("xpornum='"+xpornum+"'") .ne. #position
+				error "You do not have permission to update!" 
+			else if #position .eq. ""
+				error "You do not have permission to update!"
+			  end if
+            end event
+            event after
+            end event
+          end field
+			
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field LC
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+		  
+	 field Approve
+          embed onclick="clicked(this)"
+     end field
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetailcash"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="LC Info"){
+            form.screen.value = "poordlcinfo"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "poterms"
+            form.searchbutton.value = "Top"
+          }
+		 if (detail=="Approve"){
+           if(confirm('Are You Confirm ?')){
+			form.searchbutton.value = "Approve"
+			}else{
+			form.searchbutton.value = "Show"
+			}
+          }		  
+            return false
+        }
+		
+	 function pickItem(link){//,type
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+			//document.one.xtype.value=type.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+			//document.one.xtype.value=type.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+ end screen

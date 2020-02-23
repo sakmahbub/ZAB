@@ -1,0 +1,108 @@
+screen achrc5
+     caption "GL Level 5"
+     sidebar list five
+     sections form one,  jscript myscript
+
+	list five
+        caption "List of "+xhrc4
+        table achrc5
+        order xhrc1,xhrc2,xhrc3,xhrc4,xhrc5
+        fixed xhrc1,xhrc2,xhrc3,xhrc4
+        //select none
+      	navigators alpha
+        rows 20
+        objects  xhrc5,xdesc
+     end list
+
+
+
+     form one
+//        caption "Level 2 of "+xhrc1
+        table achrc5
+        primarykey xhrc1, xhrc2, xhrc3,xhrc4,xhrc5
+        order xhrc1,xhrc2,xhrc3,xhrc4,xhrc5
+        fixed xhrc1,xhrc2,xhrc3,xhrc4
+        //select
+        return "LogIn"
+        layout 2
+        pstyle 3
+        objects Back to previous level,*next,~
+               Show,Clear,Add, Update, Delete,*next,Top,Previous,Next,Bottom,"<p>" ,~
+               xhrc5 width(20),xdesc width(50),xnum display(const),xrow attrib(row 0 1)
+
+        field xrow
+			caption Position in Report
+        end field
+
+
+        field xhrc5
+          event after
+            set globals(xhrc5)=xhrc5
+          end event
+        end field
+		
+		field add
+			event before
+				set temp = acgroup.xgroup("xgroup='"+xhrc5+"'")
+				if #result .eq. "true"
+					error "Cannot Proceed -- Duplicate Code"
+				end if
+			end event
+			event after
+				set temp=#spsql(zabsp_AC_validateAfterAchrc,#id,#user,xhrc5,xdesc,xhrc1,xhrc2,xhrc3,xhrc4,xhrc5,"")
+			end event
+		end field
+		
+		field update
+			event before
+				set temp = #sql("update acgroup set xdesc='"+xdesc+"' where xgroup='"+xhrc5+"'")
+			end event
+		end field
+
+		field delete
+			event before
+				set temp = #sql("delete from acgroup where xgroup='"+xhrc5+"'")
+			end event
+		end field
+
+
+		
+
+
+        embed onsubmit="submitit(this)"
+
+        field Back
+          embed onclick="clicked(this)"
+        end field
+
+        field Level
+          embed onclick="grouped(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but = ""
+        function clicked(b){
+          but = "clicked"
+        }
+        function submitit(form){
+          if (but == "clicked"){
+            form.screen.value = "achrc4"
+            form.searchbutton.value = "Find xhrc1=?&xhrc2=?&xhrc3=?&xhrc4=?"
+
+          }
+          if (but == "grouped"){
+            form.screen.value = "achrc5"
+            form.searchbutton.value = "Find xhrc1=?&xhrc2=?&xhrc3=?&xhrc4=?"
+
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

@@ -1,0 +1,12 @@
+product ZAB ERP
+
+table optoari
+  caption "OP To AR Interface"
+  columns  ztime,zutime,zauserid,zuuserid, zid,~
+           xtype,xgcus,xstype,xaccdr,xacccr,xgitem
+
+  primary key zid,xtype,xgcus,xgitem,xstype
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

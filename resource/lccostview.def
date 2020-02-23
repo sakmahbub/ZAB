@@ -1,0 +1,21 @@
+
+
+
+product ZAB ERP
+
+table lccostview
+  caption "LC Item Cost Detail View"
+  columns zid,xlcno,xrow,xaccdr,xacccr,xprime,xcus,xnote,xstatus,xdate
+  primary zid,xlcno,xrow,xaccdr,xacccr,xprime,xcus,xnote,xstatus,xdate
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view lccostview (zid,xlcno,xrow,xaccdr,xacccr,xprime,xcus,xnote,xstatus,xdate)~
+                as Select zid,xlcno,xrow,xaccdr,xacccr,xprime,xcus,xnote,xstatus,xdate from lccost ~
+				UNION ALL ~
+				select a.zid,a.xlcno,xrow,'','',ISNULL(b.xbase,xlineamt),a.xcus,'',b.xstatus,null from poordheader a ~
+				join poorddetail b on a.zid=b.zid AND a.xpornum=b.xpornum ~
+				join caitem c on b.zid=c.zid AND b.xitem=c.xitem ~
+				WHERE c.xgitem='Cost'
+end table

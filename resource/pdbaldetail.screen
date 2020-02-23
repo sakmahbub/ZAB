@@ -1,0 +1,94 @@
+screen pdbaldetail
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Detail List"
+        table pdbal
+        order xyear,xper,xstaff,xrow
+        fixed xyear,xper,xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdbaldetail&command=Show&xyear=?&xper=?&xstaff=?&xrow=?"), ~
+                 xtype,xamount,xadjustment,xarrear,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdbal.xtype))
+
+        header "Line No","Componant Type","Amount","Adjustment","Arrear","Transaction Type"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Balance Detail</ACRONYM>"
+	      table pdbal
+        order xyear,xper,xstaff,xrow
+        fixed xyear,xper,xstaff
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Update,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~
+          xrow attrib(row 0 1),xtype,xamount,xadjustment,xarrear,xothours,xsign display(hide)
+
+
+        field xtype
+          caption Componant Type
+          pick "select xcode from pdnormaltrntype"
+        end field
+
+        field xtypetrn
+          display combo
+          pick "Addition,Deduction"
+        end field
+
+        field add
+          event before
+            set typetrn = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+            if typetrn .eq. "Addition"
+              set xsign=1
+            else
+              set xsign = -1
+            end if
+          end event
+        end field
+
+        field update
+          event before
+            set typetrn = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+            if typetrn .eq. "Addition"
+              set xsign=1
+            else
+              set xsign = -1
+            end if
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdbal"
+            form.searchbutton.value = "Find xyear=?&xper=?&xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

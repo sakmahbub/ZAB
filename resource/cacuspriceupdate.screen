@@ -1,0 +1,177 @@
+screen cacuspriceupdate
+
+  sidebar list one //,list two
+  sections form one,  jscript myscript
+  
+  	
+  list one
+    caption "Special Rate List"
+    table cacusprice
+    order xcus,xrow,xitem
+    fixed xcus
+	select "zactive ='1'"
+    rows 100
+    objects  xrow attrib(link "login?screen=cacuspriceupdate&command=Show&xcus=?&xitem=?&xrow=?"),xitem, ~
+             descode equals((select xtheircode from caitem where zid=cacusprice.zid and xitem=cacusprice.xitem)),~
+			 desc equals((select xdesc from caitem where zid=cacusprice.zid and xitem=cacusprice.xitem)),xcolortype,xrate,zactive
+	headers "Row","Item","Old Code","Description","Color Type","Rate","Active"
+  end list
+  
+  form one
+    caption "Special Rate Update "+xcus
+    table cacusprice
+    primary key xcus,xrow
+    order xcus,xitem,xrow
+    fixed xcus
+	select "zactive ='1'"
+    pstyle 3
+    return "login"
+    layout 3
+    objects Add,Clear,Show, *next,Return,Top,Previous,Next,Bottom,~ //,Update, Delete
+            xitem,xitemdesc,xtheircode,xcolortype,xrate,xcost display(hide),xdateeff,xdateexp,xrow display(const) attrib(row 0 1),zactive
+	
+	
+	field zactive
+		default "1"
+	end field
+	
+	field xitem
+		pick list xitemfg
+	end field
+	field xitemdesc
+		attrib local
+		display const
+		caption Product Name
+		event after
+			set xitemdesc=caitem.xdesc("xitem='"+xitem+"'")
+		end event
+	end field
+	field xtheircode
+		attrib local
+		display const
+		caption Old Code
+		event after
+			set xtheircode=caitem.xtheircode("xitem='"+xitem+"'")
+		end event
+	end field
+	
+	
+	field xcolortype
+	display combo
+		pick "select xcode from xcodes where xtype='Color Type' and zactive='1'"
+	end field
+
+	field xrate
+		caption Rate
+	end field
+
+	field xdateeff
+		default #date
+	end field
+
+    	field xdateexp
+		default "2999-01-01"
+	end field
+
+
+	field add
+		event before
+		    set disc = cacusdisc.xdisc("xcus='"+xcus+"' and xitem='"+xitem+"'")
+			
+            set bonus = #sql(double,"select xqtybonus+xqtybonus1+xqtybonus2+xqtybonus3+xqtybonus4 from cacusbonus where xcus = '"+xcus+"' and  xitem = '"+xitem+"'")
+
+          //if disc <> 0 .or. bonus <> 0
+            //  errror "Cannot Proceed -- Please Check Special Bonus/Disc" 
+		  //end if
+		 if xitem .eq. ""
+			error "Please Select Item"
+		else if xcolortype .eq. ""
+			error "Please Select Color Type"
+		else if xrate ==0
+				error "Please Write Rate"
+		else
+			set zactive="1"
+			set xcost=caitem.xcost("xitem='"+xitem+"'")
+		    set cus=xcus
+			set item=xitem
+			//set temp = #sql("update cacusprice set zactive='0' where xcus='"+cus+"' and xitem='"+item+"' and xrow<>'"+xrow+"'")
+		end if
+		end event
+		event after
+		    set cus=xcus
+			set item=xitem
+			set temp = #sql("update cacusprice set zactive='0' where xcus='"+cus+"' and xitem='"+item+"' and xcolortype='"+xcolortype+"' and xrow<>'"+xrow+"'")
+
+		//set temp = #sql("update opcrnchheader set xstatusar='Open' where xcrnnum='"+xcrnnum+"'")
+		end event
+	end field
+	
+	field update
+		event before
+		
+		if xitem .eq. ""
+			error "Please Select Item"
+		else if xcolortype .eq. ""
+			error "Please Select Color Type"
+		else if xrate ==0
+				error "Please Write Rate"
+		
+		else
+			set cus=xcus
+			set item=xitem
+			set colortype=xcolortype
+			set zactive="1"
+			set temp = #sql("update cacusprice set zactive='0' where xcus='"+cus+"' and xitem='"+item+"' and xcolortype='"+colortype+"' and xrow<>'"+xrow+"'")
+		end if
+		end event
+		
+		event after
+			
+		end event
+	end field
+	
+	field delete
+		event after
+		    set cus=xcus
+			set item=xitem
+			set xrow=#sql("select max(xrow) from cacusprice where xcus='"+cus+"' and xitem='"+item+"'")
+			set temp= #sql("update cacusprice set zactive='1' where xcus='"+cus+"' and xitem='"+item+"' and xrow='"+xrow+"'")
+
+		end event
+	end field
+	
+	
+
+    embed onsubmit="return submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+  
+  end form
+  
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          if (but == "Return"){
+            form.screen.value = "cacus"
+            form.searchbutton.value = "Find xcus=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+  
+  
+end screen
+
+
+
+

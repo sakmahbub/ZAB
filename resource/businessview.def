@@ -1,0 +1,11 @@
+product ZAB ERP
+
+table businessview
+  caption "Business View"
+
+  sql create view businessview (zid,zbid,zorg) as ~
+  	Select Top(100) 10,zid,zorg ~
+	from zbusiness union all select 10,999999,'All'
+
+
+end table

@@ -1,0 +1,24 @@
+//Operation Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Customer Ledger                  |#classPath+"/login?screen=*wcrystal arledtype(xcus=From Customer=0,xcus=To Customer=zzz,xdate=From Date=#date,xdate=To Date=#date,xsp=From PPO,xsp=To PPO,xtype=Type)"
+Summary Customer Ledger          |#classPath+"/login?screen=*wcrystal arledsummarytype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From PPO,xsp=To PPO,xtype=Type)"
+Detail Pending Report            |#classPath+"/login?screen=*wcrystal aragedetailtype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Person,xsp=To Sales Person,xtype=Type)"
+Detail Pending Report (Credit)   |#classPath+"/login?screen=*wcrystal aragedetailcredittype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Person,xsp=To Sales Person,xtype=Type)"
+Detail Pending Report (SPR)      |#classPath+"/login?screen=*wcrystal aragedetailsprtype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xpp=From SPR,xpp=To SPR,xtype=Type)"
+Detail Pending Report Credit(SPR)      |#classPath+"/login?screen=*wcrystal aragedetailcreditsprtype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xpp=From SPR,xpp=To SPR,xtype=Type)"
+Summary Pending Report (Credit)  |#classPath+"/login?screen=*wcrystal aragesummarycredittype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Person,xsp=To Sales Person,xtype=Type)"
+Summary Pending Report           |#classPath+"/login?screen=*wcrystal aragesummarytype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Person,xsp=To Sales Person,xtype=Type)"
+Statement of Account             |#classPath+"/login?screen=*wcrystal arstmttype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From PPO,xsp=To PPO,xtype=Type)"
+Detail Pending Report            |#classPath+"/login?screen=*wcrystal aragedetailtype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Person,xsp=To Sales Person,xtype=Type)"
+Ageing Report                    |#classPath+"/login?screen=*wcrystal aragetype(xcus=From Customer=0,xcus=To Customer=zzz,xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+Allocation Report                |#classPath+"/login?screen=*wcrystal arallocationtype(xvoucher=From Order,xvoucher=To Order,xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+Money Receipt Listing            |#classPath+"/login?screen=*wcrystal armrstmttype(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From PPO,xsp=To PPO,xtype=Type)"
+Territory List                   |#classPath+"/login?screen=*wcrystal territory"
+Market List                      |#classPath+"/login?screen=*wcrystal market(xterritory=From Territory=000,xterritory=To Territory=zzz)"
+Total Customer List              |#classPath+"/login?screen=*wcrystal cacus(xcus=Customer=000,xcus=Customer=zzz)"
+Customer List(PPO Wise)          |#classPath+"/login?screen=*wcrystal cacusppo(xcus=Customer=000,xcus=Customer=zzz,xsp=From PPO,xsp=To PPO)"
+PPO List                         |#classPath+"/login?screen=*wcrystal cappo(xsp=From PPO=000,xsp=To PPO=zzz)"
+//-------------------------------------------------------------------
+

@@ -1,0 +1,10 @@
+//gl.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+AR Defaults                      |#classPath+"/login?screen=ardef"
+Customer                         |#classPath+"/login?screen=cacus"
+GL Interface                     |#classPath+"/login?screen=artogl"
+Bank                             |#classPath+"/login?screen=cabank"
+//-------------------------------------------------------------------
+

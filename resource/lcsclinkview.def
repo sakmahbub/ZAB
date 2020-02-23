@@ -1,0 +1,16 @@
+product ZAB ERP
+
+table lcsclinkview
+  caption "CI View"
+  columns zid,xordernum,xpidate,xpiref,xcus,xorg,xtype,xpilinkso,xlcno,xqtyord,xlineamt
+  primary zid,xordernum,xpidate,xpiref,xcus,xorg,xtype,xpilinkso,xlcno,xqtyord,xlineamt
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  sql create view lcsclinkview (zid,xordernum,xpidate,xpiref,xcus,xorg,xtype,xpilinkso,xlcno,xqtyord,xlineamt)~
+                  as  select zid,xordernum,xpidate,xpiref,xcus,(select xorg from cacus where xcus=opordheader.xcus),xtype,xpilinkso,isnull(xlcno,''), ~
+				  isnull((select sum(xqtyord) from oporddetail where xordernum=opordheader.xordernum),0),isnull((select sum(xlineamt) from oporddetail where xordernum=opordheader.xordernum) ,0)from   opordheader group by zid,xordernum,xpidate,xpiref,xcus,xtype,xpilinkso,xlcno  			  
+					 
+end table
+
+

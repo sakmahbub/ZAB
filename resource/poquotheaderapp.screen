@@ -1,0 +1,204 @@
+screen poquotheaderapp
+	
+     sidebar list req,list detail//,list po
+     sections form one, jscript myscript
+
+      list req
+        caption "Requisition List"
+        table poquotheader
+        order xqotnum
+		select "((xstatusquot='Approved_Req' and xstatusep='Approved') OR (xstatusquot='Open' and xstatusep='Open')) and xwh='"+#wh+"'"
+        rows 20
+	   objects  xqotnum attrib(link "login?screen=poquotheaderapp&command=Show&xqotnum=?"),xporeqnum, ~
+                xdate
+      //  headers "Item","Name","Requisition Qty","Row"//"Description",
+     end list
+	 
+	 list detail
+        caption "Requisition Detail List"
+        table poquotdetail
+        order xqotnum,xrow
+        fixed xqotnum
+        rows 20
+        objects  xrow attrib(link "login?screen=poquotdetail&command=Show&xqotnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=poquotdetail.zid and xitem=poquotdetail.xitem)),xunitpur,~
+				 xqtyreq,xrate,xlineamt
+
+
+        headers "Line No","Item","Description","Unit","Qty Req","Rate","Amount"
+		total "","","Total","","","",sum
+     end list
+ 
+
+
+     form one
+		caption "Quotation Entry Header"
+        table poquotheader
+		primarykey xqotnum desc
+        order xqotnum desc
+		select "((xstatusquot='Approved_Req' and xstatusep='Approved') OR (xstatusquot='Open' and xstatusep='Open')) and xwh='"+#wh+"'"
+	   return "login"
+        layout 3
+        pstyle 3 
+        objects ~
+                Show,Clear,*Next,Top, Previous, Next, Bottom,Approval,"<p>" ,~
+                xqotnum,xdate,xporeqnum display(const),xsup display(const),xorg,xstatusquot display(hide),~
+				xdum,xep display(hide),xpm display(hide),xcpo display(hide),~
+				xdes1,xdes2,xdes3,xgmdf display(hide),xed display(hide),xdes4,xdes5,xdes6,xdmddc display(hide),xnote
+
+          
+           field xorg
+          	attrib local
+          	display const
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+		  
+		   field xdes1
+          	attrib local
+          	display const
+          	caption EP
+          	event after
+          		set xdes1 = pdmst.xname("xstaff='"+xep+"'")
+          	end event
+          end field
+		  
+		   field xdes2
+          	attrib local
+          	display const
+          	caption PM
+          	event after
+          		set xdes2 = pdmst.xname("xstaff='"+xpm+"'")
+          	end event
+          end field
+		
+		 field xdes3
+          	attrib local
+          	display const
+          	caption CPO
+          	event after
+          		set xdes3 = pdmst.xname("xstaff='"+xcpo+"'")
+          	end event
+          end field
+		
+		 field xdes4
+          	attrib local
+          	display const
+          	caption GMF/DF
+          	event after
+          		set xdes4 = pdmst.xname("xstaff='"+xgmdf+"'")
+          	end event
+          end field
+		  
+		   field xdes5
+          	attrib local
+          	display const
+          	caption ED
+          	event after
+          		set xdes5 = pdmst.xname("xstaff='"+xed+"'")
+          	end event
+          end field
+		
+		 field xdes6
+          	attrib local
+          	display const
+          	caption DMD/MD/Chairman
+          	event after
+          		set xdes6 = pdmst.xname("xstaff='"+xdmddc+"'")
+          	end event
+          end field
+		
+		
+		  field xdum
+          	attrib local
+          	display const
+			caption 
+          end field
+        
+		field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xporeqnum
+           pick list poreqapprov
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xqotnum
+            width 12
+          event after
+            set globals(xqotnum)=xqotnum
+            set globals(xporeqnum)=xporeqnum  
+		  class careports(getjspReport{poquotana,1,xporeqnum,Print Comparison Statement})
+		  class careports(getjspReport{poquotana2,1,xporeqnum,Print Quotation (Single-Product)})
+		  class careports(getjspReport{poreqprint,1,xporeqnum,Print Requisition}) 
+          end event
+        end field
+
+       field Approval
+            event before
+           // if xstatuspi .ne. "Open"
+            //	error "Cannot Proceed -- Order is not authorised for approval"
+            //end if
+            end event
+            event after
+			set temp = #spsql(zabsp_PO_Quot_Approved,#id,#user,#wh,xporeqnum,xqotnum)
+			action show
+            end event
+          end field
+		field update
+			event before
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+    end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poquotdetailapp"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		 function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+			//document.one.xdate.value=date.text
+          }else{
+            document.one.xporeqnum.value=link.innerText   
+			//document.one.xdate.value=date.innerText
+          }
+          return false
+        }
+		
+      </script>
+     end jscript
+
+end screen

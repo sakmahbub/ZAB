@@ -1,0 +1,17 @@
+
+product ERP on the Net
+
+table fabalview
+  caption "Balance View"
+  columns zid,xyear,xper,xcode,xbookval)//,xprime,xdepamt,xaccdepamt
+  primary key zid,xyear,xper,xcode
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view fabalview (zid,xyear,xper,xcode,xbookval)~//,xprime,xdepamt,xaccdepamt)~
+                  as select zid,xyear,xper,xcode,(select famst.xcost from famst where famst.xcode = fatrn.xcode and famst.zid = fatrn.zid)~
+                  - (select fabaldview.xprime from fabaldview where fabaldview.xaction = 'Accumulated Depreciation' and fabaldview.xyear = fatrn.xyear and fabaldview.xper = fatrn.xper and fabaldview.zid = fatrn.zid)~
+                  
+                  from fatrn
+end table

@@ -1,0 +1,22 @@
+//pdfacpayroll.menu
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+option                  		|action                                          	|modules	|models	|width
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+Personnel Info            		|#classPath+"/login?screen=pdmst"               	|ca        	|   		|205
+//Personnel Info Resign          	|#classPath+"/login?screen=pdmstresign"               |ca        	|   		|205
+Loans & Advance Entry   		|#classPath+"/login?screen=pdloantrn"             	|ca        	|   		|205
+Transaction Entry       		|#classPath+"/login?screen=pdfactrnheader"              |ca        	|   		|205
+Salary & Other Process   		|#classPath+"/login?menu=pdfacprocs"                	|ca        	|   		|205
+//Setting      				|#classPath+"/login?menu=pdfacsetting"         		|ca        	|   		|205
+Reports                   		|#classPath+"/login?menu=pdfacrep"               	|ca        	|   		|205
+
+
+//IT Calculation                	|#classPath+"/login?screen=pditcalcfac"             	|ca        	|   		|210
+//IT Calculation Report 	   	      |#classPath+"/login?screen=*jspcrystal pditcalculationfac(xrepuser=User,xprcs=Process Type,xstaff=From Employee,xstaff=To Employee,xyear=Tax Year,xper=Tax Period)"|ca        	|   		|210
+//IT Assessment Report	   	      |#classPath+"/login?screen=*jspcrystal pditassessmentfac(xrepuser=User,xstaff=From Employee,xstaff=To Employee,xyear=Tax Year)"|ca        	|   		|210
+//IT Return 108	   	            |#classPath+"/login?screen=*jspcrystal pditreturn108(xrepuser=User,xstaff=From Employee,xstaff=To Employee,xyear=Tax Year)"|ca        	|   		|210
+//IT Certificate	   	            |#classPath+"/login?screen=*jspcrystal pditcertificate(xrepuser=User,xstaff=From Employee,xstaff=To Employee,xyear=Tax Year)"|ca        	|   		|210
+//Annual Salary Review     		|#classPath+"/login?menu=pdanreview"                 	|ca        	|   		|205
+//Investment Entry        		|#classPath+"/login?screen=pdinvheader"               |ca        	|   		|205
+//-------------------------------------------------------------------
+

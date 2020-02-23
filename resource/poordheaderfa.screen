@@ -1,0 +1,153 @@
+screen poordheaderfa
+     caption "PO Header"
+     sidebar list one
+     sections form one,jscript myscript
+
+     list one
+        caption "Invoice Detail For :"+xmlcno
+        table pogrnheader
+        order xgrnnum
+        fixed xpornum
+        rows 20
+        objects  xgrnnum attrib(link "login?screen=pogrnheaderfa&command=Show&xgrnnum=?"), ~
+                 xdate
+
+
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+     form one
+        caption "<ACRONYM>PO Header (Fixed Asset)</ACRONYM>"
+	      table poordheader
+        order xpornum desc
+        select "xtype='FA'"
+        return "login"
+        layout 2
+        pstyle 3
+        report poprint,xpornum,PO Print
+        objects Show,Clear,Add,Update,Delete,*next,Top,Next,Previous,Bottom,*Next,Detail,Create GRN,"<p>" ,~
+          xpornum attrib(search) display(trn PO Number),xdate,xshipdate,~
+          xwh,xcur display(hide),xexch display(hide),xsup,xorg display(const),~
+          xprimetotamt display(const),xbasetotamt display(const),~
+          xtype display(hide),xrem,xstatusord,xstatusap display(const),~
+          xyear display(hide),xper display(hide),xtypeobj display(hide),xpiref display(hide),xporeqnum display(hide)
+
+
+
+          field xwh
+            default "Main Store"
+          end field
+
+          field xshipdate
+            caption Delivery Date
+          end field
+
+          field xtypeobj
+            caption Type
+          end field
+
+          field xpornum
+            event after
+              set globals(xpornum)=xpornum
+              set globals(xexch)=xexch
+            end event
+          end field
+
+          field xexportdate
+            caption  Export / Contact Date
+          end field
+
+          field xstatusap
+            caption AP Status
+            default "Open"
+            display const
+          end field
+
+
+          field xstatusord
+            caption PO Status
+            default "Open"
+            display const
+          end field
+
+
+          field xrem
+         //   column 4
+         //   width 50
+          end field
+
+          field Create
+            event before
+              set temp = #sql("select xrow from poorddetail where xpornum='"+xpornum+"'")
+              if xstatusord .eq. "GRN Created"
+                error "Cannot Proceed - GRN already created"
+              else if temp .eq. ""
+                error "Cannot Proceed - Detail Not Exists"
+              end if
+            end event
+            event after
+              class pomedical(CreateGRNSingle{xpornum,xcur,xexch,xsup,"","",xpiref,Single,xwh,xdate})
+            end event
+          end field
+
+          field add
+            event before
+              if xwh .eq. ""
+                error "Cannot Proceed--Please Fill The Location"
+              end if
+              set xtype="FA"
+              set xstatusord = "Open"
+              set xstatusap = "Open"
+//              set xexch = #exch(xdate,xcur)
+              set xorg = casup.xorg("xsup = '"+xsup+"'")
+              set xyear = #sub(xdate,0,4)
+              set xper = #sub(xdate,5,2)
+            end event
+          end field
+
+          field update
+            event before
+//              set xexch = #exch(xdate,xcur)
+              set xorg = casup.xorg("xsup = '"+xsup+"'")
+              set xyear = #sub(xdate,0,4)
+              set xper = #sub(xdate,5,2)
+            end event
+            event after
+              class pomedical(updatePoHeaderAfter{xpornum,xcur,xexch,poordheader,poorddetail})
+            end event
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Print
+            embed onclick="clicked(this)"
+          end field
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetailfa"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

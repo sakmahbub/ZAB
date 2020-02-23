@@ -1,0 +1,12 @@
+     list xlcnopo
+        table lcinfo
+        order xlcno
+        select "(xlcno like '%"+zvalue+"%') and xtype in ('Import','Export') and xstatus='Open' and xcus='"+xcus+"'"
+        searchselect "xtype in ('Import','Export')  and xstatus='Open' and xcus='"+xcus+"'"
+		rows 20
+        objects xlcno attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xtype,xlcissuedate,xpornum,xcus
+		header "LC No","LC Type","LC Issue Date","PO No","Party"
+     end list
+
+

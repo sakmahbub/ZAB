@@ -1,0 +1,76 @@
+screen pogrnconfirm
+
+     sections form detail//, jscript myscript
+
+     form detail
+        caption "C<ACRONYM>onfirm</ACRONYM> GRN"
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Clear,Process,~
+                xdate,xford,xtord
+
+        field xdate
+          attrib local
+          caption Received Date
+          display text
+        end field
+
+        field xford
+          attrib local
+          caption From GRN
+          pick list pogrn
+          display text
+        end field
+
+        field xtord
+          attrib local
+          caption To GRN
+          pick list pogrn
+          display text
+          default "z"
+        end field
+
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+        field Process
+          event after
+              class posssteel(ConfirmGRNBatch{pogrnheader,xgrnnum,xgrnnum,xdate,xwh,Batch})
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcrnheader"
+            form.searchbutton.value = "Find xcrnnum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

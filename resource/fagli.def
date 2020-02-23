@@ -1,0 +1,24 @@
+product ZAB ERP
+
+table fagli
+  caption "FA to GL Interface"
+  columns ztime,zutime,zid,zauserid,zuuserid,xcat,xvoucher,xaccdr,xacccr,xacc
+
+  primary key zid, xcat,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  field xcat
+    pick select xcode from xcodes where xtype='Category'
+  end field
+
+  field xvoucher
+    display combo
+    pick select xtrn from xtrn where xtypetrn='FA Transactions'
+  end field
+
+  list xaccdr,xacccr
+  //sql
+end table

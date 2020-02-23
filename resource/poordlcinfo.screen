@@ -1,0 +1,350 @@
+screen poordlcinfo
+	sidebar list polist
+     sections form one,list one,jscript myscript
+	
+	list polist
+        caption "Approved (Purchase Order)PO List For Create LC and Link: "
+        table poordheader
+        order xpornum desc
+		select "left(xpornum,2) in ('WO','PO') and xtype='LC' and xstatus='Approved' and isnull(xlcno,'')='' "
+		rows 10
+        objects  xpornum ,~//attrib(link "login?screen=poordheadercash&command=Show"),~ //&xpornum=?
+                xdate,xtype,xcus,org equals((select xorg from cacus where zid=poordheader.zid and xcus=poordheader.xcus),xporeqnum,xtornum,long equals((select xlong from xcodes where zid=poordheader.zid and xcode=poordheader.xwh and xtype='Branch'),xregi,~
+				 preparer equals((select xname from pdmst where zid=poordheader.zid and xstaff=poordheader.xpreparer)) 
+      headers "PO No","PO Date","PO Type","Supplier ID","Supplier Name","PR No","SR No","Plant/Store","Department","Preparer"
+     end list
+	
+	
+     list one
+        caption "PO Detail List For "+xpornum
+        table poorddetailview
+        order xpornum,xrow
+        fixed xlcno
+		select "xlcno <>''"
+        rows 250
+        objects  xrow,xpornum,xitem,xdesc,xserial,~
+				xqtypur,xunitpur,xrate,xlineamt,xbase
+
+        headers "Row","PO No","Item","Description","Part No","Quantity","Unit","Rate","Line Amount","Line Amount(BDT)"
+	  total "","","Total","","","","","",sum,sum
+     end list
+
+     form one
+        caption "Import LC Info"
+        table lcinfo
+		primarykey xlcno
+        order xlcno
+		select "xtype='Import'"
+        pstyle 3
+        return "login"
+        layout 4
+        objects Add,Update,Delete,Show,Next,Previous,Clear,Amendment,Confirm,"<p>",~ //Detail,
+               xlcno,xlctype,xlcissuedate,xshipdate,xcus,xcusdesc,xexpirydate,~
+			   xstatuspor display(const),xpornum display(hide),xcur,xexch,~
+			   xprime,xlcmargin,~
+			  xopenbank,xopdesc,xadvisingbank,xadvdesc,xfreightcost, xpiref,xdatepi,xmaturitydate,xstatusjv display(hide),~
+			   xprimetotamt display(hide),xtype display(hide),xvoucher display(hide),xstatus display(const)
+				
+        embed onsubmit="return submitit(this)"
+
+		 field xpornum
+			pick list xpornumlc
+		 end field
+		 
+		 field xprime
+			caption LC Value
+		 end field
+		 
+		 field xstatuspor
+			caption Doc Retirement Status
+		 end field
+		 
+		 field xprimebuyer
+			caption LC Value in Buyer Currency
+		 end field
+		 
+		 field xcur
+		  caption <br><FONT SIZE=2 COLOR=red>LC Currency*</font> 
+		 end field
+		 
+		 field xexch
+		 caption <br><FONT SIZE=2 COLOR=red>Exchange Rate in(Base)*</font> 
+		 end field
+		 
+		 field xcurbuyer
+		 caption <br><FONT SIZE=2 COLOR=dark green>Invoice Currency*</font>
+		 end field
+		 
+		 field xexchbuyer
+		 caption <br><FONT SIZE=2 COLOR=dark green>Exchange Rate(LC to Invoice)*</font> 
+		 end field
+		 
+		 		 
+		 field xttcur
+		 caption <br><FONT SIZE=2 COLOR=blue>Other Currency*</font>
+		 end field
+		 
+		field xttexch
+		 caption <br><FONT SIZE=2 COLOR=blue>Exchange Rate in(Base)*</font>
+		 end field
+		 
+		 field xpidate
+			default "2999-01-01"
+		  end field
+		  
+		  field note
+		  display const
+		  column 2
+			caption <br><FONT SIZE=2 COLOR=dark>** Other Exchange Rate=[Other invoice(amt)*Buyer Currency]/Other Amount(Other Currency)</font>
+		  end field
+	  
+		  
+		field xpaymentterm
+			display text
+			pick list xacc
+		end field
+			
+			field xlcno
+				event after
+					set globals(xlcno)=xlcno
+					set globals(xpornum)=xpornum
+					//class careports(getReport{poprint;2;in,st;zid,pornum;xpornum;View/Print PO})
+					 class careports(getReport{lcinfo;2;in,st;zid,lcno;xlcno;View/Print LC })
+					set amtlc=#sql("select sum(xprime) from lccost where xlcno='"+xlcno+"' and xstatus='Open'")
+					set amt=#sql("select sum(xprime) from lcitemcost where xpornum='"+xpornum+"' and xstatusjv='Open'")
+					if opordheader.xstatuspi("xordernum='"+xordernum+"'") .ne. "Open"
+					//	set #field(update.display) = "hidden"
+					end if
+				if xstatus .ne. "Open"
+					set #field(Confirm.display) = "hidden"
+					set #field(Update.attrib) = "disabled"
+					set #field(Delete.attrib) = "disabled"
+					set #field(Detail.display) = "hidden"
+				end if				
+				end event
+				pick list xlcno
+			end field
+		  
+		  field xopenbank
+			captoin Open Bank Code
+			//pick 
+		  end field
+		  
+		    field xcus
+			captoin Supplier ID
+			pick list casup
+		  end field
+		  
+		field xcusdesc
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xcusdesc = cacus.xorg("xcus = '"+xcus+"'")+"<br>"+cacus.xmadd("xcus = '"+xcus+"'")
+          end event
+        end field
+
+		  field xswiftcode
+		  	attrib local
+		  	dispaly const
+		  	caption Swift Code
+		  	event after
+		  		set xopdesc=cabank.xswiftcode("xbank='"+xopenbank+"'")
+		  	end event
+		  end field
+
+
+		  field xopdesc
+		  	attrib local
+		  	dispaly const
+		  	caption Bank Name
+		  	event after
+		  		set xopdesc=cabank.xname("xbank='"+xopenbank+"'")+"<br>"+cabank.xbranch("xbank='"+xopenbank+"'")+"<br>"+cabank.xmadd("xbank='"+xopenbank+"'")+"<br>"+cabank.xswiftcode("xbank='"+xopenbank+"'")
+		  	end event
+		  end field
+
+		  field xadvdesc
+		  	attrib local
+		  	dispaly const
+		  	caption Bank Name
+		  	event after
+		  		set xadvdesc=cabank.xname("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xbranch("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xmadd("xbank='"+xadvisingbank+"'")+"<br>"+cabank.xswiftcode("xbank='"+xadvisingbank+"'")
+		  	end event
+		  end field
+
+		field add
+			event before
+				
+				if xlcno .eq. ""
+					error "Please Write LC No."
+				else if xopenbank .eq. ""
+					error "Please select Open Bank!"
+				else if xadvisingbank .eq. ""
+					error "Please select Advising Bank!"				
+				else if xcus .eq. ""
+					error "Please select Supplier!"
+				else if cabank.xbank("xbank='"+xopenbank+"'") .ne. #trim(xopenbank)
+					error "Cannot Proceed -- Applicant Bank Not Exists in  Bank Master!"
+				else if cabank.xbank("xbank='"+xadvisingbank+"'") .ne. #trim(xadvisingbank)
+					error "Cannot Proceed -- Advising Bank Not Exists in  Bank Master!"
+				
+				else
+				set xtype="Import"
+				set xstatusjv="Open"
+				set xstatus="Open"
+				set xstatuspor="Open"
+				//set xcus=poordheader.xcus("xpornum='"+xpornum+"'")
+				//set xcur=poordheader.xcur("xpornum='"+xpornum+"'")
+				//set xexch=poordheader.xexch("xpornum='"+xpornum+"'")
+				set xbase=xprime*xexch
+				set xtotprimeamt=xprime
+        	   // set xpornum = #trn("PO Number","PO--",10)
+			   end if
+			end event
+          event after
+			//set temp =#sql("update poordheader set xlcno='"+xlcno+"' Where xpornum='"+xpornum+"'")
+		  	//set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xpornum,xlcno,0,0,"poordttinfo")
+			//set temp=#spsql(zabsp_Update_GRNRate,#id,#user,xpornum,"poordheader")
+			//set temp = #spsql(zabsp_PO_validateAfterLCInfo,#id,#user,#position,xpornum,xexch)
+            action show
+          end event
+		end field
+		
+        field update
+		  event before
+			set lcno=poordheader.xlcno("xpornum='"+xpornum+"'")
+			set pornum=lcinfo.xpornum("xlcno='"+xlcno+"'")
+				
+				if xlcno .eq. ""
+					error "Please Select LC No."
+				else if lcinfo.xstatus("xlcno='"+xlcno+"'") .ne. "Open"
+					error "LC Already Confirmed!"
+				else if xcus .eq. ""
+					error "Please select Supplier!"
+				//else if xpornum .eq. ""
+				//	error "Cannot Proceed -- PO is Blank!"
+				//else if poordheader.xpornum ("xpornum='"+xpornum+"'") .ne. xpornum
+				//	error "PO Doesn't Exists!"
+				//else if lcno .ne. xlcno .and. lcno .ne. ""
+				//	error "PO is added in LC No : "+lcno
+				else if cabank.xbank("xbank='"+xopenbank+"'") .ne. #trim(xopenbank)
+					error "Cannot Proceed -- Applicant Bank Not Exists in  Bank Master!"
+				else if cabank.xbank("xbank='"+xadvisingbank+"'") .ne. #trim(xadvisingbank)
+					error "Cannot Proceed -- Advising Bank Not Exists in  Bank Master!"	
+				
+				else if pornum .ne. xpornum
+					set temp =#sql("update poordheader set xlcno='' Where xpornum='"+pornum+"'")
+					set xcus=poordheader.xcus("xpornum='"+xpornum+"'")
+					set xcur=poordheader.xcur("xpornum='"+xpornum+"'")
+					set xexch=poordheader.xexch("xpornum='"+xpornum+"'")
+					set xbase = xprime*xexch 
+				end if
+		  end event
+          event after
+			//set temp =#sql("update poordheader set xlcno='"+xlcno+"' Where xpornum='"+xpornum+"'")
+			//set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xpornum,xlcno,0,0,"poordttinfo")
+            // set temp = #spsql(zabsp_PO_validateAfterLCInfo,#id,#user,xpornum,xexch)
+			//set temp = #spsql(zabsp_Update_LC_Currency,#id,#user,xlcno,xpornum,0,"GRN Currency")
+            action show
+          end event
+        end field
+		
+		
+        field Delete
+		  event before
+			set pornumlc=poordheader.xpornum("xlcno='"+xlcno+"'")
+			set lcno=xlcno
+			set pornum=xpornum
+			set exch=xexch
+			if lcinfo.xstatus("xlcno='"+lcno+"'") .ne. "Open"
+				error "LC Already Confirmed!"
+			else if pornumlc .ne. ""
+				error "PO's already Link with This LC!"
+			end if
+		  end event
+          event after
+		    //set temp =#sql("update poordheader set xlcno='' Where xpornum='"+pornum+"'")
+            //set temp = #spsql(zabsp_PO_validateAfterLCInfo,#id,#user,pornum,exch)
+			//set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,pornum,lcno,0,0,"poordttinfo")
+            action show
+          end event
+        end field
+		
+		field Confirm
+		
+		 event before
+		 double pono=#sql("select count(xpornum) from poordheader Where xlcno='"+xlcno+"'")
+		 if pono < 1
+			error "Please LC Link With PO"
+		 end if	 
+		
+		 end event
+          event after
+            set temp = #sql("Update lcinfo set xstatus='Applied' where xlcno='"+xlcno+"'")
+			action show
+          end event
+        end field
+
+		field Amendment
+            embed onclick="clicked(this)"
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+          field Confirm
+            embed onclick="clicked(this)"
+          end field
+		
+		 field LC
+          embed onclick="clicked(this)"
+        end field
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+	        if (but=="Amendment"){
+            form.screen.value = "lcimpamend"
+            form.searchbutton.value = "Top"
+          }
+        if (but=="Detail"){
+            form.screen.value = "poorddetaillc"
+            form.searchbutton.value = "Top"
+          }
+		 if (but=="LC Opening Cost"){
+            form.screen.value = "lccost"
+            form.searchbutton.value = "Top"
+          }
+		   if (but=="Confirm"){
+           if(confirm('Are You Confirm ?')){
+			form.searchbutton.value = "Confirm"
+			}else{
+			form.searchbutton.value = "Show"
+			}
+          }		  
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

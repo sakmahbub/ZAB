@@ -1,0 +1,290 @@
+screen opadvadjheaderapp
+	
+     sidebars list reqlist,list one//list reqlist,
+     sections form one, jscript myscript
+	 
+    list reqlist
+      caption "Advance Adjustment List"
+         table poreqheader
+        order xporeqnum desc
+	   select "left(xporeqnum,4)='ADJ-' and xsuperiorsp='"+#user+"' and xstatusreq<>''"
+		rows 10
+        objects  xporeqnum attrib(link "login?screen=opadvadjheaderapp&command=Show&xporeqnum=?"),xordernum,xdate,xregi,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Job No","Date","Car No","Division Code","Name"
+	end list
+	  
+	 list one
+        caption "Advance Against JOB Detail List."
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=opadvadjdetailapp&command=Show&xporeqnum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xlineamt,xadjustment
+
+		headers "Line No","Item","Description","Advance Amount" ,"Adjustment Amount"
+		totals "","Total","",sum,sum
+     end list
+
+
+     form one
+		caption "Adjustment Against Advance Approval Header"
+        table poreqheader
+        order xporeqnum desc
+		//select "xstatusreq='Approved' or xstatusreq='PO Created'"
+		//select "xstatusreq='Approved' and xtype='Cash'"
+        select "left(xporeqnum,4)='ADJ-' and xstatusreq<>''"//" and zauserid='"+#user+"'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Show,Clear,Update,*Next,Details,Approved,"<p>",~
+                xporeqnum,xdate,xsup display(hide),xorg display(hide),xqotnum display(hide),xfwh display(const),xfbrname,xtwh display(hide),~
+				xtype display(hide),xstatusreq display(const),xordernum display(const),xstaff display(hide),xadjemp display(const),,~
+				xep  display(hide),ep  display(const),xcheaker display(hide),cheaker display(const),xmanager display(hide),manamer display(const),xdphead display(hide),dphead display(const),~
+				xgmdf display(hide),gmdf display(const),xed display(hide),ed display(const),~
+				xstatus display(hide),xstatusap display(hide),xstatusgl display(hide),xcus display(hide),xnote,xsuperiorsp display(hide)
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+		  
+		  field xstaff
+		  pick list xstaffcnf
+		  caption Paid to
+		  end field
+		  
+		   field xadvnum
+		  pick list advancenum
+		  end field
+		  
+		   field xadjemp
+            attrib local
+            display const
+            caption Adjustment For
+            event after
+              set xadjemp= pdmst.xname("xstaff= '"+xstaff+"'")
+            end event
+          end field
+          
+		  	field xtype
+			caption Service Type
+			pick "Cash,Agreement"
+			//default "Other"
+			end field
+			
+		   field ep
+		   attrib local
+          caption Prepare By
+		  event after
+		  set ep=pdmst.xname("xstaff='"+xep+"'")
+		  end event
+          end field
+		  
+		   field cheaker
+		    attrib local
+          caption Check By
+		  event after
+		  set cheaker=pdmst.xname("xstaff='"+xcheaker+"'")
+		  end event
+          end field
+		  
+		   field manamer
+		    attrib local
+          caption Dy. Manager
+		  event after
+		  set manamer=pdmst.xname("xstaff='"+xmanager+"'")
+		  end event
+          end field
+		  
+		   field gmdf
+		    attrib local
+          caption General Manager/Director of Finance
+		  event after
+		  set gmdf=pdmst.xname("xstaff='"+xgmdf+"'")
+		  end event
+          end field
+		  
+		  field dphead
+		  attrib local
+          caption Head Of the Department
+		  event after
+		  set dphead=pdmst.xname("xstaff='"+xdphead+"'")
+		  end event
+          end field
+		  
+		   field ed
+		    attrib local
+          caption Executive Director
+		  event after
+		  set ed=pdmst.xname("xstaff='"+xed+"'")
+		  end event
+          end field
+		  
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xregi
+           caption Car No. / Other
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+		caption Adjustment Number
+		pick list adjustentnum
+        	width 15
+          event after
+		  //class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+		   class careports(getjspReport{cnfadjletter,1,xporeqnum,View Adjustment Letter})
+		     class careports(getjspReport{cnfjobhistory,1,xordernum,View Job History})
+            set globals(xporeqnum)=xporeqnum
+			 set globals(xordernum)=xordernum
+			 set globals(xstatusreq)=xstatusreq
+			  set globals(xsuperiorsp)=xsuperiorsp
+			  set globals(xadvnum)=xadvnum
+			  if xsuperiorsp .ne. #user .and. #user .ne. "01040008"
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Approved.display)="hidden"
+       	      end if
+          end event
+        end field
+		
+		field xfwh
+		default #wh
+		event before
+		 //
+		end event
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	   	field Approved
+            event before
+			if xsuperiorsp .ne. #user
+			error "Already Approved"
+			end if
+            end event
+            event after
+			set temp = #spsql(zabsp_apvprcs,#id,#user,xporeqnum,0,xstatusreq,"Adjustment Approval")
+			set temp = #spsql(zabsp_sendmail,#id,#user,xporeqnum,"CnF Adjustment","")
+	         action show
+            end event
+          end field
+		
+		  field add
+			event before
+				set xsuperiorsp=pdmst.xsuperioradj("xposition='"+#user+"'")
+				set trn = "ADJ-"
+				set xstatusreq=""
+				set xtype="Cash"
+				set xstatusrec="Open"
+				set xstatus="Open"
+				set xstatusap="Open"
+				set xstatusgl="Open"
+				set xcus=poreqheader.xcus("xadvnum='"+xadvnum+"'")
+				set xtwh=xfwh
+				set xep=pdmst.xstaff("xposition='"+#user+"'")
+				if xfwh .eq. ""
+				error "Please select Division for Adjustment"
+				else if xadvnum .eq. "" .or. #sub(xadvnum,0,2) .ne. "AD" 
+				error "Please Select Advance No."
+				else
+				set xporeqnum = #trn("Adjustment Number",trn,10)
+				end if
+			end event
+        end field
+		
+		field update
+			event before
+			if xstatusreq .eq. ""
+			error "Please Show first"
+			end if
+			//set xsuperiorsp=pdmst.xsuperioradj("xposition='"+#user+"'")
+			//set xtwh=xfwh
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opadvadjdetailapp"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

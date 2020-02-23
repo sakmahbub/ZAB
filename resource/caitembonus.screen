@@ -1,0 +1,116 @@
+screen caitembonus
+
+     caption "Bonus Master"
+     sidebar list one
+     sections  form one, jscript myscript
+
+     list one
+        caption "Bonus List For <br>"+xitem+" "+caitem.xdesc("xitem='"+xitem+"'")
+        table caitembonus
+        order xitem,xwh
+        fixed xitem
+        rows 20
+        objects  xwh,xqty attrib(link "login?screen=caitembonus&command=Show&xitem=?&xqty=?"), ~
+                 xqtybonus
+
+     end list
+
+
+     form one
+        caption "Bonus Master For <br>"+xitem+" "+caitem.xdesc("xitem='"+xitem+"'")
+      	table caitembonus
+        primarykey xitem,xwh
+        order xitem,xwh
+        fixed xitem
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Update, Delete,Show,*next,Return, Top,Previous,Next, Bottom,"<p>" ,~
+                xwh,xdesc,xpaymentterm,xbnprintstatus,xdateeff,xdateexp,xqty,xqtybonus,~
+	 	xqty1,xqtybonus1,xqty2,xqtybonus2,xqty3,xqtybonus3,xqty4,xqtybonus4
+
+        field xunitpur
+          attrib local
+          caption Unit Of Measurement
+          display const
+          event after
+            set xunitpur = caitem.xunitpur("xitem='"+xitem+"'")
+          end event
+        end field
+
+	  field xdesc
+	    atrrib local
+	    caption Branch Name
+	    display const
+	    event after
+		set xdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+	    end event
+	  end field
+	  
+        field xpaymentterm
+          caption Not Allowed Customer
+		  pick "Cash,Credit,Pick"
+		 default "Pick"
+        end field
+	  
+        field xqty
+          caption Quantity Applicable L1
+        end field
+
+        field xqty1
+          caption Quantity Applicable L2
+        end field
+
+        field xqty2
+          caption Quantity Applicable L3
+        end field
+
+        field xqty3
+          caption Quantity Applicable L4
+        end field
+
+        field xqty4
+          caption Quantity Applicable L5
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+		field Add
+			event before
+
+			end event
+			event after
+
+			end event
+		end field
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	    if (detail=="Return"){
+            form.screen.value = "caitem"
+            form.searchbutton.value = "Find xitem=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

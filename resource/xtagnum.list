@@ -1,0 +1,12 @@
+
+     list xtagnum
+        table imtag
+        order xtagnum
+        select "(xtagnum like '%"+zvalue+"%' and xstatustag<>'Confirmed')"  
+        searchselect "xstatustag<>'Confirmed'"
+		rows 20
+        objects xtagnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xwh
+     end list
+
+

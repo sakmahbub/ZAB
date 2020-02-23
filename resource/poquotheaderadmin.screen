@@ -1,0 +1,186 @@
+screen poquotheaderadmin
+	
+     sidebar list detail//,list po,list req,
+     sections form one, jscript myscript
+
+      list req
+        caption "Requisition List"
+        table poreqheader
+        order xporeqnum
+		select "xstatusreq='Recommended For Quotation' and xtype='CS'"
+        rows 20
+		objects  xporeqnum attrib(link "abc" embed onclick="return pickItem(this)"),~
+            xdate attrib(name xdate#)
+
+
+      //  headers "Item","Name","Requisition Qty","Row"//"Description",
+     end list
+        objects  xporeqnum attrib(link "login?screen=poquotheaderadmin&command=Show&xporeqnum=?"), ~
+                xdate
+        //headers "Line No","Item","Description","Unit","Qty Req"
+     end list
+	 
+     list detail
+        caption "Quotation Detail List for : "+xqotnum
+        table poquotdetail
+        order xporeqnum,xqotnum,xrow
+        fixed xporeqnum,xqotnum
+        rows 300
+        objects  xrow,~// attrib(link "login?screen=poquotdetail&command=Show&xqotnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=poquotdetail.zid and xitem=poquotdetail.xitem)),~
+				 partno equals((select xtheircode from caitem where zid=poquotdetail.zid and xitem=poquotdetail.xitem)),~
+				 xspec,xunitpur,~
+				 xqtyreq,xrate,xlineamt
+        headers "Line No","Item","Description","Part No","Specification","Unit","Qty Req","Rate","Amount"
+		total "","","Total","","","","","",sum
+     end list
+ 
+
+
+     form one
+		caption "Quotation Update Header for : "+xporeqnum
+        table poquotheader
+		primarykey xqotnum desc
+        order xqotnum desc
+		fixed xporeqnum
+        return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Add, Update, Delete, Show,Clear,*Next,Details Quotation,Top, Previous, Next, Bottom,Return,"<p>" ,~ //Upload,
+                xqotnum,xdate,xcus,xorg,xstatusep display(hide),xstatusquot display(const),~
+				xwh display(hide),xpdfimage display(hide),xcur,xvatrate,xdiscf,xnote,ximage display(hide),xrow display(hide),
+
+           field xcus
+          	caption Supplier ID
+          	pick list casup
+          end field
+
+				
+           field xorg
+          	attrib local
+          	display const
+          	caption Supplier Name
+          	event after
+          		set xorg = cacus.xorg("xcus='"+xcus+"'")
+          	end event
+          end field
+          
+          field xnote
+            height 2
+			column 2
+			width 70
+          end field
+		  
+          field xquotrec
+            default 0
+          end field
+		  
+		   field xporeqnum
+		   caption PR No
+		   attrib readonly
+           pick //list poreqapprov
+          end field
+		  
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xqotnum
+		display combo
+		pick "QT-01,QT-02,QT-03,QT-04,QT-05"
+          event after
+            set globals(xqotnum)=xqotnum
+            set globals(xporeqnum)=xporeqnum
+		 //  class careports(getaspReport{poreqprint,1,xporeqnum,Print Requisition})
+		 // class careports(getjspReport{poquotana,1,xporeqnum,Print Quotation})
+		  class careports(getReport{poquotana;2;in,st;zid,reqnum;xporeqnum;Print Quotation})
+          end event
+        end field
+
+	    field Upload
+          event after
+		  print #user
+            set temp=#spsql(zsp_picinsert,#id,#user,"poquotheader","ximage",xqotnum)
+          end event
+        end field		
+		
+        field add
+          event before
+		 set xrow=#sql(int,"select ISNULL(MAX(xrow),0)+1 from poquotheader where xporeqnum='"+xporeqnum+"'")
+		 set cus=#sql("select xcus from poquotheader where xporeqnum='"+xporeqnum+"' and xcus='"+xcus+"'")
+		 set recquot=#sql("select xquotrec from poquotheader where xporeqnum='"+xporeqnum+"'")
+		  if xqotnum .eq. ""
+			error "Please Select Quotation No!"
+		  else if xcus .eq. ""
+			error "Please Select Supplier!"
+		  else if xcus .eq. cus
+			error "Already add quotation of this supplier!"
+		  else
+					set xstatusep="Open"
+					set xstatusquot="Open"
+					//set xwh="EP"
+			//   set xqotnum = #trn("Quotation Number","QT--",10)
+		    // set xqotnum = #sub(poreqnum,0,4)+year+#sub(poreqnum,4,6)
+          	end if
+          end event
+        end field
+
+		field update
+			event before
+			print xpdfimage
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details Quotation
+          embed onclick="clicked(this)"
+        end field
+		
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+    end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "poreqheaderserviceadmin"
+            form.searchbutton.value = "Find xporeqnum=?"
+          }
+          if (button=="Details Quotation"){
+            form.screen.value = "poquotdetailadmin"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		 function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+			//document.one.xdate.value=date.text
+          }else{
+            document.one.xporeqnum.value=link.innerText   
+			//document.one.xdate.value=date.innerText
+          }
+          return false
+        }
+		
+      </script>
+     end jscript
+
+end screen

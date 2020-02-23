@@ -1,0 +1,120 @@
+screen popiheader
+
+     sections form one, jscript myscript
+
+     form one
+        caption "Requisition/Indent Entry Header"
+        table popiheader
+        order xporeqnum desc
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Add, Update, Delete,*next,Details, Top, Previous, Next, Bottom,*Next,"<p>" ,~
+                xporeqnum attrib(search) display(trn PO Requisition),~
+                xdate,~
+                xstatusord display(text),xref,xnote
+
+        field xdum
+          attrib local
+          caption Name
+          display constant
+           event after
+              set xdum = cacus.xorg("xcus = '"+xcus+"'")
+           end event
+        end field
+
+          field xtype
+            caption Type
+            display combo
+            pick "Cash,LC"
+          end field
+
+
+          field xnote
+            column 4
+            width 60
+          end field
+
+          field xstatusord
+            caption Requisition Status
+          end field
+
+        field xporeqnum
+          event before
+          end event
+          event after
+            set globals(xporeqnum)=xporeqnum
+            set globals(xexch)=xexch
+          end event
+        end field
+
+        field Create
+          event before
+            class pojamuna(updateReHeaderBefore{xporeqnum,xstatusord})
+          end event
+          event after
+            class pojamuna(CreatePo{xporeqnum,xdiv,xsec,xproj,xcur,xexch,xprimetotamt,xbasetotamt,xtype})
+          end event
+        end field
+
+        field add
+          event before
+           set xexch=#exch(xdate,xcur)
+          end event
+        end field
+
+        field delete
+          event before
+          end event
+        end field
+
+        field update
+          event before
+           // set xexch=#exch(xdate,xcur)
+          //  class pojamuna(updateReHeaderBefore{xporeqnum,xstatusord})
+          end event
+          event after
+         //   class pojamuna(updateReHeaderAfter{xporeqnum,xcur,xexch})
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "popidetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+       function pickCur(link, exch){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+            document.one.xcur.value=link.innerText
+            document.one.xexch.value=exch.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

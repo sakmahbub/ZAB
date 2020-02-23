@@ -1,0 +1,35 @@
+screen cadiscount
+
+     sidebar list one
+     sections form one
+
+     list one
+        caption "Discount Table"
+        table cadiscount
+        order xcode
+        rows 20
+        objects  xcode attrib(link "login?screen=cadiscount&command=Show&xcode=?"),~
+                 xgitem,xdisc,xfamt,xtamt
+
+     end list
+
+     form one
+        caption "Discount Table"
+        table cadiscount
+         primarykey xcode
+        order xcode
+        pstyle 3
+        return "login"
+        layout 3
+        objects Show,Clear, Add,Update,Delete,*next,Return,Top,Previous,Next, Bottom,"<p>",~
+                xcode,xgitem,xamount display(hide),xdisc,xfamt,xtamt
+
+        embed onsubmit="return submitit(this)"
+
+end form
+
+end screen
+
+
+
+

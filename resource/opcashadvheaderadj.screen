@@ -1,0 +1,263 @@
+screen opcashadvheaderadj
+	
+     sidebars list reqlist,list detail,list one//
+     sections form one, jscript myscript
+	 
+    list reqlist
+      caption "JOB Adjustment List"
+         table poreqheader
+        order xporeqnum desc
+	   select "left(xporeqnum,4)='ADJ-' and  xstatusreq='Approved' and xstatusap='Open'"
+		rows 10
+        objects  xporeqnum attrib(link "login?screen=opcashadvheaderadj&command=Show&xporeqnum=?"), xdate,xfwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xfwh))
+               
+		  headers "Requisition No","Date","Division Code","Name"
+	end list
+	  
+	 list one
+        caption "Adjustment Against JOB Detail List." 
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=opcashadvdetailapp&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xlineamt,xadjustment
+
+		headers "Line No","Item","Description","Advance Amount","Adjustment Amount"
+		totals "","Total","",sum,sum
+     end list
+	
+	 list detail
+    caption "Voucher Detail List"
+    table acdetail
+    order xvoucher,xrow
+    fixed xvoucher
+	//select "left(xvoucher,2)='JV'"
+    rows 50
+    objects  xrow,~// attrib(link "login?screen=acdetailgeneral&command=Show&xvoucher=?&xrow=?"), ~
+             xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)),~
+			 xsub,subdesc equals((select xorg from acsubview where zid=acdetail.zid and xsub=acdetail.xsub and xacc=acdetail.xacc)),xdebit,xcredit
+
+    totals "","","","","Total",sum,sum
+
+    headers "Line No","Acc Code","Description","Sub Code","Description","Debit","Credit"//,"Amt"
+  end list
+
+     form one
+		caption "Advance Adjustment Against JOB "
+        table poreqheader
+        order xporeqnum desc
+		//select "xstatusreq='Approved' or xstatusreq='PO Created'"
+		//select "xstatusreq='Approved' and xtype='Cash'"
+        select "left(xporeqnum,4)='ADJ-' and  xstatusreq='Approved'"//" and zauserid='"+#user+"'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Show,Clear,Update,Transfer to GL,"<p>",~ //Add,Delete,*Next,Top, Previous, Next, Bottom,Details,Approved,
+                xporeqnum,xdategl,xbank,xbankname,xsup display(hide),xorg display(hide),xqotnum display(hide),xfwh,xfbrname,~
+				xtype display(hide),xstatusreq display(hide),xordernum display(const),xdate display(const),xsuperiorsp display(hide),~
+				xstatus display(hide),xstatusap display(hide),xstaff display(const),sname  display(const),~
+				xvoucher display(const),xadvnum display(const,xvoucheradj display(hide),xnote,xstatusgl display(hide)
+
+		 	field xporeqnum
+			caption Adjustment No.
+			pick list adjustentnum
+			end field
+			
+			
+		 	field xdate
+			caption Adjustment Date
+			end field
+			
+		  field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+          
+		  	field xtype
+			caption Service Type
+			pick "Cash,Agreement"
+			//default "Other"
+			end field
+			
+		field xbank
+			caption Adjustment Account
+			pick list xacc
+			default "6101039"
+		end field	
+			
+		field xbankname
+          attrib local
+          display const
+          caption Account Name
+          event after
+            set xbankname=acmst.xdesc("xacc='"+xbank+"'")
+          end event
+        end field
+			
+		field sname
+		   attrib local
+          caption Name
+		  event after
+		  set sname=pdmst.xname("xstaff='"+xstaff+"'")
+		  end event
+          end field
+		  
+		  
+		  
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xdum
+            display const
+			attrib local
+			caption
+          end field
+		  
+		   field xregi
+           caption Car No. / Other
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+        	width 15
+          event after
+		  //class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+		   class careports(getjspReport{cnfadjletter,1,xporeqnum,View Adjustment Letter})
+		  class careports(getjspReport{acvoucher,1,xvoucher,Print voucher})
+            set globals(xporeqnum)=xporeqnum
+			 set globals(xordernum)=xordernum
+			 set globals(xsuperiorsp)=xsuperiorsp
+			 set globals(xstatusreq)=xstatusreq
+			  set globals(xstatusrgl)=xstatusreq
+			  if xstatusap .ne. "Open"
+		         	//set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+					set #field(Transfer.display)="hidden"
+       	      end if
+          end event
+        end field
+		
+		field xfwh
+		default #wh
+		event before
+		 //
+		end event
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+		
+		   field Transfer
+            event before
+			double advamt=#sql("select sum(xlineamt) from poreqdetail where xporeqnum='"+xporeqnum+"'")
+			double adjamt=#sql("select sum(xadjustment) from poreqdetail where xporeqnum='"+xporeqnum+"'")
+			if adjamt>advamt
+			set rel="PV"
+			else		
+			set rel=xtrnp.xrel("xtypetrn='Adjustment Number' and xtrn='ADJ-' and zactive=1")
+			end if
+			set trn=#trim(rel)+#trim(xfwh)
+			set trn2=#sql("select xtrn from xtrn where xtrn='"+trn+"'")
+			if trn2 .ne. trn
+				error "Please select division for payment"
+			else if xbank .eq. ""
+				error "Please Select Adjustment Account"
+			else if xdategl .eq. ""
+				error "Please Select GL Date"
+			end if
+            end event
+            event after
+			set temp = #spsql(zabsp_PR2GL_transfer,#id,#user,xporeqnum,trn,xfwh,xdategl,8,"opcashadvheaderadj")
+			action show
+		   end event
+          end field
+		field update
+			event before
+			if xstatusreq .eq. ""
+			error "Please Show first"
+			end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opcashadvdetailapp"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

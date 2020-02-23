@@ -1,0 +1,13 @@
+list cacusac
+  table cacus
+  order xcus
+  select "((xcus like '%"+zvalue+"%' or xorg like '%"+zvalue+"%') and xstatuscus='Open')"
+  rows 10
+  searchselect "xstatuscus='Open'"
+  objects xcus attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+          xorg
+        
+end list
+
+
+

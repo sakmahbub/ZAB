@@ -1,0 +1,9 @@
+//Master Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Customer List                    |#classPath+"/login?screen=*crystal cacus(xcus=Customer=000,xcus=Customer=zzz)"
+Supplier List                    |#classPath+"/login?screen=*crystal casuplist(xsup=Supplier=000,xsup=Supplier=zzz)"
+Item Master List                 |#classPath+"/login?screen=*crystal caitem(xitem=From Item=0,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group)"
+//-------------------------------------------------------------------
+

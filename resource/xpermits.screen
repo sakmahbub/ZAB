@@ -1,0 +1,143 @@
+screen xpermits
+
+     sidebar list one
+     sections form one
+
+     list one
+        caption "Permission List"
+        table xpermits
+        order  xmenu,xoption
+        rows 99
+        objects  xmenu attrib(link "login?screen=xpermits&command=Show&xmenu=?&xoption=?"), ~
+		 xoption,xchild,xalist,zactive,xlocation
+ 
+		 
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+     form one
+        caption "User Permits Entry"
+        table xpermits
+        primary key xmenu,xoption
+        order  xmenu,xoption
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Add,Update,Delete,*next, Top,Previous,Next,Bottom,Clear,~
+                xmenu, xoption, xchild,xlocation, xalist, zactive,xnote
+				
+			field xmenu
+				caption Main
+				display combo
+				pick "select xcode from xcodes where xtype='Menu'"
+			end field
+			
+			field xchild
+				display combo
+				pick "select xcode from xcodes where xtype='Menu'"
+			end field
+			
+			field xlocation
+				caption Module Name
+				display combo
+				pick "select xcode from xcodes where xtype='Module'"
+			end field
+			
+			field xoption
+				width 50
+				display combo
+				//pick "select xoption from xpermits"
+				pick "select xcode from xcodes where xtype='Option'"
+			end field	
+
+			field xnote
+				width 50
+			end field	
+
+        field Access
+          embed onclick="clicked(this)"
+        end field
+			
+	  field Change
+	    embed onclick="clicked(this)"
+	  end field
+
+        embed onsubmit="submitit(this)"
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	        if (detail=="Salary Detail"){
+            form.screen.value = "pdsalarydetail"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Access History"){
+            form.screen.value = "pdtransdt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Transfer History"){
+            form.screen.value = "pdtransdt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Qualification"){
+            form.screen.value = "pdeducation"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Experience"){
+            form.screen.value = "pdexperience"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Posting"){
+            form.screen.value = "pdposting"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+		    if (detail=="Superiors"){
+            form.screen.value = "pdmsthrdsuperior"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+		     if (detail=="Detail"){
+            form.screen.value = "pdmsthrddetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Change Designation"){
+            form.screen.value = "pdgradedt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        function pickAccount(link,name,rank){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xstaff.value=link.innerText
+            document.one.xname.value=name.innerText
+            document.one.xrank.value=rank.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

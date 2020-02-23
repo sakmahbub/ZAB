@@ -1,0 +1,147 @@
+screen carsm
+  caption "Regional Sales Manager"
+  sidebar list one
+  sections form one, jscript myscript
+
+
+     list one
+      caption "RSM List"
+        table carsm
+        order xrsm desc
+    	select "left(xrsm,4)='RSM-'"
+	//select "left(xfm,4)='FM--' and xwh='"+#wh+"'"
+	rows 40
+        objects  xrsm attrib(link "login?screen=carsm&command=Show&xrsm=?"), ~
+                 xname,xregion,xarea,xwh,zactive
+
+
+		
+
+        header "RSM","Name","Region","Zone","Branch","Status"
+        //totals "","Totals","","","","","","",sum,sum,sum,sum
+     end list
+
+
+  form one
+    caption "Regional Sales Manager"
+    table carsm
+    primarykey xrsm
+    order xrsm
+    select "left(xrsm,4)='RSM-'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Add,Update,Show,Clear,Delete,*next,Top,Previous,Next,Bottom,"<p>",~
+            xrsm,xname,xregion,xarea,xsm,xsmname,xwh,xphone,zactive//,xbrname,xterritory,xregion,xarea//xfm,xfmname
+
+    field xregion
+      caption Region
+      display combo
+      pick "select xcode from xcodes where xtype='Region' and zactive=1"
+    end field
+
+    field xsm
+	display const
+      caption Sales Manager
+	  event after
+		set xsm=casm.xsm("xarea='"+xarea+"'")
+	  end event
+    end field
+
+	field xdum
+		attrib local
+		display const
+		caption
+	end field
+
+    field xsmname
+	attrib local
+      caption Sales Manager Name
+	display const
+	event after
+		set xsmname=casm.xname("xsm='"+xsm+"'")
+	end event
+    end field
+
+
+    field xrsm
+      default "RSM-"
+      caption
+      //display trn Sales Representative
+      event after
+        set globals(xsm)=xsm
+        set globals(xrsm)=xrsm
+      end event
+    end field
+
+    field add
+      event before
+         if xregion .eq. ""
+          error "Cannot Proceed -- Please Provide Regoin"
+//        else if xsm .eq. ""
+//          error "Cannot Proceed -- Please Provide SM Name"
+	  else		
+       	set xrsm = #trn("Sales Representative","RSM-",8)
+        end if
+
+      end event
+    end field
+
+    field update
+      event before
+		if xregion .eq. ""
+			error "Cannot Proceed -- Please Provide Region Name"
+		else if xarea .eq. ""
+			error "Cannot Proceed -- Please Select Zone"
+		else if xwh .eq. ""
+			error "Cannot Proceed -- Please Provide Branch Name"
+		end if
+      end event
+      event after
+	  set temp = #spsql(sp_rsmupdate,#id,#user,xrsm,xregion,xwh,zactive,xname)
+		if zactive .eq. "1"
+			//set temp = #spsql(sp_rsmupdate,#id,#user,xrsm,xregion,xwh,zactive,xname)
+				set temp = #spsql(sp_rsmbyfmbymioUpdate,#id,#user,xrsm,xregion,xwh)
+		end if
+			//set temp = #spsql(sp_rsmbyfmbymioUpdate,#id,#user,xrsm,xregion,xwh)
+			//set temp = #spsql(sp_rsmbyfmupdate,#id,#user,xrsm,xregion,xwh)
+            action Show
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field SM
+      embed onclick="clicked(this)"
+    end field
+
+    field FM
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var ret
+    var fmdt
+    function clicked(b){
+      ret=b.value
+      fmdt=b.value
+      }
+      function submitit(form){
+        if (ret=="SM"){
+          form.screen.value = "casm"
+          form.searchbutton.value = "Find xsm=?"
+          //return false
+        }
+        if (fmdt=="FM"){
+          form.screen.value = "cafm"
+          form.searchbutton.value = "Find xsm=?"
+          form.searchbutton.value = "Find xrsm=?"
+        }
+      }
+      </script>
+  end jscript
+
+end screen

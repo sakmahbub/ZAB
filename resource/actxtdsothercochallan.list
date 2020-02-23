@@ -1,0 +1,13 @@
+     list actxtdsothercochallan
+        table actxchallan
+        order xcalltrn desc
+        select "(xcalltrn like '%"+zvalue+"%') and xtype='Other Party'"
+		searchselect "xtype='Other Party'"
+        rows 20
+
+        objects xcalltrn attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+		xchallan,xdate,xdistrict1,xbranch
+
+     end list
+
+

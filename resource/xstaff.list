@@ -1,0 +1,16 @@
+     list xstaff
+        table pdmst
+        order xstaff
+        select "(xstaff like '%"+zvalue+"%' or xname like '%"+zvalue+"%')"
+        rows 20
+        objects xstaff attrib(link "abc" embed onclick="return updateParent(this:'')"),xposition, ~
+                xname,xdesignation,xdeptname
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table pdsupdelegation
+  caption "Superior Delegation Setup"
+  columns  ztime,zutime,zauserid,zuuserid,zid,xtypetrn,~
+  xposition,xsuperior2,xrow,xlong,xdateeff,xdateexp
+           
+  primary key zid,xtypetrn,xposition
+  foreign key
+        zid references zbusiness.zid
+
+  end foreign key
+end table

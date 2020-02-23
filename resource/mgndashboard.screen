@@ -1,0 +1,151 @@
+screen mgndashboard
+
+     sections form one
+
+
+     form one
+        caption "Management Dashboard"
+        return "login"
+        layout 2
+        pstyle graph
+        objects Filter,xyear,mowiseturnover,salesvsnp,yearperwiserevcom//,revenuegrowth//prdwisesalesanalysis,opandadminrevcom
+
+		field xyear
+			//event after
+				default acdef.xyear("zid='"+#id+"'")//#sub(#date,0,4)
+			//end event	
+		end field
+		
+		field mowiseturnover
+			column 2
+			graphtype line-labels
+			graphsp zabsp_dashboard_management
+			graphtable mgngraphdata
+			attrib local
+			display const
+			graphpformatvalue {value}
+			graphpvaluesuffix Mln
+			graph2ndformatvalue {value}
+			graph2ndvaluesuffix Mln
+			graph3rdformatvalue {value}
+			graph3rdvaluesuffix Mln
+			//graphseries1type column
+			//graphseries2type column
+			//graphseries3type line
+			graphseries1datalabel enabled: true,format: '{point.y:.2f} '
+			graphseries1datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			graphseries2datalabel enabled: true,format: '{point.y:.2f} '
+			graphseries2datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			graphseries3datalabel enabled: true,format: '{point.y:.2f} '
+			graphseries3datalabelstyle fontSize: '11px',fontFamily:'Arial,Verdana, sans-serif'
+			event after
+				set mowiseturnover = xyear//xfdate+","+xtdate+","+xyear
+			end event
+		end field
+
+		field salesvsnp
+			column 2
+			graphtype line-labels//3d-column
+			graphsp zabsp_dashboard_management
+			graphtable mgngraphdata
+			attrib local
+			display const
+			graphpformatvalue {value}
+			graphpvaluesuffix Mln
+			graph2ndformatvalue {value}
+			graph2ndvaluesuffix Mln
+			graph3rdformatvalue {value}
+			graph3rdvaluesuffix Mln
+			//graphseries3type line
+			//graphseries1type spline
+			//graphseries2type spline
+			//graphseries3type spline
+			graphseries1datalabel enabled: true,format: '{point.y:.2f} '
+			graphseries1datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif',color:'blue'
+			graphseries2datalabel enabled: true,format: '{point.y:.2f} ',color:'red'
+			graphseries2datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			graphseries3datalabel enabled: true,format: '{point.y:.2f} '
+			graphseries3datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+
+			event after
+				set salesvsnp = xyear
+			end event
+		end field
+
+		field yearperwiserevcom
+			column 2
+			graphtype 3d-column
+			graphsp zabsp_dashboard_management
+			graphtable mgngraphdata
+			attrib local
+			display const
+			//graphseries1type spline
+			//graphseries2type spline
+			graphpformatvalue {value}
+			graphpvaluesuffix Mln
+			graph2ndformatvalue {value}
+			graph2ndvaluesuffix Mln
+			graph3rdformatvalue {value}
+			graph3rdvaluesuffix Mln
+			graphseries1datalabel rotation: -90,color: 'blue',align: 'right',y: -30,format: '{point.y:.1f}'
+			graphseries1datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			graphseries1datatooltip valueSuffix:'c'
+			graphseries2datalabel enabled: true,rotation: -90,color: '#000000',align: 'right',y: -30,format: '{point.y:.1f}'
+			graphseries2datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			graphseries2datatooltip valueSuffix:'b'
+			event after
+				set yearperwiserevcom = xyear//xfdate+","+xtdate+","+xyear
+			end event
+		end field
+
+		field revenuegrowth
+			column 2
+			graphtype combo-multi-axes//dual-axis-line-column//3d-column
+			graphsp zabsp_dashboard_management
+			graphtable mgngraphdata
+			attrib local
+			display const
+			graphpformatvalue {value}
+			graphpvaluesuffix Mln
+			graph2ndformatvalue {value}
+			graph2ndvaluesuffix Mln
+			graph3rdformatvalue {value}
+			graph3rdvaluesuffix Mln
+			//graphseries1type column
+			//graphseries2type spline
+			//graphseries3type line
+			//graphseries1datalabel enabled: true,format: '{point.y:.0f} '
+			//graphseries1datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			//graphseries2datalabel enabled: true,format: '{point.y:.0f} '
+			//graphseries2datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			//graphseries3datalabel enabled: true,format: '{point.y:.0f} '
+			//graphseries3datalabelstyle fontSize: '11px',fontFamily: 'Arial,Verdana, sans-serif'
+			event after
+				set revenuegrowth = xyear//xfdate+","+xtdate+","+xyear
+			end event
+		end field
+
+		field opandadminrevcom
+			column 2
+			graphtype combo-multi-axes//dual-axis-line-column
+			graphsp zabsp_dashboard_management
+			graphtable mgngraphdata
+			graphpformatval {value} b
+			graphpformatsuffix {value} b
+			graph2ndformatval {value} b
+			graph2ndformatsuffix {value} b
+			graph3rdformatval {value} b
+			graph3rdformatsuffix {value} b
+			attrib local
+			display const
+			event after
+				set opandadminrevcom = xyear
+			end event
+		end field
+		
+		
+        embed onsubmit="submitit(this)"
+
+     end form
+
+ end screen

@@ -1,0 +1,21 @@
+screen ardef
+
+     sections form one
+
+
+     form one
+        caption "AR Defaults"
+         table ardef
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Update, Delete,*next,Top,Bottom,"<p>" ,~
+          xlength
+
+	field xlength
+		caption Trn Length
+	end field
+
+      end form
+
+end screen

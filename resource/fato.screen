@@ -1,0 +1,196 @@
+screen fato
+
+     sections form one, jscript myscript
+
+     list one
+        table fatrn
+        order xvoucher
+        //fixed xvoucher
+        select "xtype='Transfer'"
+        //navigators alpha,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 5
+        objects  xvoucher attrib(link "login?screen=fato&command=Show&xvoucher=?"),xcode,xdate,xdiv,xsec,xproj
+
+        //headers none
+     end list
+
+     form one
+        caption "Fixed Asset Transfer Transactions"
+        table fatrn
+	  primarykey xvoucher
+        order xvoucher
+        select "xtype='Transfer'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next, Top, Previous, Next, Bottom,"<p>" ,~
+        xvoucher attrib(search) display(trn FA Transfer Trn),xdate,~
+        xcode,xname,~
+        xdeptname display(const),xtdeptname,xsec display(const),~
+        xtsec,~
+        xyear display(hide),xper display(hide),~
+        xlong,xtype display(hide)
+
+        field xdeptname
+          caption From Department
+        end field
+
+        field xsec
+          caption From Section
+        end field
+
+        field xtdeptname
+          caption To Department
+          pick code Department Name
+        end field
+
+        field xtsec
+          caption To Section
+          pick code Section
+        end field
+
+        field xdum
+          caption
+          attrib local
+          display constant
+        end field
+
+        field xlong
+          width 100
+          columns 5
+        end field
+
+        field xname
+          event after
+            set xname=famst.xname("xcode='"+xcode+"'")
+          end event
+          attrib local
+          display constant
+        end field
+
+        field xcode
+          pick list famst
+        end field
+
+        field add
+          event before
+          	if famst.xstatusfa("xcode='"+xcode+"'") .eq. "Disposal"
+            	error "Cannot Proceed -- Asset Is Already Disposed"
+            else
+              set xtype="Transfer"
+            end if
+//              set temp=#sql("select xyear from fadeplog where xyear="+xyear+" and xper="+xper+")
+//              if #result .eq. "true"
+//                error "Cannot Add--Pls Delete Log File Before Addition"
+//              end if
+//              set xaction=xtrn.xaction("xtypetrn='FA Transfer Trn' and xtrn='"+xvoucher_ONE+"'")
+//              int year=#sub(xdate,0,4)
+//              int per=12+#sub(xdate,5,2)-#prop(xlocals.xprops("xtypelocal='Module' and xname='gl'"),"offset")
+//              if per<=12
+//                set xper=per
+//                set xyear=year-1
+//              else
+//                set xper=per-12
+//                set xyear=year
+//              end if
+              end if
+          end event
+          event after
+          	set command = "add"
+	        set temp = #spsql(zabsp_FA_validateAferTrn,#id,#user,xvoucher,xyear,xper,xcode,command)
+	        action show
+          end event
+        end field
+
+        field update
+          event before
+            set temp=#sql("select xyear from fadeplog where xyear="+xyear+" and xper="+xper+")
+            if #result .eq. "true"
+              error "Cannot Update--Pls Delete Log File Before Addition"
+            end if
+          end event
+          event after
+            buffer famst
+            move famst=famst(xcode)
+            set famst.xdiv=xtdiv
+            set famst.xsec=xtsec
+            set famst.xproj=xtproj
+            set famst.xtdiv=xdiv
+            set famst.xtsec=xsec
+            set famst.xtproj=xproj
+            set famst.xdateto=#sub(xdate,0,10)
+            update famst(xcode)
+          end event
+        end field
+
+        field delete1
+          event before
+           set temp=#sql("select xyear from fadeplog where xyear="+xyear+" and xper="+xper+")
+           if #result .eq. "true"
+             error "Cannot Delete--Pls Delete Log File Before Addition"
+           end if
+          end event
+          event after
+            buffer famst
+            move famst=famst(xcode)
+            set famst.xdiv=xdiv
+            set famst.xsec=xsec
+            set famst.xproj=xproj
+            set famst.xtdiv=xdiv
+            set famst.xtsec=xsec
+            set famst.xtproj=xproj
+            set famst.xdateto=#sub(xdate,0,10)
+            update famst(xcode)
+          end event
+        end field
+
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Enter
+          embed onclick="clicked(this)"
+        end field
+
+        field DespatchAdd
+          embed onclick="desadd(this)"
+        end field
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function desadd(b){
+          b.value = "Top"
+          detail="desadd"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "opordcus"
+            form.searchbutton.value = "Find xcus=?"
+            //return false
+          }
+	    if (detail=="desadd"){
+            form.screen.value = "cadel"
+            form.searchbutton.value = "Find xcus=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,165 @@
+screen pdsuperiordetail
+     sidebar list superior
+     sections form one, jscript myscript
+  
+  list superior 
+    caption "Superiors"
+    table pdsuperior
+    order xstaff,xrow
+    fixed xstaff
+    rows 30
+    objects  xrow attrib(link "login?screen=pdsuperiordetail&command=Show&xstaff=?&xrow=?"),~
+	xtypetrn,xshift,xreqtype,xprime,xposition,desc equals((select xname from pdmst where zid=pdsuperior.zid and  xposition=pdsuperior.xposition)),~
+    xsuperior2,desc2 equals((select xname from pdmst where zid=pdsuperior.zid and  xposition=pdsuperior.xsuperior2)),~
+	xsuperior3,desc3 equals((select xname from pdmst where zid=pdsuperior.zid and  xposition=pdsuperior.xsuperior3)),~
+	xsuperior4,desc4 equals((select xname from pdmst where zid=pdsuperior.zid and  xposition=pdsuperior.xsuperior4))
+	header "Row","Process","Shift","Requisition Type","Max Amt","Superior1","Name1","Superior2","Name2","Superior3","Name3","Superior4","Name4"
+  end list
+
+     form one
+        caption "Approval Superior for "+pdmst.xname("xstaff='"+xstaff+"'")+", "+pdmst.xdesignation("xstaff='"+xstaff+"'")+", "+pdmst.xdeptname("xstaff='"+xstaff+"'")
+        table pdsuperior
+        order xstaff,xrow
+		fixed xstaff
+	    //select "xempcategory='"+#wh+"' and xempstatus='Normal'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,Return,"<p>" , *next,~
+			xrow attrib(row 0 1),xtypetrn,xposition,xsuperior,xsuperior2,superior2,xsuperior3,superior3,xsuperior4,superior4,xshift,xreqtype,xprime,xstatus,xlong
+			
+        field xtypetrn
+        	pick code Process Name
+		 end field
+		 
+		field xshift
+        	pick code Shift Name
+		 end field
+		 
+		field xreqtype
+        	default ""
+			pick code Requisition Type
+		 end field
+
+		field xprime
+        	caption Max Amount Approval
+		 end field
+
+		   field xstatus
+		   caption If Amount Exceed
+		   display combo
+          pick "Open,Applied,Created,Selected,Checked,Recommended,Approved,Confirmed"
+          end field		 
+
+		 
+		field xposition
+        caption Superior 1
+		 end field
+		
+		field xlong
+        width 60
+		column 2
+		 end field	 
+	 
+	 field xsuperior
+	 attrib local
+	 display const
+	 caption Approval Superior 1
+	 event after
+	 set xsuperior=pdmst.xname("xposition='"+xposition+"'")
+	 end event
+	 end field
+	 
+	field superior2
+	 attrib local
+	 display const
+	 caption Approval Superior 2
+	 event after
+	 set superior2=pdmst.xname("xposition='"+xsuperior2+"'")
+	 end event
+	 end field
+	 
+	field superior3
+	 attrib local
+	 display const
+	 caption Approval Superior 3
+	 event after
+	 set superior3=pdmst.xname("xposition='"+xsuperior3+"'")
+	 end event
+	 end field
+	 
+	 field superior4
+	 attrib local
+	 display const
+	 caption Approval Superior 4
+	 event after
+	 set superior4=pdmst.xname("xposition='"+xsuperior4+"'")
+	 end event
+	 end field
+	 
+	 
+        field add
+        event before
+		//set shiftname=pdsuperior.xshift("xstaff='"+xstaff+"' and xshift='"+xshift+"' and xtypetrn='"+xtypetrn+"'")
+		set positionid=pdmst.xposition("xposition='"+xposition+"'")
+        //if shiftname .eq. xshift .and. xshift .ne. ""
+		//	error "Superior already set for this shift."
+		//else 
+		if xposition .eq. ""
+			error "Please Select Superior!"
+		else if positionid .ne. xposition
+			error "Superior Doesn't Exist!"
+		end if
+		end event
+        end field
+
+        field update
+        event before
+          end event
+        end field
+   
+   field Return
+          embed onclick="clicked(this)"
+        end field
+        
+		embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	        if (detail=="Salary Detail"){
+            form.screen.value = "pdsalarydetail"
+            form.searchbutton.value = "Top"
+          }
+		   if (detail == "Return"){
+            form.screen.value = "pdsuperior"
+            form.searchbutton.value = "Find xstaff=?"
+          }
+  	      
+        }
+
+        function pickAccount(link,name,rank){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xstaff.value=link.innerText
+            document.one.xname.value=name.innerText
+            document.one.xrank.value=rank.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

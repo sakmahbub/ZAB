@@ -1,0 +1,60 @@
+screen casup
+     caption "Customer master"
+     //sidebar text two,list two, text three
+     sections  form one, jscript myscript
+
+
+     form one
+        caption "Supplier Entry"
+      	table casup
+        primarykey xsup
+        order xsup
+        //select
+        return "login"
+        layout 2
+        pstyle 3 
+        objects Clear,Add, Update, Delete,*next,Show, Top,Bottom,Next,Previous,"<p>" ,~
+                xsup,xorg,xmadd, xpadd,~
+                xemail, xphone,xmobile, xfax, xurl, ~
+                xgsup,xcontact,xstatussup
+
+        field xsup
+         // display trn Supplier Code
+        end field
+
+        field xgsup
+      //    def "Local"
+        end field
+field add
+	event before
+          set trn = "SUP-"
+          set xsup = #trn("Supplier Code",trn,10)
+	end event
+end field
+ 
+       embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "opordq"
+            form.searchbutton.value = "Find xsup=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

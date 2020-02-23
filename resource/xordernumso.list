@@ -1,0 +1,11 @@
+     list xordernumso
+        caption "Items containing: "+zvalue
+        table opordheaderso
+        order xordernum desc
+        select "(xordernum like '%"+zvalue+"%' or xpornum like '%"+zvalue+"%' )"
+        rows 20
+        objects xordernum attrib(link "abc" embed onclick="return updateParent(this:'')"),xorderdate,xcus,xpornum,xinvnum,xstyleno
+		headers "SO No","Order Date","Cus Id","PO No","PI No.","Style No."
+     end list
+
+

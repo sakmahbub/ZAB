@@ -1,0 +1,156 @@
+screen pdsalincheader
+
+    // sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Detail List"
+        table pdtrndetail
+        order xvoucher,xrow
+        fixed xvoucher
+        rows 30
+        objects  xrow attrib(link "login?screen=pdtrndetail&command=Show&xvoucher=?&xrow=?"), ~
+                 xstaff,empname equals((select xname from pdmst where zid=pdtrndetail.zid and xstaff=pdtrndetail.xstaff)),~
+				 dept equals((select xdeptname from pdmst where zid=pdtrndetail.zid and xstaff=pdtrndetail.xstaff)),xtype,xamount,xarrear,xdayssalded,xothours
+
+        header "Line No","Staff","Name","Department","Transaction Type","Amount","Arrear","Days Deduction","OT Hours"
+
+     end list
+
+
+     form one
+        caption "Salary Increment Header"
+	  table pdsalincheader
+        order xvoucher
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add, Update, Delete,Clear,Show,*next,Top,Next,Previous,Bottom,Process,"<p>" ,~
+				xvoucher,xdate,xempcategory,xyear,xday,xdeptname,xstaff,staffname,xstatus,xcomm,xinc
+
+        field xday
+			caption Day Consider 
+		end field
+	  
+	  field xcomm
+	   caption Salary Increment (%)
+	  end field
+	  
+	    field xinc
+	   caption Salary Increment(Fixed)
+	  end field
+
+        field staffname
+          attrib local
+          display const
+          caption Name
+          event after
+            set staffname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+
+        field xqty
+          caption Times of Basic
+        end field
+		
+		  field xvoucher
+          caption Transaction No
+		  pick list pdincnum
+        end field
+		
+		field Process
+	event before
+	if xstatus .eq. "Confirmed"
+	error "Already Confirmed"
+	end if
+	end event
+      event after		
+		set temp = #spsql( zabsp_PD_Salary_Inc,#id,#user,xvoucher,xstatus) //xempcategory,deptname,xyear,xstaff,xcomm,xinc,
+		action show
+      end event
+    end field
+	
+
+        field add
+          event before
+		  set xyear = #sub(xdate,0,4)
+		  set xstatus = "Open"
+		  if xdeptname .ne. ""
+		  set xstaff=""
+		  end if
+		  if xempcategory .eq. "" .and. xdeptname .eq. "" .and. xstaff .eq. ""
+		  error "Please select Division or Department or Employee ID"
+		  else if xcomm < 0.1 .and. xinc < 1
+		  error "Increment is 0"
+		  else if xday < 1
+		  error "Consider Day Must be greater than 0"
+		  else
+		  set xvoucher = #trn("Salary Increment Number","INC-",10)
+		  end if
+		  end event
+        end field
+
+	
+	
+        field update
+          event before
+		  if xstatus .eq. "Confirmed"
+			error "Already Confirmed"
+		  end if
+		   if xdeptname .ne. ""
+		  set xstaff=""
+		  end if
+		   end if
+		  if xempcategory .eq. "" .and. xdeptname .eq. "" .and. xstaff .eq. ""
+		  error "Please select Division or Department or Employee ID"
+		  else if xcomm < 0.1 .and. xinc < 1
+		  error "Increment is 0"
+		  else if xday < 1
+		  error "Consider Day Must be greater than 0"
+		  end if
+          end event
+        end field
+
+        field delete
+          event before
+		    if xstatus .eq. "Confirmed"
+			error "Already Confirmed"
+		  end if
+          end event
+        end field
+
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdtrnheader"
+            form.searchbutton.value = "Find xvoucher=?"
+            //return false
+          }
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

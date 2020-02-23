@@ -1,0 +1,61 @@
+screen pdleaveproc
+   caption "Payment Processing"
+  sections form one
+
+  form one
+    caption "Leave Assigned Process"
+    return "login"
+    layout 2
+    pstyle 3
+
+    objects Leave Process,Carry Forward Process,Clear, xfstaff,xtstaff,xyear,xempcategory //
+
+    field xempcategory
+      //display const	
+      //default #wh
+	//	pick "select xcode from xcodes where xtype='Employee Category'"// and xcode='" +#wh+"'"
+    end field
+
+    field xdum
+      attrib local
+      display const
+      caption
+    end field
+	
+    field xfstaff
+	pick list xstaff
+	width 12
+    end field	
+
+    field xtstaff
+	pick list xstaff
+	width 12
+      default "z"
+    end field
+
+    field xyear
+      attrib local
+      default #sub(#date,0,4)
+    end field
+
+    field xper
+      attrib local
+      default #sub(#date,5,2)
+    end field
+
+
+    field Leave Process
+      event after
+        set temp = #spsql(zabsp_leaveasign, #id,#user,xyear,xfstaff,xtstaff,xempcategory)
+      end event
+    end field
+	
+    field Carry Forward Process
+      event after
+        set temp = #spsql(zabsp_leaveCarryForward, #id,#user,xyear,xfstaff,xtstaff,xempcategory)
+      end event
+    end field	
+
+  end form
+
+end screen

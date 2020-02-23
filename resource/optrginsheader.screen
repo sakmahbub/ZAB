@@ -1,0 +1,71 @@
+screen optrginsheader
+  caption "Incentive Scheme Header"
+  sections form one, jscript myscript
+
+  form one
+    caption "Incentive Scheme Header"//+xsm+" "+xrsm+" "+xfm
+    table optrginsheader
+    primarykey xinstrn
+    order xinstrn
+    return "login"
+    layout 2
+    pstyle 3
+    objects Add,Update,Show,Clear,Delete,*next,Top,Previous,Next,Bottom,*next,Details,Point Details,Additional,"<p>",~
+            xinstrn,xminpoint,xminpercent,xminprdt,xyear display(hide),xyearperdate display(hide)//,xfdate,xtdate
+
+       
+          field xinstrn
+		event after
+			set globals(xinstrn)=xinstrn
+		end event
+	    end field	
+
+
+	embed onsubmit="submitit(this)"
+	field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Point Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Additional
+          embed onclick="clicked(this)"
+        end field
+
+
+
+
+  end form
+
+   jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Details"){
+            form.screen.value = "optrginsdetail"
+            form.searchbutton.value = "Find xinstrn=?"
+          }
+
+			if (but=="Point Details"){
+            form.screen.value = "optrginspointdetail"
+            form.searchbutton.value = "Find xinstrn=?"
+          }	
+	      if (but=="Additional"){
+            form.screen.value = "optrginsadditional"
+            form.searchbutton.value = "Find xinstrn=?"
+          }	
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

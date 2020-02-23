@@ -1,0 +1,14 @@
+product ERP on the Net
+
+table apdef
+  caption "AP Defaults"
+  columns ztime,zutime,zid,~
+          xyear,xper,xoffset,xaccGL,xscale
+
+  primary key zid
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

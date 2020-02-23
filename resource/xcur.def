@@ -1,0 +1,11 @@
+product ZAB
+
+table xcur
+  caption "Currency Tables"
+  columns ztime, zutime,zauserid,zuuserid, zid, xcur, xname, xcent, xcents, ~
+          xdec, xexch, xexchsell, xexchbuy, zactive,xcursign,xdefault
+  primary key zid, xcur
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

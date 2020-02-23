@@ -1,0 +1,44 @@
+model fa
+     caption "fa"
+     description "This model comprises the minimum logic and infrastructure ~
+                  required to maintain crew database."
+
+data xcodes
+ 	 xtype		          |xcode			              |zactive|xlong
+	 Category           |Vehicle                    |1      |
+	 Category           |Furniture                    |1      |
+	 Category           |Building                    |1      |
+	 Category           |Computer                    |1      |
+
+	 Asset Type         |Type One                    |1      |
+	 Asset Type         |Type Two                    |1      |
+
+	 Depreciation Method |SL                         |1      |Straight Line Method
+	 Depreciation Method |RB                         |1      |Reducing Balance Method
+
+end data
+
+
+data xtrn
+	 xtypetrn		                |xtrn   |xaction	     |xdesc	            |xnum|xinc|zactive
+	 FA Transactions            |AD--   |Addition      |Transactions         |   0|   1|  1
+	 FA Transactions            |DI--   |Disposal      |Transactions         |   0|   1|  1
+	 FA Transactions            |DP--   |Depreciation  |Transactions         |   0|   1|  1
+	 FA Transactions            |RS--   |Revised Salvage Value|Transactions  |   0|   1|  1
+
+	 Estimated Life Trn         |ESLT   |              |Estimated Life Trn         |   0|   1|  1
+
+	 FA Transfer Trn            |TO--   |              |Transfer            |   0|   1|  1
+
+
+end data
+
+
+
+data pmcomp
+xcomponent |xcompname             |xdepartment|xcomptype             |xserialno|xvendor|xcompdesc|xmstcompo
+end data
+
+
+
+end model

@@ -1,0 +1,22 @@
+product ZAB ERP
+
+table pdbal
+  caption "PD Balance"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xstaff,xyear,xper,xdaymonth,xdaywork,xdayabs,~
+          xbasic,xhrent,xconveyance,xmedical,~
+          xgrosssalary,xotamount,xothours,~
+          xvoucher,xbonusrate,xnightallowance,xshoeallowance,xbonus,xperfbonus,~
+
+          //deductions
+          xpfamount,xtaxamt,xdeduction,xabsentamt,xloanamt,xservicecharge,xsalaryadvance,~
+          xtraveladvance,xcityledger,xuniondues,xwelfarefund,xutility,xhrentdeduct,xadjustment
+
+  primary key zid,xyear,xper,xstaff
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xstaff references pdmst.zid,xstaff
+  end foreign key
+
+end table

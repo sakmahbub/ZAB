@@ -1,0 +1,85 @@
+screen caitembonusrbb
+
+     caption "Bonus Master"
+     sidebar list one
+     sections  form one, jscript myscript
+
+     list one
+        caption "Bonus List"
+        table caitembonusrbb
+        order xitem,xwh
+        fixed xitem
+        rows 20
+        objects  xwh,xqty attrib(link "login?screen=caitembonusrbb&command=Show&xitem=?&xqty=?"), ~
+                 xamount
+
+     end list
+
+
+     form one
+        caption "Discount"
+      	table caitembonusrbb
+        primarykey xitem,xwh
+        order xitem,xwh
+        fixed xitem
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Update, Delete,Show,*next,Return, Top, Bottom,"<p>" ,~
+                xwh,xdesc,xdateeff,xdateexp,xqty,xamount//,xunitpur
+
+        field xunitpur
+          attrib local
+          caption Unit Of Measurement
+          display const
+          event after
+            set xunitpur = caitem.xunitpur("xitem='"+xitem+"'")
+          end event
+        end field
+
+	  field xdesc
+	    atrrib local
+	    caption Branch Name
+	    display const
+	    event after
+		set xdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+	    end event
+	  end field
+
+        field xqty
+          caption Quantity Applicable
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	    if (detail=="Return"){
+            form.screen.value = "caitem"
+            form.searchbutton.value = "Find xitem=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

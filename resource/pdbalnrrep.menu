@@ -1,0 +1,9 @@
+//pdbalnrrep.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Pay Slip (Contract)         	   |#classPath+"/login?screen=*crystal pdpayslipnonregall(xyear=Year,xper=Period,xreptype=Report Type,xemprepcatnr=Employee Category)"
+Pay Slip Single (Contract)      |#classPath+"/login?screen=*crystal pdpayslipnr(xyear=Year,xper=Period,xposition=From ID,xposition=To ID,xemprepcatnr=Employee Category,xdesc="Description")"
+//Salary Summary (Contract)	   |#classPath+"/login?screen=*crystal pdsalsumdeptnonreg(xyear=Year,xper=Period)"
+//-------------------------------------------------------------------
+

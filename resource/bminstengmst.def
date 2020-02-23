@@ -1,0 +1,12 @@
+product ZAB
+
+table bminstengmst
+  caption "Installation Engineer Master"
+  columns ztime,zutime,zauserid,zuuserid,zid,xinsteng,xname,zactive
+
+  primary key zid,xinsteng
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

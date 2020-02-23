@@ -1,0 +1,206 @@
+screen imtordetailprn
+
+     sidebar list order,list one
+     sections  form one, jscript myscript
+
+     list order
+        caption "GRN Detail List"
+        table pogrndetailview
+        order xgrnnum,xrow
+        fixed xgrnnum
+		select "(xqtygrn-xqtyprn)>0"
+        rows 20
+		objects  xitem attrib(link "abc" embed onclick="return pickItem(this:xqtygrn#:xrow#)"), ~
+				xdesc attrib(name xdesc#),(xqtygrn-xqtyprn) attrib(name xqtygrn#),~
+				xunit attrib(name xunit#),xrow attrib(name xrow#)
+
+       headers "Item","Description","Qty","Unit","Row"
+     end list
+
+     list one
+        caption "<br><center><b>"Purchase Returned Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=imtordetailprn&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+		partno equals((select xtheircode from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyord,xunit
+
+       headers "Serial No","Item Code","Item Name","Part No","Quantity Transfer","Unit"//,"Quantity Delivered",,"Fabric Type","Fabric Color","Width","GSM",
+     end list
+
+
+     form one
+        caption "Purchase Returned Detail For "+xtornum
+        table imtordetail
+        primarykey xtornum,xrow
+        order xtornum,xrow
+        fixed xtornum
+        return "login"
+        pstyle 3
+        layout 2
+        objects Add,Delete,Clear,Show,~//Update,
+        *next,Complete,  Top,Previous,Next, Bottom,"<p>" ,~
+        xrow attrib(row 0 1),xunit display(const),xitem,xdesc,xqtyord,~ // attrib(readonly)
+        xrate display(hide),xlineamt display(hide),xdocrow attrib(readonly)
+
+		field xorderrow
+			caption Order Row
+		end field
+		
+		field xitem
+		end field
+		
+        field xrow
+          event after
+            set status = imtorheader.xstatustor("xtornum='"+xtornum+"'")
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+              set #field(add.attrib)="disabled"
+              set #field(delete.attrib)="disabled"
+              set #field(update.attrib)="disabled"
+            end if
+            
+			if imtorheader.xgrnnum("xtornum='"+xtornum+"'") .ne. ""
+              set #field(xitem.attrib)="readonly"
+            end if
+			
+          end event
+        end field
+
+		field xfabrictype
+			attrib readonly
+			display text
+			pick
+		end field
+        
+		field xfabriccolor
+			attrib readonly
+			display text
+			pick
+		end field
+        
+		field xwidth
+			attrib readonly
+			display text
+			pick
+		end field
+        
+		field xgsm
+			attrib readonly
+			display text
+			pick
+		end field
+        
+		field xprcstype
+			attrib readonly
+			display text
+			pick
+		end field
+
+		field xcomposition
+			attrib readonly
+			display text
+			pick
+		end field
+
+        field xdesc
+          caption Product Name
+          attrib local
+          display const
+          event after
+            set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+	  	
+        field add
+          event before
+            set xunit = caitem.xunit("xitem = '"+xitem+"'")
+            set fwh=imtorheader.xfwh("xtornum='"+xtornum+"'")
+//            double inhand = #sql(double,"select xavail from imstock where xwh='"+fwh+"' and xitem='"+xitem+"'")
+//            if xqtyord > inhand
+//              error "Cannot Proceed -- Available Quantity is "+inhand
+			if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+				error "Can not Proceed-- Already Confirmed!"
+			end if
+            class impharma(ValidateBeforeDetailTo({xtornum,fwh}))
+//          class oppharma(checkStockInhand({xtornum,add,opdoheader,xrow,xqtyord}))
+          end event
+		  event after
+		  set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xgrnnum,xtornum,xdocrow,xrow,"imtordetailprn")
+		  end event
+        end field
+
+        field update
+          event before
+            set xunit = caitem.xunit("xitem = '"+xitem+"'")
+            set fwh=imtorheader.xfwh("xtornum='"+xtornum+"'")
+            double inhand = #sql(double,"select xavail from imstock where xwh='"+fwh+"' and xitem='"+xitem+"'")+xqtyord
+            if xqtyord > inhand
+              error "Cannot Proceed -- Available Quantity is : "+inhand
+			else if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+				error "Can not Proceed-- Already Confirmed!"
+            end if
+            class impharma(ValidateBeforeDetailTo({xtornum,fwh}))
+          end event
+        end field
+		
+        field delete
+          event before
+            set row=xrow
+            set docrow=xdocrow
+            set tornum=xtornum
+            set grnnum=xgrnnum
+			if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+				error "Can not Proceed-- Already Confirmed!"
+			end if
+          end event
+		  event after
+		  set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,grnnum,tornum,docrow,row,"imtordetailprn")
+		  end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Complete"){
+            form.screen.value = "imtorheaderprn"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		   function pickItem(link,qty,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+			document.one.xqtyord.value =qty.text
+			document.one.xdocrow.value=row.text
+          }else{
+            document.one.xitem.value=link.innerText   
+			document.one.xqtyord.value =qty.innerText
+			document.one.xdocrow.value=row.innerText			
+          }
+          return false
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

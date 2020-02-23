@@ -1,0 +1,147 @@
+screen pdsalinchistory
+
+     //sidebar 
+     sections form one,,list salaryinc,jscript myscript//list detail, list confirm
+
+  	list detail
+        caption "Pending List"
+        table pdpromodt
+        order xstaff,xrow
+	  select "xstatus='Open'"
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdsalinchistory&command=Show&xstaff=?&xrow=?"), ~
+                 xdate,xdesignation,xdesigpromo,xgrade,xgradetran,xstatus
+
+        header "Row No","Entry Date","Current Designation","Promoted To","Current Job Level","Promoted To","Status"
+
+     end list
+
+  	list confirm
+        caption "Confirmed List"
+        table pdpromodt
+        order xstaff,xrow
+	  select "xstatus='Confirmed' and xnote not like 'Salary Increment%'"
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdsalinchistory&command=Show&xstaff=?&xrow=?"), ~
+                 xdateeff,xdesignation,xdesigpromo,xgrade,xgradetran,xstatus
+
+        header "Row No","Effective Date","Previous Designation","Promoted Designation","Previous JL","Promoted JL","Status"
+
+      end list
+	  
+	  	list salaryinc
+        caption "Salary Increment History"
+        table pdpromodt
+        order xstaff,xrow
+	  select "xstatus='Confirmed' and xnote like 'Salary Increment%'"
+        fixed xstaff
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=pdsalinchistory&command=Show&xstaff=?&xrow=?"), ~
+                 xdateeff,xdesignation,xgrade,xgrossold,~
+				 newgross equals((select xgross from pdmst where zid=pdpromodt.zid and xstaff=pdpromodt.xstaff)),xstatus
+
+        header "Row No","Effective Date","Designation","Grade","Old Gross","New Gross","Status"
+
+      end list
+
+
+     form one
+        caption "<ACRONYM>Promotion Detail For "+xname+"</ACRONYM>"
+	  table pdpromodt
+        order xstaff,xrow
+		 select "xnote not like 'Salary Increment%'"
+        fixed xstaff
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Return,Clear,*next, "<p>" ,~//Add, Update, Delete,Top,Previous,Next,Bottom,Confirm,
+          xrow attrib(row 0 1),xdate,xdesignation,xdesigpromo,xgrade,xgradetran,xdateeff,xnote,xstatus display(hide)
+
+
+    	field xrow
+	  event before
+	    set xdesignation=pdmst.xdesignation("xstaff='"+xstaff+"'")
+	  end event
+        event after
+         set status = xstatus
+         if status .eq. "Confirmed"
+           set #field(add.display)="hide"
+           set #field(update.display)="hide"
+           set #field(delete.display)="hide"
+           set #field(confirm.display)="hide"
+         end if
+        end event
+      end field
+
+	field confirm
+	  event after
+	    set xstatus=#sql("update pdpromodt set xstatus='Confirmed' where xrow="+xrow)
+	    set desgi=#sql("update pdmst set xdesignation='"+xdesigpromo+"' where xstaff='"+xstaff+"'")	
+          set grade=#sql("update pdmst set xgrade='"+xgradetran+"' where xstaff='"+xstaff+"'")
+
+	    set #field(add.display)="hide"
+          set #field(update.display)="hide"
+          set #field(delete.display)="hide"
+          set #field(confirm.display)="hide"
+
+	  end event
+	end field
+
+	  field xstatus
+	    default "Open"
+	  end field
+
+        field xdesignation
+	    display const
+          caption Current Designation
+        end field
+
+        field xdesigpromo
+          caption Promoted To
+          pick "select xcode from xcodes where xtype='Designation' and zactive=1"
+        end field
+
+	  field xdate
+	    caption Issue Date
+	  end field
+
+        field xnote
+          width 80
+          height 2
+          //column 2
+        end field
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdmst"
+            form.searchbutton.value = "Find xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

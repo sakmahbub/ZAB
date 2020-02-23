@@ -1,0 +1,89 @@
+screen pdbal
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Detail List"
+        table pdbal
+        order xyear,xper,xstaff,xrow
+        fixed xyear,xper,xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdbaldetail&command=Show&xyear=?&xper=?&xstaff=?&xrow=?"), ~
+                 xtype,xamount,xadjustment,xarrear,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdbal.xtype))
+
+        header "Line No","Componant Type","Amount","Adjustment","Arrear","Transaction Type"
+
+     end list
+
+     form one
+        caption "<ACRONYM>PD Balance</ACRONYM>"
+	      table pdbal
+        order xyear,xper,xposition
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,*next,Detail, Top,Next,  Previous, Bottom,~
+                xyear,xper,xposition,xname,xstatus,xstaff display(hide)
+
+
+          field xdeduction
+            caption Advance Deduction
+          end field
+
+          field xname
+            attrib local
+            display constant
+            event after
+              set xname=pdmst.xname("xstaff='"+xstaff+"'")
+            end event
+          end field
+
+          field xyear
+            event after
+              set globals(xyear)=xyear
+              set globals(xper)=xper
+              set globals(xstaff)=xstaff
+            end event
+          end field
+
+          field add
+            event before
+              set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+            end event
+          end field
+
+          field update
+            event before
+              set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+            end event
+          end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdbaldetail"
+            form.searchbutton.value = "Find xyear=?&xper=?&xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

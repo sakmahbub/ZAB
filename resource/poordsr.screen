@@ -1,0 +1,224 @@
+screen poordsr
+
+     sidebar list one,list grn //list poterms
+     sections form one,list reqlist,jscript myscript
+ 
+     list one
+        caption "PO Detail List For "+xpornum
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=poorddetailcash&command=Show&xpornum=?&xrow=?"), ~
+               xitem,desc equals((select xdesc from caitem where zid=poorddetail.zid and  xitem=poorddetail.xitem)),xspecification,xqtypur,xqtygrn
+
+
+        headers "Row","Item","Description","Specification","Purchase Qty","GRN Qty"
+
+	  total "Total","","","",sum,sum
+     end list
+
+     list grn
+        caption "GRN For : "+xpornum
+        table pogrnheader
+        order xgrnnum desc
+        fixed xpornum
+        rows 30
+        objects  xgrnnum attrib(link "login?screen=pogrnsr&command=Show&xgrnnum=?"),~
+                 xdate,xstatusgrn
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+	
+	  list reqlist
+      caption "Back to Purchase Requisition List"
+         table poordheader
+        order xporeqnum desc
+		fixed xpornum
+		select "left(xporeqnum,2)='PR'"
+        objects  xporeqnum attrib(link "login?screen=poreqsr&command=Show&xporeqnum=?"), xdate,xtype
+               
+		  headers "Requisition No","Date","Purchase Type"
+	end list
+	
+	  list requi
+        caption "Back to Store Requisition"
+        table poreqheader
+        order xtornum desc
+		fixed xporeqnum
+        rows 20
+		 objects  xtornum  attrib(link "login?screen=moreqsr&command=Show&xtornum=?"),~
+                 xdate
+       headers "Requisition No","Date"
+     end list
+	
+     list poterms
+        caption "Terms & Condition For "+xpornum
+        table poterms
+        order xpornum,xrow
+        fixed xpornum
+        objects  xrow,~// attrib(link "login?screen=poterms&command=Show&xpornum=?&xrow=?"), ~
+                xcode,xnote //equals((select xlong from xcodes where xtype='PO Terms & Condition' and xcode=xcodes.xcode))
+
+
+//        headers "Row","Item","Description","Qty","Rate","Disc %","Disc Fixed","Line Amount"
+//	  total "Total","","","","",sum	
+     end list
+
+     form one
+        caption "Purchase Order/Work Order Header"
+		primarykey xpornum
+        table poordheader
+        order xpornum desc
+        // select "xtype='Other' and xsign>0"
+        return "login"
+        layout 3
+        pstyle 3
+        objects Show,"<p>" ,~
+          xpornum,xdate display(const),xtype display(const),~
+          xcus display(const),xorg display(const),xstatuspor display(const),~//,xlcno  display(hide),~
+          //xprime display(hide),~
+          xporeqnum display(const),//xsign display(hide),xregi display(hide),xstaff display(hide),xwh display(hide),xtwh display(hide),~
+		 // xvatrate,xvatamt,xdisc,xdiscf,xtransport,xstatus,zauserid display(hide),prepr,xrem
+		
+        field xlcno
+			//pick list poordlcim
+			attrib local
+			//caption Store Name
+			event after
+				//set xlcno=lcinfo.xlcno("xpornum='"+xpornum+"'")
+				if xpornum .eq. ""
+					set xlcno=""
+				else
+					set xlcno=lcinfo.xlcno("xpornum='"+xpornum+"'")
+				end if
+			end event
+		end field
+		
+		field xpornum
+		event after
+		set globals(xpornum)=xpornum
+		end event
+		end field
+		
+		field xwhdesc
+			attrib local
+			display const
+			caption Store Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Store' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+		
+		field xporeqnum
+		caption PR No.
+		end field
+		
+			field xstatus
+			caption Approval Status
+			event after
+			//if xstatus .ne. "Approved"
+			//set xstatus="CPO"
+			//end if
+			end event
+		end field
+		
+		field xdate
+			caption Purchase Date
+		end field
+		
+		field xcus
+			caption Supplier ID
+			pick list casup
+		end field
+		
+		
+		field xtype
+			caption Purchase Type
+		end field
+		
+		field xtypeobj
+			display combo
+			caption Product Type
+			pick code PO Type
+		end field
+		
+        field xpaymentterm
+		caption Payment Term
+        	pick "Credit,Cash"
+        end field
+        
+		  field xorg
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+		  
+		  field prepr
+		  	attrib local
+		  	dispaly const
+		  	caption Preparer
+		  	event after
+		  		set prepr=pdmst.xname("xposition='"+zauserid+"'")
+		  	end event
+		  end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field LC
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetailcash"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="LC Info"){
+            form.screen.value = "poordlcinfo"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "poterms"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+		
+	 function pickItem(link){//,type
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+			//document.one.xtype.value=type.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+			//document.one.xtype.value=type.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+ end screen

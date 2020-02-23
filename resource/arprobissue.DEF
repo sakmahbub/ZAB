@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table arprobissue
+  caption "AR Detail"
+  columns  ztime,zutime, zid,zauserid,zuuserid,~
+           xvoucher,xstaff,xdate,~
+           xprime,xremarks,xtype,xwh
+
+  primary key zid, xvoucher
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

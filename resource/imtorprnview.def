@@ -1,0 +1,23 @@
+
+product ZAB ERP
+
+table imtorprnview
+  caption "PRN View"
+  columns zid,xtornum,xfwh,xlong,xdate,xcus,xorg,xgrnnum,xpornum,xpreparer,xname,xposition,xstatustor
+
+  primary key zid,xgrnnum,xpornum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view imtorprnview (zid,xtornum,xfwh,xlong,xdate,xcus,xorg,xgrnnum,xpornum,xpreparer,xname,xposition,xstatustor) ~
+    as Select a.zid, a.xtornum,a.xfwh,br.xlong,a.xdate,a.xcus,cus.xorg,a.xgrnnum,p.xpornum, ~
+	p.xpreparer,pd.xname,pd.xposition,a.xstatustor from imtorheader a ~
+	join pogrnheader b on a.zid=b.zid and a.xgrnnum=b.xgrnnum ~
+	join poordheader p on p.zid=b.zid and p.xpornum=b.xpornum ~
+	join pdmst pd on p.zid=pd.zid and p.xpreparer=pd.xstaff ~
+	join cacus cus on a.zid=cus.zid and a.xcus=cus.xcus ~
+	left join branchview br on a.zid=br.zid and a.xfwh=br.xcode ~
+	WHERe a.xtornum like 'PRN%'
+end table

@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table pdtrnheader
+
+  caption "Transaction Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xvoucher,xdate,xstaff,xyear,xper,xposition,xempcategory,xnote
+
+  primary key zid,xvoucher
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

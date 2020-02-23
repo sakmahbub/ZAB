@@ -1,0 +1,19 @@
+//PO Documents.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+-RFQ
+RFQ - Midcon                     |#classPath+"/login?page=*crystal porfqn(xporeqnum=RFQ No=0=text)"
+RFQ - Houston                    |#classPath+"/login?page=*crystal porfqus(xporeqnum=RFQ No=0=text)"
+-
+Requisition Form                 |#classPath+"/login?page=*crystal poreqn(xporeqnum=Requisition No=0=text)"
+//Purchase Orders                  |#classPath+"/login?menu=purchase order"
+//Goods Receipt Notes              |#classPath+"/login?menu=grn"
+-
+Purchase Orders                  |#classPath+"/login?page=*crystal pomid(xpornum=PO No=0=text)"
+Goods Receipt Notes              |#classPath+"/login?page=*crystal pogrnn(xgrnnum=From GRN No=0=text,xgrnnum=To GRN No=zzz=text)"
+-
+PO for Consign Stock             |#classPath+"/login?page=*crystal imtorpo(xtornum=Consign PO No=0=text)"
+Consign Stock Requisition        |#classPath+"/login?page=*crystal pocsrq(xpornum=PO No=0=text)"
+//-------------------------------------------------------------------
+

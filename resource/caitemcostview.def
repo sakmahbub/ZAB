@@ -1,0 +1,25 @@
+
+product ZAB ERP
+
+table caitemcostview
+  caption "Credit Limit View"
+  columns zid,xitem,xcostrow,xqty,xcost,xqtydel,xbalance
+
+  primary key zid,xitem,xrow
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view caitemcostview (zid,xitem,xcostrow,xqty,xcost,xqtydel,xbalance) ~
+                  as select a.zid,a.xitem,a.xrow,~
+                  isnull((select sum(xqty) from imtrn where zid=a.zid and xitem=a.xitem and xcostrow=a.xrow and xcostrow<>0 and left(ximtrnnum,2) in ('TD','RE','SR')),0),~
+                  a.xcost,~
+                  isnull((select sum(xqty) from imtrn where zid=a.zid and xitem=a.xitem and xcostrow=a.xrow and xcostrow<>0 and left(ximtrnnum,2) in ('OP','BN','DM')),0),~
+                  isnull((select sum(xqty) from imtrn where zid=a.zid and xitem=a.xitem and xcostrow=a.xrow and xcostrow<>0 and left(ximtrnnum,2)in ('TD','RE','SR')),0)-isnull((select sum(xqty) from imtrn where zid=a.zid and xitem=a.xitem and xcostrow=a.xrow and xcostrow<>0 and left(ximtrnnum,2) in ('OP','BN','DM')),0) ~
+                  from caitemcostprice a //a join imtrn b on a.zid=b.zid and a.xitem=b.xitem and a.xrow=b.xcostrow
+
+
+
+
+end table

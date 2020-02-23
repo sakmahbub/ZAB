@@ -1,0 +1,9 @@
+//Setup	Lists.menu
+//-------------------------------------------------------------------
+option                            |action
+//-------------------------------------------------------------------
+Users List	                      |#classPath+"/main?page=*crystal causerlist"     |common
+Codes List	                      |#classPath+"/main?page=*crystal cacodelist"     |common
+Transaction Codes List            |#classPath+"/main?page=*crystal catrnlist"      |common
+//-------------------------------------------------------------------
+

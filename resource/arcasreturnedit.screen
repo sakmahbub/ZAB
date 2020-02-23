@@ -1,0 +1,195 @@
+screen arcasreturnedit
+
+     sidebar list one,list allocation
+     sections form one, jscript myscript
+
+     list one
+        caption "Detail List"
+        table artrn
+        order xvoucher,xrow
+        fixed xvoucher
+        rows 20
+        objects  xrow attrib(link "login?screen=arcastrnedit&command=Show&xvoucher=?&xrow=?"), ~
+                xacc,desc equals((select xdesc from acmst where acmst.zid=artrn.zid and acmst.xacc=artrn.xacc)),xprime
+
+        totals "Totals","","",sum
+        header "Line No","Account Code","Description","Amount"
+     end list
+
+     list allocation
+        caption "Allocated Voucher List"
+        table aralc
+        order xvoucher,xinvnum
+        fixed xvoucher
+        rows 10
+        objects ~
+        xinvnum attrib(link "login?screen=aralcreturn&command=Show&xinvnum=?"), ~
+        xdate,xbalance,xamount
+        totals "","Totals","",sum
+
+     end list
+
+     form one
+        caption "Sales Return Allocation"
+        table arhed
+        primarykey xvoucher
+        order xvoucher
+        select "(left(xvoucher,2) in ('SR','RS')) and xwh='"+#wh+"'"
+        return "login"
+        pstyle 3
+        layout 2        // display(trn AR Transactions)
+        objects Clear,Show,Update,Delete,*next,Detail,Top,Previous,Next,Bottom,Allocate,"<p>" ,~
+                xvoucher,xdate,xcus,xorg,xwh display(hide),~
+                xprime,xbalprime attrib(readonly),xbank display(const),xbankname,xref,xvatamt,xaitamt,xdiscprime,~
+                xstatusjv,xsp,xnote,~
+
+                //hide
+                xsign display(hidden),xdeptname display(hide),~
+                xchgsprime display(hide)
+
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+        field xwh
+          default #wh
+        end field
+
+        field xvatamt
+          caption VAT paid by Customer
+          display text
+        end field
+
+        field xaitamt
+          caption AIT paid by Customer
+          display text
+        end field
+
+        field xorg
+          attrib local
+          display constant
+          caption Name
+          event after
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+        field xbankname
+          attrib local
+          display const
+          caption Bank Name
+          event after
+            set xbankname=acmst.xdesc("xacc='"+xbank+"'")
+          end event
+        end field
+
+        field xname
+          display constant
+          event after
+          end event
+        end field
+
+        field xlong
+          caption Header Description
+          width 50
+        end field
+
+        field xstatusjv
+           display constant
+        end field
+
+
+        field xvoucher
+	   width 15	
+          event after
+            set globals(xvoucher)=xvoucher
+            set globals(xcus)=xcus
+          end event
+        end field
+
+        field add
+          event before
+            set xstatusjv="Open"
+            if xprime == 0
+              error "Cannot Proceed -- Amount is Blank"
+            else
+            //*********** GETTING TRN NO ****************
+
+            set year = #sub(xdate,2,2)
+            set trn = xtrn.xtrn("xtypetrn='AR Transactions' and xwh='"+xwh+"' and xdesc='Money Receipt'")
+            set xvoucher = #trn("AR Transactions",trn,10)
+            set xvoucher = #sub(xvoucher,0,4)+year+#sub(xvoucher,4,10)
+
+            //*********** UPDATING BANK ACCOUNT ****************
+            if xbank .eq. ""
+              set voucher = #sub(xvoucher,0,4)
+//              print "<font size+2 color=red> Your Bank Account Updated Automatically</font>"
+              set gcus = cacus.xgcus("xcus='"+xcus+"'")
+              set xbank = artogli.xacc("xtrn='"+voucher+"' and xgcus='"+gcus+"'")
+              set xdeptname = artogli.xdeptname("xtrn='"+voucher+"' and xgcus='"+gcus+"'")
+            end if
+            end if
+          end event
+          event after
+            set command = "add"
+            set temp = #spsql(sp_validateAfterARcas,#id,#user,xvoucher,xcus,command)
+            action Show
+          end event
+        end field
+
+        field Update
+          event before
+            set temp = #sql("select xinvnum from aralc where xvoucher='"+xvoucher+"'")
+            if #result .eq. "false"
+              set xbalprime=xprime
+            end if
+          end event
+          event after
+            set command = "update"
+            set temp = #spsql(sp_validateAfterARcas,#id,#user,xvoucher,xcus,command)
+            action Show
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+        field Allocate
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "arcastrnedit"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+          if (detail == "Allocate"){
+            form.screen.value = "aralcreturnedit"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+        }
+        </script>
+     end jscript
+
+
+
+end screen

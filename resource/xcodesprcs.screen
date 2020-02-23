@@ -1,0 +1,138 @@
+screen xcodesprcs
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xtype,xcode
+        select "xtype='Production Process'"
+        rows 20
+        objects  xcode attrib(link "login?screen=xcodesprcs&command=Show&xcode=?"),~
+                 zactive,xlong,xtypeobj
+
+        //headers none
+     end list
+
+     form one
+
+     caption "Production Process"
+        table xcodes
+        order xtype,xcode
+        select "xtype='Production Process'"
+        return "login"
+        layout 2
+        pstyle  3
+        objects Show,Clear,Add, Update, Delete,*next,~
+                Top,Previous,Next, Bottom,"<p>" ,~
+                xcode width(50),xtype display(h),~
+                zactive,xtypeobj
+
+	field xtypeobj
+		//pick code Product Type
+		caption Department
+		pick "01.Pretreatment,02.Dyeing,03.Printing"
+	end field
+
+        field xdeptname
+          caption Cost Center
+        end field
+
+        field xdeptdesc
+          attrib local
+          caption Cost Center
+          display const
+          event after
+            set xdeptdesc = xcodes.xlong("xtype='Department Name' and xcode='"+xdeptname+"'")
+          end event
+        end field
+
+        field xaccdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xaccdesc=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+        field xdiscdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xdiscdesc=acmst.xdesc("xacc='"+xaccdisc+"'")
+          end event
+        end field
+
+        field xvatdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xvatdesc=acmst.xdesc("xacc='"+xaccvat+"'")
+          end event
+        end field
+
+        field xaitdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xaitdesc=acmst.xdesc("xacc='"+xaccait+"'")
+          end event
+        end field
+
+        field xwodesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xwodesc=acmst.xdesc("xacc='"+xaccwo+"'")
+          end event
+        end field
+
+        field xtype
+          display const
+          caption Type
+          default "Production Process"
+        end field
+
+        field add
+          event before
+            set xtype="Production Process"
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+    	    if (detail=="Budget"){
+            form.screen.value = "acbudget"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

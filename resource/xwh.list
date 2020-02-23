@@ -1,0 +1,15 @@
+     list xwh
+        table xcodes
+        order xcode
+		linksql select xlong from branchview
+        select "(xtype = 'Branch') and (xlong like '%"+zvalue+"%' or xcode like '%"+zvalue+"%') and xtypeobj='Store' and zactive=1" 
+		//and xcode in (select xwh from userstoreview where xposition='"+#position+"')"
+        rows 20
+		searchselect "xtype = 'Branch' and xtypeobj='Store' and zactive=1" 
+		//and xcode in (select xwh from userstoreview where xposition='"+#position+"')""
+		//linksql select xlong from branchview
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xlong
+     end list
+
+

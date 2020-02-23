@@ -1,0 +1,87 @@
+screen pdhrc2
+     caption "PD Group 1"
+     sidebar list two,list three
+     sections form one, jscript myscript
+
+	list two
+        caption "List of "+xhrc1
+        table pdhrc2
+        order xhrc2
+        fixed xhrc1
+        rows 30
+        objects  xhrc2 attrib(link "login?screen=pdhrc2&command=Show&xhrc1=?&xhrc2=?"),xdesc
+     end list
+
+	list three
+        caption "List of "+xhrc2
+        table pdhrc3
+        order xhrc3
+        fixed xhrc2
+        rows 20
+        objects  xhrc3,xdesc
+     end list
+
+
+
+     form one
+        caption "Region of "+xhrc1
+        table pdhrc2
+        primarykey xhrc1,xhrc2 
+        order xhrc2
+        fixed xhrc1
+        return "LogIn"
+        layout 2
+	  pstyle 3
+
+        objects Back to Area ,FM Area,*next, ~
+               Show,Clear,Add, Update, Delete,*next,Top,Previous,Next,Bottom,"<p>" ,~
+               xhrc2 width(20),xdesc width(50)
+
+        field xhrc2
+	    caption Region
+          event after
+            set globals(xhrc2)=xhrc2
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Back
+          embed onclick="clicked(this)"
+        end field
+
+        field FM
+          embed onclick="grouped(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but = ""
+        function clicked(b){
+          but = "clicked"
+        }
+        function grouped(b){
+          but = "grouped"
+        }
+        function submitit(form){
+          if (but == "clicked"){
+            form.screen.value = "pdhrc1"
+            form.searchbutton.value = "Find xhrc1=?"
+
+          }
+          if (but == "grouped"){
+            form.screen.value = "pdhrc3"
+            form.searchbutton.value = "Find xhrc1=?&xhrc2=?"
+
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

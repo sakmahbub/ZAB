@@ -1,0 +1,314 @@
+screen pdleaveapply
+  caption "Leave Detail"
+  sidebar list useleave,list trn,list asigneplan
+  sections form one,list trn1,jscript myscript
+
+  list asigneplan
+    caption "Asigned Leave Plan" //desc equals((select xdesc from caitem where xitem=opdodetail.xitem))
+    table pdmst
+    order xstaff,xplan
+    fixed xstaff
+    rows 1
+    objects xplan,dayde equals((select xdaydeduct from pdlplanehd where xname=pdmst.xplan)),~
+            hourde equals((select xhourdeduct from pdlplanehd where xname=pdmst.xplan))
+      
+    header "Plan Name","Day Deduct","Hour Deduct"
+  end list
+
+  list useleave
+    caption "Used & Available Leave"
+    table pdleaveasigne
+    order xstaff,xyear,xtypeleave
+    fixed xstaff,xyear
+    select "xtypeleave<>'Unpaid Leave'"	
+    rows 20
+    objects  xtypeleave attrib(link "abc" embed onclick="return picltype(this)"),xavailable,xmleave,xused,xbalance	
+    //header "Leave Type","Available Leave","Monthly","Used Leave","Balance Leave"
+    totals "Total",sum,sum,sum,sum
+  end list
+
+  list trn
+    caption "Availed Leave Detail"
+    table pdleaveheader
+    order xstaff,xyear,xtypeleave
+    fixed xstaff,xyear
+    //select "xstaff='"+xstaff+"' and xyear="+xyear
+    rows 50
+    objects  xyearperdate (link "login?screen=pdleaveapply&command=Show&xstaff=?&xyearperdate=?"),~
+       xdate,xtypeleave,xdatefrom,xdateto,xday,xhour,xstatus
+
+    header "S.No.","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Hour","Status"
+    totals "","","Total","","",sum
+  end list
+
+  list trn1
+    caption "Leave Detail "+xstaff+" "+xyearperdate
+    table pdleavedetail
+    order xyearperdate,xstaff
+    fixed xyearperdate,xstaff
+    //select "xstaff='"+xstaff+"' and xyearperdate="+xyearperdate
+    rows 20
+    objects xdate,xtypeleave
+    header "Date","Leave Type"
+  end list
+
+  form one
+    caption "Leave Application"
+    table pdleaveheader
+    primarykey xyearperdate,xstaff
+    order xyearperdate,xstaff
+    select "xstaff='"+xstaff+"' and xyear="+xyear"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Add,Show,Clear,*next,Apply For Leave,~
+            xstaff display(const),xname,xdate display(const),xtypeleave,xdaydeduct display(hide),xhourdeduct display(hide),~
+            xdatefrom,xdateto,xdaterpt,xyear display(const),xyesno,xday ,~
+			xyearperdate attrib(row 0 1) display(hide),xstatus display(const),xsid display(hide),xnote
+
+    field xstaff
+      default #user
+    end field
+    
+    
+	field xday
+	caption <font color=blue>No of Day(s)</font>
+	end field
+	
+    
+    field xtypeleave
+      display text
+      pick
+    end field
+    
+    field xyesno
+      caption Including Holliday
+      display const
+      default Yes
+      event before
+        set xyesno="Yes"
+      end event
+    end field
+    
+    field xdaterpt
+      caption <font color=red >Reporting Date  </font>
+      event before
+        set xdate=#date
+      end event
+    end field
+
+    field xname
+      attrib local
+      display const
+      event after
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+      end event
+    end field
+
+    field xstatus
+      default "Open"
+      event after
+        if xstatus .ne. "Open"
+          set #field(add.display)="hidden"
+          set #field(update.display)="hidden"
+          set #field(delete.display)="hidden"
+          set #field(apply.display)="hidden"
+        end if
+      end event
+    end field
+
+    field xdate
+      caption Application Date
+      event before
+        set year = #sub(xdate,0,4)
+        set per = #sub(xdate,5,2)
+        set day = #sub(xdate,8,2)
+        //set xyearperdate = year+per+day
+        set xyear=year
+      end event
+      event after
+        set globals(xyearperdate)=xyearperdate
+        set globals(xstaff)=xstaff
+        set globals(xyear)=xyear
+      end event
+    end field
+
+    //field Apply
+      //event before
+        //set xsid=#sql("select xsid from pdmst where xstaff='"+xstaff+"'")
+        // from,to,subject,bodytext,fdate,tdate,reason,number of days,type of leave,reporting date
+        //class pdmailnuvista(sendmail{xstaff,xsid,"Leave Application","",xdatefrom,xdateto,xnote,xday+" day(s)",xtypeleave,xdaterpt})
+      //end event
+    //end field
+    
+    field Apply
+      event before
+        set designation=#sql("select xdesignation from pdmst where xstaff='"+xstaff+"'")
+        set fyear=#sub(xdatefrom,0,4)
+        set fper=#sub(xdatefrom,5,2)
+        set fday=#sub(xdatefrom,8,2)
+
+        set tyear=#sub(xdateto,0,4)
+        set tper=#sub(xdateto,5,2)
+        set tday=#sub(xdateto,8,2)
+
+        set ryear=#sub(xdaterpt,0,4)
+        set rper=#sub(xdaterpt,5,2)
+        set rday=#sub(xdaterpt,8,2)
+       
+	   
+	   set bodytext="<font face="Arial" size="5" >LEAVE APPLICATION</font><br><br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Applicant&nbsp&nbsp&nbsp&nbsp:"+xname+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Type&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:"+xtypeleave+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Day(s)&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:"+xday+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Date(s)&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:"+fday+"-"+fper+"-"fyear+" to "+tday+"-"+tper+"-"tyear+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Reporting&nbsp&nbsp&nbsp:</font>"+rday+"-"+rper+"-"ryear+"<br>"
+	   
+		//set bodytext="I, "+xname+", "+designation+", hereby seek leave from "+fday+"-"+fper+"-"fyear+" to "+tday+"-"+tper+"-"tyear+" for "+xnote+". "
+     //   set bodytext=bodytext + "Kindly grant me leave for "+xday+" day(s) and consider it as "+xtypeleave+". My reporting date would be "+rday+"-"+rper+"-"ryear+".<br>"
+        //set bodytext=bodytext + "<br><font face="Arial" size="2">Thank you and regards,<br>"+xname+"</font>"
+        
+        set sid=#sql("select xsid from pdmst where xstaff='"+xstaff+"'")
+        
+        set tomailaddress=#sql("select xemail from pdmst where xstaff='"+sid+"'")
+				
+				set fromemail=#sql("select xemail from pddef")
+				set password=#sql("select xpassword from pddef")
+ 
+				// from,to,subject,bodytext,emailid,password
+      //  class zabmail(sendmail{fromemail,tomailaddress,"Leave Application",bodytext,"nuvistaleave@gmail.com","npl@s3rv3r"})
+      end event
+      event after
+print bodytext
+		set temp = #spsql(zabsp_sendmail,tomailaddress,bodytext)
+        set temp = #sql("update pdleaveheader set xstatus = 'Applied' where xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'")
+        action show
+      end event
+    end field
+
+
+    field add
+      event before
+        set xsid = pdmst.xsid("xstaff='"+xstaff+"'")	
+        double totday = 0.0
+        double avleave = 0.0
+        set xdaydeduct=1
+        set xhourdeduct=24
+        set xhourdeduct=xdaydeduct*24    
+        set temp1 = #sql("select xstaff from pdleaveview where xdate='"+xdatefrom+"' and xstaff='"+xstaff+"' and xstatus='Confirmed' and xtypeleave='"+xtypeleave+"'")
+        
+        if #result .eq. "true"
+          error "Cannot Proceed--Leave Already Taken on "+#sub(xdatefrom,8,2)+"-"+#sub(xdatefrom,5,2)+"-"+#sub(xdatefrom,0,4)
+        end if
+
+        set temp2 = #sql("select xstaff from pdleaveview where xdate='"+xdateto+"' and xstaff='"+xstaff+"' and xstatus='Confirmed' and xtypeleave='"+xtypeleave+"'")
+        if #result .eq. "true" and temp1. eq. ""
+          error "Cannot Proceed--Leave Already Taken on "+#sub(xdateto,8,2)+"-"+#sub(xdateto,5,2)+"-"+#sub(xdateto,0,4)
+        end if
+
+        if xtypeleave .eq. ""
+          error "You must choose leave type from top right corner of the screen"
+        end if
+        
+        if xtypeleave .eq. "Maternity Leave"
+          set xyesno="No"
+        end if
+        
+        if xtypeleave .ne. "Unpaid Leave" .and. xtypeleave .ne. "Tour"
+          set avleave = #sql("select xbalance from pdleaveasigne where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear="+xyear)
+         
+					set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"')")
+		 
+          set totday=totday+1
+          set totday=totday*xdaydeduct
+			//	print totday
+			//		print avleave
+					if totday > avleave
+            error "Cannot Proceed--Applied leave greater then available leave"
+          end if
+        end if
+	
+      end event
+      event after
+        action show
+      end event
+    end field
+
+    field update
+      event before
+        set xsid = pdmst.xsid("xstaff='"+xstaff+"'")	
+        double totday = 0.00
+        double avleave = 0.00
+        set xhourdeduct=xdaydeduct*24    
+        set temp1 = #sql("select xstaff from pdleaveview where xdate='"+xdatefrom+"' and xstaff='"+xstaff+"' and xstatus='Confirmed' and xtypeleave='"+xtypeleave+"'")
+        
+        if #result .eq. "true"
+          error "Cannot Proceed--Leave Already Taken on "+#sub(xdatefrom,8,2)+"-"+#sub(xdatefrom,5,2)+"-"+#sub(xdatefrom,0,4)
+        end if
+
+        set temp2 = #sql("select xstaff from pdleaveview where xdate='"+xdateto+"' and xstaff='"+xstaff+"' and xstatus='Confirmed' and xtypeleave='"+xtypeleave+"'")
+        if #result .eq. "true" and temp1. eq. ""
+          error "Cannot Proceed--Leave Already Taken on "+#sub(xdateto,8,2)+"-"+#sub(xdateto,5,2)+"-"+#sub(xdateto,0,4)
+        end if
+
+        if xtypeleave .eq. ""
+          error "You must choose leave type from top right corner of the screen"
+        end if
+        
+        if xtypeleave .ne. "Unpaid Leave" .and. xtypeleave .ne. "Tour"
+          set avleave = #sql("select xbalance from pdleaveasigne where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear="+xyear)
+       //   set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"')")
+       //   set totday=totday+1
+          set totday=totday*xdaydeduct
+          if totday > avleave
+            error "Cannot Proceed--Applied leave greater then available leave"
+          end if
+        end if
+      end event
+      event after
+        action show
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+	
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+      var detail
+
+    function clicked(b){
+      detail=b.value
+    }
+    function submitit(form){
+      if (detail=="Detail"){
+        form.screen.value = "pdleavedetail"
+        form.searchbutton.value = "Find xyearperdate=?&xstaff=?"
+        //return false
+      }
+    }
+    function picltype(link)
+    {
+      if (navigator.appName.indexOf("Netscape") >= 0)
+	  
+      {
+        //document.one.xinvnum.value=link.text
+        //document.one.xbalance.value=primebal.text
+        //document.one.xdate.value=date.text	
+		document.one.xtypeleave.value=link.text
+      }
+      else
+      {
+        document.one.xtypeleave.value=link.innerText
+        //document.one.xvatrate.value=vatamt.innerText
+        //document.one.xcost.value=cost.innerText
+        //document.one.xeta.value="1"
+     }
+      return false
+    }
+      
+    </script>
+  end jscript
+
+end screen

@@ -1,0 +1,120 @@
+screen pdleaveheader
+     caption "Leave Detail"
+//     sidebar 
+     sections form one,list trn,jscript myscript
+
+  	list trn
+        caption "Availed Leave Detail"
+        table pdleaveheader
+        order xstaff,xtypeleave
+        select "xstaff='"+xstaff+"'"
+        rows 20
+        objects  xyearperdate,xdate,xtypeleave,xdatefrom,xdateto,xday,xstatus,xpaidleave
+        header "SI No","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Status","Paid Leave"
+        totals "","","Total","","",sum
+     end list
+
+     form one
+        caption "<ACRONYM>Leave Application</ACRONYM>"
+	  table pdleaveheader
+        order xyearperdate,xstaff
+        select "xtypeleave<>'Suspend'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Top,Next,Previous,Bottom,*next,Apply For Leave,~
+          xdate,xtypeleave,xstaff,xname,~
+          xdatefrom,xdateto,xyear display(const),xpaidleave,xday display(const),xyearperdate display(hide),xstatus display(const)
+
+        field xname
+        	attrib local
+        	display const
+        	event after
+          	set xname=pdmst.xname("xstaff='"+xstaff+"'")
+        	end event
+        end field
+	  
+	  field xstatus
+	    default "Open"
+	  end field
+
+        field xdate
+          event before
+            set year = #sub(xdate,0,4)
+            set per = #sub(xdate,5,2)
+            set day = #sub(xdate,8,2)
+            set xyearperdate = year+per+day
+		set xyear=year
+          end event
+          event after
+            set globals(xyearperdate)=xyearperdate
+            set globals(xstaff)=xstaff
+          end event
+        end field
+
+        field Confirm
+          event after
+//            set temp = #spsql(sp_confirmLeave,#id,xyearperdate,xstaff,xday,xdatefrom,xdateto)
+//            class pdsheraton(confirmLeave{xyearperdate,xstaff,xday,other})
+
+          end event
+        end field
+
+         field add
+          event before
+            //set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+            //class pdsheraton(validateBeforeLeaveHeader{xyearperdate,xstaff})
+            set temp = #sql("select xrow from pdleavedetail where xdate='"+xdate+"'")
+            if #result .eq. "true"
+              error "Cannot Proceed--Leave Already Taken on "+#sub(xdate,8,2)+"-"+#sub(xdate,5,2)+"-"+#sub(xdate,0,4)
+            end if
+          end event
+         // event after
+         //   int totday =  0
+         //   set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"') from pdleaveheader where xyearperdate='"+xyearperdate+"'")
+         //   set totday=totday+1
+         //   set day = #sql("update pdleaveheader set xday = '"+totday+"' where xyearperdate='"+xyearperdate+"'")
+         // end event
+         end field
+
+       //  field update
+       //   event after
+       //     set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+       //     int totday =  0
+       //     set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"') from pdleaveheader where xyearperdate='"+xyearperdate+"'")
+       //     set totday=totday+1
+       //     set day = #sql("update pdleaveheader set xday = '"+totday+"' where xyearperdate='"+xyearperdate+"'")
+       //   end event
+       //  end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdleavedetail"
+            form.searchbutton.value = "Find xyearperdate=?&xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

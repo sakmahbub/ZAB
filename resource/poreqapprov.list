@@ -1,0 +1,13 @@
+
+     list poreqapprov
+        table poreqheader
+        order xporeqnum
+        select "xporeqnum like '%"+zvalue+"%' and xstatusreq='Approved'"
+        searchselect "xstatusreq='Approved'"
+		rows 20
+        objects xporeqnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xdate
+
+     end list
+
+

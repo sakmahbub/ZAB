@@ -1,0 +1,19 @@
+product ZAB ERP
+
+table acarvoucherchkview
+  caption "ARHED View"
+  columns zid,xdornum,xvoucher,xdate,xprime,xcus,xorg,xwh,xnote
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view acarvoucherchkview (zid,xdornum,xvoucher,xdate,xprime,xcus,xorg,xwh,xnote) ~
+                  as select a.zid,a.xvoucher,a.xdocnum,a.xdate,a.xprime,a.xcus,~
+                  b.xorg,a.xwh,a.xnote ~
+                  from arhed a join cacus b on a.zid=b.zid and a.xcus=b.xcus
+
+
+end table

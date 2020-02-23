@@ -1,0 +1,283 @@
+screen caitemupdate 
+
+     sections form detail,jscript myscript
+     sidebar list item
+	
+	  list item
+        caption "Item List"
+        table caitem
+        order xitem desc
+		//select "xlistview='1' and zactive='1'"
+		select "xgitem<>'Cost' and left(xitem,2) ='IC'"
+        rows 200
+       objects  xitem attrib(link "login?screen=caitemupdate&command=Show&xitem=?"), ~
+        xdesc 
+     end list
+	 
+     form detail
+        caption "Product Master Update"
+        table caitem
+        primarykey xitem
+        order xitem
+        select "left(xitem,2)='IC'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,*next,Update,Top,Next,Previous, Bottom,"</b></font><p>" ,~
+                xitem,xdesc width(50),xtheircode,xcountry,~
+                //xunit,xpartno display(hide),xtypeitem,xunitpur,xcfpur,xunitsel,xcfsel,xgitem,xcatitem,~
+				//xstockcat,xstocktype,xtitem,xpsize display(hide),xpnature display(hide),~
+				//xdealerp display(hide),xmrp display(hide),xvatamt display(hide),xcartoon display(hide),xpacking display(hide),~
+                //xcost display(hide),xdisc display(hide),xshelf display(hide),xrate,xvatrate,~
+                //xdateeff display(hide),xdateexp display(hide)
+				//xqty display(hide),~
+				//xqtybonus display(hide),xrateexp display(hide),xdiscstatus display(hide),~
+                xminqty,xmaxqty,zactive //,~//xgrade,
+               //xlong display(hide),xcitem display(hide),xstype display(hide),xcode
+	   
+	   
+		  field xcode
+          caption Transfer to Business
+		  attrib local
+		  display combo
+		  pick "select xlong from xcodes where xtype='Concern Name' and zactive = 1"
+		  end field
+	   
+	   field xdisc
+        caption Special Discount (Percent)
+       end field
+	   
+	   field xdesc
+        caption <br><FONT SIZE=2 COLOR=red>Item Description</font>
+       end field
+	   
+	   field xgitem
+        caption <br><FONT SIZE=2 COLOR=red>Item Group</font>
+       end field
+	   
+	   field xunitpur
+        caption <br><FONT SIZE=2 COLOR=red>Purchase Unit</font>
+       end field
+	   
+	   field xcfpur
+        caption <br><FONT SIZE=2 COLOR=red>Conv. Factor Purchase</font>
+       end field
+	   
+	   field zactive
+        caption <br><FONT SIZE=2 COLOR=red>Product</font>
+       end field
+	   
+	   field xcountry
+		//caption Country Of Origin
+        //pick "select distinct(xcountry) from caitem"
+       end field
+	
+       field xdiscstatus
+        caption Allow Discount (Over All)
+	Defualt "Yes"
+       end field 
+	   
+    field zactive
+		default "1"
+	end field 
+     
+       field xdum
+        attrib local
+        caption 
+        display const
+       end field
+	   
+	    field xshelf
+       pick code Rack No
+       end field
+	   
+	
+	field xqty
+		attib local
+		caption Qty Applicable
+		//display const
+	 event after
+        set xqty = #sql("select xqty from caitembonus where xitem='"+xitem+"'")
+     end event
+	end field
+	
+	field xqtybonus
+		attib local
+		caption Bonus Qty
+		//display const
+		event after
+		 set xqtybonus = #sql("select xqtybonus from caitembonus where xitem='"+xitem+"'")
+			//set xqtybonus=caitembonus.xqtybonus("xitem='"+xitem+"' and xqty='"+xqty+"'")
+		end event
+	end field
+	
+      field xcatname
+        attrib local
+        caption Item Category Name
+        display const
+        event after
+          set xcatname=xcodes.xlong("xtype='Item Category' and xcode='"+xcatitem+"'")
+        end event
+      end field
+
+
+        field xitem
+        // display trn Item Code
+		pick list xitemall
+          event after
+            set globals(xitem)=xitem
+          end event
+        end field
+		
+		field Transfer
+		 event before
+		if xcode .eq. ""
+		    error "Please Select Concern Name"
+		else if xitem .eq. ""
+		    error "Please Select Item"
+		else
+		 print "Item Transferred"
+		end if
+		end event
+          event after
+            set temp = #spsql(zabsp_Master_Data_Transfer,#id,#user,xcode,xcode,xitem,xitem,"Item Transfer")
+          end event
+        end field
+
+        field add
+        	event before
+        		set xcitem="NPL"
+				set desc=caitem.xdesc("xdesc='"+xdesc+"'")
+				set serial=caitem.xtheircode("xtheircode='"+xtheircode+"'")
+				set xstype="Stock-N-Sell"
+				//set xgitem="Finished Goods"
+				if xdesc .eq. ""
+					error "Please Write Product Description!"
+				else if desc .eq. xdesc .and. serial .eq. xtheircode
+				error "Product Already Exist!"
+				else if xgitem .eq. ""
+					error "Please select Item Group!"
+				else if xtheircode .ne. "" .and. xtheircode .eq. serial
+					error "Duplicate Part Number Doesn't Allow!"
+				else if xunit .eq. ""
+					error "Please select Unit of Measurement!"
+				else if xunitpur .eq. ""
+					error "Please select Purchase Unit"
+				else if xcfpur ==0
+					error "Please select Conversion Factor of Purchase"
+				else
+				set trn = "IC--"
+           		set xitem = #trn("Item Code",trn,9)
+				end if
+        	end event
+			event after
+				//print "<font color=red size=+2>Item Created.</font>"
+			end event
+			
+        end field
+
+	field Update
+        	event before
+				set desc=caitem.xdesc("xdesc='"+xdesc+"'")
+				set serial=caitem.xtheircode("xtheircode='"+xtheircode+"'")
+				set xstype="Stock-N-Sell"
+				//set xgitem="Finished Goods"
+				if xdesc .eq. ""
+					error "Please Write Product Description!"
+				end if
+        	end event
+			event after
+				//print "<font color=red size=+2>Item Updated.</font>"
+			end event
+			
+        end field
+
+    //    field xitem
+        //  display trn Item Code
+    //    end field
+
+        field xlong
+           width 100
+           column 2
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Bonus
+          embed onclick="clicked(this)"
+        end field
+
+        field Discount
+          embed onclick="clicked(this)"
+        end field
+
+        field Gift
+          embed onclick="clicked(this)"
+        end field
+
+        field Cost Price
+          embed onclick="clicked(this)"
+        end field
+		
+		 field Rack Entry
+          embed onclick="clicked(this)"
+        end field
+
+        field Selling Price
+          embed onclick="clicked(this)"
+        end field
+
+        field Package
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Bonus"){
+            form.screen.value = "caitembonus"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Discount"){
+            form.screen.value = "caitembonusrbb"
+            form.searchbutton.value = "Find xitem=?"
+          }
+           if (detail=="Gift"){
+            form.screen.value = "cagiftitem"
+            form.searchbutton.value = "Find xitem=?"
+          }
+           if (detail=="Package"){
+            form.screen.value = "caitempackage"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Cost Price"){
+            form.screen.value = "caitemcostprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Selling Price"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+		   if (detail=="Rack Entry"){
+            form.screen.value = "caitemshelf"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

@@ -1,0 +1,190 @@
+screen imdashboard
+
+     sections form one,jscript myscript
+
+
+     form one
+        caption "Dashboard (Inventory Management)"
+        return "login"
+        layout 2
+        pstyle graph
+        objects Filter,xyear,xfdate,xtdate,immstock,imstockrcvd,imloaniss,imloanrec//,pograph13,pograph2,pograph15,pograph14,pograph16//pograph4,pograph1,pograph17,pograph3,
+
+		field immstock
+			//column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+			height
+			event after
+				set immstock = xfdate+","+xtdate
+			end event
+		end field
+		
+		field imstockrcvd
+			//column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+			height
+			event after
+				set imstockrcvd = xfdate+","+xtdate
+			end event
+		end field
+		
+		field imloaniss
+			//column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+			event after
+				set imloaniss = xfdate+","+xtdate
+			end event
+		end field
+		
+		field imloanrec
+			//column 2
+			graphtype 3d-column-drilldown
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+			event after
+				set imloanrec = xfdate+","+xtdate
+			end event
+		end field
+		
+		field pograph13
+			column 2
+			graphtype 3d-column//3d-pie-donut//
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+		end field
+
+		field pograph15
+			column 2
+			graphtype 3d-pie-donut//funnel//3d-column//line-labels//funnel//combo-multi-axes
+			graphsp zabsp_IM_imdashboard//,pograph1
+			graphtable imgraphdata
+			attrib local
+			display const
+		end field
+
+		field pograph14
+			//column 2
+			graphtype 3d-pie-donut//funnel//3d-column//line-labels//funnel//combo-multi-axes
+			graphsp zabsp_IM_imdashboard//,pograph1
+			graphtable imgraphdata
+			attrib local
+			display const
+		end field	
+
+
+		field pograph16
+			//column 2
+			graphtype 3d-column//3d-pie-donut//
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+		end field		
+		
+		field pograph17
+			column 2
+			graphtype 3d-column//funnel//3d-pie-donut//combo-multi-axes//column-basic//combo-multi-axes//3d-column//line-labels//
+			graphsp zabsp_IM_imdashboard//,pograph1
+			graphtable imgraphdata
+			attrib local
+			display const
+		end field
+		
+		
+		field pograph1
+			column 2
+			graphtype 3d-column//combo-multi-axes//pyramid//3d-pie-donut//combo-multi-axes//funnel//3d-column//column-basic//combo-multi-axes//line-labels//
+			graphsp zabsp_IM_imdashboard//,pograph1
+			graphtable imgraphdata
+			attrib local
+			display const
+		end field
+		
+		field pograph2
+			column 2
+			graphtype 3d-pie//pyramid//funnel//column-rotated-labels//3d-pie//column-drilldown//pyramid//3d-column
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+		end field
+		
+		
+		field pograph3
+		column 2
+			graphtype column-drilldown//pyramid//
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+		end field
+		
+		field pograph4
+		column 2
+			graphtype treemap-large-dataset//line-labels//3d-pie
+			graphsp zabsp_IM_imdashboard
+			graphtable imgraphdata
+			attrib local
+			display const
+		end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetail"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Ammendment"){
+            form.screen.value = "polcamend"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Costs"){
+            form.screen.value = "poordcost"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Commodity"){
+            form.screen.value = "poordcommodity"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Shipment"){
+            form.screen.value = "poordshipment"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Receiving"){
+            form.screen.value = "poordreceive"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+        </script>
+    end jscript
+
+ end screen

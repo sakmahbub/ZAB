@@ -1,0 +1,22 @@
+
+product ZAB ERP
+
+table acmstview
+  caption "Ac Bal View"
+  columns zid,xacc,xsub,xyear,xprime,xacctype,xwh,xhwh
+  primary key zid,xacc,xsub,xyear
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view acmstview (zid,xacc,xdesc,xacctype,xhrc1,xhrc1desc,xhrc2,xhrc2desc,xhrc3,xhrc3desc,xhrc4,xhrc4desc,xhrc5,xhrc5desc)~
+                  as select a.zid,a.xacc,a.xdesc,a.xacctype,a.xhrc1,~
+				  isnull((select xdesc from achrc1 where zid=a.zid and xhrc1=a.xhrc1),''),a.xhrc2,~
+				  isnull((select xdesc from achrc2 where zid=a.zid and xhrc1=a.xhrc1 and xhrc2=a.xhrc2),''),a.xhrc3,~
+				  isnull((select xdesc from achrc3 where zid=a.zid and xhrc1=a.xhrc1 and xhrc2=a.xhrc2 and xhrc3=a.xhrc3),''),a.xhrc4,~
+				  isnull((select xdesc from achrc4 where zid=a.zid and xhrc1=a.xhrc1 and xhrc2=a.xhrc2 and xhrc3=a.xhrc3 and xhrc4=a.xhrc4),''),a.xhrc5,~
+				  isnull((select xdesc from achrc4 where zid=a.zid and xhrc1=a.xhrc1 and xhrc2=a.xhrc2 and xhrc3=a.xhrc3 and xhrc4=a.xhrc4),'') ~
+                  from acmst a
+				  
+
+end table

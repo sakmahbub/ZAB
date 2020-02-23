@@ -1,0 +1,333 @@
+screen cacus
+
+     sidebar list rate,list buyer,list shipping,list billing//address//list one,
+     sections  form one, jscript myscript
+	 
+	 list rate
+    caption "Special Rate List"
+    table cacusprice
+    order xcus,xrow,xitem
+    fixed xcus
+	select "zactive ='1'"
+    rows 100
+    objects  xrow attrib(link "login?screen=cacuspriceupdate&command=Show&xcus=?&xitem=?&xrow=?"),xitem, ~
+             descode equals((select xtheircode from caitem where zid=cacusprice.zid and xitem=cacusprice.xitem)),~
+			 desc equals((select xdesc from caitem where zid=cacusprice.zid and xitem=cacusprice.xitem)),xcolortype,xrate,zactive
+	headers "Row","Item","Old Code","Description","Color Type","Rate","Active"
+  end list
+  
+  
+   list shipping
+    caption "Shipping Address List of  " + xorg
+    table cacusaddress
+    order xcus,xrow
+    fixed xcus
+	select "xtype ='Shipping'"
+    rows 20
+    objects  xrow attrib(link "login?screen=cacusaddress&command=Show&xcus=?&xrow=?"), ~
+             xtype,xmadd//xshippingadd,xbillingadd
+	headers "Serial No.","Address Type","Address"
+  end list
+  
+  list billing
+    caption "Billing Address List of  " + xorg
+    table cacusaddress
+    order xcus,xrow
+    fixed xcus
+	select "xtype ='Billing'"
+    rows 20
+    objects  xrow attrib(link "login?screen=cacusaddress&command=Show&xcus=?&xrow=?"), ~
+             xtype,xmadd//xshippingadd,xbillingadd
+	headers "Serial No.","Address Type","Address"
+  end list
+  
+  
+   list buyer
+    caption "Buyer List"
+    table cacusbuyer
+    order xcus,xbuyer
+    fixed xcus
+    rows 20
+    objects  xrow attrib(link "login?screen=cacuspriceupdate&command=Show&xcus=?&xbuyer=?&xrow=?"),xbuyer, ~
+             desc equals((select xorg from cacus where zid=cacus.zid and xbuyer=cacus.xcus))
+	headers "Row","Buyer","Name"
+  end list
+  
+    list address
+    caption "Address List" 
+    table cacusaddress
+    order xcus,xrow
+    fixed xcus
+    rows 20
+    objects  xrow attrib(link "login?screen=cacusaddress&command=Show&xcus=?&xrow=?"), ~
+             xshippingadd,xbillingadd
+	
+  end list
+	 
+	 
+	 
+	
+
+     form one
+        caption "Customer Master"
+      	table cacus
+        primarykey xcus
+        order xcus
+        select "xtype in ('Customer','Both')"
+        return "login"
+        layout 2
+        pstyle 3 
+        objects Show,Clear,Upload,*next,Add,Update,Delete,*next, Top,Previous,Next,Bottom,Special_Rate,Buyer,Address,Credit Info,"<p>" ,~ //Update,Agreement Products,Terms & Condition,Transfer,
+                xcus,cus,xorg,xalias,xmadd,xgcus,xemail,xbank,xbankname,xsupcat display(hide),~
+                 xphone,xmobile,xpkey display(hide)attrib(local),~
+                xcontact,xstatuscus display(hide),xtype display(hide),xpaymentterm,,xsalesperson,name,xtin, xfax, xurl,xvatregno,xvatrate //,xcode,xnum
+
+	field cus
+		caption <br><FONT SIZE=2 COLOR=red>Upload Image</font>
+		attrib local
+      	display const
+      	event after
+		set cus = cacus.xcus("xcus='"+xcus+"'")
+      	end event
+			embed href="#" onclick="upload(this)"
+	end field
+
+	
+	
+	
+	
+	
+	
+	field xstatuscus
+		default "Open"
+	end field
+	
+	field xmadd
+		caption Billing Address
+	end field
+	
+	field xsupcat
+		caption Customer Category
+		pick code Customer Category
+	end field
+	
+	field xcode
+		caption Transfer to Business
+		attrib local
+		display combo
+		pick "select xlong from xcodes where xtype='Concern Name'"
+	end field
+	
+	
+	
+
+	field xcus
+		//caption Party Code
+		pick list cacus
+	 event after
+		 set globals(xcus)=xcus
+		 set globals(xorg)=xorg
+		 //class careports(getReport{supplierlist;1;in;zid;xcus;View Supplier List})
+		 //class careports(getReport{supplier;2;in,st;zid,xcus;xcus;View Supplier})
+	 end event
+    end field
+	
+	field xbankname
+		  	attrib local
+		  	display const
+		  	caption Bank Name
+		  	event after				
+		  		set xbankname=cabank.xname("xbank='"+xbank+"'")+"<br>"+cabank.xbacc("xbank='"+xbank+"'")+"<br>"+cabank.xbranch("xbank='"+xbank+"'")+"<br>"+cabank.xmadd("xbank='"+xbank+"'")+"<br>"+cabank.xswiftcode("xbank='"+xbank+"'")
+		  	end event
+    end field
+
+	
+	field xsalesperson
+		pick list xstaff
+	end field
+	
+	field name
+          attrib local
+          caption Name
+          display constant
+          event after
+            set name = pdmst.xname("xstaff = '"+xsalesperson+"'")
+          end event
+        end field
+
+
+	field xalias
+		caption Short Name
+	end field
+
+    field xgcus
+      //def "Local"
+    end field
+		
+		field Transfer
+		 event before
+		if xcode .eq. ""
+		    error "Please Select Concern Name!"
+		else if xcus .eq. ""
+		    error "Please Select From Item"
+		else
+		 print "Party Transferred"
+		end if
+		end event
+          event after
+            set temp = #spsql(zabsp_Master_Data_Transfer,#id,#user,xcode,xcode,xcus,xcus,"Party Transfer")
+          end event
+        end field
+
+    field Show
+	event after
+		set xpkey=xcus
+	end event
+	end field
+	
+	field add
+      event before
+	  set org=#sql("select xorg from cacus WHERE xorg='"+xorg+"' and xtype='Customer'")
+        if xgcus .eq. ""
+          error "Cannot Proceed -- Please Choose Customer Group"
+        else if xorg .eq. ""
+          error "Cannot Proceed -- Party Description is Blank"
+		 else if org .eq. xorg
+          error "Cannot Proceed -- Party Already Exists" 
+		 else if xalias .eq. ""
+		  error "Cannot Proceed -- Party Short Name is Blank"
+        //*********** GETTING TRN NO ****************
+        else
+			set xtype="Customer"
+			set xstatuscus="Open" 
+			set xallowcrinv="No"
+			set xallbndisc="No"
+			 set xcus = #trn("Party Code","PAR-",10)
+			set xpkey=xcus
+        end if
+      end event
+    end field
+	
+	
+	  field Update
+      event before
+		if xpkey .ne. xcus
+					error "Please press show first!"
+        else if xcus .eq. ""
+          error "Cannot Proceed -- Please Choose Customer Group"
+        else if xorg .eq. ""
+          error "Cannot Proceed -- Company name is Blank"
+		else if xalias .eq. ""
+		  error "Cannot Proceed -- Party Short Name is Blank"
+        //*********** GETTING TRN NO ****************
+			//else
+			//set xtype="Customer"
+        end if
+      end event
+    end field
+	
+	
+	
+	field Upload
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"cacus","xcusimage",xcus)
+          end event
+		end field	
+
+
+field delete 
+	event before
+	  
+       set sup=acdetail.xsub("xcus='"+xcus+"'")
+	   if xcus .eq. sup
+	   error "Can not delete record"
+	   end if
+	   end event
+end field
+
+   field Agreement
+        embed onclick="clicked(this)"
+    end field
+	field Special_Rate
+        embed onclick="clicked(this)"
+    end field
+	field Address
+        embed onclick="clicked(this)"
+    end field
+
+	
+    field Terms
+        embed onclick="clicked(this)"
+    end field
+	
+	 field Credit
+        embed onclick="clicked(this)"
+    end field
+	
+    field Buyer
+        embed onclick="clicked(this)"
+    end field
+	
+	
+ 
+       embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+         <script language="javascript" type="text/javascript">
+        var but
+        var result
+        function clicked(b){
+          but = b.value		
+		  }
+		function upload(b){          
+			window.open("//182.160.118.234:9191/zabimage")			
+		}	
+        
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "casup"
+            form.searchbutton.value = "Find xcus=?"
+          }
+          if (but == "Agreement Products"){
+            form.screen.value = "casupitem"
+            form.searchbutton.value = "Find xcus=?"
+          }
+		  if (but == "Special_Rate"){
+            form.screen.value = "cacuspriceupdate"
+            form.searchbutton.value = "Find xcus=?"
+          }
+		  if (but == "Buyer"){
+            form.screen.value = "cacusbuyerupdate"
+            form.searchbutton.value = "Find xcus=?"
+          }
+		    if (but == "Address"){
+            form.screen.value = "cacusaddress"
+            form.searchbutton.value = "Find xcus=?"
+          }
+		   if (but == "Credit Info"){
+            form.screen.value = "cacuscredit"
+            form.searchbutton.value = "Top"
+          }	
+
+
+          if (but == "Terms & Condition"){
+            form.screen.value = "casupterms"
+			form.searchbutton.value = "Find xcus=?"
+            //form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+
+end screen

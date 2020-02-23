@@ -1,0 +1,19 @@
+//op.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Product Wise Target Entry        |#classPath+"/login?screen=opproducttarget"
+MIO Wise Target Entry            |#classPath+"/login?screen=optargetheader"
+Region                           |#classPath+"/login?screen=xcoderegion"
+Fields                           |#classPath+"/login?screen=xcodfields"
+Territory                           |#classPath+"/login?screen=xcodesterritorycode"
+Reports                          |#classPath+"/login?menu=optrgreport"
+//Reports (RSM)                    |#classPath+"/login?menu=optrgrsmreport"
+//RSM Wise Target                  |#classPath+"/login?screen=optargetrsmedit"
+//FM Wise Target                  |#classPath+"/login?screen=optargetfmedit"
+//Market Information               |#classPath+"/login?screen=samarketinfo"
+//Incentive Master                 |#classPath+"/login?screen=optrginsheader"
+//Incentive Process                |#classPath+"/login?screen=optrginsprcs"
+//Incentive Info                   |#classPath+"/login?screen=optrginscalcheader"
+//-------------------------------------------------------------------
+

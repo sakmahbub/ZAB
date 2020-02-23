@@ -1,0 +1,284 @@
+screen oppayorderadvheader
+	
+     sidebars list one
+     sections form one, jscript myscript
+
+	 list one
+        caption "Pay Order Against JOB Detail List."
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=opcashadvdetail&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xlineamt
+
+		headers "Line No","Item","Description","Amount"
+		totals "","Total","",sum
+     end list
+
+
+     form one
+		caption "Pay Order Against JOB Header"
+        table poreqheader
+        order xporeqnum desc
+		//select "xstatusreq='Approved' or xstatusreq='PO Created'"
+		//select "xstatusreq='Approved' and xtype='Cash'"
+        select "left(xporeqnum,4)='PAY-'"//" and zauserid='"+#user+"'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Add,Show,Clear,Update,Delete,*Next,Details,Top, Previous, Next, Bottom,Confirm,~
+				Upload_One,Upload_Two,Upload_Three,Upload_Four,Upload_Five,"<p>",~
+                xporeqnum,xdate,xsup display(hide),xorg display(hide),xqotnum display(hide),xfwh,xfbrname,xtwh display(hide),~
+				xtype display(hide),xstatusreq display(const),xordernum,xstaff,sname,xnote,xsuperiorsp display(hide),~
+				xep display(hide),xstatus display(hide),xstatusap display(hide),~
+				xstatusgl display(hide),xcus display(hide),xfile
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+		  
+		  field xstaff
+		  pick list xstaffcnf
+		  caption Paid to
+		  end field
+		  
+		   field sname
+            attrib local
+            display const
+            caption Name
+            event after
+              set sname= pdmst.xname("xstaff= '"+xstaff+"'")
+            end event
+          end field
+          
+		  	field xtype
+			caption Pay Order Type
+			display combo
+			pick "Cash,Bank"
+			//default "Other"
+			end field
+		  
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xregi
+           caption Car No. / Other
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+        	width 15
+			pick list advancenum
+          event after
+		  //class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+		  class careports(getjspReport{cnfadvletter,1,xporeqnum,View Advance Letter})
+		  // class careports(getjspReport{cnfadvletterex,1,xporeqnum,View Advance Letter(PDF)})
+            set globals(xporeqnum)=xporeqnum
+			 set globals(xordernum)=xordernum
+			 set globals(xstatusreq)=xstatusreq
+			  if xstatusreq .ne. ""
+		         	//set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Confirm.display)="hidden"
+       	      end if
+          end event
+        end field
+		
+		field xfwh
+		default #wh
+		event before
+		 //
+		end event
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	   	field Upload_One
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqheader","ximageadv",xporeqnum)
+          end event
+		end field
+		
+			field Upload_Two
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqheader","ximageadv2",xporeqnum)
+          end event
+		end field
+		
+			field Upload_Three
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqheader","ximageadv3",xporeqnum)
+          end event
+		end field
+		
+			field Upload_Four
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqheader","ximageadv4",xporeqnum)
+          end event
+		end field
+		
+		field Upload_Five
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqheader","ximageadv5",xporeqnum)
+          end event
+		end field
+	   
+	   	field confirm
+            event before
+			double lineamt=#sql("select sum(xlineamt) from poreqdetail where xporeqnum='"+xporeqnum+"'")
+			if lineamt <1
+			error "Please add detail"
+			else if xstatusreq .ne. ""
+				error "SR Already Confirm"
+			end if
+            end event
+            event after
+			 set temp =  #sql("update poreqheader set xstatusreq='Open' where xporeqnum='"+xporeqnum+"'")
+			 set temp = #spsql(zabsp_sendmail,#id,#user,xporeqnum,"Department2","")
+	         action show
+            end event
+          end field
+		
+		  field add
+			event before
+				set xsuperiorsp=pdmst.xsuperiorcnf("xposition='"+#user+"'")
+				set trn = "PAY-"
+				set xstatusreq=""
+				//set xtype="Cash"
+				set xstatusrec="Open"
+				set xstatus="Open"
+				set xstatusap="Open"
+				set xstatusgl="Open"
+				//set xfile="F:\uploads\"+xfile
+				set xfile=xfile
+				set xcus=opordheader.xcus("xordernum='"+xordernum+"'")
+				set xtwh=xfwh
+				set xep=pdmst.xstaff("xposition='"+#user+"'")
+				if xfwh .eq. ""
+				error "Please select Branch/Store for Requisition Product"
+				else if xordernum .eq. ""
+				error "Please Select JOB No."
+				else
+				set year = #sub(xdate,2,2)
+				set poreqnum = #trn("Pay Order Number",trn,10)   
+				set xporeqnum= #sub(poreqnum,0,4)+year+#sub(poreqnum,6,4)
+				//set xporeqnum = #trn("Pay Order Number",trn,10)
+				end if
+			end event
+        end field
+		
+		field update
+			event before
+			if xcus .eq. ""
+			error "Please Show first"
+			else
+			set xfile="F:\uploads\"+xfile
+			set xsuperiorsp=pdmst.xsuperiorcnf("xposition='"+#user+"'")
+			set xtwh=xfwh
+			end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "oppayorderadvdetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

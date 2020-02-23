@@ -1,0 +1,28 @@
+//General Accounts Codes & Parmeter.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Machine Name                     |#classPath+"/login?screen=xcodes(xtype=Machine)"
+Item Raw Material                     |#classPath+"/login?screen=xcodes(xtype=Item Raw Material)"
+///Cotton Type                      |#classPath+"/login?screen=xcodes(xtype=Cotton Type)"
+//Customer Master (Add New)		 |#classPath+"/login?screen=cacus"            	 
+//Customer Master (Update) 	   	 |#classPath+"/login?screen=cacusupdateheader"  
+///Default Setting                  |#classPath+"/login?screen=modef"
+///Dyeing Department				 |#classPath+"/login?screen=xcodes(xtype=Dyeing)"
+///Fabric Technical Test  			 |#classPath+"/login?screen=xcodes(xtype=Fabric Technical Test)"
+///Fabric Type                      |#classPath+"/login?screen=xcodes(xtype=Fabric Type)"
+///Finish Type                      |#classPath+"/login?screen=xcodes(xtype=Finish Type)"
+///Finishing Department			 |#classPath+"/login?screen=xcodes(xtype=Finishing)"
+
+///Pretreatment Department			 |#classPath+"/login?screen=xcodes(xtype=Pretreatment)"
+///Printing Department				 |#classPath+"/login?screen=xcodes(xtype=Printing)"
+Product Master                   |#classPath+"/login?menu=immst"           	 
+///Process Type                     |#classPath+"/login?screen=xcodes(xtype=Process Type)"
+///Process No          			 |#classPath+"/login?screen=xtrn(xtypetrn=Process Number)"
+///Process Transaction Code         |#classPath+"/login?screen=xtrnp(xtypetrn=Process Number)"
+///Production Process               |#classPath+"/login?screen=xcodesprcs"
+///Related Transaction Code         |#classPath+"/login?screen=xtrnp(xtypetrn=Batch No)"
+///Store Setting					 |#classPath+"/login?screen=xcodesstore"  
+SO Number                        |#classPath+"/login?screen=xtrn(xtypetrn=SO Number)"
+Batch No                         |#classPath+"/login?screen=xtrn(xtypetrn=Batch No)"
+//-------------------------------------------------------------------

@@ -1,0 +1,196 @@
+screen pordt
+     caption "PO Entry - Details"
+     sidebar //, text html
+     sections form detail,list order, jscript myscript
+
+
+     list stock
+        caption "<br><center><b>Inventory Status for <font color=red >"+xitem+"</font>: "+xdesc+"</b><p>"
+        table imstock
+        order xitem
+        fixed xitem
+        select "xinhand+xopalc+xopdor+xpoord+xpogrn>0"
+        //navigators alpha
+        rows 20
+        objects xwh, ~
+                xavail equals(xinhand-xopalc-xopdor-xwoalc-xwokit-xtoout), ~
+                xinhand,xopord,xopalc,xopdor,~
+                xpoord,xpogrn,xwoalc,xwokit,xtoout
+
+//        totals "Totals",sum,sum,sum,sum,sum,sum,sum,sum
+
+        //headers none
+     end list
+
+     list order
+        caption "<b>Details for PO <font color=red >"+xporeqnum+"</font></b><p>"
+        table pordt
+        order xporeqnum,xrow
+        fixed xporeqnum
+        //select none
+        //navigators alpha
+        rows 20
+        objects xrow attrib(link "login?screen=pordt&command=Show&xporeqnum=?&xrow=?"), ~
+                xitem,xdesc, xqtyord,xcur,xrate,xdisc,xmargin,xdiscf,xlineamt equals(xqtyord*xrate*(1-xdisc/100)/(1-xmargin/100)-xdiscf),~
+                xinclude
+
+//        totals count,"","Totals",sum,"","","","","",sum,""
+        field xcur
+          caption Cur
+        end field
+        //headers none
+     end list
+     text html
+        "<p><b>Product Information</b><br>"
+        //"<object border=0 data=""/partners.htm"" type=""text/plain"" height=100% width=100% ></object>"
+        //"<object border=0 data=/"+xitem+".htm type=""text/plain"" height=100% width=100% ></object>"
+        "<object border=0 data="+xlinks+" type=""text/plain"" height=100% width=100% ></object>"
+
+     end text
+
+     form detail
+        caption "Detail of "+xporeqnum
+        table pordt
+        order xporeqnum,xrow
+        fixed xporeqnum
+        //select
+        return "login"
+        layout 2
+
+
+
+
+        objects Return,Add,Update, Delete, Show, Top, Previous, Next, Bottom,Clear,"</b></font><p>" ,~
+                xrow attrib(row 0 10;search),xinclude,xcode attrib(attach), ~
+                xcodebasis display(constant), xdesc display(constant),xitem  display(constant),xwh,~
+                xqtyord,xrate,~
+                xdisc,xdiscf,xmargin,xcomm ,~
+                xdatereq,xstype display(constant), xlinks attrib(hidden), ~
+                xunitpur,~
+                xcfpur ,~
+                xdatesch display(constant),xdaterec display(constant),~
+                xpricebasis display(hide), ~
+//                xlineamt equals(xqtyord*xrate*(1-xdisc/100)/(1-xmargin/100)-xdiscf) display(constant) attrib(attach) ,~
+                xcur display(hide),~
+                xexch display(hide),~
+                xcurprice display(hide),~
+                xexchbuy display(hide),xprice display(hide),~
+                xtaxcat display(hide), ~
+                xtaxcode1 display(hide),xtaxrate1 display(hide),xtaxscope display(hide),~
+                xstatusrdt display(hide),~
+                xordernum display(constant),xlong
+
+        field xinclude
+             caption Exclude
+             default "11"
+             pick "RFQ,Purchase Order"
+        end field
+
+        field xitem
+          event after
+            set globals(xitem)=xitem
+          end event
+        end field
+
+        field xcode
+          pick list xitem
+        end field
+
+        field xlong
+          pick list caitem-xlong-xcode
+          width 40
+          height 3
+        end field
+
+
+        field Add
+          event before
+
+            set xqtygrn = 0
+            set xqtystk = 0
+            set xcur=#sql(string,"select xcur from poreq where xporeqnum='"+xporeqnum+"'")
+            set xexch=#sql(double,"select xexch from poreq where xporeqnum='"+xporeqnum+"'")
+
+            class pomidcon(verify)
+            if xstatusrdt .eq. "Failed"
+              error "Failed to verify"
+            end if
+
+          end event
+          event after
+               class pomidcon(reqitem)
+          end event
+        end field
+        field Update
+          event before
+            set lastwh=""+pordt.xwh("xporeqnum='"+xporeqnum+"' and xrow='"+xrow+"'")
+            set lastcode=""+pordt.xcode("xporeqnum='"+xporeqnum+"' and xrow='"+xrow+"'")
+            if lastcode .ne. xcode
+                class pomidcon(verify)
+                if xstatusrdt .eq. "Failed"
+                  error "Failed to verify"
+                end if
+            end if
+          end event
+          event after
+              if lastcode .ne. xcode
+                class pomidcon(reqitem)
+              end if
+          end event
+        end field
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     list item
+        caption "<b>Select Item</b><br>"
+        table caitem
+        order xitem
+        fixed
+        //select none
+        navigators alpha,group xgitem "select xcode from xcodes where xtype = 'Item Group'"
+        rows 20
+        objects ~
+                xitem attrib(link "login?screen=pordt&command=Show&xporeqnum=?&xrow=?" embed onclick="return pickItem(this)"), ~
+                //xitem attrib(link "login?screen=pordtitem&command=Show&xitem=?"), ~
+                xgitem,xdesc, xalias, xcurprice,xstdprice,xunitpur
+
+        //totals count,"","Totals",sum,"","",sum,"",sum
+
+        //headers none
+     end list
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+//          b.value = "Find xporeqnum=?"
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "poreq"
+            form.searchbutton.value = "Find xporeqnum=?"
+            //return false
+          }
+        }
+
+        function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.detail.xcode.value=link.text
+          }else{
+            document.detail.xcode.value=link.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+
+end screen

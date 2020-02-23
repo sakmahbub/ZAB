@@ -1,0 +1,12 @@
+product ZAB ERP
+
+table xusers
+  caption "Business Users"
+  columns ztime, zutime,zauserid,zuuserid, zid,~
+          zemail, xpassword, xaccess, xdformat,xdsep,xrole,zactive,xlastlogdate,xwh,xsp,xoldpass,xposition
+  primary key zid, zemail
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  list xaccess, zactive,xlastlogdate
+end table

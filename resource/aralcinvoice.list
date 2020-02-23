@@ -1,0 +1,17 @@
+     list aralcinvnum
+        table aralc
+        order xinvnum
+        //select none
+        navigators alpha
+        rows 20
+        objects xinvnum attrib(link "abc" embed onclick="return updateParent(this:'xinvnum')"), ~
+                xvoucher,xdate
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

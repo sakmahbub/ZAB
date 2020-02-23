@@ -1,0 +1,50 @@
+Sales Codes & Parameter.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+
+Color Master                     |#classPath+"/login?menu=color"
+Customers Master                 |#classPath+"/login?menu=cacus"        	 
+Buyer Master   					 |#classPath+"/login?screen=cacusbuyer"
+Bank Name Entry                  |#classPath+"/login?screen=cabank"
+//PI Terms & Condition             |#classPath+"/login?screen=xcodes(xtype=PI Terms and Condition)"
+All Terms & Condition            |#classPath+"/login?screen=zterms"
+Payment Terms                    |#classPath+"/login?screen=xcodes(xtype=Payment Terms)"
+HS Code                          |#classPath+"/login?screen=xcodes(xtype=HS Code)"
+LC/SC Type                       |#classPath+"/login?screen=xcodes(xtype=LC Type)"
+Shipment By                      |#classPath+"/login?screen=xcodes(xtype=Shipment By)"
+Price basis/ Trade term          |#classPath+"/login?screen=xcodes(xtype=Inco-Terms)"
+Order Priority                   |#classPath+"/login?screen=xcodes(xtype=Order Priority)"
+
+
+////Delivery Chalan Number           |#classPath+"/login?screen=xtrn(xtypetrn=DC Number)"
+////DC Related Transaction Codes     |#classPath+"/login?screen=xtrnp(xtypetrn=DC Number)"
+////CRN Number                       |#classPath+"/login?screen=xtrncrnno"
+////CRN Related Transaction Codes    |#classPath+"/login?screen=xtrnp(xtypetrn=CRN Number)"
+//AR Interface                       |#classPath+"/login?screen=optoari"
+///Salse Default                     |#classPath+"/login?screen=opdef"
+Delivery Order Number            |#classPath+"/login?screen=xtrn(xtypetrn=DO Number)"
+DO Related Transaction Codes     |#classPath+"/login?screen=xtrnp(xtypetrn=DO Number)"
+Party Transaction Codes          |#classPath+"/login?screen=xtrn(xtypetrn=Party Code)"
+Sales Contact No            	 |#classPath+"/login?screen=xtrn(xtypetrn=SC Number)"
+//PI Number                      |#classPath+"/login?screen=probissue"
+//-------------------------------------------------------------------
+//Customer Master (Add New) 	   |#classPath+"/login?screen=cacus"            	 
+//Customer Master (Update) 	   |#classPath+"/login?screen=cacusupdateheader"    
+
+//MIO                              |#classPath+"/login?screen=cappowh"
+//Sales Assistant                  |#classPath+"/login?screen=casp"
+//Market             	         |#classPath+"/login?screen=xbrmarket"  
+//Route                            |#classPath+"/login?screen=xcodesroute"
+//Territory                        |#classPath+"/login?screen=xcodesterritorybr"
+//Sales Manager                    |#classPath+"/login?screen=casm"
+//Regional Sales Manager           |#classPath+"/login?screen=carsm"
+//Field Manager                    |#classPath+"/login?screen=cafmwh"
+//Region                           |#classPath+"/login?screen=xcodesregion"
+//Zone                             |#classPath+"/login?screen=xcodes(xtype=Zone)"
+//Fields                           |#classPath+"/login?screen=xcodesfields"
+//Bank Name Entry                  |#classPath+"/login?screen=cabank"
+//Reason For Return                |#classPath+"/login?screen=xcodes(xtype=Reason For Return)"
+//DO Number                        |#classPath+"/login?screen=xtrndono"
+//Summary Number                   |#classPath+"/login?screen=xtrnsumno"
+

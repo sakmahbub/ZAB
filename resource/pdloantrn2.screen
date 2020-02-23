@@ -1,0 +1,166 @@
+screen pdloantrn
+
+  sidebar list schedule 
+  sections form one,jscript myscript
+
+  list schedule
+    caption "Schedule Detial List "+xvoucher
+    table pdloantrndt
+    order xvoucher,xrow
+    fixed xvoucher
+    rows 100
+    objects xrow attrib(link "login?screen=pdloantrndt&command=Show&xvoucher=?&xrow=?"), ~
+            xdate,xschamt,xamount //,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdsalarydetail.xtype))
+
+	  totals "","",sum,sum
+
+    header "Line No","Installment Date","Monthly Installment","Balance"
+
+  end list
+
+  form one
+    caption "<ACRONYM>Loan & Advance Header</ACRONYM>"
+    table pdloantrn
+    select "left(xvoucher,4)='LOAN'"
+    order xvoucher
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Clear,Add, Update, Delete,Loan Write Off,*next, Top, Previous, Next, Bottom, Make Schedule, Schedule Detail,~
+            xvoucher,xdate,xstaff,xname,xtype,xloanamt,xinstallment,~
+            xinsamt,xlastinsamt display(const),xpaidinstallment display(hide),xpaid display(const),xdateeff,xyear display(hide),~
+		xper display(hide),xstatus display(const),xstatustag display(const),xamount display(const),dum
+
+    field xstatus
+      default "Open"
+      event before
+        set xyear=#sub(xdateeff,0,4)
+        set xper=#sub(xdateeff,5,2)
+      end event
+      event after
+        if xstatus .eq. "Close" .or. xstatus .eq. "Continue"
+	    set #field(add.display)="hide"
+          set #field(make.display)="hide"
+          set #field(update.display)="hide"
+          set #field(delete.display)="hide"
+        end if
+	  if xstatus .eq. "Close"
+	    set #field(loan.display)="hide"
+	  end if
+      end event
+    end field
+
+    field xamount
+      caption Settlement Amount
+
+    end field
+
+    field xstatustag
+	caption Write Off Status
+    end field
+
+    field dum
+      attrib local
+      display const
+      caption Balanced Amount
+      column 2
+      event after
+        decimal amt
+        set amt = xloanamt-xpaid
+        set dum=amt
+      end event
+    end field
+
+    field xvoucher
+      event after
+        set globals(xvoucher)=xvoucher
+      end event
+    end field
+
+    field xtype
+      caption Loan Type
+      pick select xcode from xcodes where xtype='Loan Type'// and xlong='Loan'
+    end field
+
+    field xname
+      attrib local
+      display const
+      caption Name
+      event after
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+      end event
+    end field
+
+    field xvoucher
+      display trn Loan No
+      caption Loan No
+    end field
+
+    field Add
+      event before
+        set xlastinsamt = 0
+        set xpaid = 0
+        set xstatus="Open"
+        if xtype .eq. ""
+          error "Cannot Proceed-Loan Type Is Blank"
+        end if
+        //set temp = #sql("select xvoucher from pdloantrn where xstaff='"+xstaff+"' and xstatus='Open'")
+        //if #result .eq. "true"
+         // set #field(update.display)="hide"
+         // set #field(delete.display)="hide"
+         // set #field(make.display)="hide"
+         // set xstatus="Open"
+         // error "Cannot Proceed -- Loan Account '"+temp+"' Still Open or Continue '"+xstaff+"'"
+        //end if
+        //set temp = #sql("select xvoucher from pdloantrn where xstaff='"+xstaff+"' and xstatus='Continue'")
+        //if #result .eq. "true"
+        //  set #field(update.display)="hide"
+        //  set #field(delete.display)="hide"
+        //  set #field(make.display)="hide"
+        //  set xstatus="Continue"
+        // error "Cannot Proceed -- Loan Account '"+temp+"' Still Open or Continue '"+xstaff+"'"
+        // end if
+      end event
+    end field
+
+    field Make
+      event after
+	  //print xinstallment
+        set temp = #spsql(sp_makeschedule,#user,#id,xvoucher,0)
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field Schedule
+      embed onclick="clicked(this)"
+    end field
+
+    field Loan
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+
+    function clicked(b){
+      detail=b.value
+    }
+    function submitit(form){
+      if (detail=="Schedule Detail"){
+        form.screen.value = "pdloantrndt"
+        form.searchbutton.value = "Find xvoucher=?"
+      }
+	if (detail=="Loan Write Off"){
+	  form.screen.value="pdloanwriteoff"
+	  form.searchbutton.value="Find xvoucher=?"
+	}
+    }
+
+    </script>
+  end jscript
+
+end screen

@@ -1,0 +1,11 @@
+PO Process.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Create GRN                       |#classPath+"/login?screen=pogrncreate"
+Confirm GRN                      |#classPath+"/login?screen=pogrnconfirm"
+PO To AP Transfer                |#classPath+"/login?screen=potoap"
+PO To GL Transfer                |#classPath+"/login?screen=potogltransfer"
+//Process Sales Return             |#classPath+"/login?screen=opcrnprocess"
+//-------------------------------------------------------------------
+

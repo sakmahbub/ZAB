@@ -1,0 +1,90 @@
+screen cacusdisc
+
+  sidebar list one //,list two
+  sections form one,  jscript myscript
+  
+  	
+  list one
+    caption "Special Discount List"
+    table cacusdisc
+    order xcus,xitem
+    fixed xcus
+    rows 20
+    objects  xitem attrib(link "login?screen=cacusdisc&command=Show&xcus=?&xitem=?"), ~
+             desc equals((select xdesc from caitem where zid=cacusdisc.zid and xitem=cacusdisc.xitem)),xdisc
+	headers "Item","Description","Discount"
+  end list
+  
+  form one
+    caption "Special Discount For <br>"+xcus+" - "+cacus.xorg("xcus='"+xcus+"'")
+    table cacusdisc
+    primary key xcus,xrow
+    order xcus,xitem
+    fixed xcus
+    pstyle 3
+    return "login"
+    layout 3
+    objects Add, Update, Delete,Clear,Show, *next,Return,Top,Previous,Next,Bottom,~
+            xitem,xdesc,xdisc,xdateeff,xdateexp
+	
+	field xdesc
+		attrib local
+		display const
+		caption Description
+		event after
+			set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+		end event
+	end field
+
+	field xdateeff
+		default "1999-01-01"
+	end field
+
+    	field xdateexp
+		default "2999-01-01"
+	end field
+
+  field Add
+        event before
+              set rate = cacusprice.xrate("xcus='"+xcus+"' and xitem='"+xitem+"'")
+  set bonus = #sql(double,"select xqtybonus+xqtybonus1+xqtybonus2+xqtybonus3+xqtybonus4 from cacusbonus where xcus = '"+xcus+"' and  xitem = '"+xitem+"'")
+
+          if rate <> 0 .or. bonus <> 0
+              errror "Cannot Proceed -- Please Check Special Rate/Bonus" 
+        end event
+  end field
+	
+    embed onsubmit="return submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+  
+  end form
+  
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var but
+      var result
+
+      function clicked(b){
+        but = b.value
+      }
+      function submitit(form){
+        result = true
+        if (but == "Return"){
+          form.screen.value = "cacusdepo"
+          form.searchbutton.value = "Find xcus=?"
+        }
+        but = ''
+        return result
+      }
+      </script>
+  end jscript
+  
+end screen
+
+
+
+

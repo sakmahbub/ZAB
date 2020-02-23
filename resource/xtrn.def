@@ -1,0 +1,14 @@
+product ZAB
+
+table xtrn
+  caption "Transactions"
+  columns ztime, zutime,zauserid,zuuserid, zid,~
+  xtypetrn, xtrn, xaction, xdesc, xnum, xinc,xwh, zactive
+
+  primary key zid, xtypetrn, xtrn
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  list xaction, xdesc, xnum, xinc, zactive
+end table

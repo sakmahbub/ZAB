@@ -1,0 +1,20 @@
+product ZAB
+
+table acpayview
+  caption "Payment View"
+  columns ztime,zutime,zauserid,zuuserid,zid
+
+  primary key zid,xfm
+
+  foreign key
+        zid references zbusiness.zid
+        //zid,xsm,xrsm references carsm.zid,xsm,xrsm
+  end foreign key
+
+  sql create view acpayview(ztime,zid,xvoucher,xdate,xacc,xdesc,xyear,xper,xprime,xwh,xhwh,xdeptname,xdeptcode) ~
+              as select b.ztime,b.zid,b.xvoucher,b.xdate,b.xacc,m.xdesc,b.xyear,b.xper,b.xprime,b.xwh,b.xhwh,b.xdeptname,b.xdeptcode ~
+              from acbal b inner join acmst m on b.zid=m.zid and b.xacc=m.xacc ~
+              where b.xvoucher in (select acbal.xvoucher from acbal inner join acmst on acbal.zid=acmst.zid and acbal.xacc=acmst.xacc ~
+              where acmst.xaccusage='Cash') ~
+              and m.xaccusage<>'Cash' and b.xprime>0 and b.xper>0
+end table

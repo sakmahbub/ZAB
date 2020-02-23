@@ -1,0 +1,11 @@
+     list caam
+        table cafm
+        order xfm
+        select "((xfm like '"+zvalue+"%'or xname like '%"+zvalue+"%') and left(xfm,2)='AM')"
+        rows 20
+        objects xfm attrib(link "abc" embed onclick="return updateParent(this:'xfm')"), ~
+                xname
+
+     end list
+
+

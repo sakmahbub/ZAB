@@ -1,0 +1,12 @@
+product ZAB ERP
+
+table argiftvoucher
+  caption "Gift Voucher Header"
+  columns  ztime,zutime, zid,zauserid,zuuserid,~
+           xgiftvoucher,xdate,xdateeff,xdateexp,xvoucheramt,xbalance,xstatus,xtype,xref,xnote          
+           
+  primary key zid, xgiftvoucher
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

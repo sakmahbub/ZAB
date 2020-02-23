@@ -1,0 +1,338 @@
+screen imappnotesheader
+	
+     sidebars list reqlist,list one
+     sections form one, jscript myscript
+	 
+    list reqlist
+      caption "Approval Note List"
+         table imtorheader
+        order xtornum desc
+	   select "left(xtornum,4)='APN-' and zauserid='"+#user+"'"
+		rows 10
+        objects  xtornum attrib(link "login?screen=imappnotesheader&command=Show&xtornum=?"), xdate,xregi,xtwh, ~
+				 desc equals((select xlong from branchview where zid = imtorheader.zid and  xcode=imtorheader.xtwh))
+               
+		  headers "Requisition No","Date","Car No","Division Code","Name"
+	end list
+	  
+	  list one
+        caption "Approval Notes Detail List."
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=poappnotesdetail&command=Show&xtornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = imtordetail.zid and xitem=imtordetail.xitem)),~
+				 xserial,xqtyreq,xunit,xrate,xlineamt
+
+		headers "Line No","Item","Description","Part No","Quantity","Unit","Rate","Value"
+		totals "","","Total","","","","",sum
+        //headers "Line No","Item","Description","Unit","Qty Req","Qty Apv"
+     end list
+
+     form one
+		caption "Approval Note Header"
+        table imtorheader
+        order xtornum desc
+        select "left(xtornum,4)='APN-'"//" and zauserid='"+#user+"'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Add,Show,Clear,Update,*Next,Details,Top, Previous, Next, Bottom,Confirm,"<p>",~
+                xtornum,xdate,xregi,xstatusreq display(hide),xstatustor display(const),~
+				xbudget display(hide),xfwh,xfbrname,xavailfund display(hide),xtwh  display(hide),xtbrname display(hide),~
+				xsubject,xdum2 display(const),~
+				xbackground,xdatereq,~
+				xidsup display(hide),~
+				xnote,,,~
+				signatorysec display(const),,,~
+				xpreparer display(hide),preparer display(const),~		
+				xsignatory1 display(hide),signatory1  display(const),~
+				xsignatory2 display(hide),signatory2 display(const),~
+				xsignatory3 display(hide),signatory3 display(const),~
+				xsignatory4 display(hide),signatory4 display(const),~
+				xsignatory5 display(hide),signatory5 display(const),~
+				xsignreject display(hide),signreject display(const)
+
+	  
+		    field xdatereq
+          caption Date of Requirement
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+          
+			
+		field preparerby
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Prepared By</span>
+		display const
+		//column 2
+		end field
+		  
+        field xsubject
+            width 80
+            height 2
+          end field
+		  
+		    field xbackground
+            width 80
+            height 2
+          end field
+		  
+		     field xdum
+		   attrib local
+          caption
+          end field
+		  
+		    field xdum1
+		   attrib local
+          caption
+          end field
+		   
+		   field xdum2
+		   attrib local
+          caption
+          end field
+		  
+		   field xregi
+           caption Department Name
+          end field
+		  
+	field xnote
+      caption Reject Note
+	display const
+    end field
+		  
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		//column 2
+		end field
+			
+			
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='Approval Notes'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='Approval Notes'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='Approval Notes'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='Approval Notes'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='Approval Notes'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		  
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xtornum
+		caption Approval Note No
+		pick list poreqapnum
+        	width 15
+          event after
+		  //class careports(getjspReport{poreqprint,1,xtornum,View Requisition})
+		  class careports(getjspReport{apnletter,1,xtornum,View Approval Note})
+            set globals(xtornum)=xtornum
+			 set globals(xstatustor)=xstatustor
+			if imtorheader.xstatustor("xtornum='"+xtornum+"'") .eq. "Confirmed"
+					set #field(Update.attrib) = "disabled"
+					set #field(Details.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+				end if
+		
+				if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. ""
+					set #field(Update.attrib) = "disabled"
+					set #field(Details.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+				end if
+				if xtornum .eq. ""
+					set #field(delete.attrib) = "disabled"
+					set #field(update.attrib) = "disabled"
+					set #field(Details.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+				end if
+				if xtornum .ne. ""
+					set #field(add.attrib) = "disabled"
+				end if
+					set #field(top.attrib) = "disabled"
+					set #field(next.attrib) = "disabled"
+					set #field(previous.attrib) = "disabled"
+					set #field(Bottom.attrib) = "disabled"
+          end event
+        end field
+		
+		field xtwh
+		default #wh
+        end field
+		
+		field xfwh
+		default #wh
+		caption Plant/Store
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Plant/Store Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Division Name
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+		field confirm
+            event before
+			set subject=#sql("select xsubject from imtorheader WHERE xtornum='"+xtornum+"'")
+			double prepqty=#sql("select sum(xprepqty) from imtordetail where xtornum='"+xtornum+"'")
+			if prepqty <0.01
+			error "Please add detail"
+			else if xstatustor .ne. ""
+				error "Approval Note Already Confirm"
+			else if xsubject .eq. ""
+				error "Please write Subject!"
+			end if
+            end event
+            event after
+			set temp =  #spsql(zabsp_Confirmed_Request,#id,#user,#position,xfwh,xtornum,"APN")
+			 //set temp =  #sql("update imtorheader set xstatustor='Open' where xtornum='"+xtornum+"'")
+			 set temp = #spsql(zabsp_sendmail,#id,#user,xtornum,"Department","")
+	         action show
+            end event
+          end field
+		
+		  field add
+			event before
+				set xpreparer=pdmst.xstaff("xposition='"+#position+"'")
+				set cardept=cacardept.xregi("xregi='"+xregi+"'")
+				set trn = "APN-"
+				set xstatustor=""
+				set xstatusreq="Open"
+				if xfwh .eq. ""
+				error "Please select Division for Create Approval Notes"
+				else if xregi .eq. ""
+				set xregi =pdmst.xdeptname("xposition='"+#position+"'")
+				set xtornum = #trn("APN Number",trn,10)
+				end if
+			end event
+        end field
+		
+		field update
+			event before
+				set xidsup=pdmst.xidsup("xposition='"+#user+"'")
+		        set cardept=cacardept.xregi("xregi='"+xregi+"'")
+				//if xregi .ne. "" .and.  xregi .ne. cardept
+				//error "Please select car or department"
+				//else 
+				if xfwh .eq. ""
+				error "Please select Division for Create Approval Notes"
+				else if xregi .eq. ""
+				set xregi =pdmst.xdeptname("xposition='"+#user+"'")
+				set xsuperiorsp=pdmst.xsuperiorapn("xposition='"+#user+"'")
+				end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "imappnotesdetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xtornum.value=link.text
+          }else{
+            document.one.xtornum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

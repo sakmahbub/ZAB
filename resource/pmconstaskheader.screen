@@ -1,0 +1,176 @@
+screen pmconstaskheader
+
+    sidebar list one,list detail
+    sections form one, jscript myscript
+
+     list one
+      caption "Project Work Breakdown Level 0"
+       table pmconstaskheader
+          order xhrc1
+          //select "xwh='"+#wh+"'"
+          rows 20
+          objects  xhrc1 attrib(link "login?screen=pmconstaskheader&command=Show&xhrc1=?"), ~
+                   xtaskname,xdatefrom,xdatecom,xdurdate
+
+       end list
+
+     list detail
+       caption "Project Work Breakdown For Level 1 "+xhrc1
+       table pmconstaskdetail1
+        order xhrc1,xhrc2
+        fixed xhrc1
+        //select "xwh='"+#wh+"'"
+          rows 20
+          objects  xhrc2 attrib(link "login?screen=pmconstaskdetail1&command=Show&xhrc1=?&xhrc2=?"), ~
+                   xtaskname,xdatefrom,xdatecom,xdurdate
+
+       end list
+
+     form one
+        caption "Pjoject Work Breakdown Level 1"
+        table pmconstaskheader
+        primarikey xwh,xhrc1
+        order xhrc1
+        //select "xwh='"+#wh+"'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Add,Show,Clear,Update, Delete,*next,Top, Previous, Next, Bottom,~
+                Level 2,*next,Estimated Cost,Actual Cost,"<p>" ,~
+                 xhrc1,xtaskname,xdatefrom,xdatecom, ~
+                 xdurdate display(const),xdate,xwh,xprojectdesc,~//xbrname, ~
+                 xstatustask
+
+       field xwh
+	   caption Project Code
+	   pick list xproject
+	   end field
+	   
+       field xprojectdesc
+        attrib local
+		display const
+        caption Project Name
+        event after
+          set xprojectdesc=projectallview.xlong("xcode='"+xwh+"'")
+        end event
+       end field	   
+	   
+	   field xbrname
+        attrib local
+        caption Project Name
+        display const
+        event after
+        set xbrname=xcodes.xlong("xtype='Project' and xcode='"+xwh+"'")
+        end event
+       end field
+
+      field xstatustask
+        default "Incomplete"
+      end field
+
+      field xdatefrom
+        caption Start Date
+      end Field
+
+      field xdatecom
+        caption Expected End Date
+      end Field
+
+      field xtaskname
+        event after
+          set globals(xwh)=xwh
+          set globals(xhrc1)=xhrc1
+//          set globals(xtaskname)=xtaskname
+        end event
+      end Field
+
+      field xdesc
+        caption Project Description
+      end Field
+
+       field xdate
+         caption Finished Date
+      end Field
+
+
+        field xhrc1
+         Caption Code
+		 pick list xboqno
+         event after
+          set globals(xhrc1)=xhrc1
+         end event
+        end field
+
+        field add
+          event before
+//          set xwh=#wh
+            set trn = "BOQ-"//xtrn.xtrn("xtypetrn='Constraction Task Code' and xwh='"+#wh+"'")          
+			set xhrc1 = #trn("Constraction Task Code",trn,10)
+            //int durdate = #sesql("select datediff(day,'"+xdatefrom+"','"+xdatecom+"') from pmconstaskheader")
+            //set durdate=durdate+1
+            //set xdurdate=durdate
+          end event
+          event after
+//            set temp = #spsql(sp_calculateDate2,#id,#user,xhrc1,xdatefrom,xdatecom)
+            action show
+          end event
+        end field
+
+        field update
+         event before
+            int durdate = #sesql("select datediff(day,'"+xdatefrom+"','"+xdatecom+"') from pmconstaskheader")
+            set durdate=durdate+1
+            set xdurdate=durdate
+//            set temp = #spsql(sp_calculateDate2,#id,#user,xhrc1,xdatefrom,xdatecom)
+//            action show
+         end event
+         end Field
+
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Level
+          embed onclick="clicked(this)"
+        end field
+
+        field Estimated
+          embed onclick="clicked(this)"
+        end field
+
+        field Actual
+          embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+      jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+       function submitit(form){
+          if (detail=="Level 2"){
+            form.screen.value = "pmconstaskdetail1"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Estimated Cost"){
+            form.screen.value = "pmconscost"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Actual Cost"){
+            form.screen.value = "pmconsactcost"
+            form.searchbutton.value = "Top"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+end screen

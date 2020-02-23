@@ -1,0 +1,68 @@
+screen pdathd
+     caption "Leave Detail"
+     sections form one,jscript myscript
+
+  	list trn
+        caption "Leave Detail"
+        table pdleaveview
+        order xstaff,xtypeleave
+        select "xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"'"
+        rows 20
+        objects  xyear,xday
+//        header "Year","EMP ID","Name","Total Day","Leave Type","Paid/Unpaid"
+//        totals "","","",sum,"",""
+     end list
+
+     form one
+        caption "<ACRONYM>Attendance Header</ACRONYM>"
+	      table pdathd
+        order xyearperdate
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Detail,Top,Next,Previous,Bottom,~
+          xdate,xyearperdate display(hide),xyear,xper
+
+        field xdate
+          event before
+            set year = #sub(xdate,0,4)
+            set per = #sub(xdate,5,2)
+            set day = #sub(xdate,8,2)
+            set xyearperdate = year+per+day
+          end event
+          event after
+            set globals(xyearperdate)=xyearperdate
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdatdt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,72 @@
+screen casm
+  sections form one, jscript myscript
+
+  form one
+    caption "Sales Manager Information"
+    table casm
+    primarykey xsm
+    order xsm
+    select "left(xsm,4)='SM--'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Add,Update,Show,Clear,Delete,*next,Top,Previous,Next,Bottom,"<p>",~
+            xsm,xname,xarea,xbrname
+            //xwh,xbrname,xterritory,xregion,xarea//xfm,xfmname,
+
+    //field xarea
+      //caption Zone
+      //display combo
+      //pick "select xcode from xcodes where xtype='Area' and zactive=1"
+    //end field
+
+    field xsm
+      default "SM--"
+      display trn Sales Representative
+	event before
+        class careports(getReport{casmchart,0,SM List})
+	end event
+      event after
+        set globals(xsm)=xsm
+      end event
+    end field
+
+    field xbrname
+      attrib local
+      caption
+      display const 
+    end field
+
+    field add
+      event before
+        if xsm_ONE .ne. "SM--"
+          error "Cannot Proceed -- You Chose Wrong Code. You have to chose SM--"
+        end if
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+    
+    field RSM
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+    function clicked(b){
+      detail=b.value
+      }
+      function submitit(form){
+        if (detail=="RSM"){
+          form.screen.value = "carsm"
+          form.searchbutton.value = "Find xsm=?"
+          //return false
+        }
+      }
+      </script>
+  end jscript
+
+end screen

@@ -1,0 +1,13 @@
+     list actxempchallan
+        table actxchallanview
+        order xcalltrn desc
+        select "(xcalltrn like '%"+zvalue+"%') and xtype='Employee'"
+		searchselect "xtype='Employee'"
+        rows 20
+
+        objects xcalltrn attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+		xchallan,xdate,xdistrict1,xbranch
+
+     end list
+
+

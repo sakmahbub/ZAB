@@ -1,0 +1,69 @@
+screen potoac
+     caption "PO to Accounts Transfer"
+
+     sections  form one,list one, jscript myscript
+
+     list one
+        caption "PO To AC Interface"
+        table potoac
+        order xgitem
+        rows 20
+        objects xgitem attrib(link "login?screen=potoac&command=Show&xgitem=?"), ~
+                xacc,xacccr
+
+
+//        headers "Code","Description","Percent","Account"
+     end list
+
+
+     form one
+        caption "<ACRONYM>PO To GL Interface</ACRONYM>"
+        table potoac
+        order xgitem
+        return "login"
+        layout 4
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,*next,Top,Next,Previous,Bottom,"<p>" ,~
+                xgitem,xacc,xacccr
+
+        field xacc
+          caption Debit Account//Purchase Account
+//          pick "select xtrn from xtrn where xtypetrn = 'AR Transactions'"
+        end field
+
+        field xacccr
+          caption Credit Account//LC Retirement Account
+          display text
+          pick list xacc
+        end field
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

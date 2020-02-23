@@ -1,0 +1,18 @@
+     list acprojsub
+        table acsub
+        order xsub
+        fixed xacc
+        select "(xsub like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%')"
+        navigators alpha
+        rows 10
+        objects xsub attrib(link "abc" embed onclick="return updateParent(this:'xproj')"), ~
+                xdesc
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

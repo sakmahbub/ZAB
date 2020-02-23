@@ -1,0 +1,17 @@
+
+product ZAB ERP
+
+table ardeposit
+  caption "AR Deposit"
+  columns  ztime,zutime, zid,zauserid,zuuserid,~
+           xvoucher,xrow,xacc,xnote,~
+           xamount,xdate,xstatusjv,xref,xdatechq,
+
+  primary key zid, xvoucher,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xvoucher references arhed.zid,xvoucher
+  end foreign key
+
+end table

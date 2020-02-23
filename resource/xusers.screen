@@ -1,0 +1,151 @@
+screen xusers
+	sidebar list one,list store
+	sections form one, jscript myscript
+
+	list one
+		caption "Business Users"
+		table xusers
+		order zemail
+		rows 20
+		objects	zemail attrib(link "login?screen=xusers&command=Show&zemail=?"), ~
+						xposition,xrole,xaccess,zactive
+
+		headers "Login ID","Position ID ","User Group","Access Code","Active"
+	end list
+	
+	
+     list store
+        caption "User Store/ Plant for : "+zemail
+        table userstore
+        order zemail,xwh
+        fixed zemail
+        rows 20
+        objects  zemail,xwh attrib(link "login?screen=userstore&command=Show&zemail=?&xwh=?"), ~
+                 desc equals((select xlong from branchview where zid=userstore.zid and xcode=userstore.xwh))
+     
+	 headers "User ID", "Store/Plant", "Store/Plant Name"
+	 end list
+
+
+	form one
+		caption "Manage Users"
+		table xusers
+		primarykey zemail
+		order zemail
+		return "login"
+		layout 2
+		pstyle 3
+		objects Show,Clear,Add, Update, Delete,*next,Top,Previous,Next,Bottom,Privilege,Store/Plant,"<p>" ,~
+			zemail,xpassword,xrole,xaccess,xwh,xbrname,xsp display(hide),xdformat display(h),~
+			xdsep display(h),xposition,zactive,xoldpass display(hide)
+
+		field xwh
+			caption Store/Office
+			//pick list xwhall
+		end field
+		
+		field xaccess
+			display const
+		end field
+		
+		field xposition
+			caption Employee ID
+		end field
+		
+		field xbrname
+			attrib local
+			caption Store/Office Name
+			display const
+			event after
+				set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+			end event
+		end field
+
+		field xdformat
+			default "Day-Month-Year"
+		end field
+
+		field zemail
+		pick list zemailuser
+			caption Login ID
+			event after
+						//========================class careports(getReport{userlist;2;in,st;zid,user;,Print User List})
+				//class careports(getjspReport{userlist,1,,Print User List})
+				class careports(getReport{userlist;2;in,st;zid,user;zemail;Print User List})
+				set globals(zemail)=zemail
+			end event
+		end field
+
+		field xrole
+			pick "select xrole from xroles"
+		end field
+		
+		field xname
+			caption Credit Manager
+			width 50
+			column 3
+		end field
+
+		field add
+			event before
+				set xdformat="Day-Month-Year"
+				set userposition = xusers.xposition("xposition='"+xposition+"'")
+				set empid = pdmst.xposition("xposition='"+xposition+"'")		
+			if xposition .eq. ""
+				error "Please Select Employee ID."
+			else if userposition .eq. xposition
+				error "User ID Already Exist."
+			else if empid .ne. xposition
+				error "Employee ID Doesn't Exist."
+			else if xrole .ne. ""
+				set xaccess=xroles.xaccess("xrole='"+xrole+"'")
+			end if
+			end event
+		end field
+		
+		field Update
+			event before
+				set userposition = xusers.xposition("xposition='"+xposition+"'")
+				set empid = pdmst.xposition("xposition='"+xposition+"'")		
+			if xposition .eq. ""
+				error "Please Select Employee ID."
+			else if empid .ne. xposition
+				error "Employee ID Doesn't Exist."
+			else if xrole .ne. ""
+			set xaccess=xroles.xaccess("xrole='"+xrole+"'")
+			end if
+			end event
+		end field
+
+		embed onsubmit="return submitit(this)"
+
+		field Privilege
+			embed onclick="clicked(this)"
+		end field
+		
+		field Store/Plant
+			embed onclick="clicked(this)"
+		end field
+
+	end form
+
+	jscript myscript
+		<script language="javascript" type="text/javascript">
+
+			function clicked(b){
+				but = b.value
+			}
+			function submitit(form){
+				if (but == "Privilege"){
+					form.screen.value = "xprivilege"
+					form.searchbutton.value = "Top"
+				}
+				if (but == "Store/Plant"){
+					form.screen.value = "userstore"
+					form.searchbutton.value = "Top"
+				}	
+			
+			}
+		</script>
+	end jscript
+end screen

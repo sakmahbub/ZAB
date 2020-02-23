@@ -1,0 +1,40 @@
+screen pdpoint
+     caption "Point"
+     sidebar list point
+     sections form one
+
+	list point
+        caption "Point List"
+        table pdpoint
+        order xpoint
+        rows 20
+        objects  xpoint attrib(link "login?screen=pdpoint&command=Show&xpoint=?"), ~
+                 xlong,xpercent
+	  header "Point","Description","Percent"
+      end list
+
+     form one
+      caption "<ACRONYM>Point Setting</ACRONYM>"
+	table pdpoint
+      order xpoint
+      return "login"
+      layout 2
+      pstyle 3
+      objects Add,Update, Delete, Show,Clear,*next, Top, Previous, Next, Bottom,~
+      	  xpoint,xpercent,xlong
+	
+	field xpoint
+	  caption Point
+	end field
+	
+	field xpercent
+	  caption Percent
+	end field
+
+	field xlong
+	  caption Description of Point if Any
+	end field
+	
+    end form
+
+end screen

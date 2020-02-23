@@ -1,0 +1,110 @@
+screen pdmsthrddetail
+     sidebar list detail
+     sections form one, jscript myscript
+	
+	
+		list detail
+        caption "Detail List"
+        table pdmstdetail
+        order xstaff,xrow
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdsalarydetail&command=Show&xstaff=?&xrow=?"), ~
+                 xdate,xlong
+
+        header "Line No","Date","Description"
+     end list
+
+     form one
+        caption "Employee Detail for "+xstaff 
+        table pdmstdetail
+		primarykey xstaff,xrow
+        order xstaff,xrow
+        fixed xstaff
+        return "login"
+        layout 2
+        pstyle 3 //Upload_One,Upload_Two,Upload_Three,*next,Upload_Four,Upload_Five,
+        objects Add,Update,Delete,Show,Clear,Return,~
+                xrow attrib(row 0 1),xdate,~//xdatereq,~
+                xlong
+
+	
+	
+	field supname
+	 attrib local
+	 display const
+	 caption Requisition Approval Superior
+	 event after
+	 set supname=pdmst.xname("xposition='"+xidsup+"'")
+	 end event
+	 end field
+	 
+	 field supnamesp
+	 attrib local
+	 display const
+	 caption Service Approval Superior
+	 event after
+	 set supnamesp=pdmst.xname("xposition='"+xsuperiorsp+"'")
+	 end event
+	 end field
+	 
+	 field supnamepo
+	 attrib local
+	 display const
+	 caption PO Approval Superior
+	 event after
+	 set supnamepo=pdmst.xname("xposition='"+xsuperiorpo+"'")
+	 end event
+	 end field
+
+        field update
+        event before	
+		
+          end event
+        end field
+   
+   field Return
+          embed onclick="clicked(this)"
+        end field
+        
+		embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	        if (detail=="Salary Detail"){
+            form.screen.value = "pdsalarydetail"
+            form.searchbutton.value = "Top"
+          }
+		   if (detail == "Return"){
+            form.screen.value = "pdsuperior"
+            form.searchbutton.value = "Find xstaff=?"
+          }
+  	      
+        }
+
+        function pickAccount(link,name,rank){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xstaff.value=link.innerText
+            document.one.xname.value=name.innerText
+            document.one.xrank.value=rank.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

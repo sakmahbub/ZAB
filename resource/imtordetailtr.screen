@@ -1,0 +1,141 @@
+screen imtordetailtr
+
+     caption "Transfer Chalan Detail"
+     sidebar list one,list price
+     sections  form one, jscript myscript
+
+    list one
+        caption "<br><center><b>"Transfer Chalan Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow desc
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=imtordetailtr&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyord
+
+        headers "Serial No","Item","Description","Qunatity Ordered"//,"Quantity Delivered"
+     end list
+
+
+     form one
+        caption "Transfer Chalan Entry Detail For "+xtornum
+        table imtordetail
+        primarykey xtornum,xrow
+        order xtornum,xrow
+        fixed xtornum
+        return "login"
+        pstyle 3
+        layout 3
+        objects Add,Update,Delete,Clear,Show,~
+        *next,Return,  Top,Previous,Next, Bottom,"<p>" ,~
+        xrow attrib(row 0 1),xunit display(const),xpacking display(const),xitem,xqtyord,xbatch,xdesc,~
+        xrate display(const),xlineamt display(hide),xvatrate display(const)
+
+        field xrow
+          event after
+            set status = imtorheader.xstatustor("xtornum='"+xtornum+"'")
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Open"
+              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(update.display)="hidden"
+            end if
+          end event
+        end field
+
+
+	field xbatch
+		caption Batch No.
+		width 50
+	end field
+
+        field xdesc
+          caption Product Name
+          attrib local
+          display const
+          event after
+            set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+	  	
+        field add
+          event before
+	    if xdoctype .eq. "Old Price"	
+	    end if
+            set xunit = caitem.xunit("xitem = '"+xitem+"'")
+            set xpacking = caitem.xpacking("xitem = '"+xitem+"'")
+            set xrate = caitem.xcost("xitem = '"+xitem+"'")
+            set xlineamt = xqtyord*xrate
+            set xvatrate = caitem.xvatamt("xitem = '"+xitem+"'")
+
+            set fwh=imtorheader.xfwh("xtornum='"+xtornum+"'")
+//            double inhand = #sql(double,"select xavail from imstock where xwh='"+fwh+"' and xitem='"+xitem+"'")
+//            if xqtyord > inhand
+//              error "Cannot Proceed -- Available Quantity is "+inhand
+//            end if
+
+            class impharma(ValidateBeforeDetailTo({xtornum,fwh}))
+//          	 class oppharma(checkStockInhand({xtornum,add,opdoheader,xrow,xqtyord}))
+          end event
+        end field
+
+        field update
+          event before
+	    if xdoctype .eq. ""	
+	    	set xrate = caitem.xcost("xitem='"+xitem+"'")
+	    end if
+
+            set xunit = caitem.xunit("xitem = '"+xitem+"'")
+            //set xrate = caitem.xcost("xitem = '"+xitem+"'")
+            //set xvatrate = caitem.xvatamt("xitem = '"+xitem+"'")
+
+            set fwh=imtorheader.xfwh("xtornum='"+xtornum+"'")
+            double inhand = #sql(double,"select xavail from imstock where xwh='"+fwh+"' and xitem='"+xitem+"'")+xqtyord
+            if xqtyord > inhand
+              error "Cannot Proceed -- Available Quantity is "+inhand
+            end if
+            class impharma(ValidateBeforeDetailTo({xtornum,fwh}))
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Return"){
+            form.screen.value = "imtorheadertr"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+        function pickPrice(link,vatrate){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xrate.value=link.innerText
+            document.one.xvatrate.value=vatrate.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

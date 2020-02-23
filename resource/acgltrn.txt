@@ -1,0 +1,9 @@
+product ZAB ERP
+
+table pdsign1
+  caption "Signatory One"
+  columns zid,xstaff,xname,xdeptname,xposition,xsignature
+
+  sql create view pdsign1(zid,xstaff,xname,xdeptname,xposition,xsignature) ~
+    as select zid,xstaff,xname,xdeptname,xposition,xsignature from pdmst
+end table

@@ -1,0 +1,12 @@
+list xsonumpiadmin
+        caption "Items containing: "+zvalue
+        table opordheaderso
+        order xordernum
+        select "(xordernum like '%"+zvalue+"%' or xorderdate like '%"+zvalue+"%') and xtype='Main' and xstatusord='Confirmed'"
+        searchselect "xtype='Main'"
+		rows 20
+        objects xordernum attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xorderdate,xpornum,xcus,xinvnum
+				
+		headers "SO No","Date","PO No","Customer ID","PI No."	
+ end list 

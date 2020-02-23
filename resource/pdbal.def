@@ -1,0 +1,18 @@
+product ZAB ERP
+
+table pdbal
+  caption "PD Bal"
+
+  columns ztime,zutime,zauserid,zuuserid,zid,xpaytype,xyear,xper,~
+          xstaff,xrow,xtype,xamount,xprime,xvoucher,xstatus,xadjustment,~
+          xarrear,xothours,xsign,xtaxyear,xtaxper,xposition,xempcategory,xdaysdedvar,xratephr,~
+		  xlwphr,xnote,xstatusjv,xdocnum,xcashamt,xbankamt,xwdays,xdeptname,xglvoucher,xstep,xlong,xvsign,xdate,xday,xtypeobj
+
+  primary key zid,xyear,xper,xstaff,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xstaff references pdmst.zid,xstaff
+  end foreign key
+
+end table

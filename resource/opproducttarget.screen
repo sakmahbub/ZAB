@@ -1,0 +1,98 @@
+screen opproducttarget
+
+     //sidebar list rsm
+     sections form one, jscript myscript
+
+     list rsm
+      caption "RSM Wise Target"
+        table optargetrsm
+        order xyear,xper,xitem,xrsm
+        fixed xyear,xper,xitem
+        rows 20
+        objects  xyear,xper,xitem,xrsm attrib(link "login?screen=optargetrsm&command=Show&xyear=?&xper=?&xitem=?&xrsm=?"), ~
+                 xqty,xqtydel,xstatus
+
+        header "Year","Month","Item","RSM","Target Qty","FM Wise Allocated Qty","Status"
+        totals "","","","Total",sum,sum
+     end list
+
+     form one
+        caption "Product Wise Target Entry"
+        table opproducttarget
+        primarykey xyear,xper,xitem
+        order xyear,xper,xitem
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Add, Update, Delete,*next, Top,Previous,Next, Bottom,"<p>" ,~
+                xyear,xper,xitem,xdesc display(const),xqty
+
+	
+
+      field xyear
+        event after
+         //   class careports(getReport{opbill-2,1,xdornum,Print Single Invoice})
+          class careports(getjspReport{opproducttarget,2,xyear,xper,Print National Target)
+          set globals(xyear)=xyear
+          set globals(xper)=xper
+          set globals(xitem)=xitem
+        end event
+      end field
+
+      field xdesc
+        attrib local
+        display const
+        caption Description
+        event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        end event
+      end field
+
+        field add
+          event before
+          end event
+        end field
+
+        field update
+          event before
+          end event
+        end field
+	
+	field xdum
+        attrib local
+        caption 
+        display const
+       end field
+
+
+      field RSM
+        embed onclick="clicked(this)"
+      end field
+
+
+        embed onsubmit="return submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="RSM Wise Target"){
+            form.screen.value = "optargetrsm"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

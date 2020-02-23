@@ -1,0 +1,15 @@
+
+     list mrrnum
+	caption "Purchage Order List"
+        table momrrheader
+        order xmrrnum
+        select "(xmrrnum like '%"+zvalue+"%')"// or xsup like '%"+zvalue+"%')"
+        navigators alpha
+        rows 20
+        objects xmrrnum attrib(link "abc" embed onclick="return updateParent(this:'xmrrnum')"),~
+                xbatch//,org equals((select xorg from casup where zid=poordheader.zid and xsup=poordheader.xsup))
+     	
+	header "MRR No.","Batch"
+     end list
+
+

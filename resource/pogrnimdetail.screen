@@ -1,0 +1,189 @@
+screen pogrnimdetail
+
+     sidebar list grn//list order,
+     sections form one,  jscript myscript
+
+     list grn
+        caption "GRN Detail List"
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrnimdetail&command=Show&xgrnnum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where zid=pogrndetail.zid and  xitem=pogrndetail.xitem)),xserial,xqtygrn,xqtyrec,xunitpur
+		totals "","","Total","",sum,sum,""		
+        headers "Row","Item","Description","Part No","Retirement Qty","Receiving Qty","Unit"
+     end list
+	 
+
+     form one
+        caption "Invoice Detail For "+xgrnnum
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        pstyle 3
+        return "login"
+        layout 2
+        objects Show,Clear,Update,Return,Top,Previous,Next,Bottom,"<p>",~//,Duty Payment,Delete,Add,
+                xrow attrib(row 0 1),xunitpur display(const),xitem attrib(readonly),xdesc,xdisc display(hide),xdiscf display(hide),~
+				xqtygrn attrib(readonly),xqtyrec,~//xrate,xlineamt,xbase,xprimebuyer,xttbuyer,xttbase,~
+				xdocrow attrib(readonly),xcfpur display(hide),xbinref display(hide),xlong
+
+		field xrow
+			event after
+				set globals(xrow)=xrow
+			end event
+		end field
+		
+		field xbinref
+			pick list xbinref
+		end field
+		
+
+		
+		field xdocrow
+			caption PO Row
+		end field
+		
+		field xqtygrn
+			caption Document Retirement Qty
+		end field
+		
+		field xqtyrec
+			caption Receiving Qty
+			display const
+		end field		
+		
+		field xitem
+		pick
+		event after
+		  if pogrnheader.xstatusgrn("xgrnnum='"+xgrnnum+"'").eq. "Confirmed" 
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+			         			
+       		  end if
+			end event
+		end field
+		
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+        
+        field xqtydel
+          caption Delivered Qty.
+        end field
+
+        field xlong
+          width 70
+          column 2
+        end field
+
+        field update
+          event before
+		  set binref=#sql("select xbinref from binmaster where xbinref='"+xbinref+"'")
+		  if xbinref .ne. "" .and. binref .ne. xbinref
+				error "Cannot Proceed -- Bin Reference Invalid!"
+			end if
+          end event
+          event after
+            //set temp = #spsql(zabsp_PO_validateAfterDetailGRN,#id,#user,xgrnnum,xrow,xitem,xqtygrn,0,0,xdocrow,0)
+            action show
+          end event
+        end field
+
+        field delete
+          event before
+          	set grnnum= xgrnnum
+          	set row=xrow
+          	set docrow=xdocrow
+			set item=xitem
+			set qtygrn=xqtygrn
+			set disc=xdisc
+			set discf=xdiscf
+			set vatrate=xvatrate
+          end event	
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailGRN,#id,#user,grnnum,row,item,qtygrn,disc,discf,docrow,0)
+            action show
+          end event
+        end field
+		
+	        embed onsubmit="return submitit(this)"
+		field Return
+          embed onclick="clicked(this)"
+        end field
+        field Duty
+          embed onclick="clicked(this)"
+        end field
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "pogrnim"
+            form.searchbutton.value = "Find xgrnnum=?"
+          }
+          if (but == "Duty Payment"){
+            form.screen.value = "pogrndutypayment"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        function pickItem(link,qtypur,chassisno,brand,model,capacity,prodyear,origin,color,modelyear,vcondition,interior,engineno,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+            document.one.xqtygrn.value=qtypur.text
+			document.one.xchassisno.value=chassisno.text
+			document.one.xbrand.value=brand.text
+            document.one.xmodel.value=model.text
+            document.one.xcapacity.value=capacity.text
+			document.one.xprodyear.value=prodyear.text
+            document.one.xorigin.value=origin.text
+            document.one.xcolor.value=color.text
+			document.one.xmodelyear.value=modelyear.text
+            document.one.xvcondition.value=vcondition.text
+            document.one.xinterior.value=interior.text
+			document.one.xengineno.value=engineno.text	
+            document.one.xdocrow.value=row.text			
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xqtygrn.value=qtypur.innerText
+			document.one.xchassisno.value=chassisno.innerText
+			document.one.xbrand.value=brand.innerText
+            document.one.xmodel.value=model.innerText
+            document.one.xcapacity.value=capacity.innerText
+			document.one.xprodyear.value=prodyear.innerText
+            document.one.xorigin.value=origin.innerText
+            document.one.xcolor.value=color.innerText
+			document.one.xmodelyear.value=modelyear.innerText
+            document.one.xvcondition.value=vcondition.innerText
+            document.one.xinterior.value=interior.innerText
+			document.one.xengineno.value=engineno.innerText
+		    document.one.xdocrow.value=row.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

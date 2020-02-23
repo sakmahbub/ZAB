@@ -1,0 +1,13 @@
+product ZABERP
+
+table cabankview
+  caption "Bank View"
+     columns zid, xbank,xname,xbranch,xbacc,xmadd,xacc,xswiftcode,xsub,xacctype
+   primary key zid, xbank
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+ sql create view cabankview (zid, xbank,xname,xbranch,xbacc,xmadd,xacc,xswiftcode,xsub,xacctype) ~
+                  as select zid, xbank,xname,xbranch,xbacc,xmadd,xacc,xswiftcode,xsub,xacctype from cabank
+end table
+

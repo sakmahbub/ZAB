@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table poreqview
+  caption "poreq View"
+  columns zid,xvoucher,xdate,xyear,xper,xamount
+
+  sql create view poreqview(zid,zauserid,xporeqnum,xdate,xtype,xstatus,xstatusreq,xwh,xdesc,xregi,xpreparer,xtornum,xqtyapv,xqtypor,xreqtype) ~
+    as select a.zid,a.zauserid,a.xporeqnum,a.xdate,a.xtype,a.xstatus,a.xstatusreq,a.xtwh,c.xlong,a.xregi,a.xpreparer, ~
+	a.xtornum,SUM(ISNULL(b.xqtyreq,0)),SUM(ISNULL(b.xqtypor,0)),a.xreqtype ~
+	from poreqheader a join poreqdetail b on a.zid=b.zid and a.xporeqnum=b.xporeqnum ~
+	join branchview c on a.zid=c.zid and a.xtwh=c.xcode where a.xtype in ('Cash','Agreement','CS','Direct PO') ~ 
+	group by a.zid,a.zauserid,a.xporeqnum,a.xdate,a.xtype,a.xstatus,a.xstatusreq,a.xtwh,c.xlong,a.xregi,a.xpreparer,a.xtornum,a.xreqtype
+end table 

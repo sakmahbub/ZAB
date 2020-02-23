@@ -1,0 +1,204 @@
+screen opsumprocdetailedit
+
+    sidebar list one
+    sections form one,jscript myscript
+
+     list one
+        caption "List For Processing For "+xroute+" Route"
+        table opdoheader
+        order xroute,xsumnum,xdornum
+        fixed xroute,xsumnum
+        //select "xsumnum<>''"
+        rows 20
+        objects xdornum attrib(link "login?screen=opsumprocdetailedit&command=Show&xroute=?&xsumnum=?&xdornum=?"), ~
+            xdate,xpaymentterm,xtotamt,(xtotamt+xvatamt-xdiscamt)
+                
+        header "DO Number","Date","Customer Type","TP","Invoice Value"
+total count,"","Total",sum,sum
+     end list
+
+     form one
+        caption "Summary Process Detail For: "+xroute+" Route<br> Summary No: "+xsumnum
+        table opdoheader
+//        order xroute,xsumnum,xdornum
+//        fixed xroute,xsumnum
+        order xsumnum,xdornum
+        fixed xsumnum
+//        select "xstatusord='Open' and xsumnum<>''"
+        select "xsumnum<>''"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Update,Clear,Show,*next,Back,Top,Previous,Next,Bottom,*next,Full Return,Part Return,*next,~
+        		Process_Single_Invoice,Process_All,"<p>" ,~
+                xdornum,xdate display(const),xcus display(const),xorg,xnetamt,xprime,xref,xpaymentterm,xcrnnum,xexpamt,~
+                xnote display(hide),xstatusord ,xstatus display(hide),xsp,xsumnum,~
+                xtotamt display(hide),xvatamt display(hide),,xdiscamt display(hide)
+field xref
+	caption Reason for Return
+	display combo
+	pick code Reason For Return
+end field
+
+	field xexpamt
+              display const
+        caption Exp Adjustment Amt
+        
+      end field
+
+	field xcrnnum
+		caption Exp. Adjustment No
+		pick list opdocrnexpedit
+		//attib readonly
+	end field
+	
+      field xdornum
+         event after
+            set globals(xdornum)=xdornum
+		if xstatus .eq. "Full"
+		//	set #field(part.display)="hidden"
+		end if
+		if xstatus .eq. "Partial"
+		//	set #field(full.display)="hidden"
+		end if
+     	      if xpaymentterm .eq. "Credit"
+		 //        	set #field(xprime.display)="const"
+       	      end if
+          end event
+       end field
+
+
+	field xprime
+		//attrib local
+        	display const
+        	caption Collection Amount
+        	event after
+          	//set xcoll=xprime-xexpamt
+			set xprime = xtotamt+xvatamt-xdiscamt-xexpamt
+        	end event
+	end field
+       
+ 	field xnetamt
+        attrib local
+        display const
+        caption Net Amt After Adjustment
+        event after
+          		set xnetamt = xtotamt+xvatamt-xdiscamt-xexpamt //opcrnchheader.xtotamt("xcrnnum='"+xcrnnum+"'")
+			if xnetamt <= 0
+				set xnetamt = 0
+			end if
+        end event
+      end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+        field xorg
+          attrib local
+          display constant
+          caption Name
+          event after
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+        field xnote
+          width 80
+          column 2
+        end field
+
+        field xlong
+          caption Header Description
+          width 50
+        end field
+
+        field xstatusjv
+           display constant
+        end field
+
+	field update
+          event before
+			//if xcrnnum .eq. ""
+				//error "Cannot Proceed -- Please Enter CR--"
+			//end if
+				//set xexpamt = opcrnchheader.xtotamt("xcrnnum='"+xcrnnum+"'")
+			set xwh=cacus.xwh("xcus='"+xcus+"'")
+    		set xyear = #sub(xdate,0,4)
+   		set xper = #sub(xdate,5,2)
+          end event
+        end field
+
+        field Full
+          event before
+			if xref .eq. ""
+				error "Cannot Proceed -- Please Specify Reason For Return"
+			end if
+          end event
+	    event after
+	      set temp = #spsql(zabsp_OP_summaryProcess,#id,#user,#wh,xdornum,xsumnum,"trfull")
+		action show
+	    end event	
+        end field
+
+        field Process_Single_Invoice
+          event after
+              set temp = #spsql(zabsp_OP_summaryProcess,#id,#user,#wh,xdornum,xsumnum,"single")
+            //  action show
+          end event
+        end field
+
+        field Process_All
+          event after
+              set temp = #spsql(zabsp_OP_summaryProcess,#id,#user,#wh,xdornum,xsumnum,"all")
+            //  action show
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Back
+          embed onclick="clicked(this)"
+        end field
+
+        field  Part
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Back"){
+            form.screen.value = "opsumprocheaderedit"
+//            form.searchbutton.value = "Find xroute=?&xsumnum=?"
+            form.searchbutton.value = "Find xsumnum=?"
+            //return false
+          }
+          if (detail=="Part Return"){
+            form.screen.value = "opdodetailtrparedit"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

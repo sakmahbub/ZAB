@@ -1,0 +1,10 @@
+Sales Codes & Parameter.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//DO Number                        |#classPath+"/login?screen=xtrndono"
+//DO Related Transaction Codes     |#classPath+"/login?screen=xtrnp(xtypetrn=DO Number)"
+PI Number                        |#classPath+"/login?screen=probissue"
+//PI Related Transaction Codes    |#classPath+"/login?screen=xtrnp(xtypetrn=PI Number)"
+//-------------------------------------------------------------------
+

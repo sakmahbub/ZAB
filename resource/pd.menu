@@ -1,0 +1,14 @@
+//pd.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Notifications           |#classPath+"/login?screen=pdnotification"
+HR Development (HRD)	|#classPath+"/login?menu=pdhrd"	                  |ca       |   		|hrm.png|180
+Attendance Information	|#classPath+"/login?menu=pdat"	                  |ca       |   		|hrm.png|180
+Payroll					|#classPath+"/login?menu=pdpayroll"	              |ca       |   		|hrm.png|180
+Income Tax				|#classPath+"/login?menu=pdtax"	            	  |ca       |   		|hrm.png|180
+
+//Payroll (Management)	|#classPath+"/login?menu=pdpayrollmgt"	          |ca       |   		|hrm.png|180
+Leave Management        |#classPath+"/login?menu=pdperinfo"               |ca     	|   		|hrm.png|180      
+User  Activities        |#classPath+"/login?menu=pdrepall"                |ca       |   		|100
+//-------------------------------------------------------------------

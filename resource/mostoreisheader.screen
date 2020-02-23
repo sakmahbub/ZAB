@@ -1,0 +1,146 @@
+screen mostoreisheader
+
+     sidebar list moprcs
+     sections form one,  jscript myscript
+
+              
+     list moprcs
+        caption "Selected Processes for Batch "+xbatch
+        table mohrecipesetting
+        order xbatch,xrow
+        fixed xbatch
+        rows 40
+        objects  xrow,xmoprcs attrib(link "login?screen=mostoreisdetail&command=Show&xbatch=?&xrow=?"), ~
+                 xdate,xfabriccolor,xprcstype,xstatusrec
+
+        headers "Row No","Process Name","Date","Color","Process","Process Type"
+     end list	 
+	 
+     
+     list moprcsOld
+        caption "Selected Processes for Batch "+xbatch
+        table mohrecipesetting
+        order xbatch,xrow
+        fixed xbatch
+        rows 20
+        objects  xrow attrib(link "login?screen=mostoreisdetail&command=Show&xbatch=?&xrow=?"),xmoprcs, ~
+                 xdate,xfabriccolor
+
+        headers "Row No","Process Name","Date","Color"
+     end list
+
+     form one
+        caption "Item Issue for Production "
+        table moheader
+        order xbatch
+        return "login"
+        layout 2   
+        pstyle 3
+        objects Show,Clear,~
+        		Detail,"<p>",~
+                xbatch,xmodate,xpiref,xdum,xcus,xorg,xordernum display(hide)
+		
+		field xdum
+			display const
+			attrib local
+			caption
+		end field
+
+
+		field xcus
+			attrib local
+			caption Customer Code
+			display const			
+			event after
+				set xcus=opordheader.xcus("xpiref='"+xpiref+"'")
+			end event
+		end field
+		
+		field xorg
+			attrib local
+			caption Customer Name
+			display const
+			event after
+				set xorg=cacus.xorg("xcus='"+xcus+"'")
+			end event
+		end field
+		
+
+		field xstatusmor
+			display const
+		end field
+		
+        field xstatusjv
+           display constant
+        end field
+
+
+        field xbatch
+		pick list batchcons
+         event after
+            set globals(xbatch)=xbatch
+			set globals(xpiref)=xpiref
+			set globals(xordernum)=xordernum
+			//class careports(getjspReport{moissue,0,Print Batch list for issue})
+//giash			class careports(getReport{moissue;1;in;zid;"";Print Batch list for issue})
+//			class careports(getReport{moissue;2;in,st;zid,batch;xbatch;Print Batch list for issue})
+          end event
+        end field 
+
+
+        embed onsubmit="submitit(this)"
+        
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+        field Recipe
+          embed onclick="clicked(this)"
+        end field
+        
+        field Production
+          embed onclick="clicked(this)"
+        end field
+
+	
+        field Wastage
+          embed onclick="clicked(this)"
+        end field
+
+		field Count
+          embed onclick="clicked(this)"
+        end field
+	
+		field Finished
+          embed onclick="clicked(this)"
+        end field
+	
+	
+
+        
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        } 
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "mostoreisdetail"
+            form.searchbutton.value = "Clear"
+          }
+	
+
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

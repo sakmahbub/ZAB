@@ -1,0 +1,219 @@
+screen pdfactrndetail
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+	  list detail
+        caption "Detail List"
+        table pdtrndetail
+        order xvoucher,xrow desc
+        fixed xvoucher
+        rows 30
+        objects  xrow attrib(link "login?screen=pdfactrndetail&command=Show&xvoucher=?&xrow=?"), ~
+            xstaff, empname equals((select xname from pdmst where zid=pdtrndetail.zid and xstaff=pdtrndetail.xstaff)),~
+				 dept equals((select xdeptname from pdmst where zid=pdtrndetail.zid and xstaff=pdtrndetail.xstaff)),~
+				 xtype,xamount,xdayssalded,xothours
+
+       header "Line No","Staff","Name","Department","Transaction Type","Amount","Days Deduction","OT Hours"
+
+     end list
+	 
+	 
+  	list detailssss
+        caption "Detail List"
+        table pdtrndetail
+        order xvoucher,xrow
+        fixed xvoucher
+        rows 20
+        objects  xrow attrib(link "login?screen=pdtrndetail&command=Show&xvoucher=?&xrow=?"), ~
+                xtype,xamount
+
+        header "Line No","Transaction Type","Amount"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Transaction Detail For <br></ACRONYM>"+xdate
+	  table pdtrndetail
+        order xvoucher,xrow desc
+        fixed xvoucher
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add, Update, Delete,Clear,Show,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~
+          xrow attrib(row 0 1),xtype,xposition display(hide),xstaff,xname,xdeptname,xdesignation,xempcategory,xamount,~ 
+	    xothours,xdayssalded,xarrear,xleavetype display(hide),xtrntype,xnote,xsign display(hide)
+	    //xpercent,xqty,xarearper,xdum2,xadjustment,
+
+	  field xothours
+	    caption Hour
+	  end field
+
+        field xtrntype
+          attrib local
+          display const
+          caption Transaction Type
+          event after
+            set xtrntype = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+          end event
+        end field
+	  
+	  field xarerper
+	    caption Month of Arear
+	    deafult 0
+	  end field
+	  
+	  field xrow
+		pick list pdemptrn
+		end field
+		
+			field xstaff
+          pick list xstafffac
+        end field
+		
+	  field xdum2
+	    attrib local
+	    capiton
+	    display const
+	  end field
+	  
+	   field xempcategory
+	    //display const
+	  end field
+
+        field xname
+          attrib local
+          display const
+          caption Name
+          event after
+            set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+        field xdeptname
+          attrib local
+          display const
+          caption Department Name
+          event after
+            set xdeptname=pdmst.xdeptname("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+        field xdesignation
+          attrib local
+          display const
+          caption Designation
+          event after
+            set xdesignation=pdmst.xdesignation("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+
+        field xqty
+          caption Times of Basic
+        end field
+
+        field xcomtype
+          display const
+          event after
+            set xcomtype=xcodes.xlong("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+          end event
+        end field
+
+        field xpercent
+          caption Percent
+        end field
+
+        field xtype
+          caption Transaction Type
+          pick select xcode from xcodes where xtype='PD Transaction Type' and xlong<>'Loan' and zactive=1
+        end field
+
+        field add
+          event before
+	      set result=pdmst.xempstatus("xstaff='"+xstaff+"'")
+		if result .eq. "Resigned"
+		  error "Employee already resigned cannot Add transaction"
+		end if
+            set typetrn = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+			
+			if xstaff .ne. ""
+			set xempcategory=pdmst.xempcategory("xstaff='"+xstaff+"'")
+			end if
+            if typetrn .eq. "Addition"
+              set xsign=1
+            else
+              set xsign = -1
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterTrnDetail,#id,#user,xvoucher,xrow,"Add")
+		set	xamount=0 
+	    set xothours=0
+		set xdayssalded=0
+		set xarrear=0
+          end event
+        end field
+
+        field update
+          event before
+            set typetrn = xcodes.xprops("xtype='PD Transaction Type' and xcode='"+xtype+"'")
+			if xstaff .ne. ""
+			set xempcategory=pdmst.xempcategory("xstaff='"+xstaff+"'")
+			end if
+            if typetrn .eq. "Addition"
+              set xsign=1
+            else
+              set xsign = -1
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterTrnDetail,#id,#user,xvoucher,xrow,"Update")
+		set	xamount=0 
+	    set xothours=0
+		set xdayssalded=0
+		set xarrear=0
+          end event
+        end field
+
+        field delete
+          event before
+            set temp = #spsql(sp_validateAfterTrnDetail,#id,#user,xvoucher,xrow,"Delete")
+          end event
+        end field
+
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdfactrnheader"
+            form.searchbutton.value = "Find xvoucher=?"
+            //return false
+          }
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

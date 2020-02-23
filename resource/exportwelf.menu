@@ -1,0 +1,9 @@
+exportwelf.menu
+//-------------------------------------------------------------------
+option                           |action                                        |modules|models|width
+//-------------------------------------------------------------------
+Export Entry                     |#classPath+"/login?screen=imexportheader"
+Welfare Entry               |#classPath+"/login?screen=imwelfareheader"        |       |      |120
+//Reports                          |#classPath+"/login?menu=imreports"            |       |      |120
+//Codes & Parameter               |#classPath+"/login?menu=imcodes"
+//-------------------------------------------------------------------

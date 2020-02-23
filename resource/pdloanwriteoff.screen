@@ -1,0 +1,97 @@
+screen pdloanwriteoff
+
+  //sidebar list writeoff
+  sections form one,list writeoff,jscript myscript
+
+  list writeoff
+    caption "Write off List of "+xvoucher
+    table pdloanwriteoff
+    order xvoucher,xrow
+    fixed xvoucher
+    rows 10
+    objects xrow attrib(link "login?screen=pdloanwriteoff&command=Show&xvoucher=?&xrow=?"), ~
+            xdate,xstatustag,xloanamt,xstatus //,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdsalarydetail.xtype))
+
+    totals count,"","",sum,""
+
+    header "Line No","Write Off Date","Status Tag","Write Off Amt","Status"
+
+  end list
+
+  form one
+    caption "<ACRONYM>Loan & Write Off Information "+xvoucher+"</ACRONYM>"
+    table pdloanwriteoff
+    order xvoucher,xrow
+    fixed xvoucher
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Clear,Add,Update,Delete,Confirm,*next, Top, Previous, Next, Bottom,Return,~
+		xrow attrib(row 0 1),xdate,xloanamt,xstatustag,xstatus,xnote
+            //xdate,xyear display(const),xper display(const),xschamt
+
+    field xrow
+      event after
+        //set xstatus = pdloantrn.xstatus("xvoucher='"+xvoucher+"'")
+        if xstatus .eq. "Confirmed" //.or. status .eq. "Continue"
+	    set #field(Confirm.display)="hide"
+          set #field(add.display)="hide"
+          set #field(update.display)="hide"
+          set #field(delete.display)="hide"
+        end if
+      end event
+    end field
+
+    field xstatus
+	display const
+	default "Open"
+    end field
+
+    feild xstatustag
+	caption Write Off Purpose
+	display combo
+	pick "PF Settlement,Resigne/Left,Incentive,Settlement,Part Sattlement"
+    end field
+
+    field xdate
+	caption Write Off Date
+    end field
+
+    field xloanamt
+	caption Write Off Amount
+    end field
+
+    field Confirm
+      event after
+	  //print xvoucher
+        set temp = #spsql(zabsp_writeoffconfirm,#id,#user,xvoucher)
+      end event
+    end field
+
+
+    embed onsubmit="submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+
+    function clicked(b){
+      detail="clicked"
+    }
+    function submitit(form){
+      if (detail=="clicked"){
+        form.screen.value = "pdloantrn"
+        form.searchbutton.value = "Find xvoucher=?"
+        //return false
+      }
+    }
+    </script>
+  end jscript
+
+end screen

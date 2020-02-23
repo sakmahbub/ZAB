@@ -1,0 +1,26 @@
+product ZAB ERP
+
+table imwrishview
+  caption "IM Loan Header View"
+
+  primary key zid,xtornum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view imwrishview(zid,zbid,zorg,xtornum,xsrnum,xfwh,xtwh,xstatustor,xstatusreq,xdate) ~
+					as select bc.zbid,a.zid,c.zorg,a.xtornum,a.xtornum,bc.xtwh,a.xtwh,a.xstatustor,a.xstatusreq,a.xdate from imtorheader a ~
+						left join branchclientview b on a.zid=b.zid and a.xtwh=b.xcode ~
+						left join branchclientview bc on a.zid=bc.zid and a.xtwh=bc.xcode ~ 
+						left join zbusiness c on a.zid=c.zid and a.zid=c.zid ~
+						WHERE left(a.xtornum,3)='WIS' and a.zid=100010 ~
+						union all ~
+						select 100010,a.zid,c.zorg,a.xtornum,a.xtornum,a.xfwh,a.xtwh,a.xstatustor,a.xstatusreq,a.xdate from imtorheader a ~
+						left join branchclientview b on a.zid=b.zid and a.xtwh=b.xcode ~
+						left join branchclientview bc on a.zid=bc.zbid and a.xtwh=bc.xtwh ~
+						left join zbusiness c on a.zid=c.zid and a.zid=c.zid ~
+						WHERE left(a.xtornum,3)='WIS' and a.zid<>100010
+
+
+end table

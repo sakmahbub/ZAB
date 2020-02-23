@@ -1,0 +1,192 @@
+screen pogrndutypayment
+     
+	 sidebar list dutypay//,list two
+     sections form one,  jscript myscript
+
+     list dutypay
+        caption "Invoice Cost Detail List"
+        table pogrndutypayment
+        order xgrnnum,xrow,xcostrow
+        fixed xgrnnum,xrow
+        rows 20
+		objects  xcostrow attrib(link "login?screen=pogrndutypayment&command=Show&xgrnnum=?&xrow=?&xcostrow=?"), ~
+				 xaccdr,descdr equals((select xdesc from acmst where acmst.zid=pogrndutypayment.zid and acmst.xacc=pogrndutypayment.xaccdr)),~
+				 xacccr,descdr equals((select xdesc from acmst where acmst.zid=pogrndutypayment.zid and acmst.xacc=pogrndutypayment.xacccr)),~
+				 xprime
+
+		totals "","","Total",sum,sum,sum
+
+		headers "Line No","Debit Account","Description","Credit Account","Description","Amount"
+     end list
+
+
+     list two
+        caption "C & F Sub Code"
+        table acsub
+        order xacc,xsub
+        //fixed xacc
+    	  select "xacc='128003'"
+        rows 20
+        objects  xsub attrib(link "abc" embed onclick="return pickSub(this)"), ~
+                xdesc
+
+     end list
+
+
+
+     form one
+        caption "Duty Payment for "
+        table pogrndutypayment
+        order xgrnnum,xrow,xcostrow
+        fixed xgrnnum,xrow
+        //select
+        pstyle 3
+        return "login"
+        layout 2
+        objects Return,Clear,Add,Delete,*next,Show, Top, Previous, Next, Bottom,"<p>",~
+                xcostrow attrib(row 0 1),xdate,xaccdr,xaccdrdesc,xacccr,xacccrdesc,xcus,xorg,~
+                xprime,xnote,xstatusjv display(hide)
+	
+
+        embed onsubmit="return submitit(this)"
+
+	 	field xcostrow
+	 event after
+	  if xstatusjv .eq. "Confirmed"
+	  set #field(Update.attrib)="disabled"
+	  set #field(delete.attrib)="disabled"
+	 end event
+	 end field
+	 
+	 field xcus
+      caption C & F Agent / Sub Code
+	  pick xsubduty
+    end field
+	
+	
+	field xorg
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xorg =acsubview.xorg("xacccr='"+xacccr+"' and xsub='"+xcus+"'") //cacus.xorg("xcus = '"+xcus+"'")+"<br>"+cacus.xmadd("xcus = '"+xcus+"'")
+          end event
+        end field
+
+	
+	field xaccdrdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xaccdrdesc=acmst.xdesc("xacc='"+xaccdr+"'")
+      end event
+    end field
+	
+	field xacccrdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xacccrdesc=acmst.xdesc("xacc='"+xacccr+"'")
+      end event
+    end field
+
+        field xlong
+          width 75
+          column 3
+        end field
+
+        field xdesc
+          attrib local
+          display const
+          event after
+            set xdesc=pocostmst.xdesc("xcostcode='"+xcostcode+"'")
+          end event
+        end field
+
+
+        field add
+			event before
+			 set sub=acsubview.xsub("xacccr='"+xacccr+"' and xsub='"+xcus+"'")
+			 set sub2=#sql("select max(xsub) from acsubview where xacccr='"+xacccr+"'")
+			 if sub2 .ne. "" .and. xcus .eq. ""
+			error "Please Enter Subcode"
+	        else if xcus .ne. "" .and. sub .ne. xcus
+				error "Subcode does not match"
+			else
+			set chassisno = pogrndetail.xserial("xgrnnum='"+xgrnnum+"' and xrow="+xrow)
+			set xstatusjv="Open"
+			end event
+          event after
+			if chassisno .ne. ""
+				set temp = #spsql(zabsp_LC_insertIntoCarCostDetail,#id,#user,chassisno,xcostrow,xaccdr,xprime)
+			end if
+          end event
+        end field
+
+        field update1
+			event before
+				set chassisno = pogrndetail.xserial("xgrnnum='"+xgrnnum+"'")
+			end event
+          event after
+			if chassisno .ne. ""
+				set temp = #spsql(zabsp_LC_insertIntoCarCostDetail,#id,#user,chassisno,xcostrow,xaccdr,xprime)
+			end if
+          end event
+        end field
+
+
+        field delete
+			event before
+				set costrow = xcostrow
+				set chassisno = xserial
+			end event
+          event after
+			set temp = #sql("delete from carcostdetail where xdocrow="+costrow+" and xtype='Duty Payment' and xserial='"+chassisno+"'")
+          end event
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "pogrndetailinv"
+            form.searchbutton.value = "Find xgrnnum=?&xrow=?"
+          }
+          return result
+        }
+        function pickSub(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xsub.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

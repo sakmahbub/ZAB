@@ -1,0 +1,87 @@
+screen optrginsadditional
+
+  sections form one, jscript myscript
+  sidebar list detail
+  	
+    list detail
+      caption "Additional Point List For: "+xinstrn
+	    table optrginsadditional
+	    order xinstrn
+    	fixed xinstrn
+        rows 20
+        objects  xrow attrib(link "login?screen=optrginsadditional&command=Show&xinstrn=?&xrow=?"),~
+        xqty,xpercent,xamount,xallproduct//,xnote
+
+     end list
+
+  form one
+    caption "Additional Incentive Scheme Detail For : "+xinstrn
+    table optrginsadditional
+    primarykey xinstrn
+    order xinstrn,xrow
+    fixed xinstrn
+    return "login"
+    layout 2
+    pstyle 3
+    objects Add,Update,Show,Clear,Delete,*next,Return,Top,Previous,Next,Bottom,"<p>",~
+            xrow attrib(row 0 1),xqty,xtype,xpercent,xamount,xallproduct,xdesc
+
+      field xtype
+      	caption Type
+      	pick ",At Least,More Than"	
+      end field
+      
+            field xinstrn
+		event after
+			set globals(xinstrn)=xinstrn
+		end event
+	    end field	
+	field xdesc
+		width 50
+	end field
+
+
+	embed onsubmit="submitit(this)"
+	field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Point Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+
+  end form
+
+   jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Details"){
+            form.screen.value = "optrginsdetail"
+            form.searchbutton.value = "Find xinstrn=?"
+          }
+
+		  if (but=="Return"){
+            form.screen.value = "optrginsheader"
+            form.searchbutton.value = "Find xinstrn=?"
+          }	
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

@@ -1,0 +1,19 @@
+product ZAB ERP
+
+table userstoreview
+  caption "User Store View"
+  columns zid,xtype,xlong,xcode
+
+  primary key zid,xcode
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+	sql CREATE VIEW userstoreview(zid,zemail,xposition,xwh,xlong) ~
+	AS ~
+	SELECT a.zid,a.zemail,a.xposition,a.xwh,b.xlong from xusers a join xcodes b on a.zid=b.zid and a.xwh=b.xcode Where b.xtype='Branch' ~
+	union all ~
+	SELECT a.zid,a.zemail,a.xposition,a.xwh,b.xlong from userstore a join xcodes b on a.zid=b.zid and a.xwh=b.xcode Where b.xtype='Branch'
+end table
+

@@ -1,0 +1,124 @@
+screen opratedefh
+     caption "Sales Rate Defaults"
+	sidebar list one
+	sections form one, jscript myscript
+	
+	   list one
+        caption "Sales Rate Interface"
+        table opratedefd
+        order xgrade,xrow
+		fixed xgrade
+        rows 20
+        objects xrow attrib(link "login?screen=opratedefd&command=Show&xgrade=?"), ~
+                 xacc,xcomm,xaccvat,xcomm1,xaccdisc,xcomm2,xacccr,xcomm3
+
+       headers "Row","Sales Acc","Sales Amount","Vat Acc","Vat Rate","Disc. Acc","Discount Rate","Truck Expense Acc","Truck Delivery Rate"
+     end list
+
+	
+	
+	form one
+		caption "Salary Rate Header"
+		table opratedefh
+		primary key xgrade
+		order xgrade
+		return "login"
+		layout 3
+		pstyle 3
+		objects Show,Clear,Add,Update,Details,Delete,*next,Top,Bottom,Next,Previous,"<p>" ,~
+						 xgrade,xrate//,xcomparison,xacc,acc display(const),xcomm,xaccvat,accvat  display(const),~
+						 //xcomm1,xaccdisc,accdisc display(const),xcomm2,xacccr ,acccr display(const),xcomm3
+
+	
+	field xgrade	
+	//display combo
+	//pick "A,B,C,D"
+	event after
+	set globals(xgrade)=xgrade
+	end event
+	end field
+						
+	field xcomm
+	   caption Delivery Sales Amount
+	end field
+	
+	field xcomm1
+	   caption Vat Rate
+	end field
+	
+	field xcomm2
+	   caption Discount Rate
+	end field
+	
+	field xcomm3
+	   caption Truck Expense
+	end field
+	
+	field xacccr
+	   caption Truck Expense Account
+	end field
+	
+	
+	  field acc
+          attrib local
+          caption Delivery Sales Account
+          event after
+            set acc=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+		
+	
+	  field accvat
+          attrib local
+          caption Vat Account
+          event after
+            set accvat=acmst.xdesc("xacc='"+xaccvat+"'")
+          end event
+        end field
+	
+	
+	  field accdisc
+          attrib local
+          caption Discount Account
+          event after
+            set accdisc=acmst.xdesc("xacc='"+xaccdisc+"'")
+          end event
+        end field
+		
+	
+	  field acccr
+          attrib local
+          caption Truck Expense Account
+          event after
+            set acccr=acmst.xdesc("xacc='"+xacccr+"'")
+          end event
+        end field
+		
+	  embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+	end form
+	  
+	  jscript myscript
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opratedefd"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+
+        </script>
+    end jscript
+
+end screen

@@ -1,0 +1,17 @@
+product ZAB ERP
+
+table acdetail
+  caption "AC Detail"
+  columns  ztime,zutime,zauserid,zuuserid, zid, xvoucher,xrow,xacc,~
+           xprime,xlong,xsub,xwh,xdeptname,xinvnum,xdebit,xcredit,xoldsub,xoldsubdesc,~
+		   xaccusage,xaccold,xtype,xtrn,xregi,xstaff,xcountry,xfairexp,xaccolddesc,~
+		   xchequeno,xdatechq,xbank,xpaidto,xlcno,xbase
+           
+  primary key zid, xvoucher, xrow
+  foreign key
+        zid references zbusiness.zid
+        zid,xvoucher references acheader.zid,xvoucher
+        zid,xacc references acmst.zid,xacc
+  end foreign key
+end table
+

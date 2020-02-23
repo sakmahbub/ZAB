@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table pmconsactcost3
+  caption "Actual Cost detail 3"
+  columns ztime,zutime,zauserid,zuuserid,zid,xwh,xhrc1,xhrc2,xhrc3,xhrc4,~
+  xtitem,xestimatedcost,xactualcost
+
+  primary key zid,xwh,xhrc1,xhrc2,xhrc3,xhrc4,xtitem
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xwh,xhrc1,xhrc2,xhrc3,xhrc4 references pmconstaskdetail3.zid,xwh,xhrc1,xhrc2,xhrc3,xhrc4
+  end foreign key
+end table

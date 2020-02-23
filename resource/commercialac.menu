@@ -1,0 +1,10 @@
+//commercialac.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+
+LC Opening Cost Entry                  |#classPath+"/login?screen=lcopeningcost"
+Duty & Other Payment                  	   |#classPath+"/login?screen=lcdutypayment"
+Codes & Parameter                  |#classPath+"/login?menu=lccodes"
+//-------------------------------------------------------------------
+

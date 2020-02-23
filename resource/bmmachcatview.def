@@ -1,0 +1,16 @@
+
+product ZAB ERP
+
+table bmmachcatview
+
+  caption "Ac Bal View"
+
+  columns zid,xacc,xsub,xyear,xprime,xacctype,xwh,xhwh
+  primary key zid,xacc,xsub,xyear
+
+
+  sql create view bmmachcatview (zid,xcode,xlong)~
+                  as select zid,xcode,xlong ~
+                  from xcodes where xtype='Asset Category'
+
+end table

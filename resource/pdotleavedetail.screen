@@ -1,0 +1,73 @@
+screen pdotleavedetail
+     caption "Leave Detail"
+
+//     sidebar list trn
+     sections form one,jscript myscript
+
+  	list trn
+        caption "Leave Detail"
+        table pdleaveview
+        order xyearperdate,xstaff
+        fixed xyearperdate
+        select "xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"'"
+        rows 20
+        objects  xyear,xday
+//        header "Year","EMP ID","Name","Total Day","Leave Type","Paid/Unpaid"
+//        totals "","","",sum,"",""
+     end list
+
+     form one
+        caption "<ACRONYM>Leave Entry Detail</ACRONYM>"
+	      table pdleavedetail
+        order xyearperdate,xstaff,xrow
+        fixed xyearperdate,xstaff
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Return,Top,Next,Previous,Bottom,~
+          xrow attrib(row 0 1),xdate,xyear
+
+
+        field xdate
+          event before
+//            set xfyearperdate = year+per+day
+          end event
+        end field
+
+         field add
+         end field
+
+         field update
+         end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Return"){
+            form.screen.value = "pdotleaveheader"
+            form.searchbutton.value = "Find xyearperdate=?&xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

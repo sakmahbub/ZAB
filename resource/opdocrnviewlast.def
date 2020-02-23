@@ -1,0 +1,73 @@
+product ZAB ERP
+
+table opdocrnview
+  caption "OP DO CRN View"
+
+  columns zid,xdornum,xdate,xcus,xstatusord,xref,xnote,xwh,xdesc,xstatusar,xtotamt,~
+          xtotamt,xvatamt,xdiscamt,xfm,xsm,xrsm,xsp,xpp,~
+          xrow,xitem,xlong,xvatrate,xvatamt,~
+          xqtyord,xunit,xrate,xlineamt,xqtybonus,xdateinv,xsign,xyear,xper
+
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view opdocrnview(zid,xdornum,xcrnnum,xdate,xcus,xstatusord,xwh,xstatusar,xtotamt,~
+	          xvatamt,xdiscamt,xfm,xsm,xrsm,xsp,xpp,~
+        	  xrow,xitem,xqtyord,xunit,xrate,xlineamt,xvatrate,xdiscdetamt,xqtybonus,xdateinv,xterritory,xcost,xsign,xyear,xper,xfield,xregion,xmarket,xtype) ~
+
+                  as select a.zid,a.xdornum,'',a.xdate,a.xcus,a.xstatusord,a.xwh,a.xstatusar,a.xtotamt,~
+	          a.xvatamt,a.xdiscamt,a.xfm,a.xsm,a.xrsm,a.xsp,a.xpp,~
+        	  b.xrow,b.xitem,b.xqtyord,b.xunit,b.xrate,b.xlineamt,b.xvatamt,b.xdiscdetamt,b.xqtybonus,a.xdate,a.xterritory,b.xcost,1,a.xyear,a.xper,~
+		  isnull(a.xfield,''),isnull(a.xregion,''),isnull(a.xmarket,''),a.xtype ~
+                  from opdoheader a join opdodetail b on a.zid=b.zid and a.xdornum=b.xdornum ~
+
+		  union all ~
+
+                  select a.zid,a.xdornum,'',a.xdate,a.xcus,a.xstatusord,a.xwh,a.xstatusar,a.xtotamt,~
+	          a.xvatamt,a.xdiscamt,a.xfm,a.xsm,a.xrsm,a.xsp,a.xpp,~
+        	  b.xrow,b.xitem,b.xqtyord,b.xunit,b.xrate,b.xlineamt,b.xvatamt,b.xdiscdetamt,b.xqtybonus,a.xdate,a.xterritory,b.xcost,1,a.xyear,a.xper,~
+		  isnull(a.xfield,''),isnull(a.xregion,''),isnull(a.xmarket,''),a.xtype ~
+                  from [10.0.0.21].ZABDB.dbo.opdoheader a join [10.0.0.21].ZABDB.dbo.opdodetail b on a.zid=b.zid and a.xdornum=b.xdornum ~
+
+		  union all ~	
+
+                  select a.zid,a.xordernum,a.xcrnnum,a.xdate,a.xcus,a.xstatuscrn,a.xwh,a.xstatusar,a.xtotamt,~
+	          a.xvatamt,a.xdiscamt,a.xfm,a.xsm,a.xrsm,a.xsp,a.xpp,~
+        	  b.xrow,b.xitem,b.xqtyord,b.xunit,b.xrate,b.xlineamt,b.xvatamt,b.xdiscdetamt,b.xqtybonus,~
+	  
+		  ISNULL(c.xdate,d.xdate),~
+    		  ISNULL(c.xterritory,d.xterritory),~
+
+//		  ISNULL(c.xdate,(select xdate from [10.0.0.21].ZABDB.dbo.opdoheader where zid=a.zid and xdornum=a.xordernum)),~
+//    		  ISNULL(c.xterritory,(select xterritory from [10.0.0.21].ZABDB.dbo.opdoheader where zid=a.zid and xdornum=a.xordernum)),~
+		  b.xcost,-1, ~
+//		  ISNULL(c.xyear,(select xyear from [10.0.0.21].ZABDB.dbo.opdoheader where zid=a.zid and xdornum=a.xordernum)),~
+//		  ISNULL(c.xper,(select xper from [10.0.0.21].ZABDB.dbo.opdoheader where zid=a.zid and xdornum=a.xordernum)),~	
+
+		  ISNULL(c.xyear,d.xyear),~
+		  ISNULL(c.xper,d.xper),~	
+
+		  '','',~
+//		  ISNULL(c.xmarket,(select xmarket from [10.0.0.21].ZABDB.dbo.opdoheader where zid=a.zid and xdornum=a.xordernum)), ~	
+		  ISNULL(c.xmarket,d.xmarket), ~	
+		  a.xtype ~	
+                  from opcrnheader a join opcrndetail b on a.zid=b.zid and a.xcrnnum=b.xcrnnum ~
+		  left outer join opdoheader c on a.xordernum=c.xdornum ~
+		  left outer join [10.0.0.21].ZABDB.dbo.opdoheader d on a.xordernum=c.xdornum ~
+
+		  union all ~	
+
+                  select a.zid,a.xordernum,a.xcrnnum,a.xdate,a.xcus,a.xstatuscrn,a.xwh,a.xstatusar,a.xtotamt,~
+	          a.xvatamt,a.xdiscamt,a.xfm,a.xsm,a.xrsm,a.xsp,a.xpp,~
+        	  b.xrow,b.xitem,b.xqtyord,b.xunit,b.xrate,b.xlineamt,b.xvatamt,b.xdiscdetamt,b.xqtybonus,~
+		  c.xdate,c.xterritory,b.xcost,-1,c.xyear,c.xper,'','',c.xmarket,a.xtype ~	
+
+                  from [10.0.0.21].ZABDB.dbo.opcrnheader a join [10.0.0.21].ZABDB.dbo.opcrndetail b on a.zid=b.zid and a.xcrnnum=b.xcrnnum ~
+		  join [10.0.0.21].ZABDB.dbo.opdoheader c on a.xordernum=c.xdornum
+			
+
+end table

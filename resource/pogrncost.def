@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table pogrncost
+  caption "Invoice Cost Detail"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xgrnnum,xrow,xaccdr,xacccr,xprime,xcus,xnote,xtype,xstatusap,xstatusjv,xstatus,xdate,xtrn,xpornum
+
+  primary key zid,xgrnnum,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xgrnnum references pogrnheader.zid,xgrnnum
+  end foreign key
+
+end table

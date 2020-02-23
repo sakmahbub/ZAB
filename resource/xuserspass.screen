@@ -1,0 +1,57 @@
+screen xuserspass
+  //sidebar list one
+  sections form one
+
+  list one
+    caption "Business Users"
+    table xusers
+    order zemail
+	  select "zemail='"+#user+"'"
+    rows 20
+    objects  zemail attrib(link "login?screen=xusers&command=Show&zemail=?"), ~
+             xpassword,zactive,xlastlogdate
+
+    totals "","Totals",sum
+
+    //headers none
+  end list
+
+  form one
+    caption "Change Password"
+	  table xusers
+    order zemail
+    return "login"
+	  select "zemail='"+#user+"'"
+    layout 2
+    pstyle 3
+    objects Change Password,"<p>" ,~
+      zemail display(const), xoldpass, xpassword, xconpass//, xdformat,xdsep,zactive
+
+    field zemail
+      default #user
+    end field
+
+    field xpassword
+      caption New Password
+    end field
+
+    field Change Password
+      event before
+        set temppass = #sql("select xpassword from xusers where zid="+#id+" and  zemail='"+#user+"'")
+        if xpassword .ne. xconpass
+          error "New Password and Old Password does not match"
+        end if
+        if xoldpass .ne. temppass
+          error "Wrong old password entry"
+        end if
+      end event
+      event after
+        set temp = #spsql(sp_changepass,#id,#user,xoldpass,xconpass)
+        action show
+        print "Password Change Successfully"
+      end event
+    end field
+
+  end form
+
+end screen

@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table opdocilink
+  caption "DO Header"
+   columns zid,xdornum,xdate,xcus,xorg,xordernumso,xpornum,xordernum,xinvnum,xqtydel,xlineamt,xstatusdor,xpartialchano,xinvref
+  primary key zid,xdornum,xdate,xcus,xorg,xordernumso,xpornum,xordernum,xinvnum,xqtydel,xlineamt,xstatusdor,xpartialchano,xinvref
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+ sql create view opdocilink (zid,xdornum,xdate,xcus,xorg,xordernumso,xpornum,xordernum,xinvnum,xqtydel,xlineamt,xstatusdor,xpartialchano,xinvref) ~
+                  as select h.zid,h.xdornum,h.xdate,h.xcus,(select xorg from cacus where xcus=h.xcus),h.xordernumso,h.xpornum,isnull(h.xordernum,''), isnull(h.xinvnum,''),(select sum(xqtydel) from opdodetail where xdornum=h.xdornum),(select sum(xlineamt) from opdodetail where xdornum=h.xdornum),h.xstatusdor,h.xpartialchano,ci.xinvref ~				   
+				  from opdoheader h join opinvheader ci on h.zid=ci.zid and h.xinvnum=ci.xinvnum where isnull(h.xinvnum,'')<>''
+end table
+

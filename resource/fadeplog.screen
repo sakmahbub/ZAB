@@ -1,0 +1,127 @@
+screen fadeplog
+     caption "Depreciation Log File"
+     sections form one, jscript myscript
+
+
+
+     list one
+        table fabal
+        order xvoucher
+        //fixed xvoucher
+        //select none
+	      navigators alpha group xacc
+        //navigators alpha,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 5
+        objects  xvoucher attrib(link "login?screen=fatrn&command=Show&xvoucher=?"),xcode,xdate,xprime
+
+        //headers none
+     end list
+
+
+
+
+
+     form one
+        caption "Depreciation Log File"
+	      table fadeplog
+       primarykey xyear,xper desc
+        order xyear,xper desc
+        //select
+        return "login"
+        layout 1
+        pstyle 3
+        objects Show,Clear,Top,Delete,Previous, Next, Bottom,"<p>" ,~
+        xyear,xper,xdate,xstatusfa
+
+        field xyear
+          event after
+            if xstatusfa .eq. "Posted"
+              set #field(delete.display)="hide"
+            end if
+          end event
+        end field
+
+        field delete
+          event before
+            int year = 0
+            set year = #sql(int, "select xyear from fadeplog order by xyear desc")
+            int per = 0
+            set per = #sql(int, "select xper from fadeplog where xyear="+year+" order by xper desc")
+            if xyear <> year .or. xper <> per
+              error "You Must Delete From Last Processed Month"
+            end if
+          end event
+          event after
+            set voucher=xtrn.xtrn("xtypetrn='FA Transactions' and xaction='Depreciation'")
+            set temp=#sql("delete from fatrn where xvoucher like '"+voucher+"%' and xyear="+xyear+" and xper="+xper+")
+            int year = year
+            int per = per+1
+            if per >12
+              set per=1
+              set year=year+1
+            end if
+            set temp=#sql("delete from fabal where xyear="+year+" and xper="+per+")
+            set code=#sql("select xcode from famst")
+            while #result .eq. "true"
+              int lifeused=famst.xlifeused("xcode='"+code+"'")
+              int liferemain=famst.xliferemain("xcode='"+code+"'")
+              if lifeused > 0
+                set lifeused=lifeused-1
+                set temp=#sql("update famst set xlifeused="+lifeused+" where xcode='"+code+"'")
+              end if
+              if liferemain > 0
+                set liferemain=liferemain+1
+                set temp=#sql("update famst set xliferemain="+liferemain+" where xcode='"+code+"'")
+              end if
+              set code=#sql("select xcode from famst where xcode>'"+code+"'")
+            end while
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Enter
+          embed onclick="clicked(this)"
+        end field
+
+        field DespatchAdd
+          embed onclick="desadd(this)"
+        end field
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function desadd(b){
+          b.value = "Top"
+          detail="desadd"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "opordcus"
+            form.searchbutton.value = "Find xcus=?"
+            //return false
+          }
+	    if (detail=="desadd"){
+            form.screen.value = "cadel"
+            form.searchbutton.value = "Find xcus=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

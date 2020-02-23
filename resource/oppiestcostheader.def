@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table oppiestcostheader
+
+  caption "MO PI Estimated Cost Header"
+  columns  ztime,zutime,zauserid,zuuserid, zid, xordernum,xrow,xmoprcs,xdate,xfabriccolor
+           
+           
+  primary key zid, xordernum,xrow
+  
+  foreign key
+        zid references zbusiness.zid
+        zid,xordernum references opordheader.zid,xordernum
+  end foreign key
+end table

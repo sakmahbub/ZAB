@@ -1,0 +1,12 @@
+//Purchasing.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Enter Purchase Orders            |#classPath+"/main?page=poordsup"
+Review Purchase Orders           |#classPath+"/main?page=poordr"
+Manage Goods Receipt Notes       |#classPath+"/main?page=pogrn"
+Codes and Parameters             |#classPath+"/main?menu=po codes"
+Reports                          |#classPath+"/main?menu=po reports"
+Documents                        |#classPath+"/main?menu=po documents"
+//-------------------------------------------------------------------
+

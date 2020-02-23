@@ -1,0 +1,14 @@
+product ZAB ERP
+
+	table bmbomheader
+	caption "BOM Master"
+	columns ztime,zutime,zauserid,zuuserid,zid,xbomkey,xdesc,xitem,xtitem,xdate,zactive,xqtybase,xbomtype,xpreferbatchqty,xdiv,xunit,xcolorcode
+
+	primary key zid,xbomkey
+	foreign key
+		zid references zbusiness.zid
+		//zid,xitem references caitem.zid,xitem
+		zid,xcolorcode references cacolor.zid,xcolorcode
+	end foreign key
+
+end table

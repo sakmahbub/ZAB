@@ -1,0 +1,7 @@
+//pdbalrep.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Transaction Listing By Type	   |#classPath+"/login?screen=*jspcrystal pdtrn(xempcategory=Employee Category,xyear=Year,xper=Period,xstaff=From Employee=,xstaff=To Employee,xpdtype=PD Transaction Type)"
+Transaction Listing All      	   |#classPath+"/login?screen=*jspcrystal pdtrnall(xempcategory=Employee Category,xyear=Year,xper=Period,xstaff=From Employee=,xstaff=To Employee)"
+//-------------------------------------------------------------------

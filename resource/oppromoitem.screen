@@ -1,0 +1,74 @@
+screen oppromoitem
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Applicable for : "+xpromono
+        table oppromoitem
+        order xpromono,xrow
+        fixed xpromono
+        rows 20
+        objects  xrow attrib(link "login?screen=oppromoitem&command=Show&xpromono=?&xrow=?"), ~
+                xtypetrn,xcatitem,xsubcat,xitem,~
+				desc equals((select xdesc from caitem where zid=oppromoitem.zid and xitem=oppromoitem.xitem))
+		headers "Row","Transaction","Item Category","Sub Category","Item","Description"
+     end list
+
+
+     form one
+        caption "Appicable For : "+xpromono
+	      table oppromoitem
+        order xpromono,xrow
+        fixed xpromono
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Update, Delete,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~
+          xrow attrib(row 0 1),xtypetrn,xcatitem,xsubcat,xitem,xitemdesc,xnote
+
+		field xtypetrn
+		caption Transaction
+		pick "Include,Except"
+		end field
+		
+        field xitemdesc
+          caption Product Name
+          attrib local
+          display const
+          event after
+            set xitemdesc=caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+		  
+		  
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "oppromoheader"
+            form.searchbutton.value = "Find xpromono=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

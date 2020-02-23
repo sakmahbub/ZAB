@@ -1,0 +1,171 @@
+screen mostartprocess
+
+      \\sidebar list cost
+      sections form one,jscript myscript
+
+     list cost
+        caption "Cost For: "+xitem
+        table caitemcostprice
+        order xitem,xyearperdate
+        fixed xitem
+        select "zactive='1'"
+        rows 20
+        objects  xcost attrib(link "abc" embed onclick="return pickPrice(this)"), ~
+                 xdate
+        totals "","Totals",sum,"",sum
+     end list
+
+form one
+  caption "Start Process"
+ table modailyprdtrn
+  primarykey xmoprcsnum
+  order xmoprcsnum
+  select "(left(xmoprcsnum,4)='PRS-')"
+  return "login"
+  layout 2
+  pstyle 3
+  objects Add,Clear,Show,Update,Delete,*next,Top,Previous,Next,Bottom, ~
+          xmoprcsnum,xdate display(hide),xstartdate,xtmoprcs,xdum,xitem,xdesc,xqty,xunit,xwh,xname,xnote,~
+			xstatusprcs display(hide),xdocrow display(hide),xfmoprcs display(hide)
+	   
+
+  field xmoprcsnum
+    def "PRS-"
+	set globals(xmoprcsnum)=xmoprcsnum
+	event after
+//	class careports(getaspReport{imreceiptind,1,xmoprcsnum,Print Receive Entry})
+	end event
+  end field
+	
+  field xdesc
+    caption Product Name
+    attrib local
+    display const
+    event after
+    	set xdesc = caitem.xdesc("xitem='"+xitem+"'")
+    end event
+  end field
+
+  field xunit
+  display const
+      event before
+    	set xunit = caitem.xunit("xitem='"+xitem+"'")
+    end event
+  end field
+  
+   field xname
+  display const
+   attrib local
+  end field
+  
+    field xdum
+	display const
+   attrib local
+  caption 
+  end field
+  
+    field xwh
+	//display const
+	//event before
+	//set xwh=modef.xtwh("xyesno='yes'")
+	//end event
+  end field
+  
+   field xname
+	display const
+   attrib local
+      event after
+    	set xname = xcodes.xlong("xcode='"+xwh+"' and xtype='Store'")
+    end event
+  end field
+
+  field Add
+    event before
+	set xfmoprcs = "Start Process"
+	if xtmoprcs .eq. ""
+		error "Cannot Proceed -- Please Select Process Name"
+	else if xitem .eq. ""
+		error "Cannot Proceed -- Please Select Item"
+		else
+		 set trn = "PRS-"
+         set xmoprcsnum = #trn("Process Number",trn,10) 
+	end if
+    end event
+    event after
+      set command = "add"
+      set temp=#spsql(zabsp_MO_TRN_PRCS,#id,#user,xmoprcsnum,6,"Open")
+	 // set temp = #spsql(sp_validateAfterIMtrn,#id,#user,ximtrnnum,xitem,xqty,command)
+	//set temp=#spsql(zabsp_imstock,#id,#user,xwh,xitem,xqty,"1","Add")
+      action Show
+    end event
+  end field
+
+
+  field update
+    event before
+        set xstatusjv="Open"
+	//*************IM STOCK TABLE 
+	double qty
+
+	set qty=#sql("select xqty from imtrn where ximtrnnum='"+ximtrnnum+"' and xitem='"+xitem+"'")
+
+	set temsql1=#sql("update imstock set xavail=xavail-"+qty+" where xitem='"+xitem+"' and xwh='"+xwh+"'")
+	set temsql2=#sql("update imstock set xinhand=xinhand-"+qty+" where xitem='"+xitem+"' and xwh='"+xwh+"'")
+	//****************END*************
+    end event
+    event after
+      set command = "update"
+       set temp=#spsql(zabsp_MO_TRN_PRCS,#id,#user,xmoprcsnum,6,"Open")
+	  //set temp = #spsql(sp_validateAfterIMtrn,#id,#user,ximtrnnum,xitem,xqty,command)
+	//set temp=#spsql(zabsp_imstock,#id,#user,xwh,xitem,xqty,"1","Update")
+      action Show
+    end event
+  end field
+
+  field delete
+    event before
+		 
+	// set temp=#spsql(zabsp_imstock,#id,#user,xwh,xitem,xqty,"1","Delete")
+    end event
+	event after
+	set temp=#spsql(zabsp_MO_TRN_PRCS,#id,#user,xmoprcsnum,6,"Open")
+	end event
+  end field
+
+
+ embed onsubmit="return submitit(this)"
+end form
+
+     jscript myscript
+
+        <script language=javascript type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="clicked"){
+            form.screen.value = "imtrn"
+          }
+              detail = ''
+              return result
+
+        }
+        function pickPrice(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+		//document.one.xdateexp.value=date.text
+          }else{
+            document.imtrn.xrate.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+end screen

@@ -1,0 +1,115 @@
+screen fabalmst
+     caption "Balance Maintenance"
+     //sidebar text two,list two, text three
+     sections form one, jscript myscript
+
+
+
+     list one
+        table fabal
+        order xvoucher
+        //fixed xvoucher
+        //select none
+	navigators alpha group xacc
+        //navigators alpha,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 5
+        objects  xvoucher attrib(link "Main?screen=fatrn&command=Show&xvoucher=?"),xcode,xdate,xprime
+
+        //headers none
+     end list
+
+
+
+
+
+     form one
+        caption "Balance Maintenance"
+	     table fabal
+        fixe xyear,xper,xcode
+       //primarykey xyear,xper,xcode 
+        //order xyear,xper,xcode
+        //select
+        return "login"
+        layout 1
+        pstyle 3
+        objects Return,Update,"<p>" ,~
+        xyear,xper,xcode,xname,~
+        xbookval,xprime,xdepamt,xaccdepamt
+
+        field xname
+          event after
+            set xname=famst.xname("xcode='"+xcode+"'")
+          end event
+          event before
+            set  xcode = globals(xcode)
+            set xper = globals(xper)
+            set  xyear =globals(xyear)
+          end event
+          attrib local
+          display constant
+        end field
+
+        field xprime
+          caption Added Value
+        end field
+
+        field Update
+          event before
+            set temp = #sql("select xstatusfa from fadeplog where xyear = '"+xyear+"' and xper = '"+xper+"'")
+            if #result .eq. "true"
+              error "Cannot Add--Pls Delete Log File Before Addition"
+            end if
+          end event
+          event after
+            set depmethod = #sql("select xdepmethod from famst where xcode = '"+xcode+"'")
+            set resalval = #sql("select xresalval from famst where xcode = '"+xcode+"'")
+            set liferemain = #sql("select xliferemain from famst where xcode = '"+xcode+"'")
+            buffer famst
+            move famst = famst(xcode)
+            if depmethod .eq. "RB"
+              double rate=0.00+xbookval-resalval
+              double rate1=0.00+rate/liferemain
+              set rate1=rate1/rate
+              set famst.xrate=rate1*2
+            else
+              set famst.xrate = 0.00
+            end if
+            update famst(xcode)
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "famst"
+            form.searchbutton.value = "Find xcode=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

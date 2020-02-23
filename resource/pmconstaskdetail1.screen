@@ -1,0 +1,159 @@
+screen pmconstaskdetail1
+
+     sidebar list one,list detail
+     sections form one, jscript myscript
+
+     list one
+       caption "Project Work Breakdown Level 1"
+       table pmconstaskdetail1
+        order xhrc1,xhrc2
+        fixed xhrc1
+        //select "xwh='"+#wh+"'"
+          rows 20
+          objects  xhrc2 attrib(link "login?screen=pmconstaskdetail1&command=Show&xhrc1=?&xhrc2=?"), ~
+                   xtaskname,xdatefrom,xdatecom,xdurdate
+
+       end list
+
+     list detail
+       caption "Project Work Breakdown Level 2 "+xhrc2
+       table pmconstaskdetail3
+        order xhrc1,xhrc2,xhrc3
+        fixed xhrc1,xhrc2
+       // select "xwh='"+#wh+"'"
+          rows 20
+          objects  xhrc3 attrib(link "login?screen=pmconstaskdetail2&command=Show&xhrc1=?&xhrc2=?&xhrc3=?"), ~
+                   xtaskname,xdatefrom,xdatecom,xdurdate
+
+       end list
+
+
+     form one
+        caption "Project Work Breakdown Level 2 For <br>"+xhrc1+"<br>"+pmconstaskheader.xtaskname("xhrc1='"+xhrc1+"'")
+        table pmconstaskdetail1
+        order xhrc1,xhrc2
+        fixed xhrc1
+        //select "xwh='"+#wh+"'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Add,Show,Clear,Update, Delete,*next,Return To Level 1,Top,Previous, Next, Bottom,Level 3,~
+                *next,Estimated Cost,Actual Cost,~
+                "<p>",xhrc2,xtaskname,xdatefrom,xdatecom,xdurdate display(const),xdate,xstatustask,xref display(const),xwh display(hide)
+
+      field xhrc2
+        event after
+          set globals(xhrc2)=xhrc2
+        end event
+      end Field
+
+      field xdatefrom
+        caption Start Date
+      end Field
+
+      field xdatecom
+        caption Expected End Date
+      end Field
+
+      field xdesc
+        width 50
+        caption Project Description
+      end Field
+
+       field xdate
+         caption Finished Date
+      end Field
+
+
+
+        field add
+          event before
+            set xwh=#wh
+            set xstatustask="Incomplete"
+            set xref = xhrc1+"-"+xrow
+            //int durdate = #sesql("select datediff(day,'"+xdatefrom+"','"+xdatecom+"') from pmconstaskdetail1")
+            //set durdate=durdate+1
+            //set xdurdate = durdate
+          end event
+          event after
+//             set temp = #spsql(sp_calculateDate3,#id,#user,xhrc1,xrow,xdatefrom,xdatecom)
+             action show
+          end event
+        end field
+
+
+         field update
+          event before
+//            set xref = xhrc1+"-"+
+            int durdate = #sesql("select datediff(day,'"+xdatefrom+"','"+xdatecom+"') from pmconstaskdetail1")
+            set durdate=durdate+1
+            set xdurdate = durdate
+          end event
+         event after
+//            set temp = #spsql(sp_calculateDate3,#id,#user,xhrc1,xrow,xdatefrom,xdatecom)
+//            action show
+         end event
+         end Field
+
+
+
+       // embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        field Estimated
+          embed onclick="clicked(this)"
+        end field
+
+        field Actual
+          embed onclick="clicked(this)"
+        end field
+
+         field Level 2
+          embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+
+
+      jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Return To Level 1"){
+            form.screen.value = "pmconstaskheader"
+            form.searchbutton.value = "Find xhrc1=?"
+          }
+          if (detail=="Level 3"){
+            form.screen.value = "pmconstaskdetail2"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Estimated Cost"){
+            form.screen.value = "pmconscost1"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Actual Cost"){
+            form.screen.value = "pmconsactcost1"
+            form.searchbutton.value = "Top"
+          }
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+
+end screen

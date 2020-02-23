@@ -1,0 +1,71 @@
+screen pdabsent
+     caption "Absent Entry"
+     //sidebar text two,list two, text three
+     sections form one,jscript myscript
+
+
+     form one
+        caption "A<ACRONYM>bsent</ACRONYM> E<ACRONYM>ntry</ACRONYM>"
+	      table pdabsent
+        order xyearperdate
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Show,Update, Delete,*next,Top,Previous,Next,Bottom,Detail,"<p>" ,~
+          xdate,xyear display(hide),xper display(hide),xyearperdate display(hide)
+
+        field xdate
+          event before
+            set year = #sub(xdate,0,4)
+            set xyear = #sub(xdate,0,4)
+            set per = #sub(xdate,5,2)
+            set xper = #sub(xdate,5,2)
+            set day = #sub(xdate,8,2)
+            set xday = #sub(xdate,8,2)
+            set xyearperdate = year+per+day
+          end event
+          event after
+            set globals(xdate)=xdate
+            set globals(xyear)=xyear
+            set globals(xper)=xper
+            set globals(xday)=xday
+            set globals(xyearperdate)=xyearperdate
+          end event
+        end field
+
+        field add
+        end field
+
+        field update
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdabsentdetail"
+            form.searchbutton.value = "Find xyearperdate=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

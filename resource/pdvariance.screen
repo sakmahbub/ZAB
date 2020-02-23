@@ -1,0 +1,36 @@
+screen pdvariance
+     caption "Variance Processing"
+     sections form one
+
+     form one
+        caption "<ACRONYM>Variance Process</ACRONYM>"
+        return "login"
+        layout 2
+        pstyle 3
+        //report pdvariance,,Show Report
+        objects Show,xyear,xper,xempcategory
+
+
+        field Show
+          event before
+//      class pdsheraton(processVariance{xyear,xper})
+            set temp = #spsql(sp_ProcessVariance,#id,#user,xyear,xper,xempcategory)
+          end event
+        end field
+
+        field xyear
+//        default "2007"
+          event after
+//            class careports(getreport{pdvariance,2,xyear,xper,Show Variance}
+//            class careports(getreport{pdreconciliation,2,xyear,xper,Show Reconciliation}
+          end event
+        end field
+
+        field xper
+  //      default "10"
+        end field
+
+
+     end form
+
+end screen

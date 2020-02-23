@@ -1,0 +1,34 @@
+product ZAB ERP
+
+table artoglview
+  caption "AR TO GL View"
+  columns zid,xvoucher,xgcus,xdate,~
+          xsign,xstatusjv,xacc,xprime,xbank,xtrn,xvatamt,xaitamt,xdiscprime,xwh,xdeptname
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view artoglview (zid,xvoucher,xgcus,xdate,xsign,xstatusjv,xacc,xprime,xbank,xtrn,xvatamt,xaitamt,xdiscprime,xwh,xdeptname) ~
+                  as select a.zid,a.xvoucher,~
+                  (select xgcus from cacus where xcus=b.xcus),~
+                  b.xdate,b.xsign,b.xstatusjv,a.xacc,a.xprime,'',left(a.xvoucher,4),0,0,0,b.xwh,isnull(a.xdeptname,'') ~
+                  from artrn a join arhed b on a.zid=b.zid and a.xvoucher=b.xvoucher and b.xsign>0 ~
+                  union all ~
+                  select zid,xvoucher,~
+                  (select xgcus from cacus where xcus=arhed.xcus and zid=arhed.zid),~
+                  xdate,xsign,xstatusjv,'',xprime,xbank,left(xvoucher,4),isnull(xvatamt,0),isnull(xaitamt,0),~
+                  isnull(xdiscprime,0),xwh,isnull(xdeptname,'') ~
+                  from arhed where xsign<0 and left(xvoucher,2)<>'SR' ~
+                  union all ~
+                  select a.zid,a.xvoucher,~
+                  (select xgcus from cacus where xcus=b.xcus and zid=b.zid),~
+                  b.xdate,b.xsign,b.xstatusjv,a.xacc,a.xprime,'',left(a.xvoucher,4),isnull(xvatamt,0),isnull(xaitamt,0),isnull(xdiscprime,0),~
+                  b.xwh,isnull(a.xdeptname,'') ~
+                  from artrn a join arhed b on a.zid=b.zid and a.xvoucher=b.xvoucher where b.xsign<0 and ~
+                  left(a.xvoucher,2)='SR'
+
+
+end table

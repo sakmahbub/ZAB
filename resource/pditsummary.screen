@@ -1,0 +1,21 @@
+screen pditsummary
+     sections form one
+
+     form one
+        caption "<ACRONYM>IT Summary Process</ACRONYM>"
+        return "login"
+        layout 2
+        pstyle 3
+        //report pditsummary,,Show Report
+        objects Process,xyear
+
+
+        field Process
+          event after
+            set temp = #spsql(sp_processITSummary,#id,#user,xyear)
+          end event
+        end field
+
+     end form
+
+end screen

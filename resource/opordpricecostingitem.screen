@@ -1,0 +1,200 @@
+screen opordpricecostingitem
+
+     sidebar list one
+     sections form one,  jscript myscript
+
+     list one
+        caption "Costing Detail"
+        table opordpricecostingitem
+        order xordernum,xorderrow,xrow
+        fixed xordernum,xorderrow
+        rows 20
+        objects xrow attrib(link "login?screen=opordpricecostingitem&command=Show&xordernum=?&xorderrow=?&xrow=?"), ~
+		xcostcentre,xgitem,xitem,desc equals((select xdesc from caitem where zid=opordpricecostingitem.zid and xitem=opordpricecostingitem.xitem)),xqty,xrate,xlineamt
+		  
+        headers "Row No","Const Centre","Item Group","Item Code","Description","Qty","Rate","Amount"
+		total "","","","","Total","","",sum
+     end list
+ 
+     list header
+        caption "Total Cost"
+        table mkordheader
+        order xordernum
+        fixed xordernum
+        rows 20
+        objects xordernum attrib(link "login?screen=mkordheader&command=Show&xordernum=?"), ~
+		xcur,xexch,xprimetotamt,xbasetotamt
+		  
+        //headers "Row No","Const Centre","Item Group","Item Code","Description","Qty","Rate","Amount"
+		//total "","","","","Total","","",sum
+     end list
+ 
+     form one
+        caption "Price Costing Detail For <br>"+xordernum
+        table opordpricecostingitem
+        order xordernum,xorderrow,xrow
+        fixed xordernum,xorderrow
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Update,Delete, Show, Clear,*next,Top, Previous, Next, Bottom,Complete,"<p>",~
+                xrow attrib(row 0 1),xunit,xcostcentre,xgitem,xitem,xdesc,xqty,xrate,xlineamt,xnote
+		
+		
+        embed onsubmit="return submitit(this)"
+
+        field xqty
+			default "1"
+		end field
+		
+        field xitem
+			pick xitemfin
+		end field
+		
+		field xdum
+          attrib local
+          display const
+		  caption 
+        end field
+
+        field xconstruction
+          attrib local
+          display const
+		  caption Construction
+          event after
+            set xconstruction = caitem.xconstruction("xitem = '"+xitem+"'")
+          end event
+        end field
+
+        field xfabriccolor1
+          attrib local
+          display const
+		  caption Fabric Color
+          event after
+            set xfabriccolor = caitem.xfabriccolor("xitem = '"+xitem+"'")
+          end event
+        end field
+
+        field xhscode
+          attrib local
+          display const
+		  caption H.S. Code
+          event after
+            set xhscode = caitem.xhscode("xitem = '"+xitem+"'")
+          end event
+        end field
+
+        field xunit
+          attrib local
+          display const
+		  caption Unit
+          event after
+            set xunit = caitem.xunit("xitem = '"+xitem+"'")
+          end event
+        end field
+
+        field xdesc
+          attrib local
+          display const
+          event after
+            set xdesc = caitem.xdesc("xitem = '"+xitem+"'")
+          end event
+        end field
+
+        field xlong
+          width 75
+          column 3
+        end field
+
+        field Add
+          event before
+			  if xitem .ne. ""
+				set xgitem=caitem.xgitem("xitem='"+xitem+"'")
+			  end if 
+			  if xrate == 00
+				error "Cannot Proceed -- Rate Is "+xrate
+			  end if	
+			  set xlineamt = xrate*xqty
+          end event
+          event after
+			  double amt = #sql(double,"select sum(xlineamt) from opordpricecostingitem where xordernum='"+xordernum+"' and xorderrow="+xorderrow)
+			  double exch = mkordheader.xexch("xordernum='"+xordernum+"'")
+			  double qtyord = mkorddetail.xqtyord("xordernum='"+xordernum+"' and xorderrow="+xorderrow)
+			  double prime = 0.00
+			  if exch > 0
+				set prime = amt/exch
+			  end if
+			  if prime > 0 .and. qtyord > 0
+				set rate = prime/qtyord
+				set temp = #sesql("update mkorddetail set xrate="+rate+",xlineamt="+(rate*qtyord)+" where xordernum='"+xordernum+"' and xorderrow="+xorderrow)
+				//set temp = #sql("update mkorddetail set xlineamt="+rate+" where xordernum='"+xordernum+"' and xorderrow="+xorderrow)
+			  end if
+			  set temp = #sql("update mkordheader set xprimetotamt="+prime+" where xordernum='"+xordernum+"'")
+			  set temp = #sql("update mkordheader set xprimetotamt="+prime+" where xordernum='"+xordernum+"'")
+			  set temp = #sql("update mkordheader set xbasetotamt="+amt+" where xordernum='"+xordernum+"'")
+          end event
+        end field
+
+        field update
+          event before
+			  set xlineamt = xrate*xqty
+			  if xitem .ne. ""
+				set xgitem=caitem.xgitem("xitem='"+xitem+"'")
+			  end if 	
+          end event
+          event after
+			  double amt = #sql(double,"select sum(xlineamt) from opordpricecostingitem where xordernum='"+xordernum+"' and xorderrow="+xorderrow)
+			  double exch = mkordheader.xexch("xordernum='"+xordernum+"'")
+			  double qtyord = mkorddetail.xqtyord("xordernum='"+xordernum+"' and xorderrow="+xorderrow)
+			  double prime = 0.00
+			  if exch > 0
+				set prime = amt/exch
+			  end if
+			  if prime > 0 
+				if qtyord > 0
+					set rate = prime/qtyord
+					//set temp = #sesql("update mkorddetail set xrate="+rate+",xlineamt="+rate*qtyord+" where xordernum='"+xordernum+"' and xorderrow="+xorderrow)
+					set temp = #sql("update mkorddetail set xrate="+rate+" where xordernum='"+xordernum+"' and xorderrow="+xorderrow)
+					set rate=rate*qtyord
+					set temp = #sql("update mkorddetail set xlineamt="+rate+" where xordernum='"+xordernum+"' and xorderrow="+xorderrow)
+				end if
+			  end if
+			  set temp = #sql("update mkordheader set xprimetotamt="+prime+" where xordernum='"+xordernum+"'")
+			  set temp = #sql("update mkordheader set xprimetotamt="+prime+" where xordernum='"+xordernum+"'")
+			  set temp = #sql("update mkordheader set xbasetotamt="+amt+" where xordernum='"+xordernum+"'")
+          end event
+        end field
+
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "opordlcdetail"
+            form.searchbutton.value = "Find xordernum=?&xorderrow=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

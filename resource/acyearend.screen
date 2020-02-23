@@ -1,0 +1,45 @@
+screen acyearend
+
+     caption "Year Ending"
+     sections form one,  jscript myscript
+
+
+
+     form one
+        caption "Y<ACRONYM>ear</ACRONYM> E<ACRONYM>nding</ACRONYM>"
+        return "login"
+        layout 2
+    	  pstyle 3
+        objects Process,"<p>" ,~
+                 xyear,xdate
+
+      field xwh
+		display const
+		default "01"
+	end field
+ 
+	field xyear
+        caption Closing Year
+       end field
+	   
+	   field xdate
+        caption Last Date of Closing Year
+       end field
+
+       field process
+         event before
+//            class gltrn(acYearEnd{xyear})
+            set temp = #spsql(sp_acYearEnd,#id,#user,xyear,xdate,8)
+         end event
+       end field
+
+        embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+     end jscript
+
+
+
+end screen

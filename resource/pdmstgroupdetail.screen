@@ -1,0 +1,94 @@
+screen pdmstgroupdetail
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Employee Group : "+xgroup
+        table pdmst
+        order xstaff
+        fixed xgroup
+		select "xgroup <>''"
+        rows 260
+        objects  xstaff attrib(link "login?screen=pdmstgroupdetail&command=Show&xstaff=?"), ~
+		xname,xdesignation,xdeptname     
+        header "ID","Name","Designation","Department"
+     end list	 
+	 
+     form one
+        caption "Employee Group Detail for : "+xgroup
+	  table pdmst
+        order xstaff
+        fixed xgroup
+		select "xgroup <>''"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Update,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~ 
+         xstaff,xname,xgroup
+		 
+        field xgroup
+		  caption Group Name
+          display combo
+		  pick  "select distinct xgroup from pdmst where xempcategory='"+#empcat+"'"
+			event after
+				set globals(xstaff)=xstaff
+			end event		  
+        end field
+
+        field xstaff
+		  pick list xstaffgroup		  
+        end field		
+
+        field update
+          event before
+		  if xname .eq. ""
+			error "Please show first"
+		  else if xname .ne. pdmst.xname("xstaff='"+xstaff+"'")
+			error "Please show first"
+		  end if
+          end event
+        end field
+
+        field delete
+          event before
+		  if pdrosterheader.xstatus("xroster='"+xroster+"'") .ne. "Open"
+				error "Roster Already Confirmed!"
+		  end if
+          end event
+        end field
+
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdmstgroup"
+            form.searchbutton.value = "Find xstaff=?"
+            //return false
+          }
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

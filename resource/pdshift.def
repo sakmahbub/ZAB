@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table pdshift
+  caption "PD Shift"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xshift,xtimein,xtimeout,xlncin,xlncout,xdatefrom,xdateto
+
+  primary key zid, xshift
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

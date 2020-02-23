@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table modef
+  caption "Production Defaults"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xfwh,xtwh,xwh,xmoprcs,xunit,xyesno 
+		  
+
+  primary key zid
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

@@ -1,0 +1,98 @@
+screen xcodeslocation
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xtype,xcode
+        select "xtype='Location'"
+        rows 20
+        objects  xcode attrib(link "login?screen=xcodeslocation&command=Show&xtype=?&xcode=?"),~
+                xlong,zactive
+
+        //headers none
+     end list
+
+     form one
+
+     caption "<ACRONYM>Location Name</ACRONYM>"
+        table xcodes
+        order xtype,xcode
+        select "xtype='Location'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update, Delete,*next,~
+                Top,Previous,Next,Bottom,"<p>" ,~
+                xtype,xcode width(50),~
+                xlong,xhrc1,xdesc,zactive
+
+        field xtype
+          display hide
+          caption Type
+          //default "Location/Concern"
+        end field
+
+	field xdesc
+	  display const
+	  attrib local
+	  caption Descirption
+	  event after
+	    set xdesc=achrc1.xdesc("xhrc1='"+xhrc1+"'")
+	  end event
+	end field
+
+        field xprops
+          display combo
+          pick "Addition,Deduction"
+          default "Addition"
+        end field
+
+        field xlong
+          width 40
+          height 2
+          //column 2
+        end field
+
+        field add
+          event before
+            set xtype="Location"
+          end event
+        end field
+
+        field Budget
+          embed onclick="clicked(this)"
+        end field
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+    	    if (detail=="Budget"){
+            form.screen.value = "acbudget"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

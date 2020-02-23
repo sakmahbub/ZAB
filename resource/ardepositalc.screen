@@ -1,0 +1,154 @@
+screen ardepositalc
+
+     caption "AR Allocation"
+     sidebar list invoice,list allocation
+     sections form one,jscript myscript
+
+
+     list invoice
+        caption "<br><center><b>"Unallocated Voucher List"</b>"
+        table armralc
+        order xvoucher
+        //fixed xcus
+        select "xprime> 0"
+        rows 10
+        objects ~
+        xvoucher attrib(link "abc" embed onclick="return pickDetail(this:xprime#:xdate#)"), ~
+        xprime attrib(name xprime#),xdate attrib(name xdate#)
+
+        headers "MR Number","Balance","Date"
+     end list
+
+     list allocation
+        caption "<br><center><b>"Allocated MR List"</b>"
+        table aralc
+        order xvoucher,xinvnum
+        fixed xvoucher
+        rows 10
+        objects ~
+        xinvnum attrib(link "login?screen=ardepositalc&command=Show&xinvnum=?"), ~
+        xdate,xamount
+        totals "","Totals","",sum
+		header "MR No","Date","Deposit Amount"
+     end list
+
+     form one
+        caption "MR Allocation for "+xvoucher+ " and " +xrow
+        table aralc
+        primarykey xvoucher,xinvnum
+        order xvoucher,xinvnum
+        fixed xvoucher
+        return "login"
+        pstyle 3
+        layout 2
+        objects Return,Clear,Show,Add, Update, Delete,*next, Top,Next, Previous, Bottom,~
+                xinvnum attrib(readonly),xdum,xdate attrib(readonly),xdatedue default(#date),~
+                xbalance,xamount
+ 
+ 
+        field xinvnum
+			event after
+				set status = arhed.xstatusjv("xvoucher='"+xvoucher+"'")
+     	    	if status .eq. "Confirmed"
+		         	set #field(add.display)="hidden"
+		         	set #field(delete.display)="hidden"
+         			set #field(update.display)="hidden"
+            	end if
+			end event
+        end field
+
+        field xamount
+          caption Deposit Amount
+        end field
+
+        field xdum
+          caption
+          attrib local
+          display constant
+        end field
+
+        field xbalance
+          attrib readonly
+        end field
+
+        field Add
+          event before
+            // ********** CHECKING FOR GIVEN AMOUNT ************
+            class ar(arValidateBeforeAllocate{xvoucher})
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterAllocateAR,#id,#user,xvoucher,xinvnum,xbalance,xamount)
+            action Show
+          end event
+        end field
+
+        field delete
+          event before
+            set invnum = xinvnum
+            set voucher = xvoucher
+            double balance = xbalance
+            double amount = xamount
+          end event
+          event after
+            class ar(arValidateAfterAllocate{xvoucher})
+            set temp = #spsql(sp_validateAfterAllocateAR,#id,#user,voucher,invnum,balance,amount)
+            //action Show
+          end event
+        end field
+
+        field update
+          event before
+            // ********** CHECKING FOR GIVEN AMOUNT ************
+            class ar(arValidateBeforeAllocate{xvoucher})
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterAllocateAR,#id,#user,xvoucher,xinvnum,xbalance,xamount)
+            action Show
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "ardeposit"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+        }
+
+        function pickDetail(link,primebal,date){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xinvnum.value=link.innerText
+            document.one.xbalance.value=primebal.innerText
+            document.one.xdate.value=date.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

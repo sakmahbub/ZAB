@@ -1,0 +1,194 @@
+screen acalcap
+
+     sidebar list unallocated
+     sections form one,list allocation,jscript myscript
+
+     list unallocated
+        caption "<br><center><b>"Unallocated Voucher List For "</b><br>"+xsub+" - "+acsubview.xorg("xacc='"+xacc+"' and xsub='"+xsub+"'")+"<br>"+xacc+" - "+acmst.xdesc("xacc='"+xacc+"'")
+        table apallocation
+        order xacc,xsub,xvoucher
+        fixed xacc,xsub 
+        select "xprime-xallocation>0"// = CAST(0.01 as numeric(9,2))"
+        rows 20
+        objects ~
+         xvoucher attrib(link "abc" embed onclick="return pickDetail(this:xrow#:xbalance#)"), ~
+         xinvnum,xref,~
+         xprime,xallocation ,xbalance equals(xprime-xallocation) attrib(name xbalance#),xrow attrib(name xrow#)
+
+        //headers none
+     end list
+
+
+     list allocation
+        caption "<br><center><b>"Allocated Invoice List"</b><br>"+xsub+" - "+acsubview.xorg("xacc='"+xacc+"' and xsub='"+xsub+"'")+"<br>"+xacc+" - "+acmst.xdesc("xacc='"+xacc+"'")
+        table acalc
+        order xvoucher,xrow,xalcnum,xalcrow
+        fixed xvoucher,xrow
+        rows 10
+        objects ~
+        xalcnum attrib(link "login?screen=acalcap&command=Show&xvoucher=?&xrow=?&xalcnum=?&xalcrow=?"),~
+		invnum equals((select xinvnum from acdetail where zid=acalc.zid and xvoucher=acalc.xalcnum and xrow=acalc.xalcrow)),~
+        xbalance,xamount,xalcrow
+        totals "","Totals","",sum,
+		header "Voucher No","Invoice No","Balance","Allocated Amount","Row"
+     end list
+
+     form one
+        caption "AP Invoice Allocation <br>for "+xvoucher+ " and " +xrow
+         table acalc
+        primarykey xvoucher,xalcnum,xalcrow
+        order xvoucher,xrow,xalcnum,xalcrow
+        fixed xvoucher,xrow
+        return "login"
+        pstyle 3
+        layout 2
+        objects Return,Clear,Add,Delete,~
+                xalcnum attrib(readonly),xalcrow,xdate attrib(readonly),xdum,~
+                xbalance,xamount
+
+        field xalcnum
+	    	event after
+			set status = acheader.xstatusjv("xvoucher='"+xvoucher+"'")
+     	      if status .eq. "Posted"
+		  		set #field(add.display)="hidden"
+		  		set #field(delete.display)="hidden"
+         	  	set #field(update.display)="hidden"
+              end if
+	    end event
+        end field
+
+        field xamount
+          caption Paid Amount
+        end field
+
+        field xdum
+          caption Remaining Balance
+          attrib local
+          display constant
+		  event after
+			double amt= 0.00
+			double bal  = 0.00
+			double alcamt = 0.00
+			double totalcamt = 0.00 
+			set amt = acdetail.xprime("xvoucher='"+xvoucher+"' and xrow='"+xrow+"'")
+			//set amt = 0-amt
+			set alcamt = #sql(double,"select sum(xamount) from acalc where xvoucher='"+xvoucher+"' and xrow="+xrow)
+			set alcamt = alcamt
+			set bal = amt-alcamt
+			set xdum = bal
+		  end event
+        end field
+
+        field xbalance
+          attrib readonly
+        end field
+
+        field Add
+          event before
+            // ********** CHECKING FOR GIVEN AMOUNT ************
+			double amt= 0.00
+			double bal  = 0.00
+			double alcamt = 0.00
+			double totalcamt = 0.00 
+			set amt = acdetail.xprime("xvoucher='"+xvoucher+"' and xrow='"+xrow+"'")
+			set alcamt = #sql(double,"select sum(xamount) from acalc where xvoucher='"+xvoucher+"' and xrow="+xrow)
+			set alcamt = alcamt
+			set bal = amt-alcamt
+			if bal < 0 
+				set bal = 0
+			end if	
+			if xamount == 0
+				set xamount = bal
+			end if
+			if xamount > bal
+				set xamount=xbalance
+			end if
+				if xamount > xbalance
+					error "Cannot Proceed -- Allocate Amount Is Greater Than Balance"
+				else if xamount>bal .and. alcamt > 0
+					error "Cannot Allocate -- Voucher Balance is "+bal
+				//else if xamount == 0
+				//	error "Cannot Proceed -- Amount is 0"
+				else if bal == 0
+					error "Cannot Proceed -- Allocation Balance is 0"
+				end if
+          end event
+          event after
+			set xalcnum = ""
+			set xalcrow = 0
+			set xbalance = 00
+			set xamount = 0
+          end event
+        end field
+
+        field delete
+          event before
+            set invnum = xinvnum
+            set voucher = xvoucher
+            double balance = xbalance
+            double amount = xamount
+          end event
+          event after
+           // class ar(arValidateAfterAllocate{xvoucher})
+           // set temp = #spsql(sp_validateAfterAllocateAR,#id,#user,voucher,invnum,balance,amount)
+           // action Show
+          end event
+        end field
+
+        field update
+          event before
+            // ********** CHECKING FOR GIVEN AMOUNT ************
+          //  class ar(arValidateBeforeAllocate{xvoucher})
+          end event
+          event after
+          //  set temp = #spsql(sp_validateAfterAllocateAR,#id,#user,xvoucher,xinvnum,xbalance,xamount)
+            action Show
+          end event
+        end field
+
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "acdetail"
+            form.searchbutton.value = "Find xvoucher=?&xrow=?"
+          }
+        }
+
+        function pickDetail(link,row,balance){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xalcnum.value=link.text
+            document.one.xbalance.value=balance.text
+            document.one.xalcrow.value=row.text
+          }else{
+            document.one.xalcnum.value=link.innerText
+            document.one.xbalance.value=balance.innerText
+            document.one.xalcrow.value=row.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

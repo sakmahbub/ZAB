@@ -1,0 +1,209 @@
+screen mostorereqheader
+
+     //sidebar list one//,lsit detail
+     sections form one,  jscript myscript
+
+     list detail
+        caption "Current Production Status For <br>Batch "+xbatch
+        table moprocess
+        order xbatch,xrow
+		fixed xbatch
+		select "(xqty-xbalance)>0"
+        rows 10
+        objects ~
+        xrow , ~
+        xmodate,xmoprcs,xqty
+//         headers Invoice List
+     end list
+
+
+     list one
+        caption "Processes for Batch "+xbatch
+        table mohrecipesetting
+        order xbatch,xrow 
+        fixed xbatch
+        rows 20
+        objects  xrow attrib(link "login?screen=mostorereqdetail&command=Show&xbatch=?&xrow=?"),xmoprcs, ~
+                 xdate,xfabriccolor
+
+        headers "Row No","Process Name","Date","Color"
+     end list
+
+
+     form one
+        caption "Store Requisition for Production. "
+        table moheader
+        order xbatch
+        return "login"
+        layout 2   
+        pstyle 3
+        objects Show,Clear,~
+        		Chemical,Fabric,"<p>",~
+                xbatch,xmodate,xpiref,xpidate,xcus,xorg,xqtymor,xqtyprd,xordernum,xdornum
+		
+		field xpidate
+			attrib local
+			display const
+			caption PI Date
+			event after
+				set xpidate = #sql("select xpidate from opordheader where xpiref='"+xpiref+"'")
+				//set xpidate=mopiheader.xpidate("xpiref='"+xpiref+"'")
+			end event
+		end field
+		
+		field xprcstype
+			attrib local
+			display const
+			caption Process Type
+			event after
+				set xprcstype=mopiheader.xprcstype("xpiref='"+xpiref+"'")
+			end event
+		end field
+		
+		field xcus
+			attrib local
+			caption Customer Code
+			display const
+			event after
+				set xcus=mopiheader.xcus("xpiref='"+xpiref+"'")
+			end event
+		end field
+		
+
+		field xqtymor
+			caption Production Qty in Mitre
+		end field
+
+		field xqtyprd
+			caption Production Qty in Yard
+		end field
+
+		field xitem
+			caption Finished Goods Item Code
+			pick list xitemfin
+		end field
+		
+		field xitemraw
+			pick list xitemraw
+		end field
+		
+		
+		field xorg
+			attrib local
+			caption Customer Name
+			display const
+			event after
+				set xorg=cacus.xorg("xcus='"+xcus+"'")
+			end event
+		end field
+		
+		field xitemdesc
+			attrib local
+			caption Description
+			display const
+			event after
+				set xitemdesc=caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xitemrawdesc
+			attrib local
+			caption Description
+			display const
+			pick list xitemraw
+			event after
+				set xitemrawdesc=caitem.xdesc("xitem='"+xitemraw+"'")
+			end event
+		end field
+		
+		field xordernum
+			display const
+			pick
+		end field
+		field xstatusmor
+			display const
+		end field
+		
+        field xstatusjv
+           display constant
+        end field
+
+
+        field xbatch
+		//pick list batchcons
+         event after
+			//class careports(getjspReport{mobatchwisereqnall,1,xbatch,Print Requisition})
+			class careports(getReport{mobatchwisereqnall;2;in,st;zid,batch;xbatch;Print Requisition})
+            set globals(xbatch)=xbatch			
+          end event
+        end field
+
+
+        field Add
+          event before
+          	set trn = "BAT-"
+          	set xstatusmor="Open"
+            set xbatch = #trn("Batch No",trn,9)
+			set xqty = xqtymor*1.09361
+          end event
+        end field
+
+        field update
+          event before
+			set xqtyprd = xqtymor*1.09361
+          end event
+        end field
+
+		
+        embed onsubmit="submitit(this)"
+        
+
+        field Chemical
+          embed onclick="clicked(this)"
+        end field
+
+        field Fabric
+          embed onclick="clicked(this)"
+        end field
+        
+        field Production
+          embed onclick="clicked(this)"
+        end field
+
+	
+        
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Chemical"){
+            form.screen.value = "moreqheader"
+            form.searchbutton.value = "Clear"
+          }
+          if (detail=="Fabric"){
+            form.screen.value = "moreqheadergrey"
+            form.searchbutton.value = "Clear"
+          }
+
+	
+          if (detail=="Production Process"){
+            form.screen.value = "moprocess"
+            form.searchbutton.value = "Top"
+          }
+	
+
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

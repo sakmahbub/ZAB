@@ -1,0 +1,65 @@
+screen pdshift
+
+//   sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        caption "Leave Master"
+        table pdroster
+        order xyearperdate
+        rows 20
+        objects xtypeleave attrib(link "login?screen=pdrosterhd&command=Show&xtypeleave=?"),~
+                xdesc,xday,xdaymonth
+
+     end list
+
+     form one
+        caption "<ACRONYM>Shift</ACRONYM>"
+        table pdshift
+        order xshift
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete, *next,Top, Previous, Next, Bottom,"<p>" ,~
+                xshift,xdum,xdatefrom,xtimein,xdateto,xtimeout,xlncin,xlncout
+
+        field xdum
+          attrib local
+          display const
+          caption
+        end field
+
+        field xshift
+          display text
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdrosterdt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

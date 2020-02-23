@@ -1,0 +1,76 @@
+screen pogrncontainer
+
+     caption "MRR/GRN Header"
+     sections form one, list one,jscript myscript
+
+     list one
+        caption "Container List For Invoice :"+xinvnum
+        table pogrncontainer
+        order xgrnnum,xrow,xcontainer
+        fixed xgrnnum,xrow
+        rows 20
+        objects xcontainer attrib(link "login?screen=pogrncontainer&command=Show&xgrnnum=?&xrow=?&xcontainer=?"), ~
+                xseal,xpackweightgross,xpackweightnet
+
+
+//        headers "Row","Item","Qty","Unit","Rate"
+     end list
+
+     form one
+        caption "C<ACRONYM>ontainer</ACRONYM> F<ACRONYM>or</ACRONYM> I<ACRONYM>nvoice</ACRONYM> :"+xinvnum
+        table pogrncontainer
+        order xgrnnum,xrow,xcontainer
+        fixed xgrnnum,xrow,xpornum
+        return "login"
+        layout 5
+        pstyle 1
+        objects ~
+                Return,Show,Clear,Add, Update, Delete, Top, Previous, Next, Bottom,"<p>" ,~
+                xcontainer,xseal,xunit,xpackweightgross,xpackweightnet
+
+        embed onsubmit="return submitit(this)"
+
+        field add
+          event after
+            class posssteel(UpdateGrConAfter{xpornum,xrow,xgrnnum})
+          end event
+        end field
+
+        field update
+          event after
+            class posssteel(UpdateGrConAfter{xpornum,xrow,xgrnnum})
+          end event
+        end field
+
+        field delete
+          event after
+            class posssteel(UpdateGrConAfter{xpornum,xrow,xgrnnum})
+          end event
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "pogrnlcdetail"
+            form.searchbutton.value = "Find xgrnnum=?&xrow=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

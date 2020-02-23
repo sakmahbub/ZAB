@@ -1,0 +1,149 @@
+screen pdmstrgn
+  sidebar list detail
+  sections form one, jscript myscript
+  
+  list detail
+    caption "Record Detail"
+    table pdmstrgn
+    order xstaff,xrow
+    fixed xstaff
+    rows 20
+    objects xrow attrib(link "login?screen=pdmstrgn&command=Show&xstaff=?&xrow=?"), ~
+            xempstatus,xdate,xdateeff,xstatus
+
+    header "Record No","Employee Status","Last Working Date","Effective Date","Record Staus"
+
+  end list  
+
+  form one
+    caption "Resignation Detail Entry for Staff ID: "+xstaff
+    table pdmstrgn
+    order xstaff,xrow
+    fixed xstaff
+    return "login"
+    layout 3
+    pstyle 3
+    objects Add, Update, Delete, Return, Confirm, Withdraw, "<p>",~
+            xrow attrib(row 0 1),xname attrib(local) display(const),xdeptname attrib(local) display(const),~
+            xdesignation attrib(local) display(const),xdatejoin attrib(local) display(const),xdate,xdateeff,~
+            xempstatus,xstatus display(hide),xnote //, xstaff display(hide)
+            
+    field xstaff
+      event before
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+        set xdeptname=pdmst.xdeptname("xstaff='"+xstaff+"'")
+        set xdesignation=pdmst.xdesignation("xstaff='"+xstaff+"'")
+        set xdatejoin=pdmst.xdatejoin("xstaff='"+xstaff+"'")
+      end event
+    end field
+    
+    field xstatus
+      default "Open"
+      event after
+        if xstatus .ne. "Open"
+          set #field(confirm.display)="hide"
+          set #field(withdraw.display)="hide"
+          set #field(delete.display)="hide"
+          set #field(update.display)="hide"
+        end if
+      end event
+    end field
+    
+    field xrow
+      caption Record No
+      display const
+    end field
+    
+    field xdateeff
+      caption Resign Effected Date
+    end field
+    
+    field xdate
+      caption Last Working Date
+    end field
+    
+    field xempstatus
+      caption Employee Status
+      display combo
+      pick "Resigned,Tarminate"
+    end field
+    
+    field add
+      event before
+        set xstatus="Open"
+      end event
+      event after
+        if xempstatus .eq. "Resigned"
+          set temp=#sql("update pdmst set xstatus='RL Submited'  where xstaff='"+xstaff+"'")
+        else if xempstatus .eq. "Tarminate"
+          set temp=#sql("update pdmst set xstatus='Tarminated'  where xstaff='"+xstaff+"'")
+        end if
+      end event
+    end field
+    
+    field withdraw
+      event after
+        set temp=#sql("update pdmst set xstatus='Normal'  where xstaff='"+xstaff+"'")
+        set temp=#sql("update pdmstrgn set xstatus='Withdraw' where xstaff='"+xstaff+"' and xrow="+xrow)
+        action show
+      end event
+    end field
+    
+    field confirm
+      event after
+        if xempstatus .eq. "Resigned"
+          if xdate .eq. xdateeff
+            set temp=#sql("update pdmst set xstatus='Resigned'  where xstaff='"+xstaff+"'")
+            set temp=#sql("update pdmst set xenddate='"+xdate+"'  where xstaff='"+xstaff+"'")
+            set temp=#sql("update pdmstrgn set xstatus='Confirm' where xstaff='"+xstaff+"' and xrow="+xrow)
+          else
+            set temp=#sql("update pdmstrgn set xstatus='Pending' where xstaff='"+xstaff+"' and xrow="+xrow)
+          end if
+        end if
+        if xempstatus .eq. "Tarminate"
+          set temp=#sql("update pdmst set xstatus='Tarminated'  where xstaff='"+xstaff+"'")
+          set temp=#sql("update pdmstrgn set xstatus='Confirm' where xstaff='"+xstaff+"' and xrow="+xrow)
+          set temp=#sql("update pdmst set xenddate='"+xdate+"'  where xstaff='"+xstaff+"'")
+        end if
+        action show
+      end event
+    end field
+    
+    field Return
+      embed onclick="clicked(this)"
+    end field
+    
+    embed onsubmit="submitit(this)"
+    
+  end form
+
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var detail
+      function clicked(b){
+        detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Return"){
+          form.screen.value = "pdmsthrd"
+          form.searchbutton.value = "Find xstaff=?"
+          //return false
+        }
+      }
+      function pickAccount(link,name,rank){
+        if (navigator.appName.indexOf("Netscape") >= 0){
+          document.one.xinvnum.value=link.text
+          document.one.xbalance.value=primebal.text
+          document.one.xdate.value=date.text
+      }else{
+          document.one.xstaff.value=link.innerText
+          document.one.xname.value=name.innerText
+          document.one.xrank.value=rank.innerText
+        }
+        return false
+      }
+    </script>
+  end jscript
+
+end screen

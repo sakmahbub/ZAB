@@ -1,0 +1,15 @@
+
+product ERP on the Net
+
+table fabaldview
+  caption "Balance detail"
+  columns zid,xvoucher,xaction,xyearper,xcode,xprime
+  primary key zid,xvoucher
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view fabaldview (zid,xvoucher,xaction,xyeaper,xcode,xprime)~
+                  as select zid,xvoucher,(select xtrn.xaction from xtrn where xtrn.xtrn = substring(fatrn.xvoucher,1,4) and xtrn.zid = fatrn.zid),~
+                  xyear+xper,xcode, xprime from fatrn
+end table

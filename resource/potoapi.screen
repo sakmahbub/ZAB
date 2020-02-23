@@ -1,0 +1,102 @@
+screen potoapi
+	 sidebar list opto
+     sections  form one,list one, jscript myscript
+	
+	
+	 list opto
+        caption "PO To AP Interface"
+        table potoapi
+        order xrow,xtype
+        rows 60
+        objects  xrow attrib(link "login?screen=potoapi&command=Show&xrow=?&xtype=?"),xtype,xgitem,~
+                 xgsup,xaccdr,desc equals((select xdesc from acmst where zid=potoapi.zid and xacc=potoapi.xaccdr))
+				 //xacccr,desc equals((select xdesc from acmst where zid=potoapi.zid and xacc=potoapi.xacccr))
+				 
+		header "Row","Trn Type","Item Group","Supplier Group","Debit Account Code","Description"//,"Credit Account Code","Description"
+
+     end list
+
+     list onesss
+        caption "PO To AP Interface"
+        table potoapi
+        order xgsup,xgitem
+        rows 20
+        objects xgsup attrib(link "login?screen=potoapi&command=Show&xgsup=?&xgitem=?"),xgitem ~
+                xaccdr,
+
+
+//        headers "Code","Description","Percent","Account"
+     end list
+
+	 
+     form one
+        caption "PO To AP Interface"
+        table potoapi
+	    primarykey xtype,xgsup,xgitem
+        order xrow,xtype
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,*next,Top,Next,Previous,Bottom,"<p>" ,~
+              xrow attrib(row 0 1),xtype,xgsup,xgitem,xaccdr,xdescdr,xacccr display(hide)//,xdeptname
+
+        field xacc
+          caption Debit Account//Purchase Account
+//          pick "select xtrn from xtrn where xtypetrn = 'AR Transactions'"
+        end field
+		
+		
+				
+		 field xtype
+		 caption Payment Type
+          pick "Cash,CS,LC,Direct PO"
+        end field
+
+        field xdescdr
+          attrib local
+          caption Debit Description
+          display const
+          event after
+            set xdescdr=acmst.xdesc("xacc='"+xaccdr+"'")
+          end event
+        end field
+
+        field xdesccr
+          attrib local
+          caption Credit Description
+          display const
+          event after
+            set xdesccr=acmst.xdesc("xacc='"+xacccr+"'")
+          end event
+        end field
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

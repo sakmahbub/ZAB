@@ -1,0 +1,79 @@
+screen pdinvheader
+
+     sidebar list inv
+     sections form one,jscript myscript
+
+  	list inv
+        caption "Investment Detail"
+        table pdinvdetail
+        order xyear,xstaff,xrow
+        fixed xyear,xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdinvdetail&command=Show&xyear=?&xstaff=?&xrow=?"), ~
+                 xtype,xamount
+
+        header "Line No","Investment Type","Amount"
+
+     end list
+
+
+     form one
+        caption "Investment Entry Header"
+	      table pdinvheader
+        order xyear,xstaff
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Show,Update, Delete,*next,Top,Previous,Next,Bottom,Detail,"<p>" ,~
+          xyear,xstaff,xname
+
+        field xstaff
+         // pick list xinvstaff
+        end field
+
+        field xyear
+          event after
+            set globals(xyear)=xyear
+            set globals(xstaff)=xstaff
+          end event
+        end field
+
+        field xname
+          attrib local
+          display const
+          caption Name
+          event after
+            set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdinvdetail"
+            form.searchbutton.value = "Find xyear=?&xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

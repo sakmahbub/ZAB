@@ -1,0 +1,47 @@
+adminupdate.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+ ///Purchase Order                 |#classPath+"/login?screen=poordheadercashdir"
+///Concern Name         			 	|#classPath+"/login?screen=xcodesconcern"
+//Concern Name                   	|#classPath+"/login?screen=xcodes(xtype=Concern Name)"
+//Item Transfer 					|#classPath+"/login?screen=itemtransfer"
+//Party Transfer 					|#classPath+"/login?screen=partytransfer"
+SO Update                           |#classPath+"/login?screen=opordheadersoadmin"
+SO Link PI Update                    |#classPath+"/login?screen=opordheaderpiadmin"
+SR/SPR/TO/Loan Update			    |#classPath+"/login?screen=moreqheaderadmin"
+//Work Requisition Update			|#classPath+"/login?screen=mowrheaderadmin"
+PR Update		       				|#classPath+"/login?screen=poreqheaderserviceadmin"
+//QC Update		        			|#classPath+"/login?screen=poqtcheaderadmin"
+//Conveyance Form Update		    |#classPath+"/login?screen=acconveyancehadmin"
+PO Update		        			|#classPath+"/login?screen=poordheadercashadmin"
+///PAF Update		        			|#classPath+"/login?screen=appaymentreqhadmin"
+LC Update(Import)		        			|#classPath+"/login?screen=poordlcinfoadmin"
+LC Update(Export)		        			|#classPath+"/login?screen=opordlcinfoadmin"
+SC Update(Export)		        			|#classPath+"/login?screen=opordscinfoadmin"
+GRN Update		        			|#classPath+"/login?screen=pogrnheaderadmin"
+PI Update		        			|#classPath+"/login?screen=opordlcheaderadmin"
+
+//Advance & Adjustment Update (C&F)	|#classPath+"/login?screen=opcashadvheaderadmin"
+//Voucher Update						|#classPath+"/login?screen=acheaderadmin"
+///Invoice Update 						|#classPath+"/login?screen=opdoheaderadmin"
+///Inventory Update 					|#classPath+"/login?screen=imtrnreadmin"
+///Opening Balance Entry               |#classPath+"/login?screen=imtrnre"
+//AR / AP Update 						|#classPath+"/login?screen=arhedadmin"
+//Leave Update 						|#classPath+"/login?screen=pdleaveappadmin"
+//Late, Early & Absent Update			|#classPath+"/login?screen=pdatadmin"
+//Roster Update 						|#classPath+"/login?screen=pdrostereditadmin"
+//Transfer Process & Others 			|#classPath+"/login?screen=pdempsign"
+//Progress Report                     |#classPath+"/login?screen=*viewcrystal progressrpt(1;in;@zid;xviewtype=Report View)"
+
+///Change Item Process  				|#classPath+"/login?screen=caitemchange"
+///Item Transaction Transfer 			|#classPath+"/login?screen=caitemtransfer"
+///Change Party Process  				|#classPath+"/login?screen=cacuschange"
+///Audit Trail							|#classPath+"/login?screen=*viewcrystal audittrial(4;in,st,st,st;zid,command,firstpar,secpar;xcommand=Action Type,xdegree=1st Param,xdegree=2nd Param, xviewtype=Report View)"
+///Item Checking						|#classPath+"/login?screen=*viewcrystal caitemintransaction(2;in,st;zid,xitem;xitem=Item Code, xviewtype=Report View)"
+///View Product History				|#classPath+"/login?screen=*viewcrystal poreqprint(2;in,st;@zid,@reqnum;xsprnum=SPR No, xviewtype=Report View)"
+///Hold Up Item						|#classPath+"/login?screen=posritempending"
+///Item Cost Update 					|#classPath+"/login?screen=imaverggitemcost"
+//Leave Admin 						|#classPath+"/login?screen=pdleavecanceladmin"
+//-------------------------------------------------------------------
+

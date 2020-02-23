@@ -1,0 +1,27 @@
+
+
+
+product ZAB ERP
+
+table acsubview
+  caption "Ac Sub View"
+  columns zid,xacc,xyear,xcur,xdiv,xsec,xproj,xprime,xbase,xacctype
+  primary key zid,xacc,xyear,xcur,xdiv,xsec,xproj
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view acsubview (zid,xsub,xorg,xmadd,xaccusage,xacc,xbank,xacccr,xaccdr,count,xgcus,xposition)~
+                  as select a.zid,a.xcus,a.xorg,a.xmadd,'AR',b.xacc,b.xacc,b.xacc,b.xacc,0,xgcus,'' from cacus a join acmst b on a.zid=b.zid and b.xaccusage='AR' WHERE a.xtype in ('Customer','Buyer','Both') ~
+				  union all ~
+				  select a.zid,a.xcus,a.xorg,a.xmadd,'AP',b.xacc,b.xacc,b.xacc,b.xacc,0,xgsup,'' from cacus a join acmst b on a.zid=b.zid and b.xaccusage='AP' WHERE a.xtype in ('Supplier','Both') ~
+				  union all ~
+				  select a.zid,a.xcode,a.xlong,'','Expense',b.xacc,b.xacc,b.xacc,b.xacc,0,'','' from xcodes a join acmst b on a.zid=b.zid and b.xaccusage='Expense' WHERE a.xtype in ('Cost Center','Department Name') ~
+				  union all ~
+				  select a.zid,a.xstaff,a.xname,a.xdesignation,'Advance',b.xacc,b.xacc,b.xacc,b.xacc,0,'',a.xposition from pdmst a join acmst b on a.zid=b.zid and b.xaccusage='Advance' ~
+				  where a.xstaff <> 'System.zab' ~
+				  union all ~
+				  select zid,xsub,xdesc,'','',xacc,xacc,xacc,xacc,0,'','' from acsub 
+				  //union all ~
+				  //select zid,xoldsub,xoldsubdesc,xoldsub,xoldsubdesc,xacc,count(*) from acbal where xyear=2015 and xoldsubdesc <> '' group by //zid,xoldsub,xoldsubdesc,xoldsub,xoldsubdesc,xacc
+end table

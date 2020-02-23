@@ -1,0 +1,104 @@
+screen imstock
+     caption "Stock Master"
+     sections form one,jscript myscript
+
+     form one
+        caption "Stock Master"
+        order xitem,xwh
+	      table imstock
+        primarykey xitem,xwh 
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Top,Previous,Next,Bottom,"<p>" ,~
+                xitem,xdesc,xwh,xbrname,xopalc,xqtyit,xqtyrt,xinhand,xavail//xdum4,xdum1,xdum2,xdum3,xqtylcop,xqtyshipped,xqtydel,xqtyinport,xqtydoc,xqtygrn,xinhand,xavail,xqtyord,
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+       field xdesc
+         attrib local
+         caption Description
+         display const
+         event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+         end event
+       end field
+
+       field xdum1
+         attrib local
+         caption Incoming Quantity
+         display const
+       end field
+
+       field xdum2
+         attrib local
+         caption Outgoing Quantity
+         display const
+       end field
+
+       field xdum3
+         attrib local
+         caption
+         display const
+         height 10
+         column 2
+       end field
+
+       field xdum4
+         attrib local
+         caption
+         display const
+         height 10
+         column 2
+       end field
+
+       field xdum5
+         attrib local
+         caption
+         display const
+         height 10
+         column 2
+       end field
+
+       field xnote
+         width 120
+          column 3
+          height 20
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	      if (detail=="Return"){
+            form.screen.value = "opdcheader"
+            form.searchbutton.value = "Find xdocnum=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

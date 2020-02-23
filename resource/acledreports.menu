@@ -1,0 +1,22 @@
+//General Ledger Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Cash/Bank Book                 |#classPath+"/login?screen=*viewcrystal acledcashdaily(7;in,st,dt,dt,st,st,in;zid,wh,fdate,tdate,acc,sub,year;xdiv=Plant/ Office,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xyear=Year,xviewtype=Report View)"
+Cash/Bank Book                 |#classPath+"/login?screen=*viewcrystal acledcashdaily(7;in,st,dt,dt,st,st,in;zid,wh,fdate,tdate,acc,sub,year;xdiv=Plant/ Office,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xyear=Year,xviewtype=Report View)"
+Date Wise Accounts Ledger      |#classPath+"/login?screen=*viewcrystal acleddaily(7;in,st,dt,dt,st,st,in;zid,wh,fdate,tdate,acc,sub,year;xdiv=Plant/ Office,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xyear=Year,xviewtype=Report View)"
+Date Wise Accounts Ledger(Status Wise)     |#classPath+"/login?screen=*viewcrystal acleddailytest(8;in,st,dt,dt,st,st,in,st;zid,wh,fdate,tdate,acc,sub,year,status;xdiv=Plant/ Office,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xyear=Year,xstatusjvrep=Status,xviewtype=Report View)"
+Date Wise Group Ledger          |#classPath+"/login?screen=*viewcrystal actbldategroupdetall(8;in,st,st,dt,dt,in,st,st;zid,wh,acctype,fdate,tdate,year,group,acc;xdiv=Plant/ Office,xacctyperep=Account Type,xdate=From Date=#date,xdate=To Date=#date,xyear=Year,xgroup=Accounts Group,xacc=Account,xviewtype=Report View)"
+
+Date Wise Transaction           |#classPath+"/login?screen=*viewcrystal actbldatet(5;in,st,dt,dt,in;zid,wh,fdate,tdate,year;~
+									xdiv=Plant/ Office,xdate=From Date=#date,xdate=To Date=#date,xyear=Year=,xviewtype=Report View)"
+//L/C statement       |#classPath+"/login?screen=*viewcrystal acadvanceagnsup(7;in,st,dt,dt,st,st,in;zid,wh,fdate,tdate,accode,sub,year;xdiv=Plant/ Office,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xyear=Year,xviewtype=Report View)"
+L/C statement       |#classPath+"/login?screen=*viewcrystal acadvanceagnsup(8;in,st,dt,dt,st,st,st,in;zid,wh,fdate,tdate,accode,sub,lcno,year;xdiv=Plant/ Office,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xlcno=LC No,xyear=Year,xviewtype=Report View)"
+Monthly Account Ledger      |#classPath+"/login?screen=*viewcrystal acledm(6;in,st,in,in,st,st;zid,wh,year,period,acc,sub;xdiv=Plant/ Office,xyear=Year=,xper=Period=,xacc=Account=,xsub=Subaccount,xviewtype=Report View)"
+Annual Ledger       |#classPath+"/login?screen=*viewcrystal acledasub(6;in,st,in,in,st,st;zid,wh,year,period,acc,sub;xdiv=Plant/ Office,xyear=Year=,xper=Period=,xacc=Account=,xsub=Subaccount,xviewtype=Report View)"
+LC Ledger Of Foreign Supplier   |#classPath+"/login?screen=*viewcrystal aplclegddate(5;in,dt,dt,st,st;zid,fdate,tdate,cus,lcno;xdate=From Date,xdate=To Date,xsup=Supplier=,xlcno=LC No.,xviewtype=Report View)"
+//LC Ledger     	  |#classPath+"/login?screen=*viewcrystal acledlcmnew(2;in,st;zid,lcno;xlcallno=LC/SC No.,xviewtype=Report View)"
+Inventory to GL Reconciliation     	  |#classPath+"/login?screen=*viewcrystal poimtoglrecon(4;in,dt,dt,st;zid,fdate,tdate,sup;xdate=From Date=#date,xdate=To Date=#date,xsup=Supplier=,xviewtype=Report View)"
+GL to Inventory Reconciliation     	  |#classPath+"/login?screen=*viewcrystal pogltoimrecon(3;in,dt,dt;zid,fdate,tdate;xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+////GRN to Inspection Reconciliation      |#classPath+"/login?screen=*viewcrystal pogrntoinsprecon(4;in,dt,dt,st;zid,fdate,tdate,sup;xdate=From Date=#date,xdate=To Date=#date,xsup=Supplier=,xviewtype=Report View)"
+////SQC to GL Reconciliation     	  	  |#classPath+"/login?screen=*viewcrystal posqctoglrecon(4;in,dt,dt,st;zid,fdate,tdate,sup;xdate=From Date=#date,xdate=To Date=#date,xsup=Supplier=,xviewtype=Report View)"

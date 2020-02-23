@@ -1,0 +1,103 @@
+screen oppitermsadmin
+
+     sidebar list terms
+     sections form one,  jscript myscript
+
+     list terms
+        caption "PI Terms & Condition For "+xordernum
+        table oppiterms
+        order xordernum,xrow
+        fixed xordernum
+        rows 20
+        objects  xrow attrib(link "login?screen=oppitermsadmin&command=Show&xordernum=?&xrow=?"), ~
+                xcode,xnote //equals((select xlong from xcodes where xtype='PO Terms & Condition' and xcode=xcodes.xcode))
+
+
+//        headers "Row","Item","Description","Qty","Rate","Disc %","Disc Fixed","Line Amount"
+//	  total "Total","","","","",sum	
+     end list
+
+
+     form one
+        caption "Terms & Condition For "+xordernum +" " + xpiref
+        table oppiterms
+        order xordernum,xrow
+        fixed xordernum
+        //select
+        pstyle 3
+        return "login"
+        layout 3
+        objects Add, Update, Delete,Clear, Show,*next,Complete,Top, Previous, Next, Bottom,Add_Default_Terms,"<p>",~ //
+                xrow attrib(row 0 1),xcode,xnote
+                
+        embed onsubmit="return submitit(this)"
+
+		field xrow
+			event after
+			
+				if opordheader.xpilinkso("xordernum='"+xordernum+"'") .ne. "Open"
+					set #field(add.display) = "hidden"
+					//set #field(update.display) = "hidden"
+					set #field(delete.display) = "hidden"
+				end if
+			end event
+		end field
+
+        field xcode
+        	caption Terms Code
+        	pick list oppiterms
+        end field
+        
+        field xnote
+        	caption Terms & Condition
+			width 50
+        end field
+        
+	    field add
+	    	event before
+        		set xnote=xcodes.xlong("xtype='PI Terms and Condition' and xcode='"+xcode+"'")
+	    	end event
+	    end field
+		
+
+        field Add_Default_Terms
+		  event after
+            set temp = #spsql(zabsp_OP_addPITerms,#id,#user,xordernum)
+		  end event
+        end field
+
+
+	    
+	    field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "opordlcheaderadmin"
+            form.searchbutton.value = "Find xordernum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

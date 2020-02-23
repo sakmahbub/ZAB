@@ -1,0 +1,14 @@
+     list srsprnum
+        caption "SR and SPR List"</b>"
+        table imtorheader
+        order xtornum
+        select "(xtornum like '%"+zvalue+"%' and (left(xtornum,4)='SR--' or left(xtornum,4)='SPR-'))"
+		searchselect "(left(xtornum,4)='SR--' or left(xtornum,4)='SPR-')"
+        rows 10
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xordernum
+		 
+		headers "SR and SPR Number","Date" ,"Ref"
+     end list
+
+

@@ -1,0 +1,161 @@
+screen acconveyanced
+
+     sidebars list one
+     sections form one, jscript myscript
+
+    list one
+        caption "Conveyance Detail List."
+        table acreqdetail
+        order xacreqnum,xrow
+        fixed xacreqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=acconveyanced&command=Show&xacreqnum=?&xrow=?"),xdate, ~
+                 //xacc,desc equals((select xdesc from acmst where zid = acreqdetail.zid and xacc=acreqdetail.xacc)),xprime
+				xfdestination,xtdestination,xpurpose,xmodtransport,xprime
+		headers "Line No","Date","From","To","Purpose","Mode of Transport","Amount"
+		totals "","Total","","","","",sum
+     end list
+
+
+     form one
+        caption "Conveyance Detail  For : "+xacreqnum
+        table acreqdetail
+        order xacreqnum,xrow
+        fixed xacreqnum
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+               Add,Update,Delete,Show,Clear,*next, Return,Top, Previous, Next, Bottom,~
+                xrow attrib(row 0 1),xdate, xfdestination,xtdestination,xpurpose,xmodtransport,~
+				xacc,xdesc display(const),xprime,xnote
+
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=acmst.xdesc("xacc='"+xacc+"'")
+        	end event
+        end field
+		
+		 field xacc
+          caption Code
+		  default "6101007"
+		  pick list xacccost
+        end field
+		
+		
+		 field xdum
+		 attrib local
+		display const
+          caption
+        end field
+		
+		 field xpurpose
+		display area
+		 width 50
+         height 2
+        end field
+		
+		 field xrow
+        event after
+		if xstatusreq .ne. ""
+		set #field(Update.display)="hidden"
+		set #field(Add.display)="hidden"
+		set #field(Delete.display)="hidden"
+		end event
+        end field
+		
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+
+        field add
+          event before
+            set xunit = caitem.xunitpur("xitem='"+xitem+"'")
+            set xqtyapv=xqtyreq
+			set xqtypor=0
+			set xrate=1
+			set xadjustment=0
+			//set xlineamt=xqtyapv*xrate
+			set xunitpur=#trim(xunitpur)
+          end event
+          event after
+		 // set temp=#sql("Update oporddetail set xadamount='"+xlineamt+"' where xordernum='"+xordernum+"' and xorderrow='"+xdocrow+"'")
+		  set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xporeqnum,xordernum,xdocrow,xrow,"accashadjdetail")
+          end event
+        end field
+
+        field update
+          event before
+			set xunitpur=#trim(xunitpur)
+			//set xlineamt=xqtyapv*xrate
+          end event
+          event after
+		// set temp =  #sql("update poreqheader set xep='"+ep+"' where xporeqnum='"+xporeqnum+"'")
+		  set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xporeqnum,xordernum,xdocrow,xrow,"accashadjdetail")
+          end event
+        end field
+		
+		field delete
+          event before
+		set poreqnum=xporeqnum
+		set ordernum=xordernum
+		set docrow=xdocrow
+		set row=xrow
+          end event
+          event after
+		  //set temp=#sql("Update oporddetail set xadamount=0 where xordernum='"+ordernum+"' and xorderrow='"+docrow+"'")
+		  set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,poreqnum,ordernum,docrow,row,"accashadjdetail")
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+  jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "acconveyanceh"
+            form.searchbutton.value = "Find xacreqnum=?"
+          }
+          return result
+        }
+		
+	  function pickItem(link,amt,unit,orderrow){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+            document.one.xlineamt.value=amt.text
+            document.one.xunitpur.value=unit.text
+            document.one.xdocrow.value=orderrow.text
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xlineamt.value=amt.innerText
+            document.one.xunitpur.value=unit.innerText
+            document.one.xdocrow.value=orderrow.innerText
+          }
+          return false
+        }
+		
+		
+        </script>
+     end jscript
+	 
+ end screen

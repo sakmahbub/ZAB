@@ -1,0 +1,15 @@
+product ZAB
+
+table lcitemcost
+
+  caption "Car Detail"
+  columns ztime,zutime,zauserid,zuuserid,zid,xpornum,xrow,xcostrow,xserial,xaccdr,xacccr,xcus,~
+  xprime,xnote,xtype,xstatusjv,xdate,xvoucher,xtrn,xlcno
+          
+  primary key zid,xpornum,xrow,xcostrow
+
+  foreign key
+        zid references zbusiness.zid
+		zid,xpornum,xrow references poorddetail.zid,xpornum,xrow
+  end foreign key
+end table

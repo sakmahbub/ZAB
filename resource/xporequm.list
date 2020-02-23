@@ -1,0 +1,11 @@
+     list xporeqnum
+        caption "Items containing: "+zvalue
+        table poreqheader
+        order xporeqnum desc
+        select "(xporeqnum like '%"+zvalue+"%')"
+        rows 20
+        objects xporeqnum attrib(link "abc" embed onclick="return updateParent(this:'$')")
+
+     end list
+
+

@@ -1,0 +1,32 @@
+imshort.menu
+//-------------------------------------------------------------------
+option                           |action                                        |modules|models|width
+//-------------------------------------------------------------------
+//Receive By Chalan                |#classPath+"/login?screen=imchheader"        |       |      |120
+Excess Entry                    |#classPath+"/login?screen=imtrnshortre"
+Shortage Issue Entry                    |#classPath+"/login?screen=imtrnshortis"
+//Issue Entry (Formulation)        |#classPath+"/login?screen=imtrnisfm"
+//Issue Entry (Pellets)            |#classPath+"/login?screen=imtrnispl"
+//Issue Entry (Toll Manufacture)   |#classPath+"/login?screen=imtrnistm"
+//Issue Entry (Other)              |#classPath+"/login?screen=imtrnis"
+//Damage Entry                     |#classPath+"/login?screen=imtrndm"
+//Sample Entry                     |#classPath+"/login?screen=imtrnsm"
+//Issue Entry        	           |#classPath+"/login?screen=imtrninissue"
+//Create GRN                     |#classPath+"/login?screen=poordheaderim"
+//Transfer And Receive               |#classPath+"/login?screen=imtorheader"        |       |      |120
+//Transfer Chalan                    |#classPath+"/login?screen=imtorheadertr"        |       |      |120
+//Receive Chalan                     |#classPath+"/login?screen=imtorheaderre"        |       |      |120
+//Inventory Transaction               |#classPath+"/login?screen=imtrn"
+//Transfer Exp. Product                    |#classPath+"/login?screen=imtorheadertrexp"        |       |      |120
+//Receive Exp. Product                     |#classPath+"/login?screen=imtorheaderreexp"        |       |      |120
+//Stock Take                       |#classPath+"/login?screen=imtag"        |       |      |120
+//Stock Take Process               |#classPath+"/login?screen=imtagcon"        |       |      |120
+//IM To GL Transfer                |#classPath+"/login?screen=imtogltransfer"
+//Print Transfer and Revceive         |#classPath+"/login?screen=imtorprint"        |       |      |120
+//IM To GL Transfer By Type        |#classPath+"/login?screen=imtogltransfertype"
+//FIFO Costing Process             |#classPath+"/login?screen=imfifocost"
+//Old Stock Reservation            |#classPath+"/login?screen=imreserveoldstock"
+//Stock Balance                    |#classPath+"/login?screen=imstock"
+//Codes & Parameter              |#classPath+"/login?menu=imcodes"
+//Reports                          |#classPath+"/login?menu=imreports"            |       |      |120
+//-------------------------------------------------------------------

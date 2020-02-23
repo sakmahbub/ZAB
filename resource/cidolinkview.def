@@ -1,0 +1,17 @@
+product ZAB ERP
+
+table cidolinkview
+  caption "DO Header"
+   columns zid,xdornum,xdate,xcus,xorg,xordernumso,xpornum,xordernum,xinvnum,xqtydel,xlineamt,xstatusdor,xinvref
+  primary key zid,xdornum,xdate,xcus,xorg,xordernumso,xpornum,xordernum,xinvnum,xqtydel,xlineamt,xstatusdor,xinvref
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+ sql create view cidolinkview (zid,xdornum,xdate,xcus,xorg,xordernumso,xpornum,xordernum,xinvnum,xqtydel,xlineamt,xstatusdor,xinvref) ~
+                  as select distinct h.zid,h.xdornum,h.xdate,h.xcus,(select xorg from cacus where xcus=h.xcus),h.xordernumso,h.xpornum,isnull(h.xordernum,''),d.xinvnum,(select sum(xqtydel) from opdodetail where xdornum=h.xdornum),(select sum(xlineamt) from opdodetail where xdornum=h.xdornum),h.xstatusdor,(select xinvref from opinvheader where xinvnum=d.xinvnum) ~
+					
+				  //from opdoheader h where h.xordernumso in (select distinct xordernumso from opinvdetail)
+				  from opdoheader h join opinvdetail d on h.zid=d.zid and h.xordernumso=d.xordernumso where isnull(h.xinvnum,'')='' and h.xstatusdor='Confirmed'
+end table
+

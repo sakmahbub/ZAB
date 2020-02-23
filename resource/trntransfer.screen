@@ -1,0 +1,81 @@
+screen trntransfer
+
+     sections form one,jscript myscript
+
+     form one
+        caption "TRN Transfer Process"
+        order
+        return "login"
+        layout 2
+        pstyle 3
+        objects Transfer,"<p>",~
+                xreq,xftypetrn,xttypetrn,xwindow
+
+		  field xftypetrn
+          caption From Trn
+		  display combo
+		  pick "select xtypetrn from xtrn"
+		  end field
+		  
+		   field xttypetrn
+          caption To Trn
+		   display combo
+		  pick "select xtypetrn from xtrn"
+		  end field
+		  
+		   field xwindow
+          caption Table
+		  end field
+        	
+	   field xreq
+	   caption New Business ID
+         display text
+		 width 4
+	   end field
+
+		field Transfer
+		 event before
+		end event
+          event after
+           // set temp = #spsql(zabsp_Pd_attnd_update,#id,#user,xempcategory,xdate,xdatecon)
+          end event
+        end field
+
+
+        embed onsubmit="return submitit(this)"
+
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Bonus"){
+            form.screen.value = "caitembonus"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Cost Price"){
+            form.screen.value = "caitemcostprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Sell Price"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

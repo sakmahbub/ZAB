@@ -1,0 +1,13 @@
+     list caparty
+        table cacus
+        order xcus
+		linksql select xorg from cacus
+        select "((xcus like '%"+zvalue+"%' or xorg like '%"+zvalue+"%') and xtype in('Supplier','Buyer','Customer'))"
+        rows 10
+		searchselect "xtype in('Supplier','Buyer','Customer')"
+        objects xcus attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xorg,xmadd,xtype
+		headers "Supplier ID","Supplier Name","Supplier Address","Party Type"
+     end list
+
+

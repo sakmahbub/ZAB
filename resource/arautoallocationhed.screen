@@ -1,0 +1,62 @@
+screen arautoallocationhed
+
+    sections form one,jscript myscript
+
+     form one
+        caption "Auto MR Allocation"
+        table arhed
+        primarykey xpp
+        order xpp
+        select "xsign>0 and xwh='"+#wh+"'"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Detail,Clear,Show,"<p>" ,~
+                xpp,xalias
+
+        field xpp
+  	      caption SPR
+          event after
+            set globals(xpp)=xpp
+          end event
+        end field
+
+      field xalias
+        attrib local
+        display const
+        caption SPR Name
+        event after
+          set xalias=cappo.xname("xsp='"+xpp+"'")
+        end event
+      end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "arautoallocation"
+            form.searchbutton.value = "Find xpp=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

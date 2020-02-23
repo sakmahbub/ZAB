@@ -1,0 +1,11 @@
+product ZAB ERP
+
+table podef
+  caption "PO Advance"
+  columns  ztime,zutime,zauserid,zuuserid, zid,~
+           xtype,xgitem,xaccdr,xacccr
+  primary key zid,xtype,xgitem
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

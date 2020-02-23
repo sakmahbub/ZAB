@@ -1,0 +1,104 @@
+screen opsumprocgenerate
+
+     sections form one,jscript myscript
+	
+      list summary
+        caption "Summary List"
+        table opdosumview
+        order xterritory,xsumnum
+ 	  select "xwh='"+#wh+"'"	
+        rows 20
+        objects  xterritory,xsumnum attrib(link "login?screen=opsumprocheader&command=Show&xterritory=?&xsumnum=?"),xdate
+                 
+
+     end list
+
+     form one
+        caption "Generate Summary"
+        table opdoheader
+        primarykey xterritory,xpaymentterm
+        order xterritory,xpaymentterm
+        //select "xwh='"+#wh+"' and xstatusord='On Transit'"
+        return "login"
+        pstyle 3
+        layout 4
+        objects Clear,Generate,"<p>" ,~
+                xterritory,xpp,xppname,xpaymentterm,xdatedel
+
+        field xppname
+		attrib local
+		caption Delivery Name
+		display const
+		//pick list capp
+		event after
+			set xppname=cappo.xname("xpp='"+xpp+"'")
+		end event
+        end field
+
+
+        field xtroute
+		attrib local
+		caption To Route
+		display text
+		default "z"
+		pick list xterritory
+        end field
+
+	field xwh
+		default #wh
+	end field
+
+        field Generate
+        	event before
+        		if xterritory .eq. ""
+        			error "Cannot Proceed -- Please Provide Route"
+        					//else if xpp .ne. cappo.xsp("xsp='"+xpp+"'")
+			else if xpp .eq. ""
+        			error "Cannot Proceed -- Please Provide Delivery Man"
+			else
+				set temp = #spsql(zabsp_PRCS_summaryProcessTrnasit,#id,#user,#wh,xdatedel,xterritory,xpp,xpaymentterm)
+        		end if
+        	end event
+          event after
+            	//	      set temp = #spsql(zabsp_PRCS_summaryProcessTrnasit,#id,#user,#wh,xdatedel,xterritory,xpp,xpaymentterm)
+		set sumnum = #sql("select xsumnum from opdoheader where xterritory='"+xterritory+"' and xpp='"+xpp+"' and xpaymentterm='"+xpaymentterm+"' and xdatedel='"+xdatedel+"'")
+		if #result .eq. "false"
+			print "<font color=red size=+3>Cannot Generate Summary -- Please Check The Information</font>"
+		else 
+			print "<font color=red size=+3>Summary No "+sumnum+" Generated</font>"
+		end if
+		
+//		set temp=#spsql(zsp_Chk_ReplaceaDo,#id,#user,xterritory,xdatedel,xpaymentterm)
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "opsumprocdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

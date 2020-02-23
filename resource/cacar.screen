@@ -1,0 +1,101 @@
+screen cacar
+     caption "Car master"
+     //sidebar text two,list two, text three
+     sections  form one, jscript myscript
+
+
+     form one
+        caption "Car Master"
+      	table cacar
+        primarykey xregi
+        order xregi
+        //select
+        return "login"
+        layout 2
+        pstyle 3 
+        objects Clear,Add, Update, Delete,*next,Show, Top,Bottom,Next,Previous,"<p>" ,~
+              xregi,xregidate,xbrand,xdum display(const),xmodel,~//,
+			xcapacity,xrunby,xcaruser,xempcategory,trucktype1,trucktype2,trucktype3,truckno1, ~
+            truckno2
+		
+		 field xregi
+         event before
+		 class careports(getjspReport{cacar,0,View Car Info All})
+		 set globals(xregi)=xregi
+		 end event
+         end field
+		
+        field xbrand
+         display text
+		 pick
+        end field
+		
+		field trucktype1
+       caption V1 (i.e. CHATTA)
+        end field
+		
+		field xempcategory
+	  caption Concern Name
+	  //pick "select xcode from xcodes where xtype='Employee Category' and zactive=1" //xcode='" +#wh+"'"
+	  pick "select xcode from xcodes where xtype='Concern Name' and zactive='1'" //xcode='" +#wh+"'"
+	end field
+		
+		field trucktype2
+        caption V2 (i.e. METRO)
+        end field
+		
+		field trucktype3
+         caption V3 (i.e. KHA)
+        end field
+		
+		
+		
+		 field xdum
+         attrib local
+		 caption 
+        end field
+		
+		
+field add
+	event before
+	if truckno1 .eq. "" .or. truckno2 .eq. ""
+	error "Cannot Add Record"
+	end if	
+          set xregi=trucktype1+" "+trucktype2+" "+trucktype3+"-"+truckno1+"-"+truckno2
+		//  set xregi=#uper(regi)
+	end event
+end field
+
+
+field delete 
+	event before
+
+	   end event
+end field
+ 
+       embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "opordq"
+            form.searchbutton.value = "Find xsup=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

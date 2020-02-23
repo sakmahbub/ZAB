@@ -1,0 +1,13 @@
+//PO Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+PO List by PO Number             |#classPath+"/main?page=*jspcrystal poordlistn(xpornum=From PO No=0=text,xpornum=To PO No=zzz=text)"
+PO List by Supplier              |#classPath+"/main?page=*jspcrystal poordlists(xsup=From Supplier=0,xsup=To Supplier=zzz)"
+PO List by Date                  |#classPath+"/main?page=*jspcrystal poordlistd(xdate=From PO Date,xdate=To PO Date)"
+PO List by Status                |#classPath+"/main?page=*jspcrystal poordstatus(xpornum=Purchase Order=0,xpornum=Purchase Order=zzz,xstatuspor=Order Status=)"
+GRN List by GRN Number           |#classPath+"/main?page=*jspcrystal pogrnlistn(xgrnnum=From GRN No=0=text,xgrnnum=To GRN No=zzz=text)"
+GRN List by Supplier             |#classPath+"/main?page=*jspcrystal pogrnlists(xsup=From Supplier=0,xsup=To Supplier=zzz)"
+GRN List by Date                 |#classPath+"/main?page=*jspcrystal pogrnlistd(xdate=From GRN Date,xdate=To GRN Date)"
+//-------------------------------------------------------------------
+

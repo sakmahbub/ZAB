@@ -1,0 +1,23 @@
+//AP Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Supplier Ledger                  |#classPath+"/login?screen=*jspcrystal apleddetail(xdiv=Division,xdate=From Date,xdate=To Date,xacc=Account=,xsubrep=Subaccount,xyear=Year)"
+Summary Supplier Ledger          |#classPath+"/login?screen=*jspcrystal apledsummary(xsup=Supplier=,xdate=From Date=#date,xdate=To Date=#date,xyear=Year)" 
+View SR Status            |#classPath+"/login?screen=*jspcrystal imreqstatus(xtornum=SR No)"
+WR Status     |#classPath+"/login?screen=*jspcrystal imwrstatus(xwrstatus=WR No)"
+
+//Statement of Account           |#classPath+"/login?screen=*crystal apledsummary(xsup=From Supplier=,xsup=To Supplier=z,xdate=From Date=#date,xdate=To Date=#date,xyear=Year)"\\apledsummary
+//Detail Pending Report          |#classPath+"/login?screen=*wcrystal aragedetail(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Person,xsp=To Sales Person)"
+//Detail Pending Report (Credit) |#classPath+"/login?screen=*wcrystal aragedetailcredit(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Person,xsp=To Sales Person)"
+//Summary Pending Report         |#classPath+"/login?screen=*wcrystal aragesummary(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From Sales Person,xsp=To Sales Person)"
+//Ageing Report                  |#classPath+"/login?screen=*wcrystal arage(xcus=From Customer=0,xcus=To Customer=zzz,xdate=From Date=#date,xdate=To Date=#date)"
+//Allocation Report              |#classPath+"/login?screen=*wcrystal arallocation(xvoucher=From Order,xvoucher=To Order,xdate=From Date=#date,xdate=To Date=#date)"
+//Money Receipt Listing          |#classPath+"/login?screen=*wcrystal armrstmt(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date,xsp=From PPO,xsp=To PPO)"
+//Territory List                 |#classPath+"/login?screen=*wcrystal territory"
+//Market List                    |#classPath+"/login?screen=*wcrystal market(xterritory=From Territory=000,xterritory=To Territory=zzz)"
+//Total Customer List            |#classPath+"/login?screen=*wcrystal cacus(xcus=Customer=000,xcus=Customer=zzz)"
+//Customer List(PPO Wise)        |#classPath+"/login?screen=*wcrystal cacusppo(xcus=Customer=000,xcus=Customer=zzz,xsp=From PPO,xsp=To PPO)"
+//PPO List                       |#classPath+"/login?screen=*wcrystal cappo(xsp=From PPO=000,xsp=To PPO=zzz)"
+//-------------------------------------------------------------------
+

@@ -1,0 +1,10 @@
+     list xbuilding
+        table buildingview
+        order xcode
+        select "((xcode like '%"+zvalue+"%' or xlong like '%"+zvalue+"%') and xtype='Building')"
+        rows 20
+        objects xbuilding attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xlong		
+     end list 
+
+

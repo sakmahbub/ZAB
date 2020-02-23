@@ -1,0 +1,12 @@
+     list specification
+        caption "Quotation Specification"
+        table xcodes
+        order xcode
+        select "(xcode like '%"+zvalue+"%') and zactive=1 and xtype='Quotation Specification'"
+		searchselect "zactive=1 and xtype='Quotation Specification'"
+        rows 20
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xtype
+     end list
+
+

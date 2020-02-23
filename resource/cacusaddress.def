@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table cacusaddress
+  caption "Customer Address"
+  columns ztime,zutime,zauserid,zuuserid,xrow,zid,xcus,xshippingadd,xbillingadd,xmadd,xtype
+         
+          
+  primary key zid,xrow,xcus
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xcus references cacus.zid,xcus
+  end foreign key
+end table

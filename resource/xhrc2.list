@@ -1,0 +1,11 @@
+     list xhrc2
+        caption "<br><center><b>"Account Group level 2"</b>"
+        table achrc2
+        order xhrc2
+        fixed xhrc1
+        rows 10
+        objects ~
+         xhrc2 attrib(link "abc" embed onclick="return updateParent(this:'xhrc2')"),xdesc
+     end list
+
+

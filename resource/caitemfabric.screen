@@ -1,0 +1,265 @@
+screen caitemfabric
+
+     sections form detail,jscript myscript
+     sidebar list item
+	 
+	 list item
+        caption "Item List"
+        table caitem
+        order xitem desc
+		//select "xlistview='1' and zactive='1'"
+		select "xgitem<>'Cost' and left(xitem,2) ='IC' and xgitem='Fabric'"//
+        rows 50
+       objects  xitem attrib(link "login?screen=caitemfabric&command=Show&xitem=?"), ~
+        xdesc,xtheircode,xitemtype,xwtunit,xgrossweight 
+     end list
+
+   
+
+     form detail
+        caption "Product Master Fabric"
+        table caitem
+        primarykey xitem
+        order xitem
+        select "left(xitem,2) ='IC' and xgitem='Fabric'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Top,Next,Previous, Bottom,"</b></font><p>" ,~
+                xitem,xdesc width(50),~
+               xconstruction,~
+		xfabrictype display(hide),xwidth  display(hide),xgsm display(hide),xfabriccolor display(hide),xtitem display(hide),~
+		xgitem,xunitpur,xcfpur,xunitsel,xcfsel,xunitiss,xcfiss,xrate,xhscode,xstype display(hide),xtheircode width(20),zactive,xpkey display(hide) attrib(local)
+
+	
+        field show
+		event after
+		set xpkey=xitem
+		end event
+        end field		
+		
+		
+      field xtheircode
+		caption Item Code (Old)
+	  end fiield
+	  
+      field xconstruction
+		//display const
+		//pick 
+	  end fiield
+	  
+       field xtitem
+        pick "Print,Color"
+       end field
+	
+       field xdisc
+        caption Special Discount (Percent)
+       end field
+	
+      field xdateeff
+          default #date
+       end field
+
+      field xdateexp
+          event before
+           // set year=(#date,0,2)
+           // print year
+          end event
+          default #date
+       end field
+     
+	 field xgitem
+        //caption <FONT SIZE=3 COLOR=red>Item Group</font>
+		default "Fabric"
+			display const
+       end field
+	 
+	 field zactive
+       caption <FONT SIZE=2 COLOR=red>Product</font>
+	   default "1"
+       end field
+	 
+       field xdum
+        attrib local
+        caption 
+        display const
+       end field
+	   
+	   
+	   field xunitpur
+        caption <FONT SIZE=2 COLOR=red>Purchase Unit</font>
+       end field
+	   field xcfpur
+        caption <FONT SIZE=2 COLOR=red>Conv. Factor Purchase</font>
+		default 1
+       end field
+	   
+	   field xunitsel
+	   caption <FONT SIZE=2 COLOR=red>Selling Unit</font>
+	   //default "Pcs"
+	   end field
+	   
+	   field xcfsel
+	   caption <FONT SIZE=2 COLOR=red>Conv Factor-Selling</font>
+	   default 1
+	   end field
+	  
+	   
+	    field xunitiss
+	   caption <FONT SIZE=2 COLOR=red>Issue Unit</font>
+		//default "Pcs"
+       end field
+	   
+	   field xcfiss
+	   caption <FONT SIZE=2 COLOR=red>Conv Factor-Issue</font>
+	   default 1
+	   end field
+	
+	field xqty
+		attib local
+		caption Qty Applicable
+		//display const
+	 event after
+        set xqty = #sql("select xqty from caitembonus where xitem='"+xitem+"'")
+     end event
+	end field
+	
+	field xqtybonus
+		attib local
+		caption Bonus Qty
+		//display const
+		event after
+		 set xqtybonus = #sql("select xqtybonus from caitembonus where xitem='"+xitem+"'")
+			//set xqtybonus=caitembonus.xqtybonus("xitem='"+xitem+"' and xqty='"+xqty+"'")
+		end event
+	end field
+	
+      field xcatname
+        attrib local
+        caption Item Category Name
+        display const
+        event after
+          set xcatname=xcodes.xlong("xtype='Item Category' and xcode='"+xcatitem+"'")
+        end event
+      end field
+
+
+        field xitem
+		caption Item Code
+		pick list xitemfc
+          event after
+            set globals(xitem)=xitem
+			class careports(getReport{caitemdetails;2;in,st;zid,xitem;xitem;View Item})
+          end event
+        end field
+		
+
+        field add
+        	event before
+			set xcitem="NPL"
+				set desc=caitem.xdesc("xdesc='"+xdesc+"'")
+				set serial=caitem.xtheircode("xtheircode='"+xtheircode+"'")
+				set xstype="Stock-N-Sell"
+				//set xgitem="Finished Goods"
+				if xdesc .eq. ""
+					error "Please Write Product Description!"
+				else if xdesc .eq. desc
+				error "Product Already Exist!"
+				else if xgitem .eq. ""
+					error "Please select Item Group!"
+				
+				else if xunitpur .eq. ""
+					error "Cannot Proceed -- Please Choose Purchase Unit"
+				else if xunitsel .eq. ""
+					error "Cannot Proceed -- Please Choose Selling Unit"
+				else if xunitiss .eq. ""
+					error "Cannot Proceed -- Please Choose Issue Unit"
+				else if xcfpur ==0
+					error "Please select Conversion Factor of Purchase"
+				else
+				
+				//set scode=xcodes.xtrcode("xtype='Item Group' and xcode='"+xgitem+"'")
+				//set trn = "IC"+scode
+				set trn = "IC--"
+           		set xitem = #trn("Item Code",trn,10)
+				end if
+        	end event
+			event after
+				print "<font color=red size=+2>New Item Added Successfully !!</font>"
+			end event
+
+        end field
+
+        field update
+          event before
+				if xpkey .ne. xitem
+				error "Please Show First!"
+				end if
+				if xgitem .eq. "Fabric"
+					//set xconstruction=xdesc
+				end if
+              set year = #sub(xdate,0,4)
+              set per = #sub(xdate,5,2)
+              set yr = #sub(xdate,2,2)
+
+            set xcitem="NPL"
+            set xstype="Stock-N-Sell"
+          end event
+          event after
+
+
+          end event 
+
+        end field
+
+        field xitem
+        //  display trn Item Code
+        end field
+
+        field xlong
+           width 100
+           column 2
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Bonus
+          embed onclick="clicked(this)"
+        end field
+
+ 
+        field Rate
+          embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Bonus"){
+            form.screen.value = "caitembonus"
+            form.searchbutton.value = "Find xitem=?"
+          }
+         if (detail=="Rate"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

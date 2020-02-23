@@ -1,0 +1,12 @@
+     list xterritorycode
+        table xcodes
+        order xtype,xtrcode
+        select "(xtype='Territory' and xtrcode like '%"+zvalue+"%')"
+        rows 20
+	searchselect "xtrcode like '%"+zvalue+"%' and xtype='Territory'"
+        objects xtrcode attrib(link "abc" embed onclick="return updateParent(this:'xtrcode')"), ~
+                xcode,xfield,xregion
+
+     end list
+
+

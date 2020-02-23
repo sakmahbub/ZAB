@@ -1,0 +1,56 @@
+screen xrolesdef
+	sidebar list one
+	sections form one, jscript myscript
+
+	list one
+		caption "Role Names"
+		table xcodes
+		order xtype,xcode
+		select "xtype='Role'"
+		rows 20
+		objects	xtype,xcode attrib(link "login?screen=xrolesdef&command=Show&xtype=?&xcode=?"), ~
+						zactive
+
+		headers "Code","Active"
+	end list
+
+
+	form one
+		caption "Define Role Name"
+		table xcodes
+		order xtype,xcode
+		select "xtype='Role'"
+		return "login"
+		layout 2
+		pstyle 3
+		objects Show,Clear,Add, Update, Delete,*next,Top,Previous,Next,Bottom,"<p>" ,~
+						xcode,zactive,xtype display(hide)
+
+		field xcode
+			caption Role Name
+		end field
+		
+		field add
+			event before
+				set xtype="Role"
+			end event
+		end field
+
+		embed onsubmit="return submitit(this)"
+	end form
+
+	jscript myscript
+		<script language="javascript" type="text/javascript">
+
+			function clicked(b){
+				but = b.value
+			}
+			function submitit(form){
+          if (but == "Privilege"){
+            form.screen.value = "xroleprivilege"
+            form.searchbutton.value = "Top"
+          }
+			}
+		</script>
+	end jscript
+end screen

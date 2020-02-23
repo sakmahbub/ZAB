@@ -1,0 +1,339 @@
+screen pdmst
+  sidebar list detail //,list inv
+  sections form one, jscript myscript
+
+ 
+  list detail
+    caption "Salary Details List"
+    table pdsalarydetail
+    order xstaff
+    fixed xstaff
+    rows 20
+    objects xtype,(xamount*xsign),xsign
+    //objects  xrow attrib(link "login?screen=pdsalarydetail&command=Show&xstaff=?&xrow=?"), ~
+    //         xtype,xamount,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdsalarydetail.xtype))
+	Totals "Total",sum,""
+    header "Componant Type","Amount","Transaction Type"
+  end list
+
+  list inv
+    caption "Investment Detail"
+    table pdinvdetail
+    order xstaff,xrow
+    fixed xstaff
+    rows 20
+    objects  xrow attrib(link "login?screen=pdinvdetail&command=Show&xstaff=?&xrow=?"), ~
+             xtype,xamount
+
+    header "Line No","Investment Type","Amount"
+
+  end list
+
+
+  form one
+    caption "<ACRONYM>Personnel Info </ACRONYM>"
+    table pdmst
+    order xstaff
+	select "left(xstaff,4)='EID-'"
+    return "login"
+    layout 3
+    pstyle 3
+    objects Show,Clear,Update, Delete, *next,Top, Previous, Next, Bottom,*next,Salary Detail,Increment History,~
+			Employee Transfer,Auto_Breakdown,"<p>" ,~//Add, Last Year TI,
+            xstaff width(10),xname display(const),xsex display(const),xposition  display(const),xempgrade display(const),~
+			xdesignation display(const),xdeptname display(const),xlocation display(const),~
+			xempcategory,xgrade,xbirthdate display(const),xdatejoin display(const),xdatecom display(const),xretdate display(const),xenddate,~
+			xempstatus,xemptype,xgroup display(hide),xcar,xbank,bankname,xempbank,xdesc,xacc,xrouting,xacctype,~//xlyearti,
+            xtin,xgross,xcashamt,xpfdef,xpfconrate,~ //xitdef,
+			xpkey attrib(local) display(hide)
+
+    field xempcategory 
+	  caption <br><FONT SIZE=2 COLOR=red>Salary Unit</font>
+      pick "select xcode from xcodes where xtype='Salary Unit' and zactive='1'"
+    end field
+
+    feild xdesc
+      caption Branch Name of Bank
+      width 25
+    end field
+	
+	field xgrade
+	caption <br><FONT SIZE=2 COLOR=red>Salary Grade</font>
+	display combo
+	//pick "A,B,C,D"
+	end field
+	
+	
+	field xemptype
+	  caption <br><FONT SIZE=2 COLOR=red>Employment Type</font>
+	end field
+
+       field xempstatus
+	   caption <br><FONT SIZE=2 COLOR=red>Employment Status</font>
+         default "Normal"
+       end field	
+	
+	field xlocation
+	caption Location Name
+	pick "select xcode from xcodes where xtype='Location' and zactive='1'"	
+	end field
+	
+	 feild xsplan
+      display combo
+	  pick "1.Production,2.Below Mgr.,3.Above Mgr."
+	  default "1. Production" 
+    end field
+	
+    field xgroup
+      //display combo
+     // pick "select xcode from xcodes where xtype='Group' and zactive=1"
+    end field
+	
+	 field xdesignation
+      //display combo
+      pick "select xcode from xcodes where xtype='Designation' and zactive='1'"
+    end field
+
+    field xstatus
+      embed  onblur
+      caption Service Charge Status
+      display combo
+      pick "Open,Closed"
+    end field
+
+    field xstaff
+      event after
+        set globals(xstaff)=xstaff
+      end event
+    end field
+
+    field xposition
+	caption Employee ID
+      pick
+    end field
+	
+    field xacctype
+	caption Account Type
+	display text
+	default ""
+	pick
+    end field
+
+    field xhaccomodation
+      display combo
+      pick "Yes,No"
+      default "No"
+    end field
+
+    field xbank
+	caption <br><FONT SIZE=2 COLOR=red>Salary Payment Bank</font>
+    end field
+
+	  field bankname
+      caption Bank name
+	  display const
+	  attrib local
+	  event after
+	  set bankname=cabank.xname("xbank='"+xbank+"'")
+	  end event
+    end field
+
+ 
+    field xacc
+      pick
+    end field
+	
+    field xpfdef
+      default "No"
+    end field	
+
+    field xamount
+      caption Opening Balance of PF
+    end field
+
+    field xdeduction
+      caption Total Deduction
+    end field
+
+    field xretdate
+      //caption Retirement Date
+      default "2999-01-01"
+    end field
+
+    field xenddate
+      caption Resignation Date
+      default "2999-01-01"
+    end field
+
+    field xdatecom
+      default "2999-01-01"
+    end field
+
+    field xempstatus
+      default "Normal"
+      //pick "Normal,Closed,On Hold"
+    end field
+	
+        field show
+		event after
+		set xpkey=xstaff
+		end event
+        end field
+		
+        field next
+		event after
+		set xpkey=xstaff
+		end event
+        end field
+		
+        field previous
+		event after
+		set xpkey=xstaff
+		end event
+        end field		
+
+    field xdum
+      attrib local
+      display const
+      caption
+    end field
+
+    field xdum2
+      attrib local
+      display const
+      caption
+    end field
+
+    field xdum3
+      attrib local
+      display const
+      caption
+    end field
+
+    field Search
+      event before
+        class picase(PDSearch())
+      end event
+    end field
+
+	field Auto_Breakdown
+		event before
+		set year=#year(#date,acdef)
+		end event
+        event after
+           set temp=#spsql(zabsp_emp_Salary_Upload,#id,#user,xstaff,xgrade,xgross,xdatejoin)
+		   set temp = #spsql(zabsp_PRCS_PFCalculation,#id,xempcategory,#user,"Final Run",xstaff,xstaff,year)
+		    set temp = #spsql(zabsp_PRCS_ITCalculation,#id,xempcategory,#user,"Final Run",xstaff,xstaff,year,1)
+        end event
+    end field
+    field add
+      event before
+	  if xname .eq. ""
+	  error "Please write name First"
+	  end if
+        set xretdate=#sesql("select dateadd(year,57,'"+xbirthdate+"')")
+      end event
+	   event after
+		//set temp=#spsql(zabsp_emp_Salary_Upload,#id,#user,xstaff,xgrade,xgross,xdatejoin)
+		action show
+	  end event
+    end field
+
+    field update
+      event before
+		if xpkey .ne. xstaff
+			error "Please show first"
+		else if xname .eq. ""
+			error "Please Show First"
+		else 
+        set xretdate=#sesql("select dateadd(year,57,'"+xbirthdate+"')")
+		end if
+      end event
+	   event after
+	//	set temp=#spsql(zabsp_emp_Salary_Upload,#id,#user,xstaff,xgrade,xgross,xdatejoin)
+		action show
+	  end event
+    end field
+
+    field Salary
+      embed onclick="clicked(this)"
+    end field
+
+    field Investment
+      embed onclick="clicked(this)"
+    end field
+	
+	  field Increment
+      embed onclick="clicked(this)"
+    end field
+
+    field Last
+      embed onclick="clicked(this)"
+    end field
+
+    field Employee
+      embed onclick="clicked(this)"
+    end field
+
+    embed onsubmit="submitit(this)"
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+    function clicked(b){
+      detail=b.value
+    }
+    function submitit(form){
+      if (detail=="Salary Detail"){
+      form.screen.value = "pdsalarydetail"
+      form.searchbutton.value = "Top"	  
+    }
+    if (detail=="Employee Transfer"){
+      form.screen.value = "pdemptransfer"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+    if (detail=="Training"){
+      form.screen.value = "pdtrain"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+    if (detail=="education"){
+      form.screen.value = "pdedu"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+    if (detail=="service"){
+      form.screen.value = "pdservice"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+    if (detail=="Last Year TI"){
+      form.screen.value = "pdlyearti"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+	 if (detail=="Increment History"){
+      form.screen.value = "pdsalinchistory"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+	
+    }
+    function pickAccount(link,name,rank){
+      if (navigator.appName.indexOf("Netscape") >= 0){
+        document.one.xinvnum.value=link.text
+        document.one.xbalance.value=primebal.text
+        document.one.xdate.value=date.text
+      }else{
+        document.one.xstaff.value=link.innerText
+        document.one.xname.value=name.innerText
+        document.one.xrank.value=rank.innerText
+      }
+      return false
+    }
+      </script>
+  end jscript
+
+end screen

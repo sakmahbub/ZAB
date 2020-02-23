@@ -1,0 +1,16 @@
+
+product ZAB ERP
+
+table acmstbankview
+  caption "Ac Bank View"
+  columns zid,xacc,xdesc
+  primary key zid,xacc
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view acmstbankview (zid,xacc,xdesc)~
+                  as select zid,xacc,xdesc ~
+                  from acmst where xanc1='Bank'
+
+end table

@@ -1,0 +1,18 @@
+     list xitemnpl
+        caption "Items containing: "+zvalue
+        table caitem
+        order xitem
+        select "((xitem like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%') and xcitem='NPL' and xgitem='Finished Goods')"
+        rows 20
+	searchselect "xcitem='NPL' and xgitem='Finished Goods'"	
+        objects xitem attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdesc
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

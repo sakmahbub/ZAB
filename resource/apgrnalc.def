@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table apgrnalc
+  caption "GRN Allocation"
+  columns  ztime,zutime,zauserid,zuuserid, zid,~
+	     xvoucher,xrow,xgrnnum,xdate,xdatedue,xbalance,xamount
+
+  primary key zid,xvoucher,xrow,xgrnnum
+
+  foreign key
+    zid references zbusiness.zid
+    zid,xvoucher,xrow references acdetail.zid,xvoucher,xrow
+  end foreign key
+end table

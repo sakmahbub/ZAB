@@ -1,0 +1,18 @@
+Sales Entry.menu
+//-------------------------------------------------------------------
+option                           |action                                     
+//-------------------------------------------------------------------
+Sales Order                   |#classPath+"/login?screen=opordheaderso" 
+//Delivery Order                    |#classPath+"/login?screen=opdoheader" 
+PI Entry                         |#classPath+"/login?screen=opordlcheader" 
+Sales Contract Entry                  |#classPath+"/login?screen=opordscinfo"      
+Finish Goods Stock cheeck          		 |#classPath+"/login?screen=finishstockcheeck"
+
+//Order Priority                   |#classPath+"/login?screen=xcodes(xtype=Order Priority)"
+
+Sales Codes & Parameter          |#classPath+"/login?menu=opcodes"
+
+Reports         |#classPath+"/login?menu=misdepotreports"         	 |ca     |      |sales.png|180
+
+//Customer Claim                     |#classPath+"/login?screen=poclaim"
+//-------------------------------------------------------------------

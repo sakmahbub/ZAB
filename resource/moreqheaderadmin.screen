@@ -1,0 +1,301 @@
+screen moreqheaderadmin
+
+  sidebar list imtor,list one
+	sections form one, jscript myscript
+              
+   list one
+        caption "Requisition List For Requisition No "+xtornum
+        table imtordetailview
+        order xtornum,xrow desc
+        fixed xtornum
+        rows 250
+        objects ~
+        xrow attrib(link "login?screen=moreqdetailadmin&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetailview.zid and xitem=imtordetailview.xitem)),xserial,~
+        xqtyreq,xqtyord,xavail equals((select xavail from imstock where zid=imtordetailview.zid and xitem=imtordetailview.xitem and xwh=imtordetailview.xfwh)),~
+		xunit
+
+		totals "","","Total","","",sum
+		
+        headers "Serial No","Item","Description","Part No","Quantity Required","Transfer Qty","Available Qty","UOM",
+     end list
+
+
+
+     form one
+        caption "SR/ SPR/ TO/ Damage/ Inspection/ Loan Update By Admin"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+        return "login"
+        pstyle 3
+        layout 3
+		objects	Show,Update,Delete,Top,Next,Previous,Bottom,Clear,Detail,"<p>",~
+        xtornum,xdate,xdatereq,~
+        xfwh,xfbrname,xref,xtwh,xtbrname,xproject,xregi,xshift,~
+		xstatusrec display(hide),xstatustor,xstatusreq display(combo),xtitem,xstatusloan,xloanature,xtypeobj,xlong,~
+		xnote,xidsup,superior,,~
+		xsuperior2,superior2,,~
+		signatorysec display(const),,,~
+		xpreparer display(hide),preparer display(const),~		
+		xsignatory1 display(hide),signatory1  display(const),~
+		xsignatory2 display(hide),signatory2 display(const),~
+		xsignatory3 display(text),signatory3 display(const),~
+		xsignatory4 display(hide),signatory4 display(const),~
+		xsignatory5 display(hide),signatory5 display(const),~
+		xsignreject display(hide),signreject display(const)
+		
+		
+		field xsignatory3
+			pick list xstaff
+		end field
+
+		field xtypeobj
+			caption Requisition Type
+			pick code Requisition Type
+			display combo
+		end field		
+				
+		field xdate
+			caption Requisition Date
+		end field
+		
+		field xdatereq
+			caption Required By Date
+		end field
+		
+		field xshift
+			caption Shift Name
+			pick code Shift Name
+		end field
+		
+		field xidsup
+			caption Approval Superior
+		end field
+		
+	 field superior
+	 attrib local
+	 display const
+	 caption Approval Superior 1
+	 event after
+	 set superior=pdmst.xname("xposition='"+xidsup+"'")
+	 end event
+	 end field
+		
+	 field superior2
+	 attrib local
+	 display const
+	 caption Approval Superior 2
+	 event after
+	 set superior2=pdmst.xname("xposition='"+xsuperior2+"'")
+	 end event
+	 end field		
+
+		field xstatustor
+		caption <br><FONT SIZE=2 COLOR=red>Request Status</font>
+		display combo
+		pick ",Open,Applied,Rejected,Recommended,Approved,Checked,Partial Issue,Transferred,Confirmed,Dismissed,Denied"
+		end field
+		
+		field xstatusloan
+		caption <br><FONT SIZE=2 COLOR=red>Loan Status</font>
+		display combo
+		pick ",Open,Applied,Confirmed"
+		end field
+		
+		field xstatusreq
+		caption PR Status
+		pick "Open,Create PO,PR Created"
+		end field
+		
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		//column 2
+		end field
+		
+		field xdum
+			display const
+			attrib local
+			caption
+		end field
+		
+		field xregi
+		pick list xcardept
+			caption Department Name
+			event before
+			end event
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+			caption Approved By
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption  Approved By
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption  Approved By
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+         caption  Approved By
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5 
+          caption  Approved By
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+
+		field xfwh
+		pick list xwh
+		default #wh
+		event before
+		end event
+        end field
+		
+		field xtwh
+		event before
+		end event
+        end field
+		
+		  field appname
+        attrib local
+        caption Approved Person
+        display const
+        event after
+          set appname=pdmst.xname("xposition='"+xidsup+"'")
+        end event
+       end field
+		
+       field xfbrname
+        attrib local
+        caption Store Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Store Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	field xnote
+      caption Reject Note
+          height 2
+          width 50
+	  column 1  
+    end field
+
+        field xtornum
+		caption Request No.
+		pick list xtornumall
+          event after
+			set global(xtornum)=xtornum
+			set global(xdocrow)=xdocrow
+			//class careports(getReport{imtranissueprint;2;in,st;zid,tornum;xtornum;View SR Status})			
+           end event
+        end field
+
+        field xlong
+		caption Justification
+          height 2
+          width 50
+          //column 2
+        end field
+		
+        field update
+          event before
+				if xfwh .eq. ""
+				error "Please select Branch/Store for Requisition Product")
+			end if
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+        
+		field Select
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+
+        function clicked(b){
+          but=b.value
+        }
+
+        function submitit(form){
+          if (but=="Detail"){
+            form.screen.value = "moreqdetailadmin"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickRecipe(link,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xmoprcs.value=link.text
+            document.one.xdocrow.value=row.text
+          }else{
+            document.one.xmoprcs.value=link.innerText
+            document.one.xdocrow.value=row.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+
+
+end screen

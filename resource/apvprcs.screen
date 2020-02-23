@@ -1,0 +1,71 @@
+screen apvprcs
+
+     sidebar list one
+     sections form one
+	
+	
+	 	list one
+        caption "Detail List"
+        table apvprcs
+        order xtypetrn
+        rows 100
+        objects  xrow attrib(link "login?screen=apvprcs&command=Show&xrow=?"), ~
+             xtypetrn,xposition,desc equals((select xname from pdmst where zid=apvprcs.zid and  xposition=apvprcs.xposition)),~
+			 xdesignation,xstatus
+		header "Line No","Component Type","Employee ID","Employee Name","Designation","Status"
+
+     end list
+
+     form one
+        caption "Default Approval Setting"
+	    table apvprcs
+        order xrow
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Update,Delete,Top,Clear,Next,Previous,"<p>" ,~
+          xrow attrib(row 0 1),xtypetrn,xposition,ename,xdesignation,xstatus,xdesc,zactive,
+
+    field xrow
+      event after
+		class careports(getReport{apvprcs;2;in,st;zid,prcstype;xtypetrn;Print Access List})
+		end event
+	end field
+		  
+          field xtypetrn
+         // pick "SR/WR Approval,PO Approval,GL Approval,CS Approval,Cash Approval,Employee Advance Approval,Expense Claim Approval,Employee Requisition Approval,PAF Approval,C&F Advance Approval,Leave Approval,CnF Approval,Adjustment Approval,C&F Bill Approval,Approval Notes"
+			pick code Process Name
+		 end field
+		  
+		   field xstatus
+		   display combo
+          pick "Open,Applied,Created,Selected,Checked,Recommended,Approved,Confirmed"
+          end field
+
+          field xdesignation
+            caption Designation
+			display combo
+			// pick "Preparer,Dept. Head,Checker,Manager,GMHR,PM,CPO,GM,DF,HR Executive,PO Executive,ED,MD"
+			pick code Signatory Designation
+          end field
+
+	field ename
+	 attrib local
+	 display const
+	 caption Name
+	 event after
+	 set ename=pdmst.xname("xposition='"+xposition+"'")
+	 end event
+	 end field
+	 
+	     field xdesc
+		//caption Designation &
+		display area
+          height 3
+          width 60
+          column 2
+        end field
+
+     end form
+
+end screen

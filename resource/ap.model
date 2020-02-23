@@ -1,0 +1,19 @@
+model AP
+     caption "Accounts-Payable"
+     description "This model comprises the minimum logic and infrastructure ~
+                  required to maintain AR database."
+
+data xcodes
+ 	 xtype		          |xcode			              |zactive|xlong
+end data
+
+
+data xtrn
+	 xtypetrn		                |xtrn   |xaction	     |xdesc	            |xnum|xinc|zactive
+	 AP Transactions            |PO--   |Credit Supplier|Transactions      |   0|   1|  1
+	 AP Transactions            |PA--   |Debit Supplier|Transactions      |   0|   1|  1
+end data
+
+
+
+end model

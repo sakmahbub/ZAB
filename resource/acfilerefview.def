@@ -1,0 +1,16 @@
+
+product ZAB ERP
+
+table acfilerefview
+
+  caption "Box No"
+  columns zid,xfileref
+  primary key zid,xfileref
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view acfilerefview(xfileref,zid) ~	
+	as Select distinct(xfileref),zid from acheader group by zid,xfileref
+end table
+

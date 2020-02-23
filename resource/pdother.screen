@@ -1,0 +1,68 @@
+screen pdother
+     caption "Other Deduction"
+     //sidebar text two,list two, text three
+     sections form one,jscript myscript
+
+
+     form one
+        caption "Other Deduction"
+	      table pdother
+        order xyearperdate
+        return "login"
+        layout 2
+        pstyle 1
+        objects Clear,Add, Update, Delete,Next,Previous,Bottom,Top,Detail,"<p>" ,~
+          xdate,xyear,xper,xyearperdate display(hide)
+
+        field xdate
+          event before
+            set year = #sub(xdate,0,4)
+            set xyear = #sub(xdate,0,4)
+            set per = #sub(xdate,5,2)
+            set xper = #sub(xdate,5,2)
+            set day = #sub(xdate,8,2)
+            set xday = #sub(xdate,8,2)
+            set xyearperdate = year+per+day
+          end event
+          event after
+            //set globals(xdate)=xdate
+            set globals(xyear)=xyear
+            set globals(xper)=xper
+            set globals(xday)=xday
+            set globals(xyearperdate)=xyearperdate
+          end event
+        end field
+
+        field add
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdotherdetail"
+            form.searchbutton.value = "Find xyearperdate=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

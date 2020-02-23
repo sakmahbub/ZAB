@@ -1,0 +1,12 @@
+//imreq.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Store Purchase Requisition Entry|#classPath+"/login?screen=imsprheader"
+Issue From Store   				|#classPath+"/login?screen=imtormoreqheader"        |       |      |120
+///Re-Usable Item Register			|#classPath+"/login?screen=imreitemregister"        |       |      |120
+///Tools Register					|#classPath+"/login?screen=imtoolsregister"        |       |      |120
+Purchase Return Entry  			|#classPath+"/login?screen=imtorheaderprn"        |       |      |120
+
+//-------------------------------------------------------------------
+

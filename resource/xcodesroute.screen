@@ -1,0 +1,95 @@
+screen xcodesroute
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xtype,xcode asc
+        select "xwh='"+#wh+"' and xtype='Route'"
+        rows 20
+        objects  xcode attrib(link "login?screen=xcodesroute&command=Show&xtype=?&xcode=?")
+                 
+
+        headers "Route"
+     end list
+
+     form one
+
+     caption "Route"
+        table xcodes
+        order xtype,xcode
+        select "xwh='"+#wh+"' and xtype='Route'"
+        return "login"
+        layout 2
+        pstyle  3
+        objects Show,Clear,Add, Update,Delete,*next,~
+                Top,Previous,Next,Bottom,"<p>" ,~
+                xtype,xcode width(50),~
+                xwh display(hide),xbrname,zactive	
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+      class careports(getReport{routelist,1,#wh,Print Route List})  
+	end event
+       end field
+
+        field xtype
+          display hide
+          caption Type
+          default "Route"
+        end field
+
+	field xcode
+		caption Name
+	end field
+
+        field add
+          event before
+	    //if xwh .eq. ""
+		//error "Cannot Proceed -- Please Provide Branch Code"
+	    //end if 		
+            set xtype="Route"
+		set xwh=#wh
+          end event
+        end field
+
+        field Budget
+          embed onclick="clicked(this)"
+        end field
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+    	    if (detail=="Budget"){
+            form.screen.value = "acbudget"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

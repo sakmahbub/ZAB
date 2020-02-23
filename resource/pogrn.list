@@ -1,0 +1,13 @@
+
+     list pogrn
+        table pogrnheader
+        order xgrnnum
+        select "xstatusgrn = 'Open' and xtype='Cash'"
+        navigators alpha
+        rows 10
+        objects xgrnnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xsup,xwh,xdate
+
+     end list
+
+

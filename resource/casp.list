@@ -1,0 +1,15 @@
+list casp
+  table casp
+  order xsp
+  select "(xwh='"+#wh+"' and xorg like '%"+zvalue+"%')"
+  rows 20
+  objects xcus attrib(link "abc" embed onclick="return updateParent(this:'xcus')"), ~
+          xorg,xmarket,xwh
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+        
+end list
+
+

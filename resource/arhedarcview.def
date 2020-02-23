@@ -1,0 +1,28 @@
+product ZAB ERP
+
+table arhedarcview
+  caption "OP DO CRN View"
+
+	columns ztime,zutime,zid,zauserid,zuuserid,xvoucher,xcus,xdate,xbank,xref,xprime,xdiscprime,~
+	xchgsprime,xtotamt,xnote,xstatusjv,xsign,xbalprime,xvatrate,xait,xdocnum,xvatamt,xaitamt,~
+	xwh,xpaymentterm,xdatedue,xtype,xpaymenttype,xdateref,xbsn,xadjustment,xbase,xbalbase,xgainlossbase,xadjustbase,xaitbase
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+
+  sql create view arhedarcview(ztime,zutime,zid,zauserid,zuuserid,xvoucher,xcus,xdate,xbank,xref,xprime,xdiscprime,~
+	xchgsprime,xtotamt,xnote,xstatusjv,xsign,xbalprime,xvatrate,xait,xdocnum,xvatamt,xaitamt,~
+	xwh,xpaymentterm,xdatedue,xtype,xpaymenttype,xdateref,xbsn,xadjustment,xbase,xbalbase,xgainlossbase,xadjustbase,xaitbase) ~
+	as select ztime,zutime,zid,zauserid,zuuserid,xvoucher,xcus,xdate,xbank,xref,xprime,xdiscprime,~
+	xchgsprime,xtotamt,xnote,xstatusjv,xsign,xbalprime,xvatrate,xait,xdocnum,xvatamt,xaitamt,~
+	xwh,xpaymentterm,xdatedue,xtype,xpaymenttype,xdateref,xbsn,xadjustment,ISNULL(xbase,0),ISNULL(xbalbase,0),ISNULL(xgainlossbase,0),ISNULL(xadjustbase,0),ISNULL(xaitbase,0) from arhed where xtypetrn='Sale' ~// and left(xvoucher,2)<>'CR' ~
+union all ~
+	select ztime,zutime,zid,zauserid,zuuserid,xvoucher,xcus,xdate,xbank,xref,xprime,xdiscprime,~
+	xchgsprime,xtotamt,xnote,xstatusjv,xsign,xbalprime,xvatrate,xait,xdocnum,xvatamt,xaitamt,~
+	xwh,xpaymentterm,xdatedue,xtype,xpaymenttype,xdateref,xbsn,xadjustment,ISNULL(xbase,0),ISNULL(xbalbase,0),ISNULL(xgainlossbase,0),ISNULL(xadjustbase,0),ISNULL(xaitbase,0) from arhedarc where xtypetrn='Sale' 
+
+end table

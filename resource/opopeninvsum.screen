@@ -1,0 +1,143 @@
+screen opopeninvsum
+
+     sidebar list one//,list advance
+     sections form one, jscript myscript
+
+
+     form one
+      caption "<ACRONYM>Bonus Error-1 after Summary</ACRONYM>"
+      table opdoheader
+      primarykey xdornum
+      order xdornum desc
+      //select "xwh='"+#wh+"'"
+      return "login"
+      layout 4
+      pstyle 3
+      objects ~
+              Show,Clear,Bonus_After_Summary,"<p>",~
+              xdornum,xcus display(constant),xstatusord,xdate display(constant),~
+			  xdocnum,xvoucher,xinvnum,xsumnum display(hide)
+
+
+		field xstatusord	  
+			caption Status Ord
+		end field
+			  
+        field Bonus_After_Summary
+          event before
+			if xstatusord .eq. "Confirmed"
+				error "Cannot Proceed -- Order Status Confirmed"
+			else if xsumnum .eq. ""
+				error "Cannot Proceed -- Please verify again"
+			end if
+            set temp = #sql("select xstatusjv from arhed where xvoucher='"+xdornum+"'")
+            if temp .eq. "Confirmed"
+              error "Cannot Proceed -- The '"+xdornum+"' is Posted To GL "
+            end if
+          end event
+
+          event after
+          //set temp = #spsql(sp_invoiceopengen,#id,#user,xdornum)
+          end event
+        end field
+
+		field xdocnum
+			attrib local
+			display const
+			caption Imtrn docnum
+			event before
+				set xdocnum=imtrn.xdocnum("xdocnum='"+xdornum+"'")
+			end event
+		end field
+		
+		field xvoucher
+			attrib local
+			display const
+			caption artrn voucher
+			event before
+				set xvoucher=artrn.xvoucher("xvoucher='"+xdornum+"'")
+			end event
+		end field
+		
+		field xinvnum
+			attrib local
+			display const
+			caption aralc invnum
+			event before
+				set xinvnum=aralc.xinvnum("xinvnum='"+xdornum+"'")
+			end event
+		end field
+		
+		//field Confirmed
+			//set temp = #spsql(zabsp_OP_summaryProcess, #id, #user, @wh, @docnum, @sumnum,single)
+		//end field
+
+		
+        field xdornum
+			//caption Invoice Number
+			pick list opordcrn
+		end field
+
+
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print_Challan
+          embed onclick="clicked(this)"
+        end field
+
+        field Print_Bill
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function confirmUpdate(){
+          if(confirm('Are You Confirm')){
+            alert('yes')
+            form.searchbutton.value = "Update"
+          }else{
+//            alert('no')
+            form.searchbutton.value = "Show"
+          }
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opdodetailedit"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        function pickDetail(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text;
+            document.one.xbalance.value=primebal.text;
+            document.one.xdate.value=date.text;
+          }else{
+//            var ss =eval("document.forms");
+//            alert(ss.length);
+//           if(s1.length>)1
+//              document.forms[s1.length-1].xamount.value=link.innerText
+//            else
+              document.one.xamount.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

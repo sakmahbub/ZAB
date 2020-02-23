@@ -1,0 +1,23 @@
+product ZAB ERP
+
+table imstock
+  caption "Item Warehouse View"
+  columns zid,xitem,xwh,xopalc,xqtyit,xqtyrt,xinhand,xavail
+  primary key zid,xitem,xwh
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view imstock (zactive,zid,xitem,xdesc,xrate,xwh,xgitem,xopalc,xqtyit,xqtyrt,xinhand,xavail) ~
+            as SELECT caitem.zactive,caitem.zid, caitem.xitem,caitem.xdesc,caitem.xrate,xcodes.xcode,caitem.xgitem, ~
+            isnull((select sum(xqtyord+xqtybonus) from opdodetail where opdodetail.xitem=caitem.xitem and (select opdoheader.xwh from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)=xcodes.xcode and opdodetail.zid=caitem.zid and (select opdoheader.xstatusord from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)='Open' and (select opdoheader.xsumnum from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)=''),0),~
+            isnull((select sum(xqtyord) from imtordetail where imtordetail.xitem=caitem.xitem and (select imtorheader.xfwh from imtorheader where imtorheader.xtornum=imtordetail.xtornum and imtorheader.zid=imtordetail.zid)=xcodes.xcode and imtordetail.zid=caitem.zid and (select imtorheader.xstatustor from imtorheader where imtorheader.xtornum=imtordetail.xtornum and imtorheader.zid=imtordetail.zid) not in ('Confirmed','Transferred')),0),~
+            isnull((select sum(xqtyord) from imtordetail where imtordetail.xitem=caitem.xitem and (select imtorheader.xtwh from imtorheader where imtorheader.xtornum=imtordetail.xtornum and imtorheader.zid=imtordetail.zid)=xcodes.xcode and imtordetail.zid=caitem.zid and (select imtorheader.xstatustor from imtorheader where imtorheader.xtornum=imtordetail.xtornum and imtorheader.zid=imtordetail.zid) not in ('Confirmed','Transferred')),0),~
+            isnull((select sum(xqty*xsign) from imtrn where imtrn.xitem=caitem.xitem and imtrn.xwh=xcodes.xcode and imtrn.zid=caitem.zid),0),~
+            isnull((select sum(xqty*xsign) from imtrn where imtrn.xitem=caitem.xitem and imtrn.xwh=xcodes.xcode and imtrn.zid=caitem.zid and left(ximtrnnum,2)<>'OT'),0)~
+            -isnull((select sum(xqtyord+xqtybonus) from opdodetail where opdodetail.xitem=caitem.xitem and (select opdoheader.xwh from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)=xcodes.xcode  and opdodetail.zid=caitem.zid and (select opdoheader.xstatusord from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)='Open'),0)~
+            -isnull((select sum(xqtyord) from imtordetail where imtordetail.xitem=caitem.xitem and (select imtorheader.xfwh from imtorheader where imtorheader.xtornum=imtordetail.xtornum and imtorheader.zid=imtordetail.zid)=xcodes.xcode and imtordetail.zid=caitem.zid and (select imtorheader.xstatustor from imtorheader where imtorheader.xtornum=imtordetail.xtornum and imtorheader.zid=imtordetail.zid) not in ('Confirmed','Transferred')),0) ~
+            FROM caitem join xcodes on xcodes.xtype='Branch' and caitem.zid=xcodes.zid where caitem.zactive='1' and xcodes.xcode<>''
+		
+  end table

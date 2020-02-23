@@ -1,0 +1,16 @@
+
+product ZAB ERP
+
+table faglmstview
+  caption "FA To GL View"
+  columns zid,xyear,xper,xcat,xcost
+  primary key zid,xyear,xper,xcat
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view faglmstview (zid,xyear,xper,xcat,xcost) ~
+                  as select zid,xyear,xper,xcat,sum(xcost) ~
+                  from famst  where xstatusjv='Open' ~
+                  group by zid,xyear,xper,xcat
+end table

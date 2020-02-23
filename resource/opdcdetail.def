@@ -1,0 +1,19 @@
+product CorollaSoft
+
+table opdcdetail
+  caption "Delivery Chalan Detail"
+  columns ztime,zutime,zid,zauserid,zuuserid,~
+          xdocnum,xdocrow, xitem,~
+          xqtydoc,xdornum,xordernum,xdorrow,xorderrow,xrate,xlineamt,xnote,xretqty,xvatamt
+		  
+
+
+  primary key zid,xdocnum,xdocrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xdocnum references opdcheader.zid,xdocnum
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+
+end table

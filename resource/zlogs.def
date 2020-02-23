@@ -1,0 +1,17 @@
+product ZAb ERP
+
+table zlogs
+  caption "Error Logs"
+  columns ztime, zutime,zauserid,zuuserid, zid,~
+          zerrorid,zscreen, zemail,zerrornum, zstatement,zmessage
+  primary key zerrorid
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  field zerrorid
+    attrib auto 100, 1
+  end field
+
+end table

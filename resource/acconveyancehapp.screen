@@ -1,0 +1,297 @@
+screen acconveyancehapp
+	
+     sidebars list reqlist,list one
+     sections form one, jscript myscript
+	 
+    list reqlist
+      caption "Advance List"
+         table acreqheader
+        order xacreqnum desc
+	    select "left(xacreqnum,4)='CON-' and (xsuperiorsp='"+#user+"' or xwh='"+#wh+"') and xstatusreq<>''"
+		rows 10
+        objects  xacreqnum attrib(link "login?screen=acconveyancehapp&command=Show&xacreqnum=?"), xdate,xfwh, ~
+				 desc equals((select xlong from branchview where zid = acreqheader.zid and  xcode=acreqheader.xfwh)),xprime
+               
+		  headers "Requisition No","Date","Division Code","Name","Advance Amount"
+	end list
+	
+	  list one
+        caption "Conveyance Detail List."
+        table acreqdetail
+        order xacreqnum,xrow
+        fixed xacreqnum
+        rows 200
+        objects  xrow,~ //attrib(link "login?screen=acconveyanced&command=Show&xacreqnum=?&xrow=?"), ~
+                 //xacc,desc equals((select xdesc from acmst where zid = acreqdetail.zid and xacc=acreqdetail.xacc)),xprime
+				xdate,xfdestination,xtdestination,xpurpose,xmodtransport,xprime
+		headers "Line No","Date","From","To","Purpose","Mode of Transport","Amount"
+		totals "","Total","","","","",sum
+     end list
+
+	
+     form one
+		caption "Conveyance Form"
+        table acreqheader
+        order xacreqnum desc
+        select "left(xacreqnum,4) in('CON-')"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+              Update,Delete,Show,Clear,Approved,"<p>",~ //*Next,Top, Previous, Next, Bottom,Details,Add,Details,
+                xacreqnum,xdate,xfwh,xfbrname,~
+				xtype display(hide),xstatusreq display(const),xadvnum,xprime display(const),xsuperiorsp display(hide),~//,xdum,~
+				xpreparer  display(hide),ep  display(const),xdphead display(hide),dphead display(const),~
+				xed display(hide),ed display(const),xgmdf display(hide),gmdf display(const),~
+				xstatus display(hide),xstatusap display(hide),xdmddc display(hide),dmddc display(const),xnote,xwh display(hide)
+		   
+		   field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+		  
+		
+          
+		  	field xtype
+			caption Service Type
+			pick "Cash,Agreement"
+			//default "Other"
+			end field
+			
+			  field xadjemp
+            attrib local
+            display const
+            caption Advance Paid to
+            event after
+              set xadjemp= pdmst.xname("xstaff= '"+xstaff+"'")
+            end event
+          end field
+			
+		field ep
+		   attrib local
+          caption Preparer
+		  event after
+		  set ep=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+          end field
+		  
+		  field dphead
+		  attrib local
+          caption Head Of The Department
+		  event after
+		  set dphead=pdmst.xname("xstaff='"+xdphead+"'")
+		  end event
+          end field
+		  
+		   field dmddc
+		  attrib local
+          caption Director / DMD / MD
+		  event after
+		  set dmddc=pdmst.xname("xstaff='"+xdmddc+"'")
+		  end event
+          end field
+		  
+		    field gmdf
+		    attrib local
+          caption General Manager/Director of Finance
+		  event after
+		  set gmdf=pdmst.xname("xstaff='"+xgmdf+"'")
+		  end event
+          end field
+		  
+		     field ed
+		    attrib local
+          caption Executive Director
+		  event after
+		  set ed=pdmst.xname("xstaff='"+xed+"'")
+		  end event
+          end field
+		  
+          field xnote
+		  caption Note
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xdum
+            display const
+			attrib local
+			caption
+          end field
+		  
+		   field xadvnum
+           caption Advance No
+		   pick list acadvnum
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+		  
+		    field xprime
+            caption Advance Amount
+            event before
+             // set xprime = acreqheader.xprime("xacreqnum='"+xadvnum+'")
+            end event
+          end field
+
+        field xacreqnum
+		caption Conveyance Form No
+        	width 15
+			pick list acconveyancenum
+          event after
+		  //class careports(getjspReport{poreqprint,1,xacreqnum,View Requisition})
+		  class careports(getjspReport{acconveyanceform,1,xacreqnum,Print Conveyance Form})
+		 //  class careports(getjspReport{cnfadvletterpdf,1,xacreqnum,Print Expense Claim Form})
+            set globals(xacreqnum)=xacreqnum
+			 set globals(xordernum)=xordernum
+			 set globals(xsuperiorsp)=xsuperiorsp
+			 set globals(xstatusreq)=xstatusreq
+			  if xsuperiorsp .ne. #user .and. xwh .ne. #wh
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Approved.display)="hidden"
+       	      end if
+            end event
+        end field
+		
+		  field Approved
+            event before
+			if xsuperiorsp .ne. #user .and. xwh .ne. #wh
+			error "Already Approved"
+			end if
+            end event
+            event after
+			set temp = #spsql(zabsp_apvprcs,#id,#user,xacreqnum,0,xstatusreq,"Expense Claim Approval")
+			set temp = #spsql(zabsp_sendmail,#id,#user,xacreqnum,"CON Request","")
+	         action show
+            end event
+          end field
+		
+		field xfwh
+		default #wh
+		event before
+		end event
+        end field
+		
+		
+		field xtwh
+		default #wh
+		event before
+		end event
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+		    field add
+			event before
+				set advnum=#sql("select xadvnum from acreqheader WHERE xadvnum='"+xadvnum+"'")
+				set xsuperiorsp=pdmst.xsuperioreadj("xposition='"+#user+"'")
+				set trn = "CON-"
+				set xstatusreq=""
+				set xtype="Cash"
+				set xstatusrec="Open"
+				set xstatus="Open"
+				set xstatusap="Open"
+				set xstatusgl="Open"
+				set xpreparer=pdmst.xstaff("xposition='"+#user+"'")
+				if xadvnum .eq. ""
+				set xprime=0
+				else
+				set xprime = #sql("select sum(xprime) from acreqheader where xacreqnum='"+xadvnum+"'")
+				end if
+				if xfwh .eq. ""
+				error "Please select Branch/Store for Requisition Product"
+				//else if xadvnum .eq. ""
+				//error "Please select Advance No."
+				//else if xadvnum .eq. advnum
+				//error "Advance already exclaimed."
+				else
+				set xacreqnum = #trn("Expense Claim Number",trn,10)
+				end if
+			end event
+        end field
+		
+		
+		
+		field update
+			event before
+			//if xstatusreq .eq. ""
+			//error "Please Show first"
+			//end if
+			double xprime = #sql("select sum(xprime) from acreqheader where xacreqnum='"+xadvnum+"'")
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "acconveyanced"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xacreqnum.value=link.text
+          }else{
+            document.one.xacreqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

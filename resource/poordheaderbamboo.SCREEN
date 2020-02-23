@@ -1,0 +1,250 @@
+screen poordheaderbamboo
+
+     sidebar list lcinfo,list one,list grn
+     sections form one,jscript myscript
+ 
+     list lcinfo
+        caption "LC Info For "+xpornum
+        table lcinfo
+		//table poordheader
+        order xpornum
+        fixed xpornum
+		select "xpornum<>''"
+        rows 20
+   //     objects xlcno attrib(link "login?screen=poordlcinfo&command=Show&xpornum=?"), ~
+          objects xlcno, ~
+               xlcissuedate,xshipdate,xexpirydate,xopenbank,opdesc equals((select xname from cabank where zid=lcinfo.zid and xbank=lcinfo.xopenbank)),~
+			   xcur,xexch,xprimetotamt,xbasetotamt
+
+
+        headers "LC No","LC Issue Date","Ship Date","Expiry Date","Open Bank Code","Description","Currency","Exch Rate","Prime Amt","Base Amt"
+
+	  total "Total","","","","","",sum,sum,sum
+     end list
+
+     list one
+        caption "PO Detail List For "+xpornum
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow attrib(link "login?screen=poordheaderbamboo&command=Show&xpornum=?&xrow=?"), ~
+               xitem,desc equals((select xdesc from caitem where zid=poorddetail.zid and  xitem=poorddetail.xitem)),xspecification,xqtypur,xrate,xvatrate,xvatamt,xlineamt
+
+
+        headers "Row","Item","Description","Specification","Qty","Rate","VAT %","VAT Amount","Line Amount"
+
+	  total "Total","","","",sum,"",sum,sum,sum
+     end list
+
+     list grn
+        caption "GRN For : "+xpornum
+        table pogrnheader
+        order xgrnnum desc
+        fixed xpornum
+        rows 30
+        objects  xgrnnum attrib(link "login?screen=pogrnheader&command=Show&xgrnnum=?"),~
+                 xdate,xstatusgrn
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+     form one
+        caption "PO Header (Bamboo)"
+		primarykey xpornum
+        table poordheader
+        order xpornum desc
+        // select "xtype='Other' and xsign>0"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Top,Bottom,*next,Detail,Terms & Condition,Delete,"<p>" ,~  //,LC Info
+          xpornum,xdate,~
+          xcus,xorg display(const),xtype,xlcno,~
+          xprime display(hide),~
+          xrem,xstatuspor display(const),~
+          xporeqnum display(hide),xsign display(hide)
+		
+        field xcus
+			caption Supplier Code
+			pick list casup
+		end field
+		
+        field xlcno
+			//pick list poordlcim
+			attrib local
+			display const
+			//caption Store Name
+			event after
+				//set xlcno=lcinfo.xlcno("xpornum='"+xpornum+"'")
+				if xpornum .eq. ""
+					set xlcno=""
+				else
+					set xlcno=lcinfo.xlcno("xpornum='"+xpornum+"'")
+				end if
+			end event
+		end field
+		
+		field xwhdesc
+			attrib local
+			display const
+			caption Store Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Store' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+		
+		field xdate
+			caption Purchase Date
+		end field
+		
+		
+		field xtype
+			display combo
+			caption Purchase Type
+			pick "LC,Other"
+			default "Other"
+		end field
+		
+		field xtypeobj
+			display combo
+			caption Product Type
+			pick code PO Type
+		end field
+		
+        field xpaymentterm
+		caption Payment Term
+        	pick "Credit,Cash"
+        end field
+        
+		  field xorg
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+          field xshipdate
+            caption Delivery Date
+          end field
+
+
+          field xpornum
+            pick list poord
+			event after
+             class careports(getjspReport{poprint,1,xpornum,Print PO})
+			 //class careports(getjspReport{powisegrndetail,1,xpornum,Print GRN})
+              set globals(xpornum)=xpornum
+              set globals(xporeqnum)=xporeqnum
+		
+			 if xstatuspor .eq. "Full Received" 
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(create.display)="hidden"
+       		  end if
+			 if xtype .ne. "LC" 
+		         	set #field(LC.display)="hidden"
+       		  end if
+            end event
+          end field
+
+          field xstatusord
+		     caption PO Status
+            default "Open"
+            display const
+          end field
+
+
+          field add
+            event before
+              //if xwh .eq. ""
+                //error "Cannot Proceed--Please Fill The Store"
+		 if xsup .eq. ""
+		  error "Cannot Proceed -- Please Choose Supplier"
+		 else
+			set xsign = 1	
+        	      set xstatuspor = "Open"
+				  set xtype="Other"
+            	//set xyear = #sub(xdate,0,4)
+	            //set xper = #sub(xdate,5,2)
+				//set year = #sub(xdate,2,2)
+        	      set xpornum = #trn("PO Number","PO--",10)
+		    	//set xpornum = #sub(xpornum,0,4)+year+#sub(xpornum,4,6)
+              end if
+            end event
+          end field
+
+          field update
+            event before
+              set xyear = #sub(xdate,0,4)
+              set xper = #sub(xdate,5,2)
+            end event
+            event after
+            end event
+          end field
+
+          field Create GRN
+            event before
+            //  set temp = #sql("select xrow from poorddetail where xpornum='"+xpornum+"'")
+             // if xstatuspor .eq. "GRN Created"
+            //    error "Cannot Proceed - GRN already created"
+           //   else if temp .eq. ""
+           //     error "Cannot Proceed - Detail Not Exists"
+           //   end if
+                        	
+     	 end event
+
+            event after
+              set temp = #spsql(zabsp_PO_createGRN,#id,#user,xpornum,xdate,xwh,xsup,xvatrate,xait,xdisc,xdiscf,8)
+		   action show
+            end event
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field LC
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetailbamboo"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="LC Info"){
+            form.screen.value = "poordlcinfo"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "potermsbam"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

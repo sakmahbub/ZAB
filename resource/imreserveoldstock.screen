@@ -1,0 +1,57 @@
+screen imreserveoldstock
+
+     sections form detail, jscript myscript
+
+
+     form detail
+        caption "Old Stock Revervation Process"
+	  table imoldstockrsvlog
+        old xdate,xwh,xitem		  	
+        return "login"
+        layout 2
+        pstyle 3
+        report
+        objects ~
+                Clear,Add,Update,Delete,*next,Top,Previous,Next,Bottom,~
+                xdate,xwh,xitem,xqty
+
+	  field xwh
+		default #wh
+	  end field
+	
+        field Process
+          event before
+          //  set temp = #spsql(sp_reserveOldStock,#id,#user,xwh,xitem,xdate)
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcrnheader"
+            form.searchbutton.value = "Find xcrnnum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

@@ -1,0 +1,16 @@
+//ca.module
+module CA
+     caption "Cross Application"
+     description ""
+
+     transactions Customer Number, Supplier Number
+     codes ABC Code, Buyer, Item Class, Country, Import Duty, Customer Group, ~
+           Item Group(Costing Method; Rows; Columns), Supplier Group, Price Group, Materials Manager, Market, ~
+           Payment Code, Project Manager, Price Category, Division,Project, Region, ~
+           Section, Supercession Code, Shipping Code, Shipping Product, SIC Code, Salesperson, ~
+           Customer Status, Supplier Status, Tax Code, Tax Category, Tax Scope, ~
+           Territory, Unit of Measure, Warehouse
+     properties base=US$
+end module
+
+

@@ -1,0 +1,85 @@
+screen imaveragecost
+
+     //sidebar list Costing
+     sections form one,jscript myscript
+	
+      list Costing
+        caption "Costing List"
+        table imtrn
+        order ximtrnnum
+ 	      select "xwh='"+#wh+"'"	
+        rows 10
+        objects  ximtrnnum attrib(link "login?screen=imaveragecost&command=Show&ximtrnnum=?"),xdate
+                 
+
+     end list
+
+     form one
+        caption "Consumption Process"
+        table imtrn
+        primarykey ximtrnnum
+        order ximtrnnum
+        //select "xwh='"+#wh+"' and xstatusord='On Transit'"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Clear,Process,"<p>" ,~
+                xstartdate,xenddate,xwh
+                //ximtrnnum,ximtrnnum
+
+        field xppname
+		attrib local
+		caption Delivery Name
+		display const
+		//pick list capp
+		event after
+			set xppname=cappo.xname("xpp='"+xpp+"'")
+		end event
+        end field
+
+
+        field xtroute
+		attrib local
+		caption To Route
+		display text
+		default "z"
+		pick list xroute
+        end field
+
+
+        field Process
+              event after
+                set temp = #spsql(zabsp_PROC_Averagecosting,#id,#user,xwh,xstartdate,xenddate)
+            	end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "opsumprocdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,10 @@
+//ac.module
+module AC
+     caption "General Ledger"
+     description  ""
+
+     transactions GL Voucher
+     codes Analytical Code
+end module
+
+

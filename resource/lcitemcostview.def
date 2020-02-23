@@ -1,0 +1,28 @@
+
+
+
+product ZAB ERP
+
+table lcitemcostview
+  caption "PO View"
+  columns zid,xpornum,xrow,xgitem,xitem,xdesc,xserial,xaccdr,xdes1,xacccr,xdes2,xprime,xstatusjv,xvoucher
+  primary zid,xpornum,xrow,xgitem,xitem,xdesc,xserial,xaccdr,xdes1,xacccr,xdes2,xprime,xstatusjv,xvoucher
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view lcitemcostview (zid,xpornum,xrow,xdocrow,xgitem,xitem,xdesc,xserial,xqty,xaccdr,xdes1,xacccr,xdes2,xprime,xstatusjv,xvoucher,xtype,xlcno,xgrnnum,xcostrate)~
+                  as 	Select d.zid,d.xpornum,d.xcostrow,b.xrow,c.xgitem,b.xitem,c.xdesc,c.xtheircode,b.xqtypur, ~
+				  d.xaccdr,acm.xdesc,d.xacccr,acm2.xdesc,d.xprime,d.xstatusjv,d.xvoucher,d.xtype,d.xlcno,'',(d.xprime/isnull(b.xqtypur,1)) from lcitemcost d ~
+					join poorddetail b on b.zid=d.zid and b.xpornum=d.xpornum AND b.xrow=d.xrow ~
+					join caitem c on b.zid=c.zid and b.xitem=c.xitem ~
+					left join acmst acm on acm.zid=d.zid and acm.xacc=d.xaccdr ~
+					left join acmst acm2 on acm2.zid=d.zid and acm2.xacc=d.xacccr ~
+	UNION ALL ~
+	Select a.zid,b.xpornum,c.xrow,b.xdocrow,d.xgitem,b.xitem,d.xdesc,d.xtheircode,b.xqtygrn,c.xaccdr, ~
+	acm.xdesc,c.xacccr,acm2.xdesc,c.xprime,c.xstatusjv,c.xvoucher,c.xtype,a.xlcno,b.xgrnnum,(c.xprime/isnull(b.xqtygrn,1)) from  pogrnheader a ~ 
+	join pogrndetail b  on a.zid=b.zid and a.xgrnnum=b.xgrnnum join pogrnitemcost c  on b.zid=c.zid and b.xrow=c.xrow and b.xgrnnum=c.xgrnnum ~
+	join caitem d on b.zid=d.zid and b.xitem=d.xitem ~
+	left join acmst acm on acm.zid=c.zid and acm.xacc=c.xaccdr ~
+	left join acmst acm2 on acm2.zid=c.zid and acm2.xacc=c.xacccr 
+end table

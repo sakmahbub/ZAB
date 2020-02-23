@@ -1,0 +1,109 @@
+screen pdrosterdetail
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Roster Detail List"
+        table pdrosterdetailview
+        order xroster,xrow
+        fixed xroster
+        rows 500
+        objects  xrow attrib(link "login?screen=pdrosterdetail&command=Show&xroster=?&xrow=?"),xdate,xdayname, ~
+                 xstaff,empname equals((select xname from pdmst where zid=pdrosterdetailview.zid and xstaff=pdrosterdetailview.xstaff)),~
+				 dept equals((select xdeptname from pdmst where zid=pdrosterdetailview.zid and xstaff=pdrosterdetailview.xstaff)),xshift,xnote
+        header "Line No","Date","Day Name","Staff","Name","Department","Shift","Note"
+
+     end list
+
+
+     form one
+        caption "Roster Detail : "+xroster
+	  table pdrosterdetail
+        order xroster,xrow
+        fixed xroster
+        return "login"
+        layout 2
+        pstyle 3
+        objects Update,Delete,Show,Clear,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~  //Add,
+          xrow attrib(row 0 1),xdate,xyearperdate display(hide),xstaff,xname,xshift,xnote
+
+        field xyearperdate
+			event before
+			set xyearperdate=#sub(xdate,0,4)+#sub(xdate,5,2)+#sub(xdate,8,2)
+			end event
+		event after
+		 if pdrosterheader.xstatus("xroster='"+xroster+"'") .ne. "Open"
+					set #field(update.attrib)="disabled"
+         			set #field(delete.attrib)="disabled"
+		  end if
+		end event
+		end field
+		
+        field xname
+          attrib local
+          display const
+          caption Name
+          event after
+            set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+        field add
+          event before
+		  if pdrosterheader.xstatus("xroster='"+xroster+"'") .ne. "Open"
+				error "Roster Already Confirmed!"
+		  end if		  
+		  end event
+        end field
+
+        field update
+          event before
+		  if pdrosterheader.xstatus("xroster='"+xroster+"'") .ne. "Open"
+				error "Roster Already Confirmed!"
+		  end if
+          end event
+        end field
+
+        field delete
+          event before
+		  if pdrosterheader.xstatus("xroster='"+xroster+"'") .ne. "Open"
+				error "Roster Already Confirmed!"
+		  end if
+          end event
+        end field
+
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdrosterheader"
+            form.searchbutton.value = "Find xroster=?"
+            //return false
+          }
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

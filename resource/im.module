@@ -1,0 +1,10 @@
+//im.module
+module IM
+     caption "Inventory Management"
+     description ""
+
+     transactions Inventory Transaction
+     codes
+end module
+
+

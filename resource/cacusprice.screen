@@ -1,0 +1,108 @@
+screen cacusprice 
+
+  sidebar list one //,list two
+  sections form one,  jscript myscript
+  
+  	
+  list one
+    caption "Cost Code"
+    table cacusprice
+    order xcus,xitem
+    fixed xcus
+    rows 20
+    objects  xrow,xitem attrib(link "login?screen=cacusprice&command=Show&xcus=?&xitem=?"), ~
+             desc equals((select xdesc from caitem where zid=cacusprice.zid and xitem=cacusprice.xitem)),xstype,xrate
+	headers "Line No","Item","Description","Job Type","Rate"
+  end list
+  
+  form one
+    caption "Cost Code For "+xcus
+    table cacusprice
+    primary key xcus,xrow
+    order xcus,xitem
+    fixed xcus    
+	return "login"
+    pstyle 3
+    layout 2
+    objects Add, Update, Delete,Clear,Show, *next,Return,Top,Previous,Next,Bottom,~
+            xrow attrib(row 0 1),xstype,xitem,xdesc,xrate,xcost display(hide)
+	
+	field xdesc
+		attrib local
+		display const
+		caption Product Name
+		event after
+			set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+		end event
+	end field
+
+	field xdateeff
+		default "1999-01-01"
+	end field
+
+    	field xdateexp
+		default "1999-01-01"
+	end field
+
+	field xrate
+		caption Rate
+	end field
+	
+	field xstype
+	caption Job Type
+	display combo
+	pick "Export,Import"
+	default ""
+	end field
+	
+	field xitem
+	caption Cost Code
+    pick list costitem
+    end field
+
+
+	field add
+		event before
+			set xcost=caitem.xcost("xitem='"+xitem+"'")
+		end event
+	end field	
+	field update
+		event before
+			set xcost=caitem.xcost("xitem='"+xitem+"'")
+		end event
+	end field	
+	
+    embed onsubmit="return submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+  
+  end form
+  
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var but
+      var result
+
+      function clicked(b){
+        but = b.value
+      }
+      function submitit(form){
+        result = true
+        if (but == "Return"){
+          form.screen.value = "cacus"
+          form.searchbutton.value = "Find xcus=?"
+        }
+        but = ''
+        return result
+      }
+      </script>
+  end jscript
+  
+end screen
+
+
+
+

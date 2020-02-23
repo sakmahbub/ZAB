@@ -1,0 +1,14 @@
+product ZAB ERP
+ 
+table pdloanwriteoff
+  caption "Loan & Write Off Information Table"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xvoucher,xrow,xdate,xloanamt,xnote,xstatus,xstatustag
+
+  primary key zid,xvoucher,xrow
+  foreign key
+        zid references zbusiness.zid
+	  zid,xvoucher references pdloantrn.zid,xvoucher
+  end foreign key
+
+end table

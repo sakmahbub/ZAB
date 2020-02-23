@@ -1,0 +1,286 @@
+screen pogrndirect
+
+     sidebar list grn,list voucherno
+     sections form one, jscript myscript
+
+     
+     list grn
+        caption "GRN Detail List"
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 250
+        objects  xrow,~// attrib(link "login?screen=pogrndetaildirect&command=Show&xgrnnum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where zid=pogrndetail.zid and  xitem=pogrndetail.xitem)),~
+				xserial,xqtygrn,xunitpur,xrate,xlineamt
+				
+        headers "Row","Item","Description","Part No","Qty","Unit","Rate","Amount"
+     totals "","","","Total","","","",sum
+	 end list
+
+
+	list vouchernoss
+    caption "Voucher List"
+    table acheader
+    order xvoucher desc
+	fixed xgrnnum
+	 select "xgrnnum<>''"
+    rows 5
+    objects  xvoucher attrib(link "login?screen=acheadergeneral&command=Show&xvoucher=?"), ~
+             xdate,xstatusjv
+
+    headers "Voucher No","Date","Status"
+  end list
+	
+     form one
+        caption "Create GRN / QC (Direct)"
+        table pogrnheader
+        order xgrnnum desc
+        return "login"
+		select "xtype='Direct'"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Add,Update,Delete,Top,Previous,Next,Bottom,~
+                Detail,Confirm,"<p>",~//Transfer To GL,
+                xtrn,xgrnnum,xstatusgrn display(const),xdate,xdategl display(hide),xcus display(const),xorg,~
+                xwh,xwhdesc,xref,~
+				xstatusap display(const), ~
+				xvoucher display(hide),xpornum  display(hide),xnote,xstatusjv display(hide),~
+				xtype display(hide),xinvnum display(hide),xpreparer display(hide),~
+				xpkey display(hide) attrib(local)
+
+		field xtrn
+			caption <br><FONT SIZE=2 COLOR=red>Transaction Type</font>
+			display combo
+			pick "GRN-,QC--"
+		end field
+		
+		field xexchbuyer
+			caption Exchange Rate (Buyer to LC)
+		end field
+		
+		
+		  	
+		  	
+		field xgrnnum
+		evevnt after
+			  class careports(getReport{pogrnprint;2;in,st;zid,grnnum;xgrnnum;Print GRN})
+              set globals(xgrnnum) = xgrnnum
+		if xstatusgrn .eq. "Confirmed" 
+		         	//set #field(add.attrib)="disabled"
+         			set #field(update.attrib)="disabled"
+         			set #field(delete.attrib)="disabled"
+         			set #field(confirm.attrib)="hidden"
+					set #field(Transfer.display)="hidden"
+       		  end if
+    		  if pogrnheader.xlcno("xgrnnum='"+xgrnnum+"'") .eq. "" 
+		         	set #field(Invoice.attrib)="disabled"
+       		  end if
+			  set globals(xpornum)=xpornum
+		end event
+        	width 18
+        end field
+		  
+		  field xref
+			caption Challan No./Ref No.
+			width 35
+		  end field
+		  
+		  field xwh
+			pick list xwh
+			default #wh
+			caption Plant/Store
+          end field
+		  
+		field xwhdesc
+			attrib local
+			display const
+			caption Plant/Store Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"' and zactive=1")
+			end event
+		end field
+		
+        field xcus
+		//pick list casup
+        default "PAR-000000"  
+		  caption <br><FONT SIZE=2 COLOR=red>Supplier ID</font>
+        end field
+
+ 		field xorg
+			attrib local
+		  	display const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		end field
+		
+		field show
+		event after
+          set xpkey=xgrnnum
+		  end event
+        end field
+
+        field Add
+        event before
+		set backdate=#sql("select xdateexp from acdef")
+		set backentry=#sql("select xbacklock from acdef")
+		set wh=branchclientview.xcode("xcode='"+xwh+"' and zactive=1 and xtypestore='GRN'")
+		set xdategl=xdate
+		int xday=#sql(int,"select xday from acdef")
+		set preventry=#sql("select xpreventry from acdef")
+		int cmon=#sub(#date,5,2)
+		int cyear=#sub(#date,0,4)
+		int eday=#sub(#date,8,2)
+		int eyear=#sub(xdate,0,4)
+        int emon=#sub(xdate,5,2)
+
+		if cyear>eyear .and. preventry .eq. "No"
+		error "Can not Proceed-- Previous Year entry doesn't allow."
+		
+		else if cmon>emon .and. eday>xday .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous month entry doesn't allow."		  
+		  
+		else if xtrn .eq. ""
+			error "Please select Transaction Type"
+		
+		else if xcus .eq. ""
+			error "Please select Supplier"
+		
+		else if xwh .eq. "" .and. xtrn .eq. "GRN-"
+			error "Cannot Proceed - Store is Blank!"
+		else if wh .eq. "" .and. xtrn .eq. "GRN-"
+			error "Cannot Proceed - Store not exists  or It is not GRN Store!"
+		else if backentry .eq. "No" .and. xdate .le. backdate
+			error "Back Lock Entry does not allow!"
+			else if xdate .gt. #date
+				error "Future Date does not allow!"
+		else
+			set xinvnum=xref
+			set xstatusgrn = "Open"
+			set xstatusjv="Open"
+			set xstatusap="Open"
+			//set xwh = "01"
+			set xtype="Direct"
+			set xpreparer=pdmst.xstaff("xposition='"+#poisition+"'")
+        	set xgrnnum = #trn("GRN Number",xtrn,10)
+			set xpkey=xgrnnum
+			end if
+         end event
+        end field
+		
+        field Update
+        event before
+		set backdate=#sql("select xdateexp from acdef")
+		set backentry=#sql("select xbacklock from acdef")
+		set wh=branchclientview.xcode("xcode='"+xwh+"' and zactive=1 and xtypestore='GRN'")
+		set xdategl=xdate
+		int xday=#sql(int,"select xday from acdef")
+		set preventry=#sql("select xpreventry from acdef")
+		int cmon=#sub(#date,5,2)
+		int cyear=#sub(#date,0,4)
+		int eday=#sub(#date,8,2)
+		int eyear=#sub(xdate,0,4)
+        int emon=#sub(xdate,5,2)
+		
+		if xpkey .ne. xgrnnum
+		error "Please press show first!"
+
+		else if cyear>eyear .and. preventry .eq. "No"
+		error "Can not Proceed-- Previous Year entry doesn't allow."
+		
+		else if cmon>emon .and. eday>xday .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous month entry doesn't allow."	
+
+		else if xwh .eq. "" .and. xtrn .eq. "GRN-"
+			error "Cannot Proceed - Store is Blank!"
+		else if wh .eq. "" .and. xtrn .eq. "GRN-"
+			error "Cannot Proceed - Store not exists  or It is not GRN Store!"
+		else if pogrnheader.xstatusgrn("xgrnnum='"+xgrnnum+"'") .ne. "Open"
+			error "GRN Already Confirmed!"
+		else if backentry .eq. "No" .and. xdate .le. backdate
+			error "Back Lock Entry does not allow!"
+		else if xdate .gt. #date
+			error "Future Date does not allow!"
+		end if
+        end event
+        end field		
+
+
+        field Transfer
+          event after
+            set temp = #spsql(zabsp_LC_TransferLCToGL,#id,#user,xlcno,xgrnnum,xcus,xdate,"LC Payment")
+			set temp = #spsql(zabsp_LC_transferLCtoAP,#id,#user,xlcno,xgrnnum,xcus,xdate,"LC Payment")
+          end event
+        end field
+
+
+        field xnote
+          width 80
+          column 2
+        end field
+
+
+        field Confirm
+           event before
+		   	double grnqty=#sql("select sum(xqtygrn) from pogrndetail where xgrnnum='"+xgrnnum+"'")
+			set wh=pogrnheader.xwh("xgrnnum='"+xgrnnum+"'")
+			if grnqty <0.01
+			error "Please add detail!"
+            else if xstatusap .eq. "Confirmed"
+				error "Cannot Proceed - GRN Already Confirmed"
+			//else if wh .eq. ""
+            //  error "Cannot Proceed - Store is Blank"
+            else if pogrnheader.xref("xgrnnum='"+xgrnnum+"'") .eq. ""
+				error "Can not Proceed - Please Write Ref No!"
+			end if    
+           end event
+           event after
+			  //set temp = #spsql(zabsp_LC_TransferLCToGL,#id,#user,xlcno,xgrnnum,xcus,xdate,"GRN Confirm")
+              set temp = #spsql(zabsp_PO_confirmGRN,#id,#user,xgrnnum,xdate,xwh,6)
+              action show
+           end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+		
+		 field Invoice Cost
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "pogrndetaildirect"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Amendment"){
+            form.screen.value = "opdcamend"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Invoice Cost"){
+            form.screen.value = "pogrncost"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

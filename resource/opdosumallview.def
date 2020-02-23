@@ -1,0 +1,24 @@
+
+product ZAB ERP
+
+table opdosumallview
+
+  caption "OP Sum View"
+
+  columns zid,xacc,xsub,xyear,xprime,xacctype,xwh,xhwh
+
+  primary key zid,xacc,xsub,xyear
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view opdosumallview (zid,xwh,xroute,xsumnum,xdate,xdatedel,xpaymentterm,xrow) ~
+                as select zid,xwh,xroute,xsumnum,xdate,xdatedel,xpaymentterm,count(*) ~
+                from opdoheader ~
+		where xsumnum<>'' ~
+		group by zid,xwh,xroute,xsumnum,xdate,xdatedel,xpaymentterm
+
+			
+
+end table

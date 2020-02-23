@@ -1,0 +1,111 @@
+screen pogrnadjdetail
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+
+     list detail
+        caption "Detail List"
+        table pogrnadjdetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrnadjdetail&command=Show&xgrnnum=?&xrow=?"), ~
+                xacc,desc equals((select xdesc from acmst where acmst.zid=pogrnadjdetail.zid and acmst.xacc=pogrnadjdetail.xacc)),xprime
+
+        totals "Totals","","",sum
+        header "Line No","Account Code","Description","Amount"
+     end list
+
+     form one
+        caption "Detail of "+xvoucher
+        table pogrnadjdetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        return "login"
+        layout 2
+        pstyle 3
+        objects Return,Clear,Show,Add,Delete,*next, Top, Previous, Next, Bottom,~
+               xrow attrib(row 0 1),xdum,xacc,xaccdesc,~
+               xprime,xnote width(50)
+
+    field xaccdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xaccdesc=acmst.xdesc("xacc='"+xacc+"'")
+      end event
+    end field
+		
+    field xdum
+      attrib local
+      caption 
+      display const
+    end field
+		
+        field Add
+          event before
+			set temp = #sql("select xinvnum from aralc where xvoucher='"+xvoucher+"'")
+			if #result .eq. "true"
+				error "Cannot Proceed -- Before Add Remove Allocation First"
+			end if
+          end event
+          event after
+			double total = 0.00
+			set total = #sql("select sum(xprime) from artrn where xvoucher='"+xvoucher+"'")
+			set temp = #sql("update arhed set xprime="+total+" where xvoucher='"+xvoucher+"'")
+			set temp = #sql("update arhed set xbalprime="+total+" where xvoucher='"+xvoucher+"'")
+            //set temp = #spsql(zabsp_AR_validateAfterARtrncas,#id,#user,xvoucher)
+          end event
+        end field
+
+        field delete
+			event before
+				set temp = #sql("select xinvnum from aralc where xvoucher='"+xvoucher+"'")
+				if #result .eq. "true"
+					error "Cannot Proceed -- Before Delete Remove Allocation First"
+				end if
+				set voucher = xvoucher
+			end event
+          event after
+			double total = 0.00
+            //set temp = #spsql(zabsp_AR_validateAfterARtrncas,#id,#user,xvoucher)
+			set total = #sql("select sum(xprime) from artrn where xvoucher='"+voucher+"'")
+			set temp = #sql("update arhed set xprime="+total+" where xvoucher='"+voucher+"'")
+			set temp = #sql("update arhed set xbalprime="+total+" where xvoucher='"+voucher+"'")
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "pogrnheaderadvadj"
+            form.searchbutton.value = "Find xgrnnum=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen
+
+
+
+

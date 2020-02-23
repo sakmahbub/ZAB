@@ -1,0 +1,218 @@
+screen pdmstresign
+  sidebar list detail //,list inv
+  sections form one, jscript myscript
+
+  list detail
+    caption "Salary Details List"
+    table pdsalarydtview //pdsalarydetail
+    order xstaff
+    fixed xstaff
+    rows 20
+    objects xtype,xamount,xsign
+    //objects  xrow attrib(link "login?screen=pdsalarydetail&command=Show&xstaff=?&xrow=?"), ~
+    //         xtype,xamount,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdsalarydetail.xtype))
+
+    header "Componant Type","Amount","Transaction Type"
+
+  end list
+
+  list inv
+    caption "Investment Detail"
+    table pdinvdetail
+    order xstaff,xrow
+    fixed xstaff
+    rows 20
+    objects  xrow attrib(link "login?screen=pdinvdetail&command=Show&xstaff=?&xrow=?"), ~
+             xtype,xamount
+
+    header "Line No","Investment Type","Amount"
+
+  end list
+
+
+  form one
+    caption "<ACRONYM>Personnel Info (Resigned)</ACRONYM>"
+    table pdmst
+    order xstaff//,xname,xrank
+    select "xempcategory='"+#wh+"' and xempstatus<>'Normal'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Clear,Add, Update, Delete, *next,Top, Previous, Next, Bottom,~
+            xstaff,xname attrib(search),xgroup,xdeptname,xdesignation,xsec,xgrade,xlocation,xbank,xdesc,xacc,xempcategory,xposition,~
+            xbirthdate,xdatejoin,xdatecom,xretdate display(const),xenddate,xtin,xempstatus//,xsex,xmstat,xdistrict,
+            //xempstatus,xemail,xmadd,xpadd
+
+    field xempcategory
+      default #wh
+      //pick "select xcode from xcodes where xtype='Employee Category' and xcode='" +#wh+"'"
+    end field
+
+    feild xdesc
+      caption Branch Name of Bank
+      width 45
+    end field
+
+    field xgroup
+      display combo
+      pick "select xcode from xcodes where xtype='Group' and zactive=1"
+    end field
+
+    field xstatus
+      embed  onblur
+      caption Service Charge Status
+      display combo
+      pick "Open,Closed"
+    end field
+
+    field xstaff
+      event after
+        set globals(xstaff)=xstaff
+      end event
+    end field
+
+    field xposition
+      attrib search
+      pick
+    end field
+
+    field xhaccomodation
+      display combo
+      pick "Yes,No"
+      default "No"
+    end field
+
+    field xbank
+      display combo
+    end field
+
+    field xacc
+      pick
+    end field
+
+    field xamount
+      caption Opening Balance of PF
+    end field
+
+    field xdeduction
+      caption Total Deduction
+    end field
+
+    field xretdate
+      //caption Retirement Date
+      default "2999-01-01"
+    end field
+
+    field xenddate
+      caption Resignation Date
+      default "2999-01-01"
+    end field
+
+    field xdatecom
+      default "2999-01-01"
+    end field
+
+    field xempstatus
+      default "Normal"
+      //pick "Normal,Closed,On Hold"
+    end field
+
+    field xdum
+      attrib local
+      display const
+      caption
+    end field
+
+    field xdum2
+      attrib local
+      display const
+      caption
+    end field
+
+    field xdum3
+      attrib local
+      display const
+      caption
+    end field
+
+    field Search
+      event before
+        class picase(PDSearch())
+      end event
+    end field
+
+    field add
+      event before
+        set xretdate=#sesql("select dateadd(year,57,'"+xbirthdate+"')")
+      end event
+    end field
+
+    field update
+      event before
+        set xretdate=#sesql("select dateadd(year,57,'"+xbirthdate+"')")
+      end event
+    end field
+
+    field Salary
+      embed onclick="clicked(this)"
+    end field
+
+    field Investment
+      embed onclick="clicked(this)"
+    end field
+
+    field Employee
+      embed onclick="clicked(this)"
+    end field
+
+    embed onsubmit="submitit(this)"
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+    function clicked(b){
+      detail=b.value
+    }
+    function submitit(form){
+      if (detail=="Salary Detail"){
+      form.screen.value = "pdsalarydetail"
+      form.searchbutton.value = "Top"
+    }
+    if (detail=="Employee Transfer"){
+      form.screen.value = "pdemptransfer"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+    if (detail=="Training"){
+      form.screen.value = "pdtrain"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+    if (detail=="education"){
+      form.screen.value = "pdedu"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+    if (detail=="service"){
+      form.screen.value = "pdservice"
+      form.searchbutton.value = "Top"
+      //return false
+    }
+    }
+    function pickAccount(link,name,rank){
+      if (navigator.appName.indexOf("Netscape") >= 0){
+        document.one.xinvnum.value=link.text
+        document.one.xbalance.value=primebal.text
+        document.one.xdate.value=date.text
+      }else{
+        document.one.xstaff.value=link.innerText
+        document.one.xname.value=name.innerText
+        document.one.xrank.value=rank.innerText
+      }
+      return false
+    }
+      </script>
+  end jscript
+
+end screen

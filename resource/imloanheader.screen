@@ -1,0 +1,620 @@
+screen imloanheader
+
+  sidebar list loanreq,list imtor,list one,list imtoreject
+	sections form one, list reqlist, jscript myscript
+	
+	list loanreq
+        caption "Pending Loan Request"
+        table imloanheaderview
+        order xtornum desc
+        //select "xstatustor in ('Approved','Confirmed') and left(xtornum,4) in ('LRE-','LIS-') and xstatusloan='Open' and xtype in ('Loan Receive')"
+		select "xstatustor in ('Approved') and left(xtornum,4)='LRE-' and xstatusloan='Open' and xtype in ('Loan Receive') ~
+		and xtwh in (select xwh from userstoreview where xposition='"+#position+"') and '"+#wh+"'<>'' and '"+#position+"'<>''"
+		rows 50
+        objects  xtornum attrib(link "abc" embed onclick="return pickItem(this:zbid#:xfwh#)"),~ 
+                 zbid attrib(name zbid#),plant equals((select zorg from zbusiness where zid=imloanheaderview.zbid)),~
+				 xdate,xfwh attrib(name xfwh#),xlong,xstatusloan,xtype		 
+        headers "Loan Request No","Plant Code","Plant","Date","Store/Plant","Request From","Status","Request Type"
+     end list
+
+	 list imtor
+        caption "Loan List"
+        table imtorheader
+        order xtornum desc
+		select "zauserid='"+#user+"' and left(xtornum,4) in ('LRE-','LIS-') and xstatustor<>'Rejected' and xtype in ('Loan Receive','Loan Issue')"
+        rows 10
+        objects  xtornum  attrib(link "login?screen=imloanheader&command=Show&xtornum=?"),~
+                 xdate,xstatustor,xidsupdesc equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xidsup)),~
+				 xidsupdesc2 equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xsuperior2))
+				 //xidsupdesc3 equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xsuperior3)
+				 
+        headers "Loan No","Date","Loan Status","Approver","OR >>>>>> Approver"
+    end list
+	
+      list reqlist
+        caption "Loan Detail List : "+xloannum+", "zbusiness.zorg("zid='"+#trim(xacc)+"'")
+        table imloandetailview
+        order xtornum,xrow
+        fixed xloannum
+		select "xqtyreq-xqtyalc>0 and xloannum <>'' and zbid='"+#trim(xacc)+"'"
+        rows 350
+        objects  xrow,~
+                xitem attrib(name xitem#),xdesc,xtheircode,(xqtyreq-xqtyalc) attrib(name xprepqty#),xunit
+
+	  headers "Serial No","Item","Name","Part No","Requisition Qty","Unit"
+     end list
+	
+	 list imtoreject
+        caption "Rejected Loan List"
+        table imtorheader
+        order xtornum desc
+		select "zauserid='"+#user+"' and left(xtornum,4) in ('LRE-','LIS-') and xstatustor='Rejected' and xtype in ('Loan Receive','Loan Issue')"
+        rows 10
+        objects  xtornum  attrib(link "login?screen=imloanheader&command=Show&xtornum=?"),~
+                 xdate,xstatustor
+				 
+        headers "Loan No","Date","Loan Status"
+    end list
+              
+    list one
+        caption "Loan Receive/Issue Detail List"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        select "left(xtornum,3) in ('LRE','LIS')"
+		rows 30
+        objects ~
+        xrow,~// attrib(link "login?screen=moreqdetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+		partno equals((select xtheircode from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyreq,xunit
+
+        headers "Serial No","Item","Description","Part No","Quantity Required","Unit"
+     end list
+
+
+
+     form one
+        caption "Loan Request/Issue Entry Header"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+		select "zauserid='"+#user+"' and left(xtornum,4) in ('LRE-','LIS-') and xtype in ('Loan Receive','Loan Issue')"
+        return "login"
+        pstyle 3
+        layout 3
+        objects	Show,Clear,*Next,*Next,*Next,Add,Update,Delete,*Next,*Next,*Next,~
+				Top,Next,Previous,Bottom,Detail,Confirm,Request Deny,*next,"<p>",~
+        xtrn,xtornum,xdate,xdatecom display(hide),~
+        xfwh,xfbrname,xdaterec,xacc,xaccdesc display(const),xloannum attrib(search readonly),~
+		xtwh,xtbrname,xloanature,xref,xregi,xshift display(hide),~
+		xstatusrec display(hide),xidsup display(hide),xlong,xstatustor,xstatusreq display(hide),~
+		xstatusloan display(hide),xtype display(hide),xstatusjv display(hide),,~
+		xnote,,,~
+		xpkey display(hide) attrib(local),~
+		signatorysec display(const),,,~
+		xpreparer display(hide),preparer display(const),~		
+		xsignatory1 display(hide),signatory1  display(const),~
+		xsignatory2 display(hide),signatory2 display(const),~
+		xsignatory3 display(hide),signatory3 display(const),~
+		xsignatory4 display(hide),signatory4 display(const),~
+		xsignatory5 display(hide),signatory5 display(const),~
+		xsignreject display(hide),signreject display(const)
+				
+		field xtrn
+			caption Transaction Type
+			display combo
+			pick "LRE-,LIS-"
+			default "LRE-"
+		end field
+		
+		field xdate
+			caption Loan Receive/Issue Date
+		end field
+		
+		field xloanature
+			pick "select xcode from xcodes where xtype='Loan Nature' and xtrcode in ('01','03','04','05','06','07','')"
+		end field		
+		
+		field xdaterec
+		caption <br><FONT SIZE=2 COLOR=red>Approx. Return Date</font>
+			default "2099-01-01"
+		end field
+		
+		field xloannum
+			caption Loan Request No
+			width 20
+			pick
+		end field
+		
+		
+		field xdatereq
+			caption Required Date
+		end field
+		
+	field xnote
+      caption Reject Note
+	display const
+    end field
+	
+		field xshift
+			caption Shift Name
+			pick code Shift Name
+		end field
+		
+		field xstatustor
+		caption Loan Receive/Issue Status
+		display const
+		end field
+		
+		field xstatusreq
+		caption PR Status
+		end field
+		
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		//column 2
+		end field
+		
+		field xdum
+			display const
+			attrib local
+			caption
+		end field
+		
+		field xregi
+		pick list xcardept
+			caption Department Name
+			event before
+			end event
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='Loan Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='Loan Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='Loan Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='Loan Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='Loan Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		
+		field show
+		event after
+          set xpkey=xtornum
+		  end event
+        end field
+
+		field xfwh
+		pick list xwh
+		default #wh
+		event before
+		set trn=#sub(xtornum,0,4)
+		if trn .eq. "LIS-"
+		set #field(xfwh.caption) = "From Plant/Store"
+		set #field(xtwh.caption) = "To Plant/Store"
+		else 
+		set #field(xfwh.caption) = "To Plant/Store"
+		set #field(xtwh.caption) = "From Plant/Store"
+		end if
+		end event
+        end field
+		
+		field xtwh
+		default #wh
+		pick
+        end field
+		
+		  field appname
+        attrib local
+        caption Approved Person
+        display const
+        event after
+          set appname=pdmst.xname("xposition='"+xidsup+"'")
+        end event
+       end field
+		
+       field xfbrname
+        attrib local
+        caption Plant/Store Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+		field xacc
+			caption Inter Company/Party
+			pick list intercompany
+			width 20
+		end field
+	   
+       field xaccdesc
+        attrib local
+        caption Inter Company/Party Name
+        event after
+          set xaccdesc=cacusview.xorg("xcus='"+xacc+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Plant/Store Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"' and zid='"+xacc+"'")
+        end event
+       end field
+	   
+
+
+        field xtornum
+		caption Loan Receive/Issue No.
+		pick list lrelisnum
+		width 20
+          event after
+		  double loanqty=#sql(double,"select sum(xqtyalc) from imtordetail where xtornum='"+xloannum+"' and zid='"+xacc+"'")
+		    set acc=#sub(xacc,0,1) 
+			if  acc .eq. "P" .or. acc .eq. "S" .or. acc .eq. "C"
+				set accp=#sub(xacc,4,6)
+			else 
+				set accp=xacc
+			end if
+			set global(xtornum)=xtornum
+			set global(xacc)=xacc
+			set globals(xloannum)=xloannum
+			set global(xdocrow)=xdocrow
+			set global(xtrn)=xtrn
+			
+			class careports(getReport{imloanprint;2;in,st;zid,tornum;xtornum;View Loan Receive/Issue Status})
+			//class careports(getjspReport{imloanprint,1,xtornum,View Loan Receive/Issue Status})
+				if imtorheader.xstatustor("xtornum='"+xtornum+"'") .eq. "Confirmed"
+					set #field(Update.attrib) = "disabled"
+					set #field(Detail.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+					set #field(request.attrib) = "hidden"
+				end if
+		
+				if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+					set #field(Update.attrib) = "disabled"
+					set #field(Detail.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+				end if
+				if xtornum .eq. ""
+					set #field(delete.attrib) = "disabled"
+					set #field(update.attrib) = "disabled"
+					set #field(Detail.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+					set #field(request.attrib) = "hidden"
+				end if
+				if xtornum .ne. ""
+					set #field(add.attrib) = "disabled"
+				end if
+				if loanqty > 0
+					set #field(request.attrib) = "hidden"
+				end if
+					set #field(top.attrib) = "disabled"
+					set #field(next.attrib) = "disabled"
+					set #field(previous.attrib) = "disabled"
+					set #field(Bottom.attrib) = "disabled"
+					//set #field(delete.attrib) = "disabled"
+			
+           end event
+        end field
+
+        field xlong
+		caption Justification
+          height 2
+          width 50
+          //column 2
+        end field
+
+		field Request
+            event before
+			set xacc=#trim(xacc)
+			set xloannum=#trim(xloannum)
+			set xtornum=#trim(xtornum)
+			double loanqty=#sql(double,"select sum(xqtyalc) from imtordetail where xloannum='"+xtornum+"' and zid='"+xacc+"'")
+			if xtornum .eq. ""
+				error "Can not Proceed -- Please select Loan Request No!"
+			else if imtorheader.xstatustor("xtornum='"+xtornum+"') .eq. "Approved"
+				error "Can not Proceed -- Already Confirmed!"
+			else if imtorheader.xstatustor("xtornum='"+xtornum+"') .eq. "Denied"
+				error "Can not Proceed -- Already Denied!"
+			else if loanqty >0.01
+			error "Can not Denied. Already Added Loan !"
+			end if
+            end event
+            event after
+			set temp =  #spsql(zabsp_Dismissed_Request,#id,#user,#position,xacc,xloannum,"Loan Request Denied")
+			set temp =  #spsql(zabsp_Dismissed_Request,#id,#user,#position,xacc,xtornum,"Self Request Denied")
+            end event
+          end field		
+
+		
+		field confirm
+            event before
+			set justificat=#sql("select xlong from imtorheader WHERE xtornum='"+xtornum+"'")
+			double prepqty=#sql("select sum(xprepqty) from imtordetail where xtornum='"+xtornum+"'")
+			set loantrn=#sub(xloannum,0,3)
+			set acc=#sub(xacc,0,1)
+			if prepqty <0.01
+			error "Please add detail"
+			else if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+				error "SR Already Confirm"
+			else if justificat .eq. ""
+				error "Please write Justification!"
+			end if
+            end event
+            event after
+				set temp =  #spsql(zabsp_Confirmed_Request,#id,#user,#position,xfwh,xtornum,"Loan")
+				if #sub(xtornum,0,3) .eq. "LIS" .and. acc .ne. "P"
+				set temp=#sql("update imtorheader set xloannum='"+xtornum+"' where zid='"+xacc+"' and xtornum='"+xloannum+"'")
+				end if
+			//if loantrn .eq. "LIS" .or. acc .eq. "P" .or. acc .eq. "S" .or. acc .eq. "C"
+			//	set temp=#sql("update imtorheader set xstatusloan='Confirmed' where xtornum='"+xtornum+"'")
+			//end if
+	         action show
+            end event
+          end field
+		
+		
+        field add
+			event before
+				set loannaturecode=xcodes.xtrcode("xtype='Loan Nature' and xcode='"+xloanature+"'")
+				set backdate=#sql("select xdateexp from acdef")
+				set backentry=#sql("select xbacklock from acdef")
+				set cardept=cacardept.xregi("xregi='"+xregi+"'")
+				set xstatusreq="Open"
+				set xstatusrec="Open"
+				set xstatusloan="Open"
+				set xstatusjv="Open"
+				set xloannum=#trim(xloannum)
+				set xacc=#trim(xacc)
+				set xtwh=#trim(xtwh)
+				set trnreq=#sub(xloannum,0,3)
+				set acc=#sub(xacc,0,1)
+				set fwh=branchclientview.xcode("xcode='"+xfwh+"' and zactive=1")
+				set twh=branchclientview.xcode("xcode='"+xtwh+"' and zactive=1 and zid='"+xacc+"'")
+				set cusid=cacusview.xcus("xcus='"+xacc+"'")
+				if trnreq .eq. "LRE"
+					set xtrn="LIS-"
+				//else if trnreq .eq. ""
+				//	set xtrn=xtrn
+				end if
+				
+				if xtrn .eq. "LRE-"
+					set xtype="Loan Receive"
+				else 
+					set xtype="Loan Issue"
+				end if
+				
+				if acc .eq. "P" .or. acc .eq. "S" .or. acc .eq. "C"
+				set xtwh=""
+				end if
+
+				set xpreparer=pdmst.xstaff("xposition='"+#position+"'")
+				if xdaterec .eq. "2099-01-01" .and. xtrn .eq. "LRE-" 
+					error "Approx. Return Date is required!"
+				else if xdaterec .lt. xdate
+					error "Previous Date Return is not Acceptable!"	
+				else if xdaterec .eq. xdate .and.  xtrn .eq. "LRE-"
+					error "Same Date Receive & Return is not Acceptable!"						
+				else if xacc .eq. "" .or. cusid .ne. xacc
+					error "Please select Inter Company/Party ID!"
+				else if xfwh .eq. "" .or. fwh .ne. xfwh .and. xfwh .ne. "09"
+					error "Please select Plant/Store Code Or Plant/Store not Exists!"
+				else if xtwh .ne. "" .and. twh .ne. xtwh .and. xtwh .ne. "09"
+					error "Please select Plant/Store Code Or Plant/Store not Exists!"
+				else if acc .ne. "P" .and. acc .ne. "S" .and. acc .ne. "C" .and. xtwh .eq. ""
+					error "Please select Plant/Store Code"
+				else if backentry .eq. "No" .and. xdate .le. backdate
+					error "Back Lock Entry does not allow!"
+				else if xtrn .eq. "LIS-" .and. xloannum .eq. "" .and. acc .ne. "P" .and. acc .ne. "C" .and. acc .ne. "S"
+					error "Please select Loan Request No!"
+				else if xloanature .eq. ""
+					error "Please select Loan Nature!"
+				else if xtrn .eq. "LRE-" .and. acc .ne. "P" .and. acc .ne. "C" .and. acc .ne. "S" .and. xloanature .ne. "Loan Request"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LIS-" .and. acc .ne. "P" .and. acc .ne. "C" .and. acc .ne. "S" .and. xloanature .ne. "Loan issue against Loan Request"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LRE-" .and. acc .eq. "P" .and. xloanature .ne. "3rd party loan receive"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LRE-" .and. acc .eq. "C" .and. xloanature .ne. "3rd party loan receive"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LRE-" .and. acc .eq. "S" .and. xloanature .ne. "3rd party loan receive"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LIS-" .and. acc .eq. "P" .and. xloanature .ne. "3rd party loan issue for servicing" .and. xloanature .ne. "3rd party loan issue"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LIS-" .and. acc .eq. "C" .and. xloanature .ne. "3rd party loan issue for servicing" .and. xloanature .ne. "3rd party loan issue"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LIS-" .and. acc .eq. "S" .and. xloanature .ne. "3rd party loan issue for servicing" .and. xloanature .ne. "3rd party loan issue"
+					error "Loan Nature Selection Error!"
+				else 
+						if xregi .eq. ""
+							set xregi =pdmst.xdeptname("xposition='"+#position+"'")
+						end if
+				set xtornum = #trn("Transfer Transaction",xtrn,10)
+				set xpkey = xtornum
+				end if
+			end event
+		event after
+		set temp=#sql("update imtorheader set xstatusloan='Applied' where zid='"+xacc+"' and xtornum='"+xloannum+"'")
+		action show
+		end event
+        end field
+		
+        field update
+          event before
+				set backdate=#sql("select xdateexp from acdef")
+				set backentry=#sql("select xbacklock from acdef")
+		        set cardept=cacardept.xregi("xregi='"+xregi+"'") 
+				set fwh=branchclientview.xcode("xcode='"+xfwh+"' and zactive=1")
+				set twh=branchclientview.xcode("xcode='"+xtwh+"' and zactive=1 and zid='"+xacc+"'")
+				set cusid=cacusview.xcus("xcus='"+xacc+"'")
+				set xloannum=#trim(xloannum)
+				set xacc=#trim(xacc)
+				set acc=#sub(xacc,0,1)
+				
+				if acc .eq. "P" .or. acc .eq. "S" .or. acc .eq. "C"
+					set xtwh=""
+				end if
+				
+				if xpkey .ne. xtornum
+					error "Please press show first!"
+				else if xtrn .ne. #sub(xtornum,0,4)
+					error "Transaction Type Selection Error !"
+				else if xdaterec .eq. "2099-01-01" .and. xtrn .eq. "LRE-" 
+					error "Approx. Return Date is required!"
+				else if xdaterec .lt. xdate
+					error "Previous Date Return is not Acceptable!"	
+				else if xdaterec .eq. xdate .and.  xtrn .eq. "LRE-"
+					error "Same Date Receive & Return is not Acceptable!"
+				else if xacc .eq. "" .or. cusid .ne. xacc
+					error "Please select Inter Company/Party ID!"
+				else if xfwh .eq. "" .or. fwh .ne. xfwh .and. xfwh .ne. "09"
+					error "Please select Plant/Store Code Or Plant/Store not Exists!"
+				else if xtwh .ne. "" .and. twh .ne. xtwh .and. xtwh .ne. "09"
+					error "Please select Plant/Store Code Or Plant/Store not Exists!"
+				else if acc .ne. "P" .and. acc .ne. "S" .and. acc .ne. "C" .and. xtwh .eq. ""
+					error "Please select Plant/Store Code"
+				else if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+					error "Can not Proceed-- Already Confirmed!"
+				else if backentry .eq. "No" .and. xdate .le. backdate
+					error "Back Lock Entry does not allow!"
+				else if xtrn .eq. "LIS-" .and. xloannum .eq. "" .and. acc .ne. "P" .and. acc .ne. "C" .and. acc .ne. "S"
+					error "Please select Loan Request No!"
+				else if xloanature .eq. ""
+					error "Please select Loan Nature!"
+				else if xtrn .eq. "LRE-" .and. acc .ne. "P" .and. acc .ne. "C" .and. acc .ne. "S" .and. xloanature .ne. "Loan Request"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LIS-" .and. acc .ne. "P" .and. acc .ne. "C" .and. acc .ne. "S" .and. xloanature .ne. "Loan issue against Loan Request"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LRE-" .and. acc .eq. "P" .and. xloanature .ne. "3rd party loan receive"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LRE-" .and. acc .eq. "C" .and. xloanature .ne. "3rd party loan receive"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LRE-" .and. acc .eq. "S" .and. xloanature .ne. "3rd party loan receive"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LIS-" .and. acc .eq. "P" .and. xloanature .ne. "3rd party loan issue for servicing" .and. xloanature .ne. "3rd party loan issue"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LIS-" .and. acc .eq. "C" .and. xloanature .ne. "3rd party loan issue for servicing" .and. xloanature .ne. "3rd party loan issue"
+					error "Loan Nature Selection Error!"
+				else if xtrn .eq. "LIS-" .and. acc .eq. "S" .and. xloanature .ne. "3rd party loan issue for servicing" .and. xloanature .ne. "3rd party loan issue"
+					error "Loan Nature Selection Error!"
+				else if imtorheader.xloannum("xtornum='"+xtornum+"'") .ne. xloannum
+					error "Can not Proceed-- Loan Request Changed!"
+				else if xregi .eq. ""
+					set xregi =pdmst.xdeptname("xposition='"+#position+"'")
+
+			end if
+          end event
+        end field
+		
+        field delete
+			event before
+			set acc=xacc
+			set loannum=xloannum
+			end event
+		event after
+		set temp=#sql("update imtorheader set xstatusloan='Open' where zid='"+acc+"' and xtornum='"+loannum+"'")
+		action show
+		end event
+        end field
+		
+		
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+        
+		field Select
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+
+        function clicked(b){
+          but=b.value
+        }
+
+        function submitit(form){
+          if (but=="Detail"){
+            form.screen.value = "imloandetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickItem(link,zbid,twh){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xloannum.value=link.text
+            document.one.xacc.value=zbid.text
+			document.one.xtwh.value=twh.text
+          }else{
+            document.one.xloannum.value=link.innerText
+            document.one.xacc.value=zbid.innerText
+			document.one.xtwh.value=twh.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+
+
+end screen

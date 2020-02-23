@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table optrgactrpt
+  caption "Target Achievement"
+
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xyear,xper,xitem,xqtyord,xqtydel,xrate,xval,xpercent
+
+
+  primary key zid, xyear,xper,xitem
+  foreign key
+        zid references zbusiness.zid
+        zid,xinstrn references optrginsheader.zid,xinstrn
+  end foreign key
+end table

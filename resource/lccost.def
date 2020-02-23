@@ -1,0 +1,15 @@
+product ZABERP
+
+table lccost
+  caption "Cost Detail"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xlcno,xrow,xaccdr,xacccr,xprime,xcus,xnote,xtype,xstatusap,xstatusjv,xstatus,xttamount,xdate,xtrn,xvoucher
+ 
+ primary key zid,xlcno,xrow
+
+ foreign key
+        zid references zbusiness.zid
+        zid,xlcno references lcinfo.zid,xlcno
+  end foreign key
+
+end table

@@ -1,0 +1,102 @@
+screen acsub
+     sidebar list one
+     sections form one, jscript myscript
+
+  	 list one
+        caption "Sub Code For Account No: "+xacc
+        table acsub
+        order xacc,xsub desc
+        fixed xacc
+        rows 20
+        objects  xsub attrib(link "login?screen=acsub&command=Show&xacc=?&xsub=?"), ~
+                xdesc,xtypeobj
+     end list
+
+
+
+     form one
+        caption "Sub Code For Account No: "+xacc
+        table acsub
+        primarykey xacc,xsub
+        order xacc,xsub
+        fixed xacc
+        return "login"
+        layout 2
+        pstyle 3
+        objects Return, ~
+               Show,Clear,Add, Update, Delete,*next, Top, Bottom,"" ,~
+               xsub,xdesc width(50)//,xtypeobj
+
+		field xsub
+			pick xsubacc
+		end field
+		
+		field xtypeobj
+			display combo
+			pick "Local,Overseas"
+		end field
+		
+		field add
+		event before
+		set desc=#sql("select xdesc from acsub where xacc='"+xacc+"' and xdesc='"+xdesc+"'")
+		//set num=#sql("select right('0000' + cast((isnull(max(xsub),0)+1) as nvarchar( 10)), 4 ) from acsub where xacc='"+xacc+"'")
+		//print num
+		if xdesc .eq. ""
+		error "Cannot Proceed -- Account Description is Blank"
+		else if xsub .eq. ""
+		error "Cannot Proceed -- Sub-Code Code is Blank"
+		else if xdesc .eq. desc
+		error "Cannot Proceed -- Chart of account exists"
+		else
+		print desc
+		end if
+		end event
+		event after
+				//set temp = #sql("update acmst set xaccsource='Subaccount' where xacc='"+xacc+"'")
+		end event
+		end field
+		
+		
+		
+		field delete
+			event before
+				set acc = xacc
+				set sub = xsub
+				set acsub=#sql("select xsub from acdetail where xacc='"+acc+"' and xsub='"+sub+"'")
+			if sub .eq. acsub
+				error "Can not Proceed-- Sub Code already used in transaction!"
+			end if
+			end event
+			event after
+				set subcode = #sql("select xacc from acsub where xacc='"+acc+"'")
+				if #result .eq. "false"
+					set temp = #sql("update acmst set xaccsource='' where xacc='"+acc+"'")
+				end if
+			end event
+		end field
+		
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but = ""
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          if (but == "Return"){
+            form.screen.value = "acmst"
+            form.searchbutton.value = "Find xacc=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

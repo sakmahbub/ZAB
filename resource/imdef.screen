@@ -1,0 +1,75 @@
+screen imdef
+     caption "IM Defaults"
+     sections form one
+
+
+     form one
+        caption "Default Setting For Inventory"
+	    table imdef
+		primary key xgitem
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Update, Delete,*next,Next,Top,"<p>" ,~
+          xgitem,,xfwh,xfdesc,xtwh,xtdesc,xwh,xdesc//,xmoprcs,xunit,xyesno
+		
+		field xyesno
+			caption Check Estimated Cost
+			default "No"
+		end field
+		
+		field xunit
+			caption Machine Process Unit
+			pick code Unit Of Measure
+		end field
+		
+		field xmoprcs
+			caption Starting Process
+		end field
+		
+		field xfdesc
+			attrib local
+			display const
+			caption Description
+			event after
+				set xfdesc=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+			end event
+		end field
+		
+		field xdesc
+			attrib local
+			display const
+			caption Description
+			event after
+				set xdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+		field xtdesc
+			attrib local
+			display const
+			caption Description
+			event after
+				set xtdesc=xcodes.xlong("xtype='Store' and xcode='"+xtwh+"'")
+			end event
+		end field
+	
+	    field xfwh
+    		caption Finished Goods Store
+			pick list xwh
+			display text
+	    end field
+		
+	    field xtwh
+    		caption Raw Material Store
+			display text
+			pick list xwh
+	    end field
+	    field xwh
+    		caption Recipe Store
+			display text
+			pick list xwh
+	    end field
+      end form
+
+end screen

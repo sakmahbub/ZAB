@@ -1,0 +1,15 @@
+//System Administration.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Codes                            |#classPath+"/login?menu=codes"
+//Users                            |#classPath+"/login?menu=users"
+//Logs                             |#classPath+"/login?menu=logs"
+AR Error Check     	         |#classPath+"/login?screen=*crystal errorchk_arnumber"
+Invoice Error Check     	         |#classPath+"/login?screen=*crystal errorchk_opdonumber"
+//Modules                         |#classPath+"/login?screen=*modules"
+//Models                           |#classPath+"/login?screen=*models"
+//Lists                            |#classPath+"/login?menu=lists"
+//Mobile Order                     |#classPath+"/login?screen=opmobdoheader"
+//-------------------------------------------------------------------
+

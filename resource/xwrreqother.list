@@ -1,0 +1,14 @@
+     list xwrreqother
+        table poreqheader
+        order xporeqnum
+        select "xporeqnum like '%"+zvalue+"%' and xtype='Other' and left(xporeqnum,4) in ('JN--')"
+		searchselect "xtype='Other' and left(xporeqnum,4) in ('JN--')"
+        rows 20
+        objects xporeqnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xdate,xtype
+
+				
+		 header "Requisition No","Date","Puechase Type"
+     end list
+
+

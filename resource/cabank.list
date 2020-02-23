@@ -1,0 +1,11 @@
+     list cabank
+        table cabank
+        order xbank
+		linksql select xname from cabank
+        select "(xbank like '%"+zvalue+"%' or xname like '%"+zvalue+"%')"
+        rows 24
+        objects xbank attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xname,xbacc,xbranch,xmadd,xacc,xswiftcode
+     end list
+
+

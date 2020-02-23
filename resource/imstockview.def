@@ -1,0 +1,17 @@
+product ZAB ERP
+
+table imstockview
+  caption "Item Warehouse View"
+  columns zid,xitem,xwh,xopalc,xqtyit,xqtyrt,xinhand,xavail
+  primary key zid,xitem,xwh
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view imstockview (zactive,zid,xitem,xdesc,xrate,xwh,xgitem,xshelf,xopalc,xqtyit,xqtyrt,xinhand,xavail) ~
+            as Select a.zactive,a.zid,a.xitem,a.xdesc,a.xrate,a.xwh,a.xgitem,b.xshelf,a.xopalc,a.xqtyit,a.xqtyrt,a.xinhand,a.xavail ~
+			from imstock a left join caitemshelf b on a.zid=b.zid and a.xitem=b.xitem and a.xwh=b.xwh
+          
+		
+  end table

@@ -1,0 +1,91 @@
+screen pdtogltransfer
+
+     sections form detail, jscript myscript
+
+
+     form detail
+        caption "Payroll To GL Transfer"
+        return "login"
+        layout 2
+        pstyle 3
+        report
+        objects ~
+                Clear,Transfer to GL,~
+                xyear,xper,xdatecom,xempcategory,xtrn,xbank
+				
+        field xdatecom
+          caption Posting Date
+        end field
+		
+		field xyear
+		default #sub(#date,0,4)
+        end field
+		
+		field xper
+		default #sub(#date,5,2)
+        end field
+		
+		field xtrn
+		display combo
+		pick "select xtrn from xtrn where xtypetrn='GL Voucher' and left(xtrn,2) in ('JV','BP','PV')"//" and xwh='01'"
+		end field
+
+
+        field Transfer
+		event before
+		set statusgl=#sql("select xstatusjv from pdbal where xyear='"+xyear+"' and xper='"+xper+"' and xstatusjv='Open' and xempcategory='"+xempcategory+"' and xpaytype='"+xbank+"'")
+		set voucherno=pdbal.xdocnum("xyear='"+xyear+"' and xper='"+xper+"' and xempcategory='"+xempcategory+"' and xpaytype='"+xbank+"'")
+			if xtrn .eq. ""
+			error "Please select Transaction Type"
+			else if xempcategory .eq. ""
+			error "Please select Employee Category"
+			else if xbank .eq. ""
+			error "Please select Bank code"
+			else if voucherno .ne. "" .and. statusgl .eq. ""
+			error "Voucher : "+voucherno+" already Created."
+			else if voucherno .eq. "" .and. statusgl .eq. ""
+			error "No Voucher Created-- Salary does not exist."
+			end if 
+		end event
+          event after
+            set temp = #spsql(zabsp_PD_transferPayrolltoGL,#id,#user,xyear,xper,xdatecom,xempcategory,xtrn,xbank)
+			set voucherno=pdbal.xdocnum("xyear='"+xyear+"' and xper='"+xper+"' and xempcategory='"+xempcategory+"' and xpaytype='"+xbank+"'")
+			if voucherno .ne. ""
+			print "<font color=green size=+2>Voucher : "+voucherno+" Created.</font>"
+			else 
+			print "<font color=red size=+2>No Voucher Created -- Salary does not exist.</font>"
+			end if
+			action show
+		  end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcrnheader"
+            form.searchbutton.value = "Find xcrnnum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

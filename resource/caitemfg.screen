@@ -1,0 +1,289 @@
+screen caitemfg
+
+     sections form detail,jscript myscript
+     //sidebar list one,list inv
+
+     list one
+        caption "Bonus List For <br>"+xitem+" "+caitem.xdesc("xitem='"+xitem+"'")
+        table caitembonus
+        order xitem,xwh
+        fixed xitem
+        rows 20
+        objects  xwh,xqty attrib(link "login?screen=caitembonus&command=Show&xitem=?&xqty=?"), ~
+                 xqtybonus,xdateeff,xdateexp
+      headers "Branch","Quantity","Bonus Quantity","Effictive Date","Expiry Date"
+	 end list
+	 
+	  list inv
+        caption "Gift List For <br>"+xitem+" "+caitem.xdesc("xitem='"+xitem+"'")
+        table cagiftitem
+        order xitem,xqty
+        fixed xitem
+        rows 20
+        objects  xgiftitem attrib(link "login?screen=cagiftitem&command=Show&xgiftitem=?&xgiftitem=?"), ~
+		     desc equals((select xdesc from caitem where caitem.zid=cagiftitem.zid and caitem.xitem=cagiftitem.xgiftitem)),~
+                 xqtybonus,xwh,xdateeff,xdateexp
+
+	  headers "Code","Description","Gift Item Qty","Brach Code","Effictive Date","Expiry Date"
+     end list
+
+     form detail
+        caption "Product Master (Finished Goods)"
+        table caitem
+        primarykey xitem
+        order xitem
+        select "xgitem='Finished Goods'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Top,Next,Previous, Bottom,"</b></font><p>" ,~
+               xtrn,xgitem display(const),xitem,xdesc width(50),~
+				xtheircode width(30),~
+				xtypeitem,xcatitem,xcountry,xunit,xcount,xlengthfg,xwtunit,xunitpur,~ //xcatname,xtitem,,xfabriccolor width(30)
+				xcfpur,xunitsel,xcfsel,xunitiss display(hide),xcfiss display(hide),xtitem,~
+				xrate,,xhscode,~
+				xstype display(hide),slno display(hide),~//xgsm,xmoldno
+                zbid display(hide)
+			
+
+		field xdesc
+			height 2			
+		end field
+		
+		field xtheircode
+			caption Item Code (Manual)
+			display text
+			width 20		
+		end field
+		
+		field xtrn
+			display combo
+			pick "select xtrn from xtrn where xtypetrn='Item Code' and xtrn = 'FG--'"
+		end field
+		
+		field xdescu
+			height 2
+			caption Local Reference
+		end field
+		
+		
+	   field xfabriccolor
+		display text
+		//pick 
+	  end fiield
+ 
+	    field xgitem
+				caption Item Groups				
+				default "Finished Goods"
+				
+				
+				// pick "select xcode from xcodes where xtype='Item Group'"// and zactive='1'"
+				 // embed onclick="setCombo(this,'xgitem',xcatitem,'xcatitem','xcodes')"
+		end field	
+				 
+   
+	   
+	    field xcatitem                
+			display combo
+			pick code Item Category
+       end field
+
+       field xtitem
+        caption Item Type (Production)
+		pick code Item Type
+       end field
+	
+       field xdisc
+        caption Special Discount (Percent)
+		
+       end field	   
+	   
+	
+      field xdateeff
+          default #date
+       end field
+
+      field xcountry
+          caption Country of Origin
+	//	  display combo
+		  pick "select xcode from xcodes where xtype = 'Country'"
+       end field
+	   
+      field xdateexp
+          event before
+           // set year=(#date,0,2)
+           // print year
+          end event
+          default #date
+       end field
+     
+       field xdum
+        attrib local
+        caption 
+        display const
+       end field
+	   
+	    field xdum2
+        attrib local
+        caption 
+        display const
+       end field
+
+	    field xsize
+			pick list size
+		end field	   
+	
+	field xqty
+		attib local
+		caption Qty Applicable
+		//display const
+	 event after
+        set xqty = #sql("select xqty from caitembonus where xitem='"+xitem+"'")
+     end event
+	end field
+	
+	field xqtybonus
+		attib local
+		caption Bonus Qty
+		//display const
+		event after
+		 set xqtybonus = #sql("select xqtybonus from caitembonus where xitem='"+xitem+"'")
+			//set xqtybonus=caitembonus.xqtybonus("xitem='"+xitem+"' and xqty='"+xqty+"'")
+		end event
+	end field
+	
+      field xcatname
+        attrib local
+        caption Item Type Name
+        display const
+        event after
+          set xcatname=xcodes.xlong("xtype='Item Category' and xcode='"+xcatitem+"'")
+        end event
+      end field
+
+        field xitem
+        caption Item Code (System)
+		event before
+			//set xitemA=#sub(xitem,0,2)+#sub(xitem,4,4)
+		end event
+         event after
+            set globals(xitem)=xitem
+          end event
+        end field
+		
+        field xlong
+           width 100
+           column 2
+        end field
+		
+//		field xitemA
+//			attrib local
+//			caption Item Number
+//			display const
+//      end field
+		
+		
+        field add
+        	event before			
+				set xcountry = cazid.xcountry("xcountry='"+xcountry+"'")	
+
+			set size = xcodes.xcode("xtype='Size' and xcode='"+xsize+"'")	
+			set color = xcodes.xcode("xtype='Color' and xcode='"+xfabriccolor+"'")
+//print color
+				if color .ne. xfabriccolor .or. xfabriccolor .eq. ""
+					error "Cannot Proceed -- Please Check Color"
+				else if size .ne. xsize .or.  xsize .eq. ""
+					error "Cannot Proceed -- Please Check Size"			
+				else if xdesc .eq. ""
+					error "Cannot Proceed -- Please Check Description"
+				else
+					set xgitem ="Finished Goods"
+									
+					set trn = xtrn					
+					set xitem = #trn("Item Code",trn,9)				
+				end if
+					
+				if xcfpur .eq. "0.000000"
+					set xcfpur=1.000000
+				end if
+				if xcfsel .eq. "0.000000"
+					set xcfsel=1.000000
+				end if
+				if xcfiss .eq. "0.000000"
+					set xcfiss=1.000000
+				end if
+				
+        	end event
+
+        end field
+
+        field update
+          event before
+			set size = xcodes.xcode("xtype='Size' and xcode='"+xsize+"'")	
+			set color = xcodes.xcode("xtype='Color' and xcode='"+xfabriccolor+"'")
+				if color .ne. xfabriccolor .or. xfabriccolor .eq. ""
+					error "Cannot Proceed -- Please Check Color"
+				else if size .ne. xsize .or.  xsize .eq. ""
+					error "Cannot Proceed -- Please Check Size"		
+				end if
+
+              set year = #sub(xdate,0,4)
+              set per = #sub(xdate,5,2)
+              set yr = #sub(xdate,2,2)
+
+           // set xcitem="NPL"
+            //set xstype="Stock-N-Sell"
+          end event
+          event after
+
+
+          end event 
+              print year
+              print per
+              print yr
+            actionshow
+        end field
+
+
+        embed onsubmit="return submitit(this)"
+
+        field Charge
+          embed onclick="clicked(this)"
+        end field
+
+ 
+        field Rate
+          embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Charge Entry"){
+            form.screen.value = "caitemcharge"
+            form.searchbutton.value = "Find xitem=?"
+          }
+         if (detail=="Rate"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

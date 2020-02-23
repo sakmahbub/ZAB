@@ -1,0 +1,46 @@
+screen pdleaveasigne
+  caption "Payment Processing"
+  sections form one
+
+  form one
+    caption "<ACRONYM>Leave Assign</ACRONYM>"
+    return "login"
+    layout 2
+    pstyle 3
+
+    objects Leave Assign, xfstaff,xtstaff,xyear,xempcategory display(const)
+
+    field xempcategory
+	default #wh
+    end field
+
+    field xdum
+      attrib local
+      display const
+      caption
+    end field
+
+    field xtstaff
+      default "z"
+    end field
+
+    field xyear
+      attrib local
+      default #sub(#date,0,4)
+    end field
+
+    field xper
+      attrib local
+      default #sub(#date,5,2)
+    end field
+
+
+    field Leave
+      event after
+        set temp = #spsql(zabsp_leaveasign, #id,#user,xyear,xfstaff,xtstaff,xempcategory) 
+      end event
+    end field
+
+  end form
+
+end screen

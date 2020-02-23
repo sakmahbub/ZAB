@@ -1,0 +1,81 @@
+screen posritempending
+
+  caption "Hold Up Item"   
+ 	sidebar  list imtorall//,list imtor1, list imtorwr,list docreq,list conv,list ecf,list qtc
+	sections form one,list imtor, jscript myscript
+     	 list imtor
+        caption "SR Item Pending"
+        table imtordetailview
+        order xfwh,xitem 
+		fixed xfwh,xitem
+		select "xqtycom>0"//" and xfwh='"+#wh+"'"
+        rows 100
+        objects  xtornum attrib(link "login?screen=moreqheaderadmin&command=Show&xtornum=?"),xdes1,xdes2,xitem,xdesc,~
+                 xqtyreq,xqtycom,xqtyalc			 
+        headers "Requisition No","From Division","To Division","Item","Description","Requisition Qty","Holding Qty","Issue Qty"
+     end list
+	 
+	    list imtorall
+        caption "SR Item Pending"
+        table imtordetailview
+		select "xqtycom>0 and xfwh='"+#wh+"'"
+        rows 100
+        objects  xtornum,xdes1,xdes2,xitem,xdesc,~
+                 xqtyreq,xqtycom,xqtyalc			 
+        headers "Requisition No","From Division","To Division","Item","Description","Requisition Qty","Holding Qty","Issue Qty"
+     end list
+
+     form one
+        caption "Hold Up Item"
+        table imtordetailview
+        primarykey xfwh,xitem
+        order xfwh,xitem 
+		select "left(xtornum,2)='SR'"
+        return "login"
+       // pstyle 1
+       // layout 1
+	    layout 2
+		pstyle 3
+		objects Show,Clear,~
+          xfwh,xitem
+        
+		
+		
+		field xfwh
+		default #wh
+		end field
+	
+        embed onsubmit="submitit(this)"
+
+      end form
+
+   jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+    function clicked(b){
+      detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Detail"){
+          form.screen.value = "acdetailgeneral"
+          form.searchbutton.value = "Find xvoucher=?"
+          //return false
+        }
+      }
+	  
+	    function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xvoucher.value=link.text
+          }else{
+            document.one.xvoucher.value=link.innerText
+          }
+          return false
+        }
+
+      </script>
+  end jscript
+
+
+
+
+end screen

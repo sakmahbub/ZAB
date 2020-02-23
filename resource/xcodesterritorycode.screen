@@ -1,0 +1,141 @@
+screen xcodesterritorycode
+
+  sidebar list one
+  sections form one, jscript myscript
+
+  list one
+    table xcodes
+    order xtype,xcode
+    select "xtype='Territory'"
+    fixed xtype
+    rows 20
+    objects xcode attrib(link "login?screen=xcodesterritorycode&command=Show&xtype=?&xcode=?"),~
+             xtrcode,xfield,xregion,xarea,xwh
+
+    headers "Territory Code","Territory Name","Fields","Region","Zone","Branch"
+  end list
+
+  form one
+
+  caption "Territory (All Depot)"
+    table xcodes
+    order xtype,xcode
+    select "xtype='Territory'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Clear, Update,*next,~
+            Top,Previous,Next, Bottom,"<p>" ,~
+            xcode width(50),xtrcode,xtargetshare,xfield display(constant),xarea,xregion,xwh display(hide),~
+            zactive display(hide),xtype
+
+    field xcode
+	pick list xterritory
+	caption Territory Name
+    	event after
+	      //class careports(getReport{territorylist,1,#wh,Print Territory List})
+	end event
+    end field 
+
+    field xtrcode
+	//pick list xterritorycode
+	caption Territory Code
+    	event after
+	      //class careports(getReport{territorylist,1,#wh,Print Territory List})
+	end event
+    end field 	
+
+    
+    field xregion
+      display const
+    end field
+
+    field xwh1
+      display const
+    end field
+
+    field xarea
+	caption Zone
+      display const
+    end field
+
+    field xbrname
+      attrib local
+      caption Branch Name
+      display const
+      event after
+        set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+      //class careports(getReport{territorylist,1,#wh,Print Territory List})
+	end event
+    end field
+
+    field xtype
+      display hide
+      caption Type
+      default "Territory"
+    end field
+
+    field xprops
+      display combo
+      pick "Addition,Deduction"
+      default "Addition"
+    end field
+
+    field xlong
+      width 40
+      height 2
+      //column 2
+    end field
+
+    field add
+      event before
+        set xtype="Territory"
+	set xwh=#wh
+        set xregion=xcodes.xregion("xtype='Fields' and xcode='"+xfield+"'")
+		    if xfield .ne. ""
+	        //set xwh=xcodes.xwh("xtype='Fields' and xcode='"+xfield+"'")
+		    end if
+        set xarea=xcodes.xarea("xtype='Fields' and xcode='"+xfield+"'")
+      end event
+    end field
+
+    field update
+      event before
+        set xtype="Territory"
+        set xregion=xcodes.xregion("xtype='Fields' and xcode='"+xfield+"'")
+		    if xfield .ne. ""
+	        //set xwh=xcodes.xwh("xtype='Fields' and xcode='"+xfield+"'")
+		    end if
+        set xarea=xcodes.xarea("xtype='Fields' and xcode='"+xfield+"'")
+      end event
+    end filed
+
+    field Budget
+      embed onclick="clicked(this)"
+    end field
+
+    embed onsubmit="submitit(this)"
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+    function clicked(b){
+      detail=b.value
+      }
+        function budgeted(b){
+        detail="budgeted"
+      }
+      function submitit(form){
+        if (detail=="Budget"){
+          form.screen.value = "acbudget"
+          form.searchbutton.value = "Top"
+          //return false
+        }
+      }
+
+      </script>
+  end jscript
+
+end screen

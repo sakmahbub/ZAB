@@ -1,0 +1,13 @@
+product ZAB ERP
+//This point table design for NPL Anual Salary Review Pointing. 
+table pdpoint
+  caption "Point"
+  columns ztime,zutime,zauserid,zuuserid,zid,xpoint,xpercent,xlong
+
+  primary key zid,xpoint
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

@@ -1,0 +1,50 @@
+screen caspsm
+
+     sections  form one
+
+
+     form one
+        caption "Sales Manager Master"
+      	table casp
+        primarykey xsp
+        order xsp
+        select "left(xsp,4)='SM--'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update,Delete,*next,Top,Previous,Next, Bottom,"<p>" ,~
+                xsp,xname,xarea
+
+    field xsp
+      default "SM--"
+      display trn Sales Representative
+    end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+    field add
+      event before
+        if xsp_ONE .ne. "SM--"
+          error "Cannot Proceed -- You Chose Wrong Code"
+        end if
+      end event
+    end field
+
+
+field xorg
+	caption Customer Name
+end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+end screen

@@ -1,0 +1,155 @@
+screen poquotheadercrpo
+	
+     sidebar list req,list detail,list po
+     sections form one, jscript myscript
+
+      list req
+        caption "Requisition List"
+        table poquotheader
+        order xqotnum
+		select "xstatusquot='Approved'"// and xwh='"+#wh+"'"
+        rows 20
+	   objects  xqotnum attrib(link "login?screen=poquotheadercrpo&command=Show&xqotnum=?"),xporeqnum, ~
+                xdate
+      //  headers "Item","Name","Requisition Qty","Row"//"Description",
+     end list
+	 
+	 list detail
+        caption "Requisition Detail List"
+        table poquotdetail
+        order xqotnum,xrow
+        fixed xqotnum
+        rows 20
+        objects  xrow attrib(link "login?screen=poquotdetail&command=Show&xqotnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=poquotdetail.zid and xitem=poquotdetail.xitem)),xunitpur,~
+				 xqtyreq,xrate,xlineamt
+
+
+        headers "Line No","Item","Description","Unit","Qty Req","Rate","Amount"
+		total "","","Total","","","",sum
+     end list
+	
+	   list po
+        caption "PO For : "+xreqnum
+        table poordheader
+        order xpornum desc
+        fixed xporeqnum
+        rows 10
+        objects  xpornum attrib(link "login?screen=poordheadercash&command=Show&xpornum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+
+     form one
+		caption "Requisition Header"
+        table poquotheader
+		primarykey xqotnum desc
+        order xqotnum desc
+		select "xstatusquot='Approved' or xstatusquot='PO Created' "
+	   return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Show,Clear,*Next,Details,Top, Previous, Next, Bottom,Create_PO,"<p>" ,~
+                xqotnum,xdate,xsup display(const),xorg,xporeqnum display(const),xstatusquot display(const),xnote
+
+          
+           field xorg
+          	attrib local
+          	display const
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+          
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xporeqnum
+           pick list poreqapprov
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xqotnum
+            width 12
+          event after
+            set globals(xqotnum)=xqotnum
+            set globals(xporeqnum)=xporeqnum
+		  class careports(getjspReport{poreqprint,1,xporeqnum,Print Requisition})  
+			  class careports(getjspReport{poquotana2,1,xporeqnum,Print Quotation (Single-Product)})
+		  //class careports(getjspReport{poquotana,1,xporeqnum,Print Comparison Statement})
+          end event
+        end field
+
+       field Create_PO
+			event before
+				if xstatusquot .eq. "PO Created"
+					error "Cannot Proceed -- PO Already Created"
+				else if xqotnum .eq. ""
+					error "Cannot Proceed -- Please select Quotation"
+				end if
+			end event
+          event after
+            //set temp = #spsql(zabsp_PO_createPO,#id,#user,xporeqnum,xsup,xwh,6)
+			set temp = #spsql(zabsp_PO_createPO,#id,#user,xqotnum,xporeqnum,xstatusquot,xsup,xwh,6)
+            action show
+          end event
+        end field
+		field update
+			event before
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+    end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poquotdetailcrpo"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		 function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+			//document.one.xdate.value=date.text
+          }else{
+            document.one.xporeqnum.value=link.innerText   
+			//document.one.xdate.value=date.innerText
+          }
+          return false
+        }
+		
+      </script>
+     end jscript
+
+end screen

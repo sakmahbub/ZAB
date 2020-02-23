@@ -1,0 +1,42 @@
+
+
+
+product ZAB ERP
+
+table pdleaveappview
+  caption "PD Leave Approval View"
+  columns zid,xstaff,xposition,xstatustor,xstatusreq,xwh,xdate
+  primary key zid,xstaff,xposition,xstatustor,xstatusreq,xwh,xdate
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdleaveappview (zid,xyearperdate,xstaff,xname,xdate,xdatefrom,xdateto,xyear,xtypeleave,xday,xstatus,xposition,xdesignation,xdateapp,xappday,xrow)~
+  as select a.zid,a.xyearperdate,a.xstaff,b.xname,a.xdate,a.xdatefrom,a.xdateto,a.xyear,a.xtypeleave,a.xday,a.xstatus,c.xposition,'Preparer',a.xdate,a.xappday,rank() OVER (ORDER BY a.xdate desc,a.xyearperdate) from ~
+   pdleaveheader a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff join pdsign1 c on a.zid=c.zid and a.xpreparer=c.xstaff ~
+union all ~
+	select a.zid,a.xyearperdate,a.xstaff,b.xname,a.xdate,a.xdatefrom,a.xdateto,a.xyear,a.xtypeleave,a.xday,a.xstatus,c.xposition,'Signatory 1',a.xsigndate1,a.xappday,rank() OVER (ORDER BY a.xsigndate1 desc,a.xyearperdate) from ~
+	pdleaveheader a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff join pdsign1 c on a.zid=c.zid and a.xsignatory1=c.xstaff ~
+union all ~
+	select a.zid,a.xyearperdate,a.xstaff,b.xname,a.xdate,a.xdatefrom,a.xdateto,a.xyear,a.xtypeleave,a.xday,a.xstatus,c.xposition,'Signatory 2',a.xsigndate2,a.xappday,rank() OVER (ORDER BY a.xsigndate2 desc,a.xyearperdate) from ~
+	pdleaveheader a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff join pdsign1 c on a.zid=c.zid and a.xsignatory2=c.xstaff ~
+union all ~
+	select a.zid,a.xyearperdate,a.xstaff,b.xname,a.xdate,a.xdatefrom,a.xdateto,a.xyear,a.xtypeleave,a.xday,a.xstatus,c.xposition,'Signatory 3',a.xsigndate3,a.xappday,rank() OVER (ORDER BY a.xsigndate3 desc,a.xyearperdate) from ~
+	pdleaveheader a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff join pdsign1 c on a.zid=c.zid and a.xsignatory3=c.xstaff ~
+union all ~
+	select a.zid,a.xyearperdate,a.xstaff,b.xname,a.xdate,a.xdatefrom,a.xdateto,a.xyear,a.xtypeleave,a.xday,a.xstatus,c.xposition,'Signatory 4',a.xsigndate4,a.xappday,rank() OVER (ORDER BY a.xsigndate4 desc,a.xyearperdate) from ~
+	pdleaveheader a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff join pdsign1 c on a.zid=c.zid and a.xsignatory4=c.xstaff ~
+union all ~
+	select a.zid,a.xyearperdate,a.xstaff,b.xname,a.xdate,a.xdatefrom,a.xdateto,a.xyear,a.xtypeleave,a.xday,a.xstatus,c.xposition,'Signatory 5',a.xsigndate5,a.xappday,rank() OVER (ORDER BY a.xsigndate5 desc,a.xyearperdate) from ~
+	pdleaveheader a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff join pdsign1 c on a.zid=c.zid and a.xsignatory5=c.xstaff ~
+union all ~
+	select a.zid,a.xyearperdate,a.xstaff,b.xname,a.xdate,a.xdatefrom,a.xdateto,a.xyear,a.xtypeleave,a.xday,a.xstatus,c.xposition,'Signatory 6',a.xsigndate6,a.xappday,rank() OVER (ORDER BY a.xsigndate6 desc,a.xyearperdate) from ~
+	pdleaveheader a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff join pdsign1 c on a.zid=c.zid and a.xsignatory6=c.xstaff ~
+union all ~
+	select a.zid,a.xyearperdate,a.xstaff,b.xname,a.xdate,a.xdatefrom,a.xdateto,a.xyear,a.xtypeleave,a.xday,a.xstatus,c.xposition,'Signatory 7',a.xsigndate7,a.xappday,rank() OVER (ORDER BY a.xsigndate7 desc,a.xyearperdate) from ~
+	pdleaveheader a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff join pdsign1 c on a.zid=c.zid and a.xsignatory7=c.xstaff ~
+union all ~
+	select a.zid,a.xyearperdate,a.xstaff,b.xname,a.xdate,a.xdatefrom,a.xdateto,a.xyear,a.xtypeleave,a.xday,a.xstatus,c.xposition,'Signatory Reject',a.xdatereject,a.xappday,rank() OVER (ORDER BY a.xdatereject desc,a.xyearperdate) from ~
+	pdleaveheader a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff join pdsign1 c on a.zid=c.zid and a.xsignreject=c.xstaff	
+
+end table

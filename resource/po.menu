@@ -1,0 +1,34 @@
+po.menu
+//-------------------------------------------------------------------
+option                           |action                                        |modules|models|width
+//-------------------------------------------------------------------
+Notifications             		   		|#classPath+"/login?screen=ponotification"
+///Store Purchase Requisition Review  	|#classPath+"/login?screen=imsprheaderreview"
+Create PR        				   		|#classPath+"/login?screen=imtorreqpr"          |       |      |120
+Estimated Cost Entry(Cash Purchase)     |#classPath+"/login?screen=poreqheadercash"          |       |      |120
+Cash Purchase Advance Adjustment		|#classPath+"/login?screen=poadvadjheader"        |       |      |120
+Payment Authorization Form        		|#classPath+"/login?screen=appaymentreqh"
+Cash Advance Approval       			|#classPath+"/login?screen=poreqheadercashapv"        |       |      |120
+Quotation Entry       					|#classPath+"/login?screen=poreqheader"          |       |      |120
+Quotation Approval    					|#classPath+"/login?screen=poreqheaderapp"          |       |      |120
+Create PO From Requisition     			|#classPath+"/login?screen=poreqheadercrpo"          |       |      |120
+Purchase Order (Direct)               	|#classPath+"/login?screen=poordheaderdirect"        |       |      |120
+////Purchase Order   (This PO FRom Requisition)             			|#classPath+"/login?screen=poordheadercash"        |       |      |120
+Purchase Order                          |#classPath+"/login?screen=poordheadercashwospr"  |       |      |120
+PO / WO Approval        				|#classPath+"/login?screen=poordheadercpo"        |       |      |120
+PO / WO Update        					|#classPath+"/login?screen=poordheaderupdate"        |       |      |120
+Purchase Adjustment Approval			|#classPath+"/login?screen=poadvadjheaderapp"        |       |      |120
+Payment Authorization Approval        	|#classPath+"/login?screen=appaymentreqhapp"
+Purchase Return Confirmation       	    |#classPath+"/login?screen=imtorprnconfirm"
+Supplier Master                 		|#classPath+"/login?menu=casup"                 |
+Product Master                      	|#classPath+"/login?menu=immst"  
+Color Master                      		|#classPath+"/login?menu=color"  
+
+PO Reports                       		|#classPath+"/login?menu=poreports"             |       |      |120
+///Terms & Condition                	|#classPath+"/login?screen=xcodes(xtype=PO Terms & Condition)"
+////Create JN        				    |#classPath+"/login?screen=imwrtojn"          |       |      |120
+////Cash Received Against (PR / JN)     |#classPath+"/login?screen=poreqcashreceived"          |       |      |120
+////Create WO From Requisition          |#classPath+"/login?screen=poreqheadercrwo"          |       |      |120
+////Work Order     								|#classPath+"/login?screen=poworkheadercash"        |       |      |120
+//Car Master                  		    |#classPath+"/login?screen=cacar"
+//------------------------------------------------------------------

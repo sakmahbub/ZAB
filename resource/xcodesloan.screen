@@ -1,0 +1,80 @@
+screen xcodesloan
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xcode
+        select "xtype='Loan Nature'"
+        rows 20
+        objects  xcode attrib(link "login?screen=xcodesloan&command=Show&xcode=?"),~
+                xlong,xtypeobj,xtrcode,zactive
+
+        headers "Loan Nature","Description","Type of Loan","Code Serial","Active?"
+     end list
+
+     form one
+
+     caption "Loan Nature"
+        table xcodes
+        order xcode
+        select "xtype='Loan Nature'"
+        return "login"
+        layout 1
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next,~
+                Top,Previous,Next, Bottom,"<p>" ,~
+                xtype display(hide),~
+                xcode width(40),~
+                xlong,xtypeobj,xtrcode,zactive
+
+		field xtrcode
+		caption Code Serial
+        end field
+		
+  field xcode
+    pick list xcodeall
+  end field				
+		
+		field xregion
+		caption Concern Name (Alias)
+		display text
+		pick
+        end field
+		
+		field xwh
+		caption Accounting Division
+        end field
+		
+       field xwhdesc
+        attrib local
+        caption Accounting Division
+        display const
+        event after
+          set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+		
+	   field xtypeobj
+		caption Type of Loan
+		pick "Inter company Receive,Inter Company Issue,3rd Party Receive,3rd Party Issue"
+        end field
+        
+        field xlong
+          width 40
+          height 2
+          //column 2
+        end field
+
+        field add
+          event before
+           set xtype="Loan Nature"
+         end event
+        end field
+
+
+     end form
+
+
+end screen

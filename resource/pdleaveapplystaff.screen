@@ -1,0 +1,626 @@
+screen pdleaveapplystaff
+  sidebar list useleave,list trn//,list todayleave//,list asigneplan
+  sections form one,jscript myscript//list trn1,
+
+  list asigneplan
+    caption "Assigned Leave Plan"//desc equals((select xdesc from caitem where xitem=opdodetail.xitem))
+    table pdmst
+    order xstaff,xplan
+    fixed xstaff
+    rows 1
+    objects xplan,dayde equals((select xdaydeduct from pdlplanehd where xname=pdmst.xplan)),~
+            hourde equals((select xhourdeduct from pdlplanehd where xname=pdmst.xplan))
+    header "Plan Name","Day Deduct","Hour Deduct"
+  end list
+  
+   list todayleave
+    caption "Today's Applied Leave"
+    table pdleaveheader
+    order xstaff,xyearperdate
+   // fixed xstaff,xyear
+   select "xdate='"+#date+"'"
+    rows 50
+    objects  xyearperdate attrib(link "login?screen=pdleaveapplystaff&command=Show&xstaff=?&xyearperdate=?"),xstaff,~
+       xdate,xtypeleave,xdatefrom,xdateto,xday,xhour,xstatus
+
+    header "S.No.","Employee ID","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Hour","Status"
+    totals "","","Total","","",sum
+  end list
+  
+  
+  list useleave
+    caption "Used & Available Leave"
+    table pdleaveasigne
+    order xstaff,xyear,xtypeleave
+    fixed xstaff,xyear
+    select "xtypeleave<>'Unpaid Leave'"	
+    rows 20
+    objects  xtypeleave attrib(link "abc" embed onclick="return picltype(this)"),xavailable,xmleave,xused,xbalance	
+    //header "Leave Type","Available Leave","Monthly","Used Leave","Balance Leave"
+    totals "Total",sum,sum,sum,sum
+  end list
+  
+	list trn
+    caption "Applied Leave & Tour Info"
+    table pdleavehdview
+    order xstaff,xyear,xtypeleave,xyearperdate desc
+    select "xposition='"+#position+"' and DATEPART(year,xdate)=DATEPART(year,'"+#date+"')"
+    rows 50
+     objects  xyearperdate attrib(link "login?screen=pdleaveapplystaff&command=Show&xstaff=?&xyearperdate=?"),~
+       xdate,xtypeleave,xdatefrom,xdateto,xappday,xday,xstatus,~
+	   xidsupdesc equals((select xname from pdmst where zid=pdleavehdview.zid and xposition=pdleavehdview.xsid)),~
+	   //xidsupdesc2 equals((select xname from pdmst where zid=pdleaveheader.zid and xposition=pdleaveheader.xsuperior2)),~
+	    xidsupdesc2 equals((select xname from pdmst where zid=pdleavehdview.zid and xstaff=pdleavehdview.xsignatory2)),xsigndate2,xnote,xnote1
+
+    header "S.No.","Apply Date","Type Of Application","From Date","To Date","Applied Day(s)","Approved Day(s)","Status","Approver","Approved By","Approved Date","Note","Approver Remarks"
+    totals "","","Total","","",sum,sum
+	end list  
+
+  list trnsss
+    caption "Applied and Tour Leave Detail"
+    table pdleaveheader
+    order xstaff,xyear,xtypeleave,xyearperdate
+    fixed xstaff,xyear
+    rows 50
+    objects  xyearperdate attrib(link "login?screen=pdleaveapplystaff&command=Show&xstaff=?&xyearperdate=?"),~
+       xdate,xtypeleave,xdatefrom,xdateto,xappday,xstatus,xday,~
+	   xidsupdesc equals((select xname from pdmst where zid=pdleaveheader.zid and xposition=pdleaveheader.xsid)),~
+				 xidsupdesc2 equals((select xname from pdmst where zid=pdleaveheader.zid and xposition=pdleaveheader.xsuperior2))
+
+    header "S.No.","Apply Date","Type Of Leave","From Date","To Date","Applied Day(s)","Status","Approve Day(s)","Approver","OR >>>>>> Approver"
+    totals "","","Total","","",sum
+  end list
+
+    list trn1
+    caption "Leave Detail "+xstaff+" "+xyearperdate
+    table pdleavedetail
+    order xyearperdate,xstaff
+    fixed xyearperdate
+    //select "xstaff='"+xstaff+"' and xyearperdate="+xyearperdate
+    rows 20
+    objects xrow,xdate,xdayname
+    header "SL","Date","Name of Day"
+	 totals count,"Day(s)",""
+  end list
+  
+
+  form one
+    caption "Leave & Tour Application"
+    table pdleaveheader
+    primarykey xyearperdate,xstaff
+    order xyearperdate,xstaff
+  // select "xstaff='"+xstaff+"' and xyear="+xyear"
+    return "login"
+    layout 3
+    pstyle 3
+    objects Add,Update,Show,Clear,Delete,*next,Apply,~//LWP_Confirmed,For Leave
+            xstaff,xname,xdate display(const),xtypeleave,xyesno,xstatus display(const),xdaydeduct display(hide),xhourdeduct display(hide),~
+            xdatefrom,xdateto,,xday,hday display(const) attrib(local),xhday display(hide),xyear display(const),xmobile,~//xdaterpt
+			xtstaff,tstaff display(const) attrib(local),~
+			xyearperdate attrib(row 0 1) display(hide),xposition display(hide),~
+			xsid display(hide),xnote,xappday display(hide),xdateeff display(hide),xdateexp display(hide),~
+			xnote1 display(const),xpkey display(hide) attrib(local),,~
+				signatorysec display(const),,,~
+				xpreparer  display(hide),preparer  display(const),~
+				xsignatory1 display(hide),signatory1  display(const),~
+				xsignatory2 display(hide),signatory2 display(const),~
+				xsignatory3 display(hide),signatory3 display(const),~
+				xsignatory4 display(hide),signatory4 display(const),~
+				xsignatory5 display(hide),signatory5 display(const),~
+				xsignreject display(hide),signreject display(const)
+
+
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatory</span>
+		display const
+		end field				
+				
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='Leave Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		  
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		
+		field show
+		event after
+          set xpkey=xyearperdate
+		  end event
+        end field   
+   
+		field hday
+		caption Holiday
+		event after
+		set incholid1=xcodes.xincholiday("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set incholid2=#sql("select xyesno from pddef")
+		if incholid1 .eq. "Yes" .or. incholid2 .eq. "Yes"
+			set hday=0
+		else		
+        //set hday=#sesql("select count(xyearperdate) from pdcalenderdetail where xdate between '"+xdatefrom+"' and '"+xdateto+"'")
+		set hday=#sesql("select count(xyearperdate) from pdattview where xdate between '"+xdatefrom+"' and '"+xdateto+"' and xstatus='Weekend' and xstaff='"+xstaff+"'")  
+		end if
+		end event
+        end field     
+   
+   field xstaff
+	display text
+	attrib readonly
+	pick
+     event before
+	 set xstaff=pdmst.xstaff("xposition='"+#position+"'")
+		end event
+	end field
+	
+	field xtstaff
+	caption Task Assign To
+	pick list xstaff
+	width 10
+	end field	
+
+		field tstaff
+          caption Name
+		  event after
+		  set tstaff=pdmst.xname("xstaff='"+xtstaff+"'")
+		  end event
+        end field	
+    
+    
+	field xday
+	caption <font color=blue>No of Day(s)</font>
+	attrib readonly
+	end field
+
+	field xyearperdate
+		caption Serial No
+	//	attrib readonly
+	end field
+	
+	field xnote
+	caption Reason for Application
+	column 1
+	width 30
+	height 2
+	end field
+	
+	field xmobile
+		caption Contact during Leave 
+		width 20
+	end field
+    
+    field xtypeleave
+	caption Type of Application
+      display combo
+      //pick "select xcode from xcodes where xtype='Leave Type' and zactive=1"
+	  pick "select xtypeleave from pdleavetypeview where xstaff='"+xstaff+"'"
+    end field
+    
+    field xyesno
+      caption Including Holiday
+      display const
+      event before
+        set xyesno=#sql("select xyesno from pddef")
+      end event
+    end field
+    
+    field xdaterpt
+      caption <font color=red >Reporting Date  </font>
+      event before
+        set xdate=#date
+      end event
+    end field
+
+    field xname
+      attrib local
+      display const
+      event after
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+      end event
+    end field
+	
+	   field preparer
+		   attrib local
+		   display const
+          caption Preparer
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+       end field
+		  
+	field xnote1
+      caption Approver Remarks
+    end field
+
+    field xstatus
+      default "Open"
+      event after
+        if xstatus .ne. "Open"
+          set #field(add.display)="hidden"
+          set #field(update.display)="hidden"
+          set #field(delete.display)="hidden"
+          set #field(apply.display)="hidden"
+		  set #field(LWP_Confirmed.display)="hidden"
+        end if	
+      end event
+    end field
+
+    field xdate
+      caption Application Date
+      event before
+        set year = #sub(xdatefrom,0,4)
+        set per = #sub(xdatefrom,5,2)
+        set day = #sub(xdatefrom,8,2)
+        //set xyearperdate = year+per+day
+        set xyear=year
+      end event
+      event after
+        set globals(xyearperdate)=xyearperdate
+        set globals(xstaff)=xstaff
+        set globals(xyear)=xyear
+      end event
+    end field
+    
+	
+    field Apply
+      event before
+	  	set applyover=xcodes.xtypeobj("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set applyearned=xcodes.xprops("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set incholiday2=xcodes.xincholiday("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set avleave = #sql("select xbalance from pdleaveasigne where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear="+xyear)
+		set temp1 = #sesql("select xstaff from pdleavempview where xdate between '"+xdatefrom+"' and '"+xdateto+"' and xstaff='"+xstaff+"' and xyearperdate<>'"+xyearperdate+"' and xstatus not in ('Rejected','Cancelled')")
+		if #result .eq. "true"
+			error "Leave already applied for that Day(s)!"	  
+	  else if xday < 1.0
+		error "Applied leave must be greater than 0"
+	  else if xday > avleave .and. applyover .eq. "No"
+		error "Cannot Proceed--Applied leave greater then available leave"
+	  else
+		set preparerleave=pdmst.xstaff("xposition='"+#position+"'")
+        set designation=#sql("select xdesignation from pdmst where xstaff='"+xstaff+"'")
+        set fyear=#sub(xdatefrom,0,4)
+        set fper=#sub(xdatefrom,5,2)
+        set fday=#sub(xdatefrom,8,2)
+
+        set tyear=#sub(xdateto,0,4)
+        set tper=#sub(xdateto,5,2)
+        set tday=#sub(xdateto,8,2)
+
+        set ryear=#sub(xdaterpt,0,4)
+        set rper=#sub(xdaterpt,5,2)
+        set rday=#sub(xdaterpt,8,2)
+   
+	   set bodytext="<font face="Arial" size="5" >LEAVE / TOUR APPLICATION</font><br><br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Applicant&nbsp&nbsp&nbsp&nbsp:"+xname+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Type&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:"+xtypeleave+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Day(s)&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:"+xday+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Date(s)&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:"+fday+"-"+fper+"-"fyear+" to "+tday+"-"+tper+"-"tyear+"<br>"
+	   //set bodytext=bodytext+"<font face="Arial" size="3">Reporting&nbsp&nbsp&nbsp:</font>"+rday+"-"+rper+"-"ryear+"<br>"
+	   
+        
+        set sid=#sql("select xsid from pdmst where xstaff='"+xstaff+"'")
+        
+        set tomailaddress=#sql("select xemail from pdmst where xstaff='"+sid+"'")
+				
+				set fromemail=#sql("select xemail from pddef")
+				set password=#sql("select xpassword from pddef")
+      end if
+	  end event
+      event after
+		print bodytext
+		set temp = #spsql(zabsp_leaveapply,#id,#user,xstaff,xyearperdate,xyear,xtypeleave)
+		set temp =  #spsql(zabsp_Confirmed_Request,#id,#user,#position,xyearperdate,xstaff,"Leave")
+		// set temp = #spsql(zabsp_sendmail,#id,#user,xstaff,"Leave Approval","")
+		//set temp = #spsql(zabsp_sendmail,tomailaddress,bodytext)
+       // set temp = #sql("update pdleaveheader set xstatus = 'Applied' where xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'")
+		//set temp = #sql("update pdleaveheader set xpreparer = '"+preparerleave+"' where xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'")
+        action show
+      end event
+    end field
+
+   field LWP_Confirmed
+      event before
+	  if xday < 1.0
+		error "Applied leave must be greater than 0"
+	 else if xtypeleave .ne. "Leave Without Pay"
+		error "Used only for Leave Without Pay"
+	  else
+        set designation=#sql("select xdesignation from pdmst where xstaff='"+xstaff+"'")
+        set fyear=#sub(xdatefrom,0,4)
+        set fper=#sub(xdatefrom,5,2)
+        set fday=#sub(xdatefrom,8,2)
+
+        set tyear=#sub(xdateto,0,4)
+        set tper=#sub(xdateto,5,2)
+        set tday=#sub(xdateto,8,2)
+
+        set ryear=#sub(xdaterpt,0,4)
+        set rper=#sub(xdaterpt,5,2)
+        set rday=#sub(xdaterpt,8,2)
+   
+	   set bodytext="<font face="Arial" size="5" >LEAVE APPLICATION</font><br><br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Applicant&nbsp&nbsp&nbsp&nbsp:"+xname+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Type&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:"+xtypeleave+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Day(s)&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:"+xday+"<br>"
+	   set bodytext=bodytext+"<font face="Arial" size="3">Date(s)&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:"+fday+"-"+fper+"-"fyear+" to "+tday+"-"+tper+"-"tyear+"<br>"
+	   //set bodytext=bodytext+"<font face="Arial" size="3">Reporting&nbsp&nbsp&nbsp:</font>"+rday+"-"+rper+"-"ryear+"<br>"
+	   
+        
+        set sid=#sql("select xsid from pdmst where xstaff='"+xstaff+"'")
+        
+        set tomailaddress=#sql("select xemail from pdmst where xstaff='"+sid+"'")
+				
+				set fromemail=#sql("select xemail from pddef")
+				set password=#sql("select xpassword from pddef")
+      end if
+	  end event
+      event after
+//print bodytext
+	if xtypeleave .eq. ""
+		error "Just for 'Leave Without Pay'"
+	else if xtypeleave .ne. "Leave Without Pay"
+		error "Applied Type: 'Leave Without Pay'"
+	else if xtypeleave .eq. "Leave Without Pay"
+		set temp = #spsql(zabsp_leave_LWP_apply,#id,#user,xstaff,xyearperdate,xyear)
+				//set temp = #spsql(zabsp_sendmail,tomailaddress,bodytext)
+		set temp = #spsql(zabsp_leaveconf,#id,#user,xstaff,xyearperdate,xyear)
+
+	end if
+        action show
+      end event
+    end field
+
+
+    field Add
+      event before
+        set xsid = pdmst.xsid("xstaff='"+xstaff+"'")	
+		set xposition=pdmst.xposition("xstaff='"+xstaff+"'")
+		set xpreparer=pdmst.xstaff("xposition='"+#position+"'")
+		set xdateeff=xdatefrom
+		set xdateexp=xdateto
+		set xpkey=xyearperdate
+        double totday = 0.0
+        double avleave = 0.0
+        set xdaydeduct=1
+        set xhourdeduct=24
+        set xhourdeduct=xdaydeduct*24
+		set xday=0.0	  
+        set xtypeleave=#trim(xtypeleave)
+		set applyover=xcodes.xtypeobj("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set applyearned=xcodes.xprops("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set incholiday2=xcodes.xincholiday("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set backdate=#sql("select xdateexp from pddef")
+		set prevapply=#sql("select xprevleave from pddef")		
+		set tothday=#sesql("select count(xyearperdate) from pdattview where xdate between '"+xdatefrom+"' and '"+xdateto+"' and xstatus='Weekend' and xstaff='"+xstaff+"'")
+		set incholiday=#sql("select xyesno from pddef")
+		double usedlv = #sql(double,"select xused from pdleaveasigne where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear = DATEPART(yyyy,'"+xdatefrom+"')")	
+		double cfleave = #sql(double,"select xcfleaveact from pdleaveasigne where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear = DATEPART(yyyy,'"+xdatefrom+"')")		
+		double availlv = #sql(double,"select xavail from pdleaveavailview where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"'")
+		set availlv=availlv+cfleave
+		set availlv=availlv-usedlv
+		if incholiday .eq. "Yes" .or. incholiday2 .eq. "Yes"
+			set tothday=0
+		end if		
+
+
+		set temp1 = #sesql("select xstaff from pdleavempview where xdate between '"+xdatefrom+"' and '"+xdateto+"' and xstaff='"+xstaff+"'  and xyearperdate<>'"+xyearperdate+"' and xstatus not in ('Rejected','Cancelled')")
+		if #result .eq. "true"
+			error "Leave already applied for that Day(s)!"
+		else if xsid .eq. ""
+			error "Superior does not set. Please add superior for Leave application!"
+		else if xdatefrom .gt. xdateto
+			error "To Date must be after From Date!"
+		else if prevapply .eq. "No" .and. backdate .gt. xdatefrom
+			error "Previous leave application does not allow!"
+		//else if xdaterpt .le. xdateto
+		//	error "Reporting Date must be after Leave Date!"
+        else if xtypeleave .eq. ""
+          error "You must choose leave type from top right corner of the screen!"
+		else if #sub(xdatefrom,0,4) .ne. #sub(xdateto,0,4)
+		   error "You have to Apply Leave in same year!"
+		else if applyover .eq. "Yes"
+		//else if xtypeleave .eq. "Leave Without Pay" .or. xtypeleave .eq. "Tour"
+			set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"')") 
+			set totday=totday+1-tothday
+			set totday=totday*xdaydeduct
+			set totday=totday*xdaydeduct
+			set xday=totday
+			set xappday=xday
+		else if applyover .ne. "Yes"
+		//else if xtypeleave .ne. "Leave Without Pay" .and. xtypeleave .ne. "Tour"
+			set avleave = #sql("select xbalance from pdleaveasigne where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear="+xyear)
+			set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"')") 
+			set totday=totday+1-tothday
+			set totday=totday*xdaydeduct
+			set totday=totday*xdaydeduct
+			
+				if totday > avleave
+							error "Cannot Proceed--Applied leave greater then available leave"
+				else if applyearned .eq. "Yes" .and. totday>availlv
+							error "Cannot Proceed--Your Available Leave earn as on Today : "+availlv
+				//else if xtypeleave .eq. "Annual Leave" .and. totday>availlv
+				//			error "Cannot Proceed--Your Available Leave earn as on Today : "+availlv
+				//else if xtypeleave .eq. "Earned Leave" .and. totday>availlv
+				//			error "Cannot Proceed--Your Available Leave earn as on Today : "+availlv
+				else
+							set xday=totday
+							set xappday=xday
+				end if 
+        end if
+      end event
+      event after
+        action show
+      end event
+    end field	
+	
+
+    field update
+      event before
+        set xtypeleave=#trim(xtypeleave)
+		set xdateeff=xdatefrom
+		set xdateexp=xdateto
+		set xposition=pdmst.xposition("xstaff='"+xstaff+"'")
+		set applyover=xcodes.xtypeobj("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set applyearned=xcodes.xprops("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set incholiday2=xcodes.xincholiday("xcode='"+xtypeleave+"' and xtype='Leave Type' and zactive=1")
+		set backdate=#sql("select xdateexp from pddef")
+		set prevapply=#sql("select xprevleave from pddef")	
+		set tothday=#sesql("select count(xyearperdate) from pdattview where xdate between '"+xdatefrom+"' and '"+xdateto+"' and xstatus='Weekend' and xstaff='"+xstaff+"'")
+		set incholiday=#sql("select xyesno from pddef")
+		set xsid = pdmst.xsid("xstaff='"+xstaff+"'")
+		double usedlv = #sql(double,"select xused from pdleaveasigne where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear = DATEPART(yyyy,'"+xdatefrom+"')")		
+        double availlv = #sql(double,"select xavail from pdleaveavailview where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"'")
+		set availlv=availlv-usedlv
+		if incholiday .eq. "Yes" .or. incholiday2 .eq. "Yes"
+			set tothday=0
+		end if		
+
+        double totday = 0.00
+        double avleave = 0.00
+        set xhourdeduct=xdaydeduct*24    
+
+	    set temp1 = #sesql("select xstaff from pdleavempview where xdate between '"+xdatefrom+"' and '"+xdateto+"' and xstaff='"+xstaff+"'  and xyearperdate<>'"+xyearperdate+"' and xstatus not in ('Rejected','Cancelled')")
+		//set temp1 = #sesql("select xstaff from pdleavempview where xdate between '"+xdatefrom+"' and '"+xdateto+"' and xstaff='"+xstaff+"' and xstatus not in ('Rejected','Cancelled')")
+		if #result .eq. "true"
+			error "Leave already applied for that Day(s)!"		   
+		else if xpkey .ne. xyearperdate
+			error "Please show first!"
+		else if xsid .eq. ""
+			error "Superior does not set. Please add superior for Leave application!"
+		else if xdatefrom .gt. xdateto
+			error "To Date must be after From Date!"
+		else if prevapply .eq. "No" .and. backdate .gt. xdatefrom
+			error "Previous leave application does not allow!"
+		//else if xdaterpt .le. xdateto
+		//	error "Reporting Date must be after Leave Date!"
+        else if xtypeleave .eq. ""
+          error "You must choose leave type from top right corner of the screen!"
+		else if #sub(xdatefrom,0,4) .ne. #sub(xdateto,0,4)
+		   error "You have to Apply Leave in same year!"
+		else if applyover .eq. "Yes"
+		//else if xtypeleave .eq. "Leave Without Pay" .or. xtypeleave .eq. "Tour"
+			set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"')") 
+			set totday=totday+1-tothday
+			set totday=totday*xdaydeduct
+			set totday=totday*xdaydeduct
+			set xday=totday
+			set xappday=xday
+		else if applyover .ne. "Yes"
+		//else if xtypeleave .ne. "Leave Without Pay" .and. xtypeleave .ne. "Tour"
+			set avleave = #sql("select xbalance from pdleaveasigne where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear="+xyear)
+			set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"')") 
+			set totday=totday+1-tothday
+			set totday=totday*xdaydeduct
+			set totday=totday*xdaydeduct
+			
+				if totday > avleave
+							error "Cannot Proceed--Applied leave greater then available leave"
+				else if applyearned .eq. "Yes" .and. totday>availlv
+							error "Cannot Proceed--Your Available Leave earn as on Today : "+availlv
+				//else if xtypeleave .eq. "Annual Leave" .and. totday>availlv
+				//			error "Cannot Proceed--Your Available Leave earn as on Today : "+availlv
+				//else if xtypeleave .eq. "Earned Leave" .and. totday>availlv
+				//			error "Cannot Proceed--Your Available Leave earn as on Today : "+availlv
+				else
+							set xday=totday
+							set xappday=xday
+				end if 
+        end if
+      end event
+      event after
+        action show
+      end event
+    end field
+	
+	field Delete
+    event before
+    set status=pdleaveheader.xstatus("xstaff='"+xstaff+"' and xyearperdate='"+xyearperdate+"'")
+	if status .ne. "Open"
+	error "Leave already "+status
+    end event
+    end field
+	
+	
+    embed onsubmit="submitit(this)"
+	
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+      var detail
+
+    function clicked(b){
+      detail=b.value
+    }
+    function submitit(form){
+      if (detail=="Detail"){
+        form.screen.value = "pdleavedetail"
+        form.searchbutton.value = "Find xyearperdate=?&xstaff=?"
+        //return false
+      }
+    }
+    function picltype(link)
+    {
+      if (navigator.appName.indexOf("Netscape") >= 0)
+	  
+      {
+        //document.one.xinvnum.value=link.text
+        //document.one.xbalance.value=primebal.text
+        //document.one.xdate.value=date.text	
+		document.one.xtypeleave.value=link.text
+      }
+      else
+      {
+        document.one.xtypeleave.value=link.innerText
+        //document.one.xvatrate.value=vatamt.innerText
+        //document.one.xcost.value=cost.innerText
+        //document.one.xeta.value="1"
+     }
+      return false
+    }
+      
+    </script>
+  end jscript
+
+end screen

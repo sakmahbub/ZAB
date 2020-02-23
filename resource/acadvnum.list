@@ -1,0 +1,12 @@
+ list acadvnum
+        table acreqheader
+        order xacreqnum
+        select "xacreqnum like '%"+zvalue+"%' and (left(xacreqnum,4)='EAD-')"
+		searchselect "left(xacreqnum,4)='EAD-'"
+        rows 20
+        objects xacreqnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xdate,xnote
+
+     end list
+
+

@@ -1,0 +1,72 @@
+screen caspfm
+
+     sections  form one
+
+
+     form one
+        caption "Field Manager Master"
+      	table casp
+        primarykey xsp
+        order xsp
+        select "left(xsp,4)='FM--'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update,Delete,*next,Top,Previous,Next, Bottom,"<p>" ,~
+                xsp,xname,xwh,xbrname,xfield,xregion,xarea
+
+    field xsp
+      default "FM--"
+      display trn Sales Representative
+    end field
+
+       field xfield
+       //  pick "select xcode from xcodes where xtype='Fields' and xwh='"+xwh+"'"
+       end field
+
+       field xregion
+        attrib local
+        caption Region
+        display const
+        event after
+          set xregion=xcodes.xregion("xtype='Fields' and xcode='"+xfield+"'")
+        end event
+       end field
+
+       field xarea
+        attrib local
+        caption Area
+        display const
+        event after
+          set xarea=xcodes.xarea("xtype='Region' and xcode='"+xregion+"'")
+        end event
+       end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+    field add
+      event before
+        if xsp_ONE .ne. "FM--"
+          error "Cannot Proceed -- You Chose Wrong Code"
+        end if
+      end event
+    end field
+
+
+field xorg
+	caption Customer Name
+end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+end screen

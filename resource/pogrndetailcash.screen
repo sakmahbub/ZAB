@@ -1,0 +1,124 @@
+screen pogrndetailcash
+     caption "MRR Detail For "+xgrnnum
+     sidebar list one
+     sections form one,  jscript myscript
+
+     list one
+        caption "MRR Detail List"
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        //select none
+        //navigators alpha
+        //,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrndetail&command=Show&xgrnnum=?&xrow=?"), ~
+                xitem,xqtygrn,xunitpur,xrate
+
+
+        headers "Row","Item","Qty","Unit","Rate"
+     end list
+
+
+     form one
+        caption "MRR Detail For "+xgrnnum
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        pstyle 3
+        return "login"
+        layout 3
+        objects Show,Clear,Add, Update, Delete,*next, Return,Top, Previous, Next, Bottom,Costs,"<p>",~
+                xrow attrib(row 0 1),~
+                xitem,xdesc,xqtygrn,xunitpur,xrate,xwh,xquality,xlineamt,~
+                //xprime display(constant),~
+                xdocrow display(const),xlong//,xbase display(constant)
+
+        embed onsubmit="return submitit(this)"
+		
+		field xdocrow
+			caption Document Row
+		end field
+		
+        field xdesc
+          attrib local
+          display const
+          event after
+            set xdesc = caitem.xdesc("xitem = '"+xitem+"'")
+          end event
+        end field
+
+        field xrow
+          event after
+            set globals(xgrnnum)=xgrnnum
+            set globals(xrow)=xrow
+          end event
+        end field
+
+        field xqtydel
+          caption Delivered Qty.
+        end field
+
+        field xlong
+          width 70
+          column 3
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        field Costs
+          embed onclick="clicked(this)"
+        end field
+
+        field update
+          event after
+//            class pojamuna(UpdateGrDetailAfter{xpornum,xrow})
+           	set temp = #spsql(zabsp_PO_validateAfterGRNDetail,#id,#user,xgrnnum,xdocrow) 	
+          end event
+        end field
+
+        field delete
+        	event before
+        		set grnnum=xgrnnum
+        		set docrow=xdocrow
+        	end event
+          event after
+           	set temp = #spsql(zabsp_PO_validateAfterGRNDetail,#id,#user,grnnum,docrow) 	
+          end event
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "pogrnheadercash"
+            form.searchbutton.value = "Find xgrnnum=?"
+          }
+          if (but == "Costs"){
+            form.screen.value = "pogrndetailcost"
+            form.searchbutton.value = "Find xgrnnum=?&xrow=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

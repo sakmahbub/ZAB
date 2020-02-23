@@ -1,0 +1,18 @@
+     list xcitem
+        table xcodes
+        order xcode
+        select "xtype = 'Item Class'"
+        navigators alpha
+        rows 15
+        //objects  xcur attrib(link "Main?page=xcur&command=Show&xcur=?"),
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'xcitem')"), ~
+                xlong, xprops,zactive
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

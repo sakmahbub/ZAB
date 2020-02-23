@@ -1,0 +1,138 @@
+screen optargetfm
+
+     sidebar list prdtrg,list ppo
+     sections form one, jscript myscript
+
+    list prdtrg
+      caption "RSM Wise Target For "+xrsm
+        table optargetrsm
+        order xyear,xper,xitem,xrsm
+        fixed xyear,xper,xitem,xrsm
+        rows 20
+        objects  xitem,xqty,xqtydel,xstatus
+
+        header "Item Code","Target Qty","Allocated Qty","Status"
+//        totals "Total",sum,sum
+     end list
+
+     list ppo
+      caption "PPO Wise Allocated Target For "+xfm
+        table optargetppo
+        order xyear,xper,xitem,xrsm,xfm,xsp
+        fixed xyear,xper,xitem,xrsm,xfm
+        rows 20
+        objects  xyear,xper,xitem,xrsm,xfm,xsp attrib(link "login?screen=optargetppo&command=Show&xyear=?&xper=?&xitem=?&xrsm=?&xfm=?&xsp=?"), ~
+                 xqty
+
+        //header "PPO","Target Qty"
+        totals "","","","","","Total",sum
+     end list
+
+     form one
+        caption "FM Wise Target For "xfm
+        table optargetfm
+        primarykey xyear,xper,xitem,xrsm,xfm
+        order xyear,xper,xitem,xrsm,xfm
+        fixed xyear,xper,xitem,xrsm
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Update,*next, Top,Previous,Next, Bottom,*next,Auto Allocate,~
+                *next,Back To RSM Wise Target,PPO Wise Target,*next,"<p>" ,~
+                xfm,xfmname,xitem,xdesc,xqty,xrate display(hide),xval,xqtydel display(const),xbalance,xstatus
+
+      field xbalance
+	  attrib local	
+        display const
+	  caption Balance
+	  event after
+		set xbalance=xqty-xqtydel
+	  end event	
+      end field
+
+      field xfm
+        event after
+//          set globals(xyear)=xyear
+//          set globals(xper)=xper
+            set globals(xfm)=xfm
+//          set globals(xitem)=xitem
+        end event
+      end field
+
+      field xqtydel
+        display const
+        caption Qty Allocated To PPO
+      end field
+
+      field xdesc
+        attrib local
+        display const
+        caption Description
+        event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        end event
+      end field
+
+      field xfmname
+        attrib local
+        display const
+        caption FM Name
+        event after
+          set xfmname=cafm.xname("xfm='"+xfm+"'")
+        end event
+      end field
+
+      field Update
+      	event before
+      		set xval=xrate*xqty
+      	end event
+        event after
+          	set temp = #spsql(zabsp_OPTRG_updateTargetRSM,#id,#user,xyear,xper,xitem,xrsm,"","FM")
+            action show
+        end event
+      end field
+
+      field Auto
+        event after
+            set temp = #spsql(zabsp_OPTRG_targetAllocationFMBT,#id,#user,xyear,xper,xitem,xrsm,xfm,xqty,xrate)
+            action show
+        end event
+      end field
+
+      field PPO
+        embed onclick="clicked(this)"
+      end field
+
+      field Back
+        embed onclick="clicked(this)"
+      end field
+
+        embed onsubmit="return submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Back To RSM Wise Target"){
+            form.screen.value = "optargetrsm"
+            form.searchbutton.value = "Find xyear=?&xper=?&xitem=?&xrsm=?"
+          }
+          if (button=="PPO Wise Target"){
+            form.screen.value = "optargetppo"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

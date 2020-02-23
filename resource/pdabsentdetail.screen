@@ -1,0 +1,88 @@
+screen pdabsentdetail
+     caption "Absent Detail"
+     sidebar list trn
+     sections form one,jscript myscript
+
+  	list trn
+        caption "Absent List"
+        table pdabsentdetail
+        order xyearperdate,xposition
+        select "xyear = '"+xyear+"' and xper = '"+xper+"' and xposition='"+xposition+"'"
+        rows 20
+        objects  xposition,~// attrib(link "login?screen=pdabs&command=Show&xstaff=?&xyear=?&xper=?"), ~
+                name equals((select xname from pdmst where pdmst.zid=pdabsentdetail.zid and pdmst.xstaff=pdabsentdetail.xstaff)),~
+                xday
+
+        Headers "ID","Name","Absent Days"
+     end list
+
+     form one
+        caption "A<ACRONYM>bsent</ACRONYM> D<ACRONYM>etail</ACRONYM>"
+	      table pdabsentdetail
+        order xyearperdate,xposition
+        fixed xyear,xper,xyearperdate
+        return "login"
+        layout 2
+        pstyle 3
+             objects Add,Show,Clear,Update,Delete,*next,Return,Top,Next,Previous,Bottom,~
+             xposition,xname,xday,xpaidleave display(hide),xstaff display(hide),xdate display(hide)
+
+
+          field xname
+          	attrib local
+          	display const
+          	event after
+            	set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          	end event
+          end field
+
+
+         field add
+          event before
+              set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+		      end event
+         end field
+
+         field update
+          event before
+              set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+		      end event
+         end field
+
+         field delete
+          event after
+          //  class pd(leave{xyear,xstaff,xtypeleave})
+          end event
+         end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdabsent"
+            form.searchbutton.value = "Find xyearperdate=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

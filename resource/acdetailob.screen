@@ -1,0 +1,187 @@
+screen acdetailob
+
+     sidebar list one,list two
+     sections form one,  jscript myscript
+
+
+     list one
+        caption "Detail List"
+        table acdetail
+        order xvoucher,xrow
+        fixed xvoucher
+        rows 20
+        objects  xrow attrib(link "login?screen=acdetailob&command=Show&xvoucher=?&xrow=?"), ~
+                xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)), xprime
+
+        totals "","","Totals",sum
+
+        headers "Line No","Acc Code","Description","Amount"
+     end list
+
+     list two
+        caption "Sub Code"
+        table acsub
+        order xacc,xsub
+    	  select "xacc='"+xacc+"'"
+        rows 20
+        objects  xsub attrib(link "abc" embed onclick="return pickSub(this:xdesc#)"), ~
+                 xdesc attrib(name xdesc#)
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Details of "+xvoucher+"</ACRONYM>"
+        table acdetail
+        primary key xvoucher,xrow
+        order xvoucher,xrow
+        fixed xvoucher
+        pstyle 3
+        return "login"
+        layout 2
+        objects Return,Clear,Add, Update, Delete,*next,Show, Top,Previous,Next,Bottom,~
+               xrow attrib(row 0 1),xdum,xdeptname,xdeptdesc,xacc,xaccdesc,~
+               xsub display(hide),xprime,xdesc display(hide),xlong,xwh display(hide)
+
+
+
+    field xacc
+      event after
+        set statusjv = acheader.xstatusjv("xvoucher='"+xvoucher+"'")
+        if statusjv .eq. "Posted"
+          set #field(Add.display) = "hidden"
+          set #field(Delete.display) = "hidden"
+          set #field(Update.display) = "hidden"
+        end if
+      end event
+    end field
+
+        field xdeptname
+          caption Cost Center
+          default "00"
+          //pick "select xcode from accostcenterbr"
+        end field
+
+        field xdeptdesc
+          attrib local
+          caption Cost Center
+          display const
+          event after
+            set xdeptdesc = xcodes.xlong("xtype='Cost Center' and xcode='"+xdeptname+"'")
+          end event
+        end field
+
+        field xdesc
+          width 40
+          attrib local
+          caption // Sub Code Description
+          display const
+          //event after
+           // set xdesc = acsub.xdesc("xacc='"+xacc+"' and xsub='"+xsub+"'")
+          //end event
+        end field
+
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+        field xaccdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xaccdesc=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+        field xlong
+                width 80
+                columns 3
+        end field
+
+        field xbase
+          event after
+          end event
+        end field
+
+        field Add
+          event before
+            set xwh = acheader.xwh("xvoucher='"+xvoucher+"'")
+            set sub = #sql("select xsub from acsub where xacc='"+xacc+"'")
+            if #result .eq. "true"
+              print "<font size=+3 color=red>Please Update With Sub Code</font>"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterDetailAC,#id,#user,xvoucher)
+          end event
+        end field
+
+        field Update
+          event before
+            set sub = #sql("select xsub from acsub where xacc='"+xacc+"'")
+            if #result .eq. "true"
+        		   if xsub .eq. ""
+	                error "Cannot Proceed,Check Sub Account"
+		           end if
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterDetailAC,#id,#user,xvoucher)
+          end event
+        end field
+
+        field Delete
+          event after
+            set temp = #spsql(sp_validateAfterDetailAC,#id,#user,xvoucher)
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "acheaderob"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+              but = ''
+              return result
+        }
+        function pickSub(link,desc){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xsub.value=link.innerText
+            document.one.xdesc.value=desc.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

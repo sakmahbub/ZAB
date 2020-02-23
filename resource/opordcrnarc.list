@@ -1,0 +1,13 @@
+     list opordcrnarc
+        table opdoheaderarc
+	//table opdoheader
+        order xdornum desc
+        select "xwh='"+#wh+"' and xdornum like '%"+zvalue+"%' and xtype='NPL' and xstatusord='Confirmed'"
+        rows 20
+	searchselect "xwh='"+#wh+"'"
+        objects xdornum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xcus,xdate
+
+     end list
+
+

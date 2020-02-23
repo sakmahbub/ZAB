@@ -1,0 +1,13 @@
+//ar.module
+module AP
+     caption "Accounts Payable"
+     description "You want to ensure that all your transactions from various ~
+                  modules to be reflected in your accounts. You want to maintain ~
+                  the books and generate financial statements."
+
+     transactions AP Transactions
+     codes
+//     properties offset=0;bs=20;pl=60;placcount="Profit & Loss Appropriation Account"
+end module
+
+

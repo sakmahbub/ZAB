@@ -1,0 +1,17 @@
+
+
+
+product ZAB ERP
+
+table pogrnappview
+  caption "PO QC APP View"
+  columns zid,xstaff,xposition,xgrnnum,xstatusgrn,xwh,xdesc,xregi,xdesignation,xdateapp
+  primary key zid,xstaff,xposition,xgrnnum,xstatusgrn,xwh,xdesc,xregi,xdesignation,xdateapp
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pogrnappview (zid,xstaff,xposition,xgrnnum,xstatusgrn,xwh,xdesc,xdate,xregi,xdesignation,xdateapp)~
+as  select a.zid,a.xdphead,b.xposition,a.xgrnnum,a.xstatusgrn,a.xwh,c.xlong,a.xdate,a.xregi,'Department Head',xdatedph from pogrnheader a join ~
+ pdmst b on a.zid=b.zid and a.xdphead=b.xstaff  join branchview c on a.zid=c.zid and a.xwh=c.xcode where left(a.xgrnnum,4)='QC--'
+end table

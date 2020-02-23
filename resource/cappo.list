@@ -1,0 +1,8 @@
+     list cappo
+        table cappo
+        order xsp 
+        select "((xname like '%"+zvalue+"%' or xsp like '%"+zvalue+"%') and left(xsp,3)='MIO')"
+        rows 10
+        objects xsp attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xname,xfm,xwh
+     end list

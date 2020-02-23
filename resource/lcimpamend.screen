@@ -1,0 +1,63 @@
+screen lcimpamend
+
+     sidebar list one
+     sections form one,jscript myscript
+
+     list one
+        caption "<br><center><b>"Ammendment List For LC No ""+xmlcno+"</b>"
+        table lcamend
+        fixed xlcno
+        order xlcno,xamendno
+        rows 10
+        objects ~
+         xamendno attrib(link "login?screen=lcamend&command=Show&xamendno=?"), ~
+         xdate,xnote
+//         headers Invoice List
+     end list
+
+     form one
+        caption "LC Ammendment"
+	    table lcamend
+        fixed xlcno
+        order xlcno,xamendno
+        //select
+        return "login"
+        layout 3
+        pstyle 3
+        objects Add,Update,Delete,Show,Clear,Complete,"<p>" ,~
+                xamendno attrib(row 0 1),xdate,xapprover,xnote
+
+        field xnote
+          width 80
+          column 3
+          height 4
+        end field
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	      if (detail=="Complete"){
+            form.screen.value = "poordlcinfo"
+            form.searchbutton.value = "Find xlcno=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

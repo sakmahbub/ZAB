@@ -1,0 +1,17 @@
+//pdpayroll.menu
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+option                  		|action                                          	|modules	|models	|width
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+Personnel Info            		|#classPath+"/login?screen=pdmstmgt"               	|ca        	|   		|205
+//Designation                      |#classPath+"/login?screen=xcodes(xtype=Designation)"
+//Personnel Info Resign          	|#classPath+"/login?screen=pdmstresign"               |ca        	|   		|205
+//Annual Salary Review     		|#classPath+"/login?menu=pdanreview"                 	|ca        	|   		|205
+//Investment Entry        		|#classPath+"/login?screen=pdinvheader"               |ca        	|   		|205
+Loans & Advance Entry   		|#classPath+"/login?screen=pdloantrn"                	|ca        	|   		|205
+Transaction Entry       		|#classPath+"/login?screen=pdtrnheader"               |ca        	|   		|205
+//Salary & Other Process   		|#classPath+"/login?menu=pdprocs"                	|ca        	|   		|205
+Salary Process                   |#classPath+"/login?screen=pdprocs"
+//Balance Maintenance      		|#classPath+"/login?menu=pdbal"                		|ca        	|   		|205
+Reports                   		|#classPath+"/login?menu=pdpayrollrepmgt"               	|ca        	|   		|205
+//Factory Reports                   	|#classPath+"/login?menu=pdfacrep"               	|ca        	|   		|205
+//-------------------------------------------------------------------

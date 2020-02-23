@@ -1,0 +1,398 @@
+screen poordheadercashadmin
+
+     sidebar list one, list poterms //list reqlist,list grn,
+     sections form one,jscript myscript
+ 
+    
+	 list reqlist
+        caption "Requisition List: "
+        table poreqview
+        order xporeqnum desc
+		//select "xstatusreq='Open' or xstatusreq<>'PO Created'"
+		select "xqtyapv-xqtypor>0 and xstatus='Approved for PO' and left(xporeqnum,2)<>'SP'"
+		rows 10
+       objects xporeqnum attrib(link "abc" embed onclick="return pickItem(this)"),~//:xtype#
+	   xdate attrib(name xdate#),xtype attrib(name xtype#),xwh attrib(name xwh#),xdesc attrib(name xdesc#),
+       headers "Requisition No","Date","Purchase Type","Branch","Name"
+     end list
+
+	list lcinfoss
+        caption "LC Info For "+xpornum
+        table lcinfo
+		//table poordheader
+        order xpornum
+        fixed xpornum
+		select "xpornum<>''"
+        rows 20
+   //     objects xlcno attrib(link "login?screen=poordlcinfo&command=Show&xpornum=?"), ~
+          objects xlcno, ~
+               xlcissuedate,xshipdate,xexpirydate,xopenbank,opdesc equals((select xname from cabank where zid=lcinfo.zid and xbank=lcinfo.xopenbank)),~
+			   xcur,xexch,xprimetotamt,xbasetotamt
+
+
+        headers "LC No","LC Issue Date","Ship Date","Expiry Date","Open Bank Code","Description","Currency","Exch Rate","Prime Amt","Base Amt"
+
+	  total "Total","","","","","",sum,sum,sum
+     end list
+
+	 list one
+        caption "PO Detail List For "+xpornum
+        table poorddetailview
+        order xpornum,xrow
+        fixed xpornum
+        //select none
+        rows 350
+        objects  xrow attrib(link "login?screen=poorddetailcashadmin&command=Show&xpornum=?&xrow=?"),~
+                xitem,xdesc,~// equals((select xdesc from caitem where zid=poorddetail.zid and  xitem=poorddetail.xitem))
+				partno equals((select xtheircode from caitem where zid=poorddetailview.zid and xitem=poorddetailview.xitem)),~
+				xqtypur,xunitpur,unitiss equals((select xunit from caitem where zid=poorddetailview.zid and xitem=poorddetailview.xitem)),~
+				cfpur equals((select xcfpur from caitem where zid=poorddetailview.zid and xitem=poorddetailview.xitem)),~
+				xrate,xlineamt
+				
+        headers "Row","Item","Description","Part No","Qty","Purchase Unit","Issue Unit","Purchase Conversion Factor","Rate","Line Amount"  //"Qty Per Unit","Issue Unit",
+	  total "Total","","","","","","","","",sum	
+     end list
+
+     list grn
+        caption "GRN For : "+xpornum
+        table pogrnheader
+        order xgrnnum desc
+        fixed xpornum
+        rows 30
+        objects  xgrnnum attrib(link "login?screen=pogrnheader&command=Show&xgrnnum=?"),~
+                 xdate,xstatusgrn
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+	
+	
+	
+     list poterms
+        caption "Terms & Condition For "+xpornum
+        table poterms
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=poterms&command=Show&xpornum=?&xrow=?"), ~
+                xcode,xnote //equals((select xlong from xcodes where xtype='PO Terms & Condition' and xcode=xcodes.xcode))
+
+
+//        headers "Row","Item","Description","Qty","Rate","Disc %","Disc Fixed","Line Amount"
+//	  total "Total","","","","",sum	
+     end list
+
+     form one
+        caption "PO/WO Header Admin"
+		primarykey xpornum
+        table poordheader
+        order xpornum desc
+        // select "xtype='Other' and xsign>0"
+		//select "left(xpornum,2)<>'WO'"
+        return "login"
+        layout 3
+        pstyle 3
+        objects Show,Clear,Update,Delete,Top,Next,Previous,Bottom,*next,Detail,Terms & Condition,"<p>" ,~  //,LC Info,Terms & Condition,Send to CPO,
+          xpornum,xdate,xtype,~
+          xcus,xorg display(const),xstatuspor,xwh,xwhdesc,xlcno,~
+          xprime display(hide),~
+          xporeqnum,xsign display(hide),xregi display(hide),~
+		  xstaff display(hide),xtwh display(hide),~
+		  xvatrate,xvatamt,xdisc,xdiscf,xtransport,xstatus,~
+		  xtypeobj,xpreparer,preparer display(const),xcur,xexch,xproject,xidsup,superior,xdeliloc,~
+		  xsuperior2,superior2,xnote1,zauserid,xrem
+		
+		field xpreparer
+			pick list xstaff
+		end field
+		
+		field xtypeobj
+			caption Requisition Type
+			pick code Requisition Type
+			display combo
+		end field		  
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+        field xwh
+			caption Store/Plant
+		end field
+		
+		field xwhdesc
+			attrib local
+			display const
+			caption Store/Plant Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+			end event
+		end field
+
+		
+	field xnote1
+      caption Reject Note
+		display const
+    end field
+		
+		field xporeqnum
+			display text
+			pick
+			attrib readonly
+		end field
+		
+			field xtransport
+			caption Freight Cost
+			end field
+		
+			field xstatus
+			caption Approval Status
+			display combo
+			pick "Open,Applied,Rejected,Recommended,Approved,Dismissed"
+		end field
+		
+		field xidsup
+			caption Approval Superior
+		end field
+		
+	 field superior
+	 attrib local
+	 display const
+	 caption Approval Superior 1
+	 event after
+	 set superior=pdmst.xname("xposition='"+xidsup+"'")
+	 end event
+	 end field
+		
+	 field superior2
+	 attrib local
+	 display const
+	 caption Approval Superior 2
+	 event after
+	 set superior2=pdmst.xname("xposition='"+xsuperior2+"'")
+	 end event
+	 end field		
+
+		field xdate
+			caption Purchase Date
+		end field
+		
+		field xcus
+			caption Supplier ID
+			pick list casup
+		end field
+		
+		
+		field xtype
+			display combo
+			caption Purchase Type
+			pick "Cash,CS,LC,Direct PO"
+			//default "Other"
+		end field
+		
+		field xtypeobjss
+			display combo
+			caption Product Type
+			pick code PO Type
+		end field
+		
+        field xpaymentterm
+		caption Payment Term
+        	pick "Credit,Cash"
+        end field
+        
+		  field xorg
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+		  
+		  field prepr
+		  	attrib local
+		  	dispaly const
+		  	caption Preparer
+		  	event after
+		  		set prepr=pdmst.xname("xposition='"+zauserid+"'")
+		  	end event
+		  end field
+
+          field xshipdate
+            caption Delivery Date
+          end field
+		  
+		field xstatuspor
+         display combo
+		 pick "Open,GRN Created,Partially Received,Full Received,Confirmed"
+          end field  
+		  
+		field xrem
+		column 2
+		height 2
+		weight 75
+		end field
+
+
+          field xpornum
+          //  pick list poord
+			event after
+             class careports(getReport{poprint;2;in,st;zid,pornum;xpornum;View/Print PO})
+			// class careports(getjspReport{prletter,1,xpornum,Print Advance Letter})
+			 class careports(getReport{powisegrndetail;2;in,st;zid,xpornum;xpornum;View/Print GRN})
+              set globals(xpornum)=xpornum
+              set globals(xporeqnum)=xporeqnum
+		
+			 if xstatuspor .ne. "Open" 
+		         	//set #field(add.display)="hidden"
+         			//set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(create.display)="hidden"
+       		  end if
+			 if xtype .ne. "LC" 
+		         	set #field(LC.display)="hidden"
+       		  end if
+            end event
+          end field
+
+          field xstatusord
+		     caption PO Status
+            default "Open"
+            display const
+          end field
+
+
+          field add
+            event before
+              //if xwh .eq. ""
+                //error "Cannot Proceed--Please Fill The Store"
+		 if xcus .eq. ""
+		  error "Cannot Proceed -- Please Choose Supplier"
+		 // else  if xporeqnum .eq. ""
+		 // error "Cannot Proceed -- Please Choose PR No"
+		   else
+				  set xtype=poreqheader.xtype("xporeqnum='"+xporeqnum+"'")
+				  set xregi=poreqheader.xregi("xporeqnum='"+xporeqnum+"'")
+				   set xstaff=poreqheader.xep("xporeqnum='"+xporeqnum+"'")
+			    set xwh=#sql("select xfwh from imtorheader where xtornum=(select xtornum from poreqheader where xporeqnum='"+xporeqnum+"')")
+				set xtwh=#sql("select xtwh from imtorheader where xtornum=(select xtornum from poreqheader where xporeqnum='"+xporeqnum+"')")
+				  set xsign = 1	
+        	      set xstatuspor = "Open"
+				  set xstatus="Open"
+				// set xtype="Other"
+            	//set xyear = #sub(xdate,0,4)
+	            //set xper = #sub(xdate,5,2)
+				//set year = #sub(xdate,2,2)
+        	      set xpornum = #trn("PO Number","PO--",10)
+		    	//set xpornum = #sub(xpornum,0,4)+year+#sub(xpornum,4,6)
+              end if
+            end event
+          end field
+
+          field update
+            event before
+              set xyear = #sub(xdate,0,4)
+              set xper = #sub(xdate,5,2)
+            end event
+            event after
+			//set temp=#spsql(zabsp_Update_GRNRate,#id,#user,xpornum,"poordheader")	
+            //set temp=#spsql(zabsp_Update_GRNRate,#id,#user,xpornum,"poordheader")
+			end event
+          end field
+		
+		  field Send
+            event before
+			double qtypur=#sql("select sum(xqtypur) from poorddetail where xpornum='"+xpornum+"'")
+			set status=#sql("select xstatus from poordheader where xpornum='"+xpornum+"'")
+			if xpornum .eq. ""
+			error "Please Select Purchase Order"
+			else if qtypur .lt. 0.01
+			error "Purchase Qty is 0."
+			else if status .ne. "Open"
+				error "PO Already Send"
+			end if
+			end event
+			event after
+			set temp= #sql("Update poordheader set xstatus='CPO' where xpornum='"+xpornum+"'")
+			set temp =#spsql(zabsp_sendmail #id,#user,xpornum,"CPO","")
+			end if
+			end event
+			end field
+		
+		
+          field Create GRN
+            event before
+			 set xtype=poreqheader.xtype("xporeqnum='"+xporeqnum+"'")
+            //  set temp = #sql("select xrow from poorddetail where xpornum='"+xpornum+"'")
+             // if xstatuspor .eq. "GRN Created"
+            //    error "Cannot Proceed - GRN already created"
+           //   else if temp .eq. ""
+           //     error "Cannot Proceed - Detail Not Exists"
+           //   end if
+                        	
+     	 end event
+            event after
+              set temp = #spsql(zabsp_PO_createGRN,#id,#user,xpornum,xdate,xwh,xcus,xvatrate,xait,xdisc,xdiscf,8)
+		   action show
+            end event
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field LC
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetailcashadmin"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="LC Info"){
+            form.screen.value = "poordlcinfo"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "potermsadmin"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+		
+	 function pickItem(link){//,type
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+			//document.one.xtype.value=type.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+			//document.one.xtype.value=type.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+ end screen

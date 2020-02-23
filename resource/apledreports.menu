@@ -1,0 +1,21 @@
+//AP Ledger Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+
+//Supplier Ledger              |#classPath+"/login?screen=*jspcrystal arleddetail(xsup=Supplier=,xdate=From Date=#date,xdate=To Date=#date)"
+LC Ledger Of Foreign Supplier   |#classPath+"/login?screen=*viewcrystal aplclegddate(5;in,dt,dt,st,st;zid,fdate,tdate,cus,lcno;xdate=From Date,xdate=To Date,xsup=Supplier=,xlcno=LC No.,xviewtype=Report View)"
+Supplier Ledger                |#classPath+"/login?screen=*viewcrystal apleddetail(4;in,st,dt,dt;zid,cus,fdate,tdate;xsup=Supplier=,xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Foreign Supplier Ledger        |#classPath+"/login?screen=*viewcrystal apleddetapcur(4;in,st,dt,dt;zid,cus,fdate,tdate;xsup=Supplier,xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Summary Supplier Ledger        |#classPath+"/login?screen=*viewcrystal apsummary(4;in,st,st,st;zid,fdate,tdate,xcus;xdate=From Date=#date,xdate=To Date=#date,xsup=Supplier=,xviewtype=Report View)"
+
+//Supplier Ledger              |#classPath+"/login?screen=*viewcrystal apleddetail(6;in,st,st,dt,dt,in;zid,wh,sup,fdate,tdate,year;xwh=Division,xsup=Supplier=,xdate=From Date=#date,xdate=To Date=#date,xyear=Year,xviewtype=Report View)"
+//Summary Supplier Ledger      |#classPath+"/login?screen=*viewcrystal apledsummary(6;in,st,st,dt,dt,in;zid,wh,sup,fdate,tdate,year;xwh=Division,xsup=Supplier=,xdate=From Date=#date,xdate=To Date=#date,xyear=Year,xviewtype=Report View)" 
+Allocation Listing             |#classPath+"/login?screen=*viewcrystal apalc(6;in,st,st,dt,dt,in;zid,wh,sup,fdate,tdate,year;xwh=Store,xsup=Supplier=,xdate=From Date=#date,xdate=To Date=#date,xyear=Year,xviewtype=Report View)" 
+Unallocated MR / PM List       |#classPath+"/login?screen=*viewcrystal arunallocate(3;in,st,st;zid,sup,type;xcus=Customer,xtypetrnrep=Type,xviewtype=Report View)"
+Unallocated All Invoice List   |#classPath+"/login?screen=*viewcrystal arunallocatelist(3;in,st,st;zid,sup,type;xcus=Customer,xtypetrnrep=Type,xviewtype=Report View)"
+Party Wise Advance List        |#classPath+"/login?screen=*viewcrystal arapadvance(3;in,st,st;zid,sup,type;xcus=Customer,xtypetrnrep=Type=AP,xviewtype=Report View)"
+//Annual Ledger                |#classPath+"/login?screen=*jspcrystal acleda(xyear=Year=,xper=Period=,xacc=Account=)"
+Supplier List                  |#classPath+"/login?screen=*viewcrystal supplierlist(1;in;zid;xviewtype=Report View)"
+
+

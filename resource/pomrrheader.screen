@@ -1,0 +1,133 @@
+screen pomrrheader
+     caption "GRN Header"
+     sections form one, jscript myscript
+
+     form one
+        caption "MRR H<ACRONYM>eader</ACRONYM>"
+        table pogrnheader
+        order xyear,xper,xref //desc
+        select "xtype<>'LC Status'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Add, Update, Delete,~
+                *next,Detail,Top, Previous, Next, Bottom,Confirm,"<p>" ,~
+                xyear,xper,xref,xinvnum,xsup,xdum,xgatepass,xtruckno,xtype,xmlcno,~
+                xdate,xcur,xexch,xwh,xprimetotamt,xbasetotamt display(const),~
+                xtype display(hide),~
+                xstatusgrn display(const),xpornum,xnote,xgrnnum attrib(search) display(trn GRN Number)
+
+
+
+        field xwh
+          display const
+          default "Factory"
+        end field
+
+        field xtype
+          pick "Cash,LC"
+          display combo
+        end field
+
+
+        field xmlcno
+          pick list pomrrlcno
+        end field
+
+        field xref
+          default "MRR-"
+          caption MRR Number
+          event before
+         //   set xyear = #sub(xdate,0,4)
+         //   set xper = #sub(xdate,5,2)
+            //set xref = #padl(xref,4,0)
+          end event
+
+        end field
+
+        field xdum
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xdum = cacus.xcus("xsup = '"+xsup+"')
+          end event
+        end field
+
+
+        field update
+          event before
+            set xstatusgrn = "Open"
+          end event
+        end field
+
+        field xnote
+          width 50
+          column 4
+        end field
+
+        field xgrnnum
+           event after
+              set globals(xgrnnum) = xgrnnum
+           end event
+        end field
+
+        field add
+          event before
+            set temp = #sql("select xref from pogrnheader where xyear="+xyear+" and xper="+xper+" and xref='"+xref+"'")
+            if #result .eq. "true"
+              error "You Already Enter This MRR No: "+temp
+            end if
+          //  set xtype="Cash"
+          end event
+        end field
+
+        field Confirm
+           event before
+            if xstatusgrn .eq. "Confirmed"
+              error "Already Confirmed"
+            end if
+           end event
+           event after
+              class posssteel(ConfirmGRNSingle{xgrnnum,xdate,xwh,Single})
+           end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+        field Amendment
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "pomrrdetail"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="Amendment"){
+            form.screen.value = "opdcamend"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

@@ -1,0 +1,13 @@
+     list xquotnum
+        caption "Items containing: "+zvalue
+        table poquotheader
+        order xqotnum
+        select "(xqotnum like '%"+zvalue+"%' or xdate like '%"+zvalue+"%')"
+        rows 20
+        objects xqotnum attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdate,xporeqnum,xcus
+				
+		headers "Quotation No","Date","PR No","Supplier ID"
+     end list 
+
+

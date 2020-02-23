@@ -1,0 +1,244 @@
+screen poreqhedjn
+	
+     sidebar list one//list sp
+     sections form one,list requi, jscript myscript
+	 
+	  list sp
+        caption "Work Requisition No"
+        table poreqheader
+        order xporeqnum desc
+		select " xstatusreq='Approved_ED'"
+		//fixed xporeqnum
+        rows 20
+		 objects  xporeqnum  attrib(link "login?screen=poreqhedjn&command=Show&xporeqnum=?"),~
+                 xtwh,div equals((select xlong from branchview where zid = poreqheader.zid and xcode=poreqheader.xtwh)),xregi,xdate
+       headers "Work Requisition No","Division","Division Name","Car/Other","Date"
+     end list
+	
+	list one
+        caption "Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        objects  xrow attrib(link "login?screen=poreqdetjn&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xbrand,xunitpur,xqtyreq
+
+
+        headers "Line No","Item","Description","Brand","Unit","Qty Req"
+     end list
+
+
+  list requi
+        caption "Work Requisition No"
+        table poreqheader
+        order xtornum desc
+		fixed xporeqnum
+        rows 20
+		 objects  xtornum  attrib(link "login?screen=imwrtojn&command=Show&xtornum=?"),~
+                 xdate
+       headers "Requisition No","Date"
+     end list
+
+
+     form one
+     caption "Job Number Header"
+        table poreqheader
+		primarykey xporeqnum desc
+        order xporeqnum desc
+		select "left(xporeqnum,4) in ('JN--')"// and xtype<>'Cash'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Update,Show,Clear,*Next,Details,Confirm,"<p>" ,~
+                xporeqnum,xdate,xtornum display(const),xtype,xdeptname display(hide),xstatusreq display(hide),xwh display(hide),~
+				xappdate display(const),~
+				xnote,xsup display(hide),xstatus display(hide),xtwh display(hide),xstatusap display(hide),~
+				xvoucher display(hide),xregi display(hide),xep display(hide)
+
+           
+           field xorg
+          	attrib local
+          	display const
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+          
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		
+		field xtype
+			display combo
+			caption Purchase Type
+			pick "Cash,Agreement,Other"
+			//default "Other"
+		end field
+		
+          field xwh
+           // defualt #wh
+          end field
+		  
+		  field xappdate
+          caption Approved Date & Time
+		  attrib local
+		  event after
+		  set xappdate=#sql(varchar,"select convert(VARCHAR, xdatedirector, 100) from poreqheader where xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+            width 12
+			pick list poreqspnum
+			caption Job No
+          event after
+            set globals(xporeqnum)=xporeqnum
+			set globals(xtornum)=xtornum
+			set globals(xstatusreq)=xstatusreq
+              class careports(getjspReport{imtranissueprint,1,xtornum,View SR})
+			  class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+			 // class careports(getjspReport{prletter,1,xporeqnum,Print Advance Letter})
+			  //pick poreq
+			  if xstatusreq .ne. "Open" .and. xstatusreq .ne. "Approved_ED" 
+			  set #field(Update.display)="hidden"
+			   set #field(Confirm.display)="hidden"
+			  end if
+          end event
+        end field
+		
+		field confirm
+		event before
+		set type=poreqheader.xtype("xporeqnum='"+xporeqnum+"'")
+		double qty=#sql("select sum(xqtyapv) from poreqdetail where xporeqnum='"+xporeqnum+"'")
+		if type .eq. ""
+		error "Please Select Purchase /Work Requisition Type"
+		else if qty <0.01
+		error "Please add detail for PR"
+		end if
+		end event
+		event after
+		set type=poreqheader.xtype("xporeqnum='"+xporeqnum+"'")
+		if type .eq. "Cash"
+			set temp= #sql("Update poreqheader set xstatusreq='Approved For Estimated Cost' where xporeqnum='"+xporeqnum+"'")
+			double qty=#sql("select sum(xqtyreq) from imtordetail where xtornum='"+xtornum+"'")
+			double qtycom=#sql("select sum(xqtypor+xqtyalc+xqtycom) from imtordetail where xtornum='"+xtornum+"'")
+				if qty > qtycom
+				set temp=#sql("Update imtorheader set xstatusreq='Create PO' where xtornum='"+xtornum+"'")
+				else
+				set temp=#sql("Update imtorheader set xstatusreq='PR Created' where xtornum='"+xtornum+"'")
+				end if
+			action show 
+		else if type .eq. "Agreement"
+			set temp= #sql("Update poreqheader set xstatusreq='Approved' where xporeqnum='"+xporeqnum+"'")
+			set temp= #sql("Update poreqheader set xstatus='Approved for PO' where xporeqnum='"+xporeqnum+"'")
+		
+			double qty=#sql("select sum(xqtyreq) from imtordetail where xtornum='"+xtornum+"'")
+			double qtycom=#sql("select sum(xqtypor+xqtyalc+xqtycom) from imtordetail where xtornum='"+xtornum+"'")
+			//	print qty
+			//	print qtycom
+				if qty > qtycom
+				set temp=#sql("Update imtorheader set xstatusreq='Create PO' where xtornum='"+xtornum+"'")
+				else
+				set temp=#sql("Update imtorheader set xstatusreq='PR Created' where xtornum='"+xtornum+"'")
+				end if
+			action show
+		else if type .eq. "Other"
+			set temp= #sql("Update poreqheader set xstatusreq='Approved For Quotation' where xporeqnum='"+xporeqnum+"'")
+			set temp= #sql("Update poreqheader set xwh='EP' where xporeqnum='"+xporeqnum+"'")
+		
+			double qty=#sql("select sum(xqtyreq) from imtordetail where xtornum='"+xtornum+"'")
+			double qtycom=#sql("select sum(xqtypor+xqtyalc+xqtycom) from imtordetail where xtornum='"+xtornum+"'")
+				if qty > qtycom
+				set temp=#sql("Update imtorheader set xstatusreq='Create PO' where xtornum='"+xtornum+"'")
+				else
+				set temp=#sql("Update imtorheader set xstatusreq='PR Created' where xtornum='"+xtornum+"'")
+				end if
+			action show
+		end if
+		end event
+		end field
+		
+		
+        field add
+          event before
+				set xregi=imtorheader.xregi("xtornum='"+xtornum+"'")
+				if xtornum .eq. ""
+				error "Please pick Store Requisition No."
+				else
+				set xtwh=imtorheader.xtwh("xtornum='"+xtornum+"'")
+                set xwh = "EP"
+          		set xstatusreq="Open"
+				set xstatus="Open"
+				set xstatusap="Open"
+				set xvoucher=""
+	          	set year = #sub(xdate,2,2)
+    	       set xporeqnum = #trn("Requisition Number","PR--",10)
+		       // set xporeqnum = #sub(poreqnum,0,4)+year+#sub(poreqnum,4,6)
+          end if
+          end event
+		  event after
+		  set ep=pdmst.xstaff("xposition='"+#user+"'")
+		  set temp =#sql("update poreqheader set xep='"+ep+"' where xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+
+		field update
+			event before
+			if xstatusreq .eq. ""
+				error "Please pick Store Requisition No."
+			else
+			set xep=pdmst.xstaff("xposition='"+#user+"'")
+			end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poreqdetjn"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		 function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xtornum.value=link.text
+          }else{
+            document.one.xtornum.value=link.innerText   
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+end screen

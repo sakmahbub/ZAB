@@ -1,0 +1,92 @@
+screen caitemchange
+
+     sections form one,jscript myscript
+
+     form one
+        caption "Item Change Process"
+        order
+        return "login"
+        layout 3
+        pstyle 3
+        objects Process,"<p>",~
+                xbomitem,xitem,xpassword
+
+		field xbomitem
+		caption Old Item 
+		end field
+		
+		field xitem
+		caption New Item
+		end field
+		
+		
+		field Process
+		 event before
+		// if xsuperiorsp .eq. ""
+		// error "Please Enter Employee ID"
+		// else  if xcode .eq. ""
+		// error "Please enter New Business ID"
+	    //else if xsid .eq. ""
+		//    error "Please New Superior ID"
+		//else 
+		if xpassword .ne. "zab@123"
+			error "Wrong Password!"
+		else if xbomitem .eq. ""
+			error "Select Old Item!"
+		else if xitem .eq. ""
+			error "Select New Item!"
+		 else
+		 print "Item Changed & Old Item Deleted"
+		 end if
+		end event
+          event after
+            set temp = #spsql(zabsp_Emp_Transfer,#id,#user,"",xbomitem,xitem,"Item Code Change","")
+          end event
+        end field
+
+
+        field Delete_Upload
+          event after
+            set temp = #spsql(sp_deleteUpload,#id,#user,xtype,#wh)
+          end event
+        end field
+
+
+
+        embed onsubmit="return submitit(this)"
+
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Bonus"){
+            form.screen.value = "caitembonus"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Cost Price"){
+            form.screen.value = "caitemcostprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Sell Price"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

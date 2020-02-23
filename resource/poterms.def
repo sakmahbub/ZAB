@@ -1,0 +1,15 @@
+product ZABDB 
+
+table poterms
+  caption "PO Terms"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xpornum,xrow,xcode,xnote
+          
+  primary key zid,xpornum,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xpornum references poordheader.zid,xpornum
+  end foreign key
+
+end table

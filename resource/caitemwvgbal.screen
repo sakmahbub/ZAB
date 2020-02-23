@@ -1,0 +1,73 @@
+screen caitemwvgbal
+     caption "Weighted Average Balance"
+     sections form detail,jscript myscript
+
+     form detail
+        caption "Weighted Average Balance"
+        table caitemwvgbal
+        primarykey xitem
+        order xitem
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show, Clear,Add,Update, Delete,*next,Top,Bottom,"</b></font><p>" ,~
+                xitem width(50), ~
+                xbalance,xcost
+        filed xcitem
+           caption Grade
+           pick code Item Class
+        end field
+
+        filed xcatitem
+           caption Size
+           pick code Item Category
+        end field
+
+        field xcurcost
+          default xlocals.xname("xtypelocal='Base Currency'")
+        end field
+
+        field xlong
+           width 100
+           column 2
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Kit
+          embed onclick="clicked(this)"
+        end field
+        field Extension
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Kit"){
+            form.screen.value = "caitemkit"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Extension"){
+            form.screen.value = "caext"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

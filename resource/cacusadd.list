@@ -1,0 +1,14 @@
+list cacusadd
+  table cacusaddress
+  order xcus
+	select "((xcus like '%"+zvalue+"%' or xshippingadd like '%"+zvalue+"%') and xtype='Shipping')"
+	rows 20
+	searchselect "xtype ='Shipping'"
+	objects xshippingadd attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+	xcus,xtype
+
+  header "Address","Customer","Type"
+        
+end list
+
+

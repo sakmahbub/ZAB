@@ -1,0 +1,92 @@
+screen caspo
+
+  sections form one, jscript myscript
+
+  form one
+    caption "SPO Master Entry"
+    table cappo
+    primarykey xsp
+    order xsp
+    select "left(xsp,4)='SPO-'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Add,Update,Show,Clear,Delete,*next,Top,Previous,Next,Bottom,"<p>",~
+            xsp,xname,xwh,xterritory,xfm,xsm,xrsm,xbrname,xpassword,zactive
+            //xwh,xbrname,xterritory,xregion,xarea//xfm,xfmname
+
+    field xbrname
+      attrib local
+      caption
+      display const
+    end field
+
+    field xterritory
+      caption Territory
+      display combo
+      pick "select xcode from xcodes where xtype='Territory' and zactive=1"
+    end field
+
+    field xsm
+      caption Sales Manager
+      display const
+      event before
+        set xsm= #sql("select xsm from cafm where xfm='"+xfm+"'")
+      end event
+    end field
+
+    field xrsm
+      caption Regional Sales Manager
+      display const
+      event before
+        set xrsm = #sql("select xrsm from cafm where xfm='"+xfm+"'")
+      end event
+    end field
+
+    field xfm
+      caption Area Manager
+      //display combo
+      pick list caam
+    end field
+
+    field xsp
+      default "SPO-"
+      caption
+      display trn Sales Representative
+    end field
+
+    field add
+      event before
+        if xsp_ONE .ne. "SPO-"
+          error "Cannot Proceed -- You Chose Wrong Code. You have to chose SPO-"
+        end if
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field FM
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var ret
+    function clicked(b){
+      ret=b.value
+      }
+      function submitit(form){
+        if (ret=="FM"){
+          form.screen.value = "cafm"
+          form.searchbutton.value = "Find xsm=?"
+          form.searchbutton.value = "Find xrsm=?"
+          form.searchbutton.value = "Find xfm=?"
+          //return false
+        }
+      }
+      </script>
+  end jscript
+
+end screen

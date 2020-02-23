@@ -1,0 +1,135 @@
+screen poorddetail
+     caption "Po Detail For "+xpornum
+ //    sidebar
+     sections form one,list one,  jscript myscript
+
+     list one
+        caption "LC Detail For :"+xmlcno
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        //select none
+        //navigators alpha
+        //,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 20
+        objects  xrow attrib(link "login?screen=poorddetail&command=Show&xpornum=?&xrow=?"), ~
+                xitem,xdesc,xqtyord,xunitpur,xrate,xqtydel
+
+
+        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+     form one
+        caption "LC Detail For :"+xmlcno
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        //select
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add, Update, Delete,Clear,Show, *next,Return,Top, Previous, Next, Bottom,"<p>",~
+                xrow attrib(row 0 10;search),xunitpur, xitem, xdesc,xqtyord,xrate,~
+                xqtydel display(const),xprime display(const),xbase display(const),xnote
+
+        embed onsubmit="return submitit(this)"
+
+        field xunit
+		default "MT"
+        end field
+
+        field xdesc
+          width 50
+          display const
+        end field
+
+        field xnote
+          width 75
+          column 3
+        end field
+
+        field xqtydel
+//          caption MRR Quantity
+        end field
+
+        field Add
+          event before
+            set xdesc = caitem.xdesc("xitem='"+xitem+"'")
+//            set xunit = caitem.xunit("xitem='"+xitem+"'")
+//            if xunit .eq. "lbs"
+//              double mtqty = 0.00
+//              set mtqty = xqtyord/2.2
+//              set xqtymt = mtqty/1000
+//            else
+//              set xqtymt = xqtyord
+//            end if
+          end event
+          event after
+            class posssteel(UpdatePoDetailAfter{xpornum,xrow,add})
+            set temp = #sql("update poordheader set xcommodity='"+xdesc+"' where xpornum='"+xpornum+"'")
+            double qty = #sql(double,"select sum(xqtyord) from poorddetail where xpornum='"+xpornum+"'")
+            set temp = #sql("update poordheader set xlcqty="+qty+" where xpornum='"+xpornum+"'")
+          end event
+        end field
+
+        field update
+          event before
+            set xdesc = caitem.xdesc("xitem='"+xitem+"'")
+//            set xunit = caitem.xunit("xitem='"+xitem+"'")
+            if xunit .eq. "lbs"
+              double mtqty = 0.00
+              set mtqty = xqtyord/2.2
+              set xqtymt = mtqty/1000
+            else
+              set xqtymt = xqtyord
+            end if
+//            class posssteel(UpdatePoDetailBefore{xpornum,xrow,xqtyord,xqtydel})
+          end event
+          event after
+            class posssteel(UpdatePoDetailAfter{xpornum,xrow,update})
+          set temp = #sql("update poordheader set xcommodity='"+xdesc+"' where xpornum='"+xpornum+"'")
+            double qty = #sql(double,"select sum(xqtyord) from poorddetail where xpornum='"+xpornum+"'")
+            set temp = #sql("update poordheader set xlcqty="+qty+" where xpornum='"+xpornum+"'")
+          end event
+        end field
+
+        field delete
+          event after
+            class posssteel(UpdatePoDetailAfter{xpornum,xrow,delete})
+          end event
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "poordheader"
+            form.searchbutton.value = "Find xpornum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

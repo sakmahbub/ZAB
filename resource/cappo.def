@@ -1,0 +1,13 @@
+product ZAB
+
+table cappo
+  caption "PPO Information Table"
+  columns ztime,zutime,zauserid,zuuserid,zid,xsp,xsm,xrsm,xfm,xname,xwh,xterritory,xpassword,zactive,xcode,xcrlimit,xfield,xdateeff,xdateexp,xphone,xnote
+
+  primary key zid,xsp
+
+  foreign key
+        zid references zbusiness.zid
+        //zid,xsm,xrsm,xfm references cafm.zid,xsm,xrsm,xfm
+  end foreign key
+end table

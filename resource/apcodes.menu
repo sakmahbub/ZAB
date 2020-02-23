@@ -1,0 +1,10 @@
+//General Accounts Codes & Parmeter.menu
+//-------------------------------------------------------------------
+option           |action
+//-------------------------------------------------------------------
+Invoice Code     |#classPath+"/login?screen=xtrn(xtypetrn=Invoice Code)"
+Payment Code     |#classPath+"/login?screen=xtrn(xtypetrn=Payment Code)"
+IM to AP Interface    |#classPath+"/login?screen=imtoapi"
+//Analytical Code                  |#classPath+"/login?screen=xcodes(xtype=Analytical Code)"
+//-------------------------------------------------------------------
+

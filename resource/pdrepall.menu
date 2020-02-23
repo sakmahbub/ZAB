@@ -1,0 +1,24 @@
+//HR Reports.menu
+//-------------------------------------------------------------------
+option                           			|action
+//-------------------------------------------------------------------
+Notifications           		   |#classPath+"/login?screen=pdusernotification"
+Leave and Tour Application         |#classPath+"/login?screen=pdleaveapplystaff"        	|ca        	|   		  |210
+Absence Approval Application       |#classPath+"/login?screen=pdabsentapplication"        	|ca        	|   		  |210
+Employee Attendance Info	   	   |#classPath+"/login?screen=*viewcrystal pdempattdetail(6;in,st,st,st,st,st;@zid,@fdate,@tdate,@empcat,@staff,@adminid;xdate=From Date=#date,xdate=To Date=#date,xhide=Hide,xstaffrep=Employee,xhide=admin ID,xviewtype=Report View)"
+Employee Duty Schedule	   	   	   |#classPath+"/login?screen=*viewcrystal pddutyschedule(6;in,st,st,st,st,st;@zid,@fdate,@tdate,@empcat,@staff,@adminid;xdate=From Date=#date,xdate=To Date=#date,xhide=Hide,xstaffrep=Employee,xhide=admin ID,xviewtype=Report View)"
+Personal Leave Information         |#classPath+"/login?screen=*viewcrystal pdselfleaveinfo(6;in,st,in,st,st,st;zid,staff,year,rpttype,empcat,adminid;xstaffrep=Employee ID,xyear=Year,xtyperpt=Report Type,xhide=admin ID,xhide=admin ID,xviewtype=Report View)"
+Pay Slip                         |#classPath+"/login?screen=*viewcrystal pdselfpayslip(6;in,st,st,in,in,st;zid,empcat,staff,year,per,bank;xhide=Employee Category,xstaffrep=Employee ID,xyear=Year,xpercombo=Month,xhide=Bank,xviewtype=Report View)"
+IT Calculation Report            |#classPath+"/login?screen=*viewcrystal pditcalculation(8;in,st,st,st,st,st,in,in; ~
+	@zid,@empcat,@user,@prcstype,@fstaff,@tstaff,@year,@per; ~
+	xhide=Employee Category,xrepuser=User,xprcs=Process Type,xstaffrep=Employee ID,xstaffrep=Employee ID,xyear=Tax Year,xpercombo=Tax Period,xviewtype=Report View)"
+
+Leave and Tour application (Admin) |#classPath+"/login?screen=pdleaveapplyall"        	   |ca        	|   		|210
+Absence Approval Application(Admin)|#classPath+"/login?screen=pdabsentapplicadmin"         |ca        	|   		  |210
+Roster Entry              		   |#classPath+"/login?screen=pdrosterheader"              |ca        	|   		|100
+Roster Update              		   |#classPath+"/login?screen=pdrosterupdate"              |ca        	|   		|100
+Roster Update (Group Wise)         |#classPath+"/login?screen=pdrostereditprcs"            |ca        	|   		|100
+Employee Group Setup               |#classPath+"/login?screen=pdmsthrdgroup"               |ca        	|   		|100
+Employee Group Update              |#classPath+"/login?screen=pdmstgroup"              	   |ca        	|   		|100	
+Reports           				   |#classPath+"/login?menu=pdrepalladmin"
+Plant Reports           		   |#classPath+"/login?menu=pdrepallplant"

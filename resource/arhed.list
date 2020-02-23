@@ -1,0 +1,13 @@
+list arhed
+        caption "AR /AP"
+        table arhed
+        order xvoucher
+        select "xvoucher like '%"+zvalue+"%'"
+        rows 15
+
+         objects xvoucher attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                 xcus,xdocnum,xgrnnum,xpornum,xlcno
+
+     end list
+
+

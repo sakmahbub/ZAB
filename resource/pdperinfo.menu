@@ -1,0 +1,13 @@
+//Main.menu
+//------------------------------------------------------------------------------------------------------------------------------------------
+option                  		      |action                                          	|modules	  |models	  |width
+//------------------------------------------------------------------------------------------------------------------------------------------
+//Leave Apply	            		      |#classPath+"/login?screen=pdleaveapply"        	|ca        	|   		  |210
+Leave and Tour Application          |#classPath+"/login?screen=pdleaveapplystaff"        	|ca        	|   		  |210
+Leave and Tour application (Admin)  |#classPath+"/login?screen=pdleaveapplyall"        	|ca        	|   		  |210
+Leave Approval            		    |#classPath+"/login?screen=pdleaveaproved"        |ca        	|   		  |210
+Leave Confirm             		    |#classPath+"/login?screen=pdleaveconfirm"        |ca        	|   		  |210
+Leave Cancel             		    |#classPath+"/login?screen=pdleavecancel"        |ca        	|   		  |210
+Leave Codes & Process        		|#classPath+"/login?menu=pdleave"            	        |ca        	|   		|100
+Reports              		        |#classPath+"/login?menu=pdperrpt"                |ca        	|   		  |210
+//-------------------------------------------------------------------

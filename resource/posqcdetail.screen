@@ -1,0 +1,189 @@
+screen posqcdetail
+
+     sidebar list order,list one
+     sections form one,  jscript myscript
+
+     list order
+    	caption "Item List For WO No "+xpornum
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        select "(xqtypur-xqtygrn)<>0"
+        rows 20
+        objects xitem attrib(link "abc" embed onclick="return pickItem(this:xunitpur#:xqtypur#:xrow#:xserial#)"),~
+        desc equals((select xdesc from caitem where zid=poorddetail.zid and  xitem=poorddetail.xitem)),~
+        (xqtypur-xqtygrn) attrib(name xqtypur#),xunitpur attrib(name xunitpur#),xrow attrib(name xrow#),xserial attrib(name xserial#)
+		
+        header "Item Code","Description","Qty","Unit","Row","Part Number"
+		
+     end list
+
+     list one
+        caption "SQC Detail List"
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrndetail&command=Show&xgrnnum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where zid=pogrndetail.zid and  xitem=pogrndetail.xitem)),xserial,xqtygrn,xunitpur,~
+				xcfpur,unitiss equals((select xunitiss from caitem where zid=pogrndetail.zid and xitem=pogrndetail.xitem))
+
+        headers "Row","Item","Description","Part Number","Qty","Purchase Unit","Qty per Unit","Issue Unit"
+     end list
+
+     form one
+        caption "SQC Detail For "+xgrnnum
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        pstyle 3
+        return "login"
+        layout 2
+        objects Show,Clear,Add,Delete,*next,Return,Top, Previous, Next, Bottom,"<p>",~// Update,
+                xrow attrib(row 0 1),xunitpur,xitem attrib(readonly),xdesc,xdisc display(hide),xqtyinsp display(hide),xdiscf display(hide),~
+                xrate display(hide),xqtygrn,xlineamt display(hide),xdocrow attrib(readonly),xserial,xlong
+
+        embed onsubmit="return submitit(this)"
+		
+		field xdocrow
+			caption PO Row
+		end field
+		
+		field xunitpur
+			display text
+			attrib readonly
+		end field
+		
+		field xitem
+			pick xitemstk
+
+
+		event after
+		  if pogrnheader.xstatusgrn("xgrnnum='"+xgrnnum+"'").eq. "Confirmed" 
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+			         			
+       		  end if
+			end event
+
+		end field
+		
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+        
+        field xqtydel
+          caption Delivered Qty.
+        end field
+
+        field xlong
+          width 70
+          column 2
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        field Add
+          event before
+			set xdisc =0
+			set xdiscf=0
+			set xvatrate=0
+			set xqtyinsp=0
+			 set xunitpur = caitem.xunitpur("xitem='"+xitem+"'")
+			double qty=poorddetail.xqtypur("xpornum='"+xpornum+"' and xitem='"+xitem+"' and xrow='"+xdocrow+"'")-poorddetail.xqtygrn("xpornum='"+xpornum+"' and xitem='"+xitem+"' and xrow='"+xdocrow+"'")
+			if xqtygrn>qty
+			error "Cannot Proceed -- Qty exceed"	
+			end if
+			
+          end event
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailGRN,#id,#user,xgrnnum,xrow,xitem,xqtygrn,xdisc,xdiscf,xdocrow,xvatrate)
+            action show
+          end event
+        end field
+
+        field update
+          event before
+			set xdisc =0
+			set xdiscf=0
+			set xvatrate=0
+			
+				double qty=poorddetail.xqtypur("xpornum='"+xpornum+"' and xitem='"+xitem+"'")-poorddetail.xqtygrn("xpornum='"+xpornum+"' and xitem='"+xitem+"'") 
+			if xqtygrn>qty
+			error "Cannot Proceed -- Qty exceed"	
+			end if
+			
+          end event
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailGRN,#id,#user,xgrnnum,xrow,xitem,xqtygrn,xdisc,xdiscf,xdocrow,xvatrate)
+            action show
+          end event
+        end field
+
+        field delete
+          event before
+          	set grnnum= xgrnnum
+          	set row=xrow
+          	set docrow=xdocrow
+			set item=xitem
+			set qtygrn=xqtygrn
+			set disc=xdisc
+			set discf=xdiscf
+			set vatrate=xvatrate
+          end event	
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailGRN,#id,#user,grnnum,row,item,qtygrn,disc,discf,docrow,0)
+            action show
+          end event
+        end field
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "posqcheader"
+            form.searchbutton.value = "Find xgrnnum=?"
+          }
+          return result
+        }
+        function pickItem(link,unit,qtypur,row,serial){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+            document.one.xunitpur.value=unit.text
+            document.one.xqtygrn.value=qtypur.text
+            document.one.xdocrow.value=row.text
+            document.one.xserial.value=serial.text
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xunitpur.value=unit.innerText
+            document.one.xqtygrn.value=qtypur.innerText
+            document.one.xdocrow.value=row.innerText
+            document.one.xserial.value=serial.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

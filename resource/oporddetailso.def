@@ -1,0 +1,22 @@
+product ZAB ERP
+
+table oporddetailso
+  caption "LC Detail"
+  columns ztime,zutime,zid,zauserid,zuuserid,zemail,~
+          xordernum,xorderrow, xitem,xlong,~
+          xqtyord,xqtydel,xqtydoc,xqtyreq,xrate,xlineamt,xnetweight,xqtyinv,xqtymor,xprcstype,xstyle,~
+		 xdatedel,xbrate,xdocrow,xgsm,xwidth,xconstruction,xfabriccolor,xfabrictype,xunitsel,xhscode,~
+		  xfabricfinish,xseason,xunit,xdoamount,xadamount,~
+		  xbase,xdesc,xmattype,xsize,xmoldstatus,xartnum,xnote,~
+		  xexch,xgrossweight,xqtyordmtr,xqtyprd,xitemnew,xldref,xdatefrom,xdateto,xstylename,xwoordnum,xcordref,xccontract,~
+		  xcolor,xbcolor,xcolorcode,xbatch,xsampleqty,xqtybac,xpsize
+
+  primary key zid,xordernum,xorderrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xordernum references opordheaderso.zid,xordernum
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+
+end table

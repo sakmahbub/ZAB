@@ -1,0 +1,16 @@
+product ZAB ERP
+
+table opdopjdetail
+  caption "Do Project"
+  columns ztime,zutime,zauserid,zuuserid,zid,xdornum,xrow,xproject 
+	 
+
+  primary key zid,xrow,xdornum
+  foreign key
+        zid references zbusiness.zid
+        
+  end foreign key
+
+ // list xdesc,xstype
+
+end table

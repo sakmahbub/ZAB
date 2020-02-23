@@ -1,0 +1,165 @@
+screen zdbschedulebackup
+
+	sidebar list one
+     sections form one,jscript myscript
+
+     list one
+        caption "Database Backup Schedule List"
+        table zdbschedule
+        primarykey xrow
+        order xrow
+       //  select "xtype = 'Backup'"
+        rows 10
+		objects  xrow,zauserid,xdate,xpfeffdate,xexpirydate,xtimein,xlocation
+
+			headers "Row","User ID","Entry Date","Eff. Date","Exp. Date","Start Time","Backup Location"
+     end list
+	 
+     form one
+        caption "Schedule Backup"
+        table zdbschedule
+        primarykey xrow
+        order xrow
+ //select "xempcategory='"+#wh+"' and xempstatus='Normal'"
+        return "login"
+        layout 2
+        pstyle 3
+      objects Add,Update,Delete,*next,*next,*next,Show,Clear,~
+              *next,*next,*next,Confirm,Top,Previous,Next,Bottom,"<p>",~			
+       // objects Add,Show,Clear,Confirm,Update,Top,"<p>" ,~
+                xrow attrib(row 0 1),xdate display(const),~
+				xpfeffdate,xexpirydate,xtimein,~
+				xexpiry,xsizetype display(h),xltype,xpassword,,xcntrecurs,xrecurs,~
+				xlocation,xorg,xtype display(h)
+			//xrow attrib(row 0 1)
+
+
+
+		field xlocation
+			caption Backup Location ( E.g. - "F:\TVSABLDB" )
+			width 60
+			column 2
+			display text
+			pick
+			default "F:\TVSABLDB"
+		end field
+
+		field xorg
+			caption Name of Business (Short Name)
+			width 60
+			default "TVSABL"
+			column 2
+        end field
+		
+		field xrow
+			display const
+		end field
+		
+		field xsettime
+		end field
+
+		field xapphour
+			caption Start Time
+			display const
+		end field
+
+		field xltype
+			default "Local Server"
+		end field
+		
+		field xpassword
+			caption Security Key for DBBackup
+			//display const
+		end field
+		
+        field zemail
+			caption User ID
+			display const
+			event after
+				set zemail = #user
+			end event
+        end field
+
+		field xexpiry
+			caption DB Expiry Date
+			default "2099-12-31"
+        end field
+		
+
+
+        field Confirm					
+          event before
+			//	set row = #sql(double,"select xrow from oporddetail where xordernum='"+xordernum+"' and xorderrow="+xdocrow)
+			if xpassword .ne. "DBBackup"
+				error "Cannot Proceed--Please Fill The Security Key"
+			else
+					set temp = #spsql(zabsp_DB_Backup_Auto,#user,xlocation,xorg)
+				
+					set row = #sql("select max(xrow) from zdbmgt")
+//					print row
+					set row = #sql("delete from zdbmgt where xrow='"+row+"' and xdate = '"+xdate+"'")
+			end if
+			
+          end event
+
+			event after				
+				print "<font color=blue size=+3>Successfully Accomplished </font>"
+					if xlocation .ne. ""
+						print "<font size=+2 color=red>Database - Location: "+xlocation
+					else if xlocation .eq. ""
+						print "<font color=red size=+2>Default Location:"D:\ZABSQLDB"</font>"
+					end if	
+				set xpassword = ""					
+			end event
+			
+        end field
+
+		field Add
+			event before
+				set xtype = "Backup"
+			end event
+			event after
+			end after
+		end field
+		
+		field Update
+					event before
+						//set xpassword = #user
+					end event
+						event after
+
+						end after
+		end field
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+		
+        embed onsubmit="return submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "zabdbbackup"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+
+        </script>
+     end jscript
+
+
+end screen

@@ -1,0 +1,172 @@
+
+     sidebar list one,list grn
+     sections form one,jscript myscript
+
+     list one
+        caption "PO Detail List For "+xpornum
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow attrib(link "login?screen=poorddetailcash&command=Show&xpornum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where caitem.zid=poorddetail.zid and caitem.xitem=poorddetail.xitem)),~
+                xqtyord,xrate,xlineamt
+
+
+        headers "Row","Item","Description","Qty","Rate","Line Amount"
+	  total "Total","","",sum,"",sum
+     end list
+
+
+     list grn
+        caption "GRN For : "+xpornum
+        table pogrnheader
+        order xgrnnum
+        fixed xpornum
+        rows 20
+        objects  xgrnnum attrib(link "login?screen=pogrnheader&command=Show&xgrnnum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+     form one
+        caption "PO Header"
+	      table poordheader
+        order xpornum
+        select "xtype='LC'"
+        return "login"
+        layout 4
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,Next,Previous,Top,Bottom,*Next,Detail,Ammendment,Create MRR,Costs,Commodity,Shipment,Receiving,"<p>" ,~
+          xpornum attrib(search) display(trn PO Number), xmlcno,xlcissuedate,xshipdate,xexpirydate,xcus,xorg,xfobcnf,x1stbeneficiary,~
+          xadvicebank,xopenbank,xshipfrom,xshipto,xshipline,~
+          xforwarder,xlcstatus,xcur,xexch,xshipmode,xconsignee,xpaymentterm,xagent display(hide),xlcqty,xprimetotamt display(const),xbasetotamt display(const),~
+          xnotify,xstatuspor,xdiscf display(hide),xdisc display(hide),xcomm display(hide),xtype display(hide)
+
+
+        field xcus
+			caption Supplier Code
+			pick list casup
+		end field
+				  field xorg
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+
+
+          field xpornum
+            event after
+	set	width 70
+              set globals(xpornum)=xpornum
+            end event
+          end field
+
+          field xexportdate
+            caption  Export / Contact Date
+          end field
+
+          field xlcstatus
+            default "LC Opened"
+          end field
+
+          field add
+            event before
+              set xtype="LC"
+              set xstatuspor="Open"
+            end event
+          end field
+
+          field update
+            event before
+            set xstatuspor="Open"
+            end event
+            event after
+            //  class pojamuna(updatePoHeaderAfter{xpornum,xcur,xexch})
+            end event
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Ammendment
+            embed onclick="clicked(this)"
+          end field
+
+          field Costs
+            embed onclick="clicked(this)"
+          end field
+
+          field Commodity
+            embed onclick="clicked(this)"
+          end field
+
+          field Shipment
+            embed onclick="clicked(this)"
+          end field
+
+          field Receiving
+            embed onclick="clicked(this)"
+          end field
+
+          field Create
+            event before
+              if xstatuspor .eq. "MRR Created"
+                error "MRR Already Created"
+              end if
+            end event
+            event after
+            	set temp = #spsql(zabsp_PO_createGRN,#id,#user,xpornum,xlcissuedate,xsup) 	
+            	action Show
+            end event
+          end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetail"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Ammendment"){
+            form.screen.value = "polcamend"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Costs"){
+            form.screen.value = "poordcost"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Commodity"){
+            form.screen.value = "poordcommodity"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Shipment"){
+            form.screen.value = "poordshipment"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Receiving"){
+            form.screen.value = "poordreceive"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

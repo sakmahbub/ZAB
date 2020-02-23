@@ -1,0 +1,274 @@
+screen poreqsr
+	
+     sidebar list reqlist,list one,list po
+     sections form one,list requi, jscript myscript
+	
+		  list reqlist
+      caption "Purchase Requisition List"
+         table poreqheader
+        order xporeqnum desc
+		fixed xtornum
+		select "left(xporeqnum,2)='PR'"
+        objects  xporeqnum attrib(link "login?screen=poreqsr&command=Show&xporeqnum=?"), xdate,xtype
+               
+		  headers "Requisition No","Date","Purchase Type"
+	end list
+	
+	
+	list one
+        caption "Purchase Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=poreqdet&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xbrand,xspecification,xunitpur,xqtyreq,xlineamt,xadjustment
+
+
+        headers "Line No","Item","Description","Brand","Specification","Unit","Qty Req","Line Amount","Adjustment Amount"
+     end list
+
+
+  list requi
+        caption "Store Requisition No"
+        table poreqheader
+        order xtornum desc
+		fixed xporeqnum
+        rows 20
+		 objects  xtornum  attrib(link "login?screen=moreqsr&command=Show&xtornum=?"),~
+                 xdate
+       headers "Requisition No","Date"
+     end list
+	 
+	    list po
+        caption "PO For : "+xporeqnum
+        table poordheader
+        order xpornum desc
+        fixed xporeqnum
+		select "xporeqnum<>''"
+        rows 10
+        objects  xpornum attrib(link "login?screen=poordsr&command=Show&xpornum=?"),xtype,~
+                 xdate
+      headers "PO No","Purchase Type","PO Date"
+     end list
+	
+	  list requi
+        caption "Back to Store Requisition"
+        table poreqheader
+        order xtornum desc
+		fixed xporeqnum
+        rows 20
+		 objects  xtornum  attrib(link "login?screen=moreqsr&command=Show&xtornum=?"),~
+                 xdate
+       headers "Requisition No","Date"
+     end list
+
+     form one
+     caption "Purchase Requisition(PR) Status"
+        table poreqheader
+		primarykey xporeqnum desc
+        order xporeqnum desc
+        // select " xstatusreq<>'Approved'"
+		//select "left(xporeqnum,4)='PR--'"// and xtype<>'Cash'"
+		return "login"
+        pstyle 3
+        layout 3
+        objects ~
+                Show,"<p>" ,~
+                xporeqnum,xdate display(const),xtornum display(const),xtype display(const),~//,xdeptname display(hide),xstatusreq display(hide),xwh display(hide),~
+				xstatusreq,xsuperiorsp display(hide),superiorsp display(const),xep display(hide),ep display(const),~
+				xpreparer display(hide),preparer display(const),xwh display(const),//~
+				//xpm  display(hide),pm  display(const),xcpo  display(hide),cpo  display(const),~
+				//xgmdf  display(hide),gmdf  display(const),xed  display(hide),ed  display(const),xdmddc  display(hide),dmddc  display(const)
+           
+           field xorg
+          	attrib local
+          	display const
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+          
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xstatusreq
+           caption Status
+          end field
+		
+		field xtype
+			//display combo
+			caption Purchase Type
+			//pick "Cash,Agreement,Other"
+			//default "Other"
+		end field
+		
+          field xwh
+          caption CS Position
+	//	  event after
+	//	  if xwh .eq. "EP"
+	//	  set xwh="Executive Purchase"
+	//	  else  if xwh .eq. "PM"
+	//	  set xwh="Procurement Manager"
+	//	  else  if xwh .eq. "CPO"
+	//	  set xwh="Chief Procurement Officer"
+	//	   else  if xwh .eq. "GMDF"
+	//	  set xwh="GM / DF"
+	//	  else  if xwh .eq. "ED"
+	//	  set xwh="Executive Director"
+	//	   else  if xwh .eq. "DMDDC"
+	//	  set xwh="DMD / MD/ Chairman"
+	//	   else  
+	//	  set xwh=""
+	//	  end if
+	//	  end event
+          end field
+		  
+		   field xtornum
+          caption SR No.
+          end field
+		  
+	   	field superiorsp
+		   attrib local
+          caption PR/SP/Advance/Adjustment Position
+		  event after
+		  set superiorsp=pdmst.xname("xposition='"+xsuperiorsp+"'")
+		  end event
+          end field
+		 
+		 field ep
+		   attrib local
+          caption PR Preparer
+		  event after
+		  set ep=pdmst.xname("xstaff='"+xep+"'")
+		  end event
+          end field
+		  
+		   field preparer
+		   attrib local
+          caption SP/Advance/Adjustment Preparer
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+          end field
+		  
+		 field pm
+		   attrib local
+          caption Procurement Manager
+		  event after
+		  set pm=pdmst.xname("xstaff='"+xpm+"'")
+		  end event
+          end field
+		  
+		   field cpo
+		   attrib local
+          caption Chief Procurement Manager
+		  event after
+		  set cpo=pdmst.xname("xstaff='"+xcpo+"'")
+		  end event
+          end field
+		  
+		  field dphead
+		  attrib local
+          caption Head Of The Department
+		  event after
+		  set dphead=pdmst.xname("xstaff='"+xdphead+"'")
+		  end event
+          end field
+		  
+		   field dmddc
+		  attrib local
+          caption DMD / MD / Chairman
+		  event after
+		  set dmddc=pdmst.xname("xstaff='"+xdmddc+"'")
+		  end event
+          end field
+		  
+		    field gmdf
+		    attrib local
+          caption General Manager/Director of Finance
+		  event after
+		  set gmdf=pdmst.xname("xstaff='"+xgmdf+"'")
+		  end event
+          end field
+		  
+		     field ed
+		    attrib local
+          caption Executive Director
+		  event after
+		  set ed=pdmst.xname("xstaff='"+xed+"'")
+		  end event
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+            width 12
+          event after
+            set globals(xporeqnum)=xporeqnum
+			set globals(xtornum)=xtornum
+			set globals(xstatusreq)=xstatusreq
+           //   class careports(getjspReport{imtranissueprint,1,xtornum,View SR})
+			//  class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+			 // class careports(getjspReport{prletter,1,xporeqnum,Print Advance Letter})
+			  //pick poreq
+			//  if xstatusreq .ne. "Open"
+			//  set #field(Update.display)="hidden"
+			//  end if
+          end event
+        end field
+
+		field Clear
+			event after
+			set globals(xtornum)=xtornum
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poreqdet"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		 function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xtornum.value=link.text
+          }else{
+            document.one.xtornum.value=link.innerText   
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+end screen

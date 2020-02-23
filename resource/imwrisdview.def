@@ -1,0 +1,32 @@
+product ZAB ERP
+
+table imwrisdview
+  caption "IM Loan Header View"
+
+  primary key zid,xtornum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view imwrisdview(zid,zbid,zorg,xtornum,xsrnum,xfwh,xtwh,xwh,xrow,xitem,xdesc,xtheircode,xqtyreq,xqtyalc,xqtycrn,xqtypor,xunit,xstype,xnote) ~
+					as select 100010,d.zid,c.xorg,d.xtornum,d.xtornum,bc.xcode,bc.xcode,a.xfwh,d.xrow,d.xitem,ca.xdesc, ~
+						ca.xtheircode,d.xqtyreq,isnull(d.xqtyalc,0),isnull(d.xqtycrn,0),isnull(d.xqtypor,0),d.xunit,d.xstype,d.xnote from imtordetail d ~
+						join imwrishview a on a.zbid=d.zid and a.xtornum=d.xtornum ~
+						left join branchclientview b on a.zid=b.zid and a.xtwh=b.xcode ~  
+						left join branchclientview bc on a.zbid=bc.zbid and a.xtwh=bc.xtwh ~  
+						left join caitem ca on d.zid=ca.zid and d.xitem=ca.xitem ~
+						left join cacusview c on b.zid=c.zid and b.zbid=c.xcus ~
+						WHERE a.zid=100010 and left(a.xtornum,3)='WIS' and a.xstatustor='Confirmed' ~
+						union all ~
+						select bc.zbid,a.zid,c.xorg,d.xtornum,d.xtornum,bc.xcode,bc.xcode,a.xfwh,d.xrow,d.xitem,ca.xdesc, ~
+						ca.xtheircode,d.xqtyreq,isnull(d.xqtyalc,0),isnull(d.xqtycrn,0),isnull(d.xqtypor,0),d.xunit,d.xstype,d.xnote from imtordetail d ~
+						join imwrishview a on a.zbid=d.zid and a.xtornum=d.xtornum ~
+						left join branchclientview b on a.zid=b.zid and a.xtwh=b.xcode ~  
+						left join branchclientview bc on a.zbid=bc.zid and a.xtwh=bc.xcode ~ 
+						left join caitem ca on d.zid=ca.zid and d.xitem=ca.xitem ~
+						left join cacusview c on b.zid=c.zid and b.zbid=c.xcus ~
+						WHERE a.zbid=100010 and left(a.xtornum,3)='WIS' and a.xstatustor='Confirmed'
+
+
+end table

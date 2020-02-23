@@ -1,0 +1,12 @@
+     list xgrnnumcash
+        caption "Items containing: "+zvalue
+        table pogrnheader
+        order xgrnnum
+        select "(xgrnnum like '%"+zvalue+"%' or xdate like '%"+zvalue+"%') and xtype='Cash' and xstatusgrn='Confirmed' and xstatusjv='Open'"
+		searchselect "xtype='Cash' and xstatusgrn='Confirmed' and xstatusjv='Open'"
+        rows 20
+        objects xgrnnum attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdate,xpornum,xporeqnum,xtornum
+     end list
+
+

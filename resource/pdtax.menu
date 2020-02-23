@@ -1,0 +1,24 @@
+//pd.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+PF Calculation                		|#classPath+"/login?screen=pdpfcalc"             	|ca       |   		|gl.png	|210
+IT Calculation                		|#classPath+"/login?screen=pditcalc"             	|ca       |   		|gl.png	|210
+Return 108 Process                	|#classPath+"/login?screen=pdreturn108prcs"             	|ca       |   		|gl.png	|210
+IT Calculation Report               |#classPath+"/login?screen=*viewcrystal pditcalculation(8;in,st,st,st,st,st,in,in; ~
+	@zid,@empcat,@user,@prcstype,@fstaff,@tstaff,@year,@per; ~
+	xempcategory=Employee Category,xrepuser=User,xprcs=Process Type,xstaff=From Employee,xstaff=To Employee,xyear=Tax Year,xper=Tax Period,xviewtype=Report View)"
+IT Assessment Report                |#classPath+"/login?screen=*viewcrystal pditassessment(6;in,st,st,st,st,in; ~
+	@zid,@empcat,@user,@fstaff,@tstaff,@year;xempcategory=Employee Category,xrepuser=User,xstaff=From Employee,xstaff=To Employee,xyear=Tax Year,xviewtype=Report View)"
+
+IT Return 108                		|#classPath+"/login?screen=*viewcrystal pditreturn108new(6;in,st,st,st,st,in; ~
+	@zid,@empcat,@user,@fstaff,@tstaff,@year;xempcategory=Employee Category,xrepuser=User,xstaff=From Employee,xstaff=To Employee,xyear=Tax Year,xviewtype=Report View)"
+	
+//IT Return 108                		|#classPath+"/login?screen=*viewcrystal pditreturn108(6;in,st,st,st,st,in; ~
+//	@zid,@empcat,@user,@fstaff,@tstaff,@year;xempcategory=Employee Category,xrepuser=User,xstaff=From Employee,xstaff=To Employee,xyear=Tax Year,xviewtype=Report View)"
+IT Certificate                		|#classPath+"/login?screen=*viewcrystal pditcertificate(6;in,st,st,st,st,in; ~
+	@zid,@empcat,@user,@fstaff,@tstaff,@year;xempcategory=Employee Category,xrepuser=User,xstaff=From Employee,xstaff=To Employee,xyear=Tax Year,xviewtype=Report View)"
+
+										
+Tax Slab Entry          			|#classPath+"/login?screen=pdtaxheader"                |ca        |   |100  
+//-------------------------------------------------------------------

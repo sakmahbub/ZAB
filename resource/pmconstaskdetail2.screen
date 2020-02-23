@@ -1,0 +1,138 @@
+screen pmconstaskdetail2
+
+     sidebar list one,list detail
+     sections form one, jscript myscript
+
+     list one
+       caption "Project Work Breakdown Level 2"
+       table pmconstaskdetail2
+        order xhrc1,xhrc2,xhrc3
+        fixed xhrc1,xhrc2
+        //select "xwh='"+#wh+"'"
+          rows 20
+          objects  xhrc3 attrib(link "login?screen=pmconstaskdetail2&command=Show&xhrc1=?&xhrc2=?&xhrc3=?"), ~
+                   xtaskname,xdatefrom,xdatecom,xdurdate
+
+       end list
+
+     list detail
+       caption "Project Work Breakdown Level 3<br> "+xhrc3
+       table pmconstaskdetail3
+        order xhrc1,xhrc2,xhrc3,xhrc4
+        fixed xhrc1,xhrc2,xhrc3
+        //select "xwh='"+#wh+"'"
+          rows 20
+          objects  xhrc4 attrib(link "login?screen=pmconstaskdetail3&command=Show&xhrc1=?&xhrc2=?&xhrc3=?&xhrc4=?"), ~
+                   xtaskname,xdatefrom,xdatecom,xdurdate
+
+       end list
+
+
+     form one
+        caption "Project Work Breakdown Level 3 For <br>"+xhrc2+"<br>"+pmconstaskdetail1.xtaskname("xhrc2='"+xhrc2+"'")
+        table pmconstaskdetail2
+        order xhrc1,xhrc2,xhrc3
+        fixed xhrc1,xhrc2
+        select "xwh='"+#wh+"'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Add,Show,Clear,Update, Delete,Level 4,*next,Return To Level 2,Top, Previous, Next, Bottom,"<p>",~
+                *next,Estimated Cost,Actual Cost,~
+                xhrc3,xtaskname,xdatefrom,xdatecom,~
+                xdurdate display(const),xdate,xstatustask,xref display(const),xwh display(hide)
+
+        field xhrc3
+          event after
+            set globals(xhrc3)=xhrc3
+          end event
+        end field
+
+        field xdatefrom
+          default "2999-01-01"
+        end field
+
+        field xdatecom
+          default "2999-01-01"
+        end field
+
+        field xdate
+          default "2999-01-01"
+        end field
+
+        field add
+          event before
+            set xwh=#wh
+            set xstatustask="Incomplete"
+            //int durdate = #sesql("select datediff(day,'"+xdatefrom+"','"+xdatecom+"') from pmconstaskdetail2")
+            //set durdate=durdate+1
+            //set xdurdate = durdate
+          end event
+        end field
+
+        field update
+          event before
+            int durdate = #sesql("select datediff(day,'"+xdatefrom+"','"+xdatecom+"') from pmconstaskdetail2")
+            set durdate=durdate+1
+            set xdurdate = durdate
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        field Level
+          embed onclick="clicked(this)"
+        end field
+
+        field Estimated
+          embed onclick="clicked(this)"
+        end field
+
+        field Actual
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+
+    jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          detail = b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail == "Return To Level 2"){
+            form.screen.value = "pmconstaskdetail1"
+            form.searchbutton.value = "Find xhrc1=?&xhrc2=?"
+          }
+          if (detail == "Level 4"){
+            form.screen.value = "pmconstaskdetail3"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Estimated Cost"){
+            form.screen.value = "pmconscost2"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Actual Cost"){
+            form.screen.value = "pmconsactcost2"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

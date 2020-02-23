@@ -1,0 +1,15 @@
+
+
+product ZAB ERP
+
+table shipmentview
+  caption "Buyer View"
+  columns zid,xacc,xyear,xcur,xdiv,xsec,xproj,xprime,xbase,xacctype
+  primary key zid,xacc,xyear,xcur,xdiv,xsec,xproj
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view shipmentview(zid,xcus,xorg,xmadd)~
+                  as select zid,xcus,xorg,xmadd from cacus where xtype='Buyer'
+end table

@@ -1,0 +1,150 @@
+screen opdoerrorupdate
+
+     //sidebar list one//,list advance
+     sections form one, jscript myscript
+
+     list one
+      caption "Detail List"
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=opdodetailtrpareditable&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,xqtyord,xqtybntr,xdiscdetamttr,xvatamttr,xnetamttr //(xlineamt+xvatamt-xdiscdetamt)
+
+        //header "Line No","Product <br>Code","Qty","Bonus <br>TR","Disc <br>TR","Vat <br>TR","Net TR"
+        //totals "","Totals",sum,"",sum,sum,sum
+     end list
+
+     form one
+	caption "<font color=Red size=+3>Error Handling before Confirmed</font>"
+      table opdoheader
+      //primarykey xdornum
+      primarykey xdornum
+      order xdornum desc
+	//fixed xdornum
+      select "left(xdornum,2) in ('DO','DT')"
+      return "login"
+      layout 6
+      pstyle 3
+      objects Clear,*next,|>,Update_DOSN,<|,*next,|>,Amount_Error_Aging,<|,"<p>",~
+              xdornum,xstatusord display(hide),xref
+			//*Next,CHK_Replace,Repair_tr_DO,REPAIR_TR_ALL,
+
+	field xref	  
+		caption Security Key
+	end field
+		
+        field xdornum
+			caption DO Number
+			pick list opordcrnable
+
+			event after
+				set globals(xdornum)=xdornum
+			end event
+	end field
+
+
+	field Update_DOSN
+          	event before
+			set dor=#sub(xdornum,0,2)
+			if dor .eq. "DO"
+				set dostatus = opdoheader.xstatusord("xdornum='"+xdornum+"'") 
+			else
+				set dostatus = opdoheader.xstatusord("xsumnum='"+xdornum+"'") 
+			end if
+			
+			if dostatus .eq. "Confirmed"
+				error "Cannot Proceed  --  Invoice Status Confirmed"
+			else xref .eq. "zab"
+				set temp=#spsql(zabsp_PROC_MFRS_DOSN,#id,#user,xdornum,xref)
+				print "Updated"
+			else
+					error "Cannot Proceed  --   All Rights Reserved by ZAB ERP System"
+			end if
+   		end event
+   	end field
+
+
+	field Amount_Error_Aging
+		event before
+
+   		end event
+   	end field
+
+
+
+	field Complete_Deleted
+          	event before
+			if xref .eq. "zab"
+				set temp=#spsql(zsp_Delete_All_Invoice,#id,#user,xdornum,xref)
+				print "Deleted"
+			else
+					error "Cannot Proceed  --   All Rights Reserved by ZAB ERP System"
+
+			end if
+   		end event
+   end field
+
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field REPAIR_TR_ALL
+          embed onclick="clicked(this)"
+        end field
+
+      //  field Complete_Deleted
+      //    embed onclick="clicked(this)"
+      //  end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function confirmUpdate(){
+          if(confirm('Are You Confirm')){
+            alert('yes')
+            form.searchbutton.value = "Update"
+          }else{
+//            alert('no')
+            form.searchbutton.value = "Show"
+          }
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opsumprocdetaileditable"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        function pickDetail(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text;
+            document.one.xbalance.value=primebal.text;
+            document.one.xdate.value=date.text;
+          }else{
+//            var ss =eval("document.forms");
+//            alert(ss.length);
+//           if(s1.length>)1
+//              document.forms[s1.length-1].xamount.value=link.innerText
+//            else
+              document.one.xamount.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

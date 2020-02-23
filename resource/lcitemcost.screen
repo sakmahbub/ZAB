@@ -1,0 +1,115 @@
+screen lcitemcost
+
+  sidebar list one //,list two
+  sections form one,  jscript myscript
+  
+  	
+  list one
+    caption "Item Detail List"
+    table lcitemcost
+    order xpornum,xrow,xcostrow
+    fixed xpornum,xrow
+    rows 20
+    objects  xrow attrib(link "login?screen=lcitemcost&command=Show&xpornum=?&xrow=?"), ~
+             xaccdr,descdr equals((select xdesc from acmst where acmst.zid=lcitemcost.zid and acmst.xacc=lcitemcost.xaccdr)),~
+				 //xacccr,descdr equals((select xdesc from acmst where acmst.zid=lcitemcost.zid and acmst.xacc=lcitemcost.xacccr)),~
+				 xprime,xtype
+	total "","","Total",sum			 
+	headers "Line No","Cost Code","Description","Amount","Cost Type"
+  end list
+  
+  form one
+    caption "Item detail for : "+xpornum
+    table lcitemcost
+    primary key xpornum,xrow
+    order xpornum,xrow,xcostrow
+    fixed xpornum,xrow
+    pstyle 3
+    return "login"
+    layout 2
+    objects Add,Update,Delete,Clear,Show, *next,Return,Top,Previous,Next,Bottom,~
+           xcostrow attrib(row 0 1),xdum,xaccdr,xaccdrdesc,xacccr,xacccrdesc,xcus,xorg,~
+           xprime,xnote
+	
+		field xorg
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")+"<br>"+cacus.xmadd("xcus = '"+xcus+"'")
+          end event
+        end field
+
+	
+	field xaccdrdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xaccdrdesc=acmst.xdesc("xacc='"+xaccdr+"'")
+      end event
+    end field
+	
+	field xacccrdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xacccrdesc=acmst.xdesc("xacc='"+xacccr+"'")
+      end event
+    end field
+	
+	
+	field xdum
+		attrib local
+		display const
+		caption
+	end field
+	
+	field xdateeff
+		default "1999-01-01"
+	end field
+
+    	field xdateexp
+		default "2999-01-01"
+	end field
+
+  field Add
+        event before
+        end event
+  end field
+
+    embed onsubmit="return submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+  
+  end form
+  
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var but
+      var result
+
+      function clicked(b){
+        but = b.value
+      }
+      function submitit(form){
+        result = true
+        if (but == "Return"){
+          form.screen.value = "poorddetaillc"
+          form.searchbutton.value = "Find xpornum=?&xrow=?"
+        }
+        but = ''
+        return result
+      }
+      </script>
+  end jscript
+  
+end screen
+
+
+
+

@@ -1,0 +1,21 @@
+product ZAB ERP
+
+table acvoucherdescview
+  caption "Voucher Description View"
+  columns zid,xtype,xlong,xcode
+
+  primary key zid,xcode
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+	sql CREATE VIEW acvoucherdescview(zid,xtypetrn,xdesc,xtrn) ~
+	AS ~
+	SELECT a.zid,b.xtypetrn,b.xdesc,b.xtrn ~
+	FROM zbusiness a JOIN ~
+	xtrn b ON a.zid=b.zid ~
+	WHERE b.xtypetrn='GL Voucher'
+
+end table
+

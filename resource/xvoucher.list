@@ -1,0 +1,17 @@
+     list xvoucher
+        table acheader
+        order xvoucher desc
+        //select none
+        navigators alpha
+        //select "(xvoucher like '%"+zvalue+"%' and xwh='"+xwh+"')"
+		rows 10
+        objects xvoucher attrib(link "abc" embed onclick="return updateParent(this:'xvoucher')"), ~
+                xdate,xoldvoucher,xref,zauserid,xfileref
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

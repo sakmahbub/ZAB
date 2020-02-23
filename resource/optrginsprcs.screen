@@ -1,0 +1,90 @@
+screen optrginsprcs
+
+     sections form detail, jscript myscript
+
+
+     form detail
+        caption "Incentive Process"
+        return "login"
+        layout 2
+        pstyle 3
+        report
+        objects ~
+                Clear,Final Run,~
+                xinstrn,xyear,xper
+
+        field xdate
+        event after
+         // class careports(getreport({artogltrial,5,xdate,xdatedue,xfvoucher,xtvoucher,xdatecom,Trial Run})
+        end event
+          caption From Date
+          def "1999-01-01"
+
+        end field
+
+        field xdatedue
+          caption To Date
+          def "3000-01-01"
+        end field
+
+        field xdatecom
+          caption Posting Date
+        end field
+
+        field xfvoucher
+          attrib local
+          caption From Voucher
+          pick list artoac
+          display text
+        end field
+
+        field xtvoucher
+          attrib local
+          caption To Voucher
+          pick list artoac
+          display text
+          default "z"
+        end field
+
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+        field Final Run
+          event after
+            set temp = #spsql(spzab_OPTRG_processIncentive,#id,#user,xinstrn,xyear,xper)
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcrnheader"
+            form.searchbutton.value = "Find xcrnnum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

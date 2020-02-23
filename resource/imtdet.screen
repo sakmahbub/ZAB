@@ -1,0 +1,94 @@
+screen imtdet
+
+     caption "Transfer Order Detail"
+     sidebar list one
+     sections  form one, jscript myscript
+
+    list one
+        caption "<br><center><b>"Transfer Order Detail List"</b>"
+        table imtdet
+        order xtagnum,xrow
+        fixed xtagnum
+        rows 100
+        objects ~
+        xrow attrib(link "login?screen=imtdet&command=Show&xtagnum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtdet.zid and xitem=imtdet.xitem)),xqty,~
+		unit equals((select xunit from caitem where zid=imtdet.zid and xitem=imtdet.xitem))
+
+         headers "Line","Item","Description","Qty","UOM"
+     end list
+
+
+
+     form one
+        caption "Tag Detail"
+        table imtdet
+		primarykey xtagnum,xrow
+        order xtagnum,xrow
+        fixed xtagnum
+        return "login"
+        layout 4
+        pstyle 3
+        objects Return, Add, Update, Delete,Clear,Show,*next, Top, Previous, Next, Bottom,"<p>" ,~
+        xrow attrib(row 0 1),xitem,xdesc,xqty,xstatustag display(hide)
+
+        field xrow
+          event after
+            set globals(xtagnum)=xtagnum
+			if imtag.xstatustag("xtagnum='"+xtagnum+"'") .eq. "Confirmed"
+					set #field(update.attrib)="disabled"
+					set #field(detail.attrib)="disabled"
+         			set #field(delete.attrib)="disabled"
+					set #field(Add.attrib)="disabled"
+					
+			end if 
+          end event
+        end field       
+
+
+	   field Add
+          event before
+			if xqty ==0
+				error "Cannot Proceed -- Qty is 0"
+			end if
+          end event
+        end field
+
+        field xdesc
+          attrib local
+          display constant
+          caption Description
+          event after
+            set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtag"
+            form.searchbutton.value = "Find xtagnum=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

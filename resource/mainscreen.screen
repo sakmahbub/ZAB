@@ -1,0 +1,416 @@
+screen mainscreen
+
+  caption "Notifications"
+    
+ 	sidebar list imtor,list imspr,list apn,list rr,list to,list wis,list damage,list loan,list grnno,list sqcno,list insp,list imtor1, list cs //list conv,list ecf,list imtorwr,list docreq,list qtc,
+	sections list voucherl,list pocashadv,list po,list cashadj,list prn,list paf,list late,list early,jscript myscript //list cnfapp,list cnfadj,list billlist,list leaveapp,
+
+	list imtor
+        caption "Pending SRQ For Approval"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and left(xtornum,2)='SR'  and xstatustor not in ('Approved','Partial Issue','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=moreqheaderdph&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","Store/Plant"
+     end list
+	 
+	list imspr
+        caption "Pending Store Purchase Requisition List For Approval"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and left(xtornum,3)='SPR'  and xstatustor not in ('Approved','Checked','Partial Issue','Confirmed','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=imsprheaderapp&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xfwh))
+				 
+        headers "Requisition No","Date","Store/Plant/Project"
+     end list
+	 
+	list apn
+        caption "Pending Approval Note"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and left(xtornum,4)='APN-'  and xstatustor not in ('Approved','Checked','Partial Issue','Confirmed','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=imappnotehedapp&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Approval Note No","Date","Store/Plant"
+     end list	 
+
+	list rr
+        caption "Pending RR For Approval"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and left(xtornum,2)='RR'  and xstatustor not in ('Approved','Checked','Partial Issue','Confirmed','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=imrrheaderapp&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "RR No","Date","Store/Plant"
+     end list
+	 
+	list to
+        caption "Pending TO For Approval"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') and '"+#position+"'<>'' ~
+		and left(xtornum,4) in ('TO--') and xstatustor not in ('Approved','Checked','Transferred','Confirmed','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=imtorheaderapp&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "TO No","Date","Store/Plant"
+     end list
+	 
+	list wis
+        caption "Pending WIS/WRE For Approval"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') and '"+#position+"'<>'' ~
+		and left(xtornum,4) in ('WIS-','WRE-') and xstatustor not in ('Approved','Checked','Transferred','Confirmed','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=imtorheaderwsapp&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "WIS/WRE No","Date","Store/Plant"
+     end list
+	 
+	list damage
+        caption "Pending Damage For Approval"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') and '"+#position+"'<>'' ~
+		and left(xtornum,4) in ('DAM-') and xstatustor not in ('Approved','Checked','Transferred','Confirmed','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=imtorheaderdamapp&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Damage No","Date","Store/Plant"
+     end list
+	 
+	list loan
+        caption "Pending Loan Receive/Issue For Approval"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') and '"+#position+"'<>'' ~
+		and left(xtornum,4) in ('LRE-','LIS-') and xstatustor not in ('Approved','Checked','Transferred','Confirmed','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=imloanheaderapp&command=Show&xtornum=?"),~
+                 xdate,acc equals((select xorg from cacusview where zid=imtorheader.zid and xcus=imtorheader.xacc )),~
+				 twhdesc equals((select xlong from branchview where zbid=imtorheader.xacc and xcode=imtorheader.xtwh ))
+				 
+        headers "Loan No","Date","Inter Company/Party","Store/Plant"
+     end list
+	 
+	 list grnno
+        caption "GRN List for Approval"
+        table pogrnheader
+        order xgrnnum
+		select "(xsuperiorsp='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+				and xstatusgrn='Open' and '"+#position+"'<>'' and xstatusdoc not in ('Open','Approved') and left(xgrnnum,3)='GRN'"
+        rows 20
+        objects  xgrnnum attrib(link "login?screen=pogrnapp&command=Show&xgrnnum=?"), ~
+                 xdate,xlcno,sup  equals((select xorg from cacus where zid=pogrnheader.zid and xcus=pogrnheader.xcus))
+       headers "GRN No","Date","LC No","Party"
+     end list 
+
+	 list sqcno
+        caption "SQC List for Approval"
+        table pogrnheader
+        order xgrnnum
+		select "(xsuperiorsp='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+				and xstatusgrn='Open' and '"+#position+"'<>'' and xstatusdoc not in ('Open','Approved') and left(xgrnnum,3)='SQC'"
+        rows 20
+        objects  xgrnnum attrib(link "login?screen=pogrnimapp&command=Show&xgrnnum=?"), ~
+                 xdate,xlcno,sup  equals((select xorg from cacus where zid=pogrnheader.zid and xcus=pogrnheader.xcus))
+       headers "GRN No","Date","LC No","Party"
+     end list 	 
+	 
+	list insp
+        caption "Pending Inspection For Approval"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and left(xtornum,4)='INSP'  and xstatustor not in ('Approved','Checked','Partial Issue','Confirmed','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=imtordetailinspapp&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","Store/Plant"
+     end list
+	 
+	list prn
+        caption "Pending Purchase Return For Approval"
+        table imtorheader
+        order xtornum desc
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and left(xtornum,4)='PRN-'  and xstatustor not in ('Approved','Checked','Partial Issue','Confirmed','')"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=imtorheaderprnapp&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "PRN No","Date","Store/Plant"
+     end list
+	 
+	list cs
+      caption "Pending Comparison Statement (CS) Approval"
+         table poreqheader
+        order xporeqnum desc
+		select "(xsuperiorsp='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and left(xporeqnum,4) in ('PR--','JN--') and xtype='CS' and xstatusreq not in ('Approved')"
+		rows 25
+        objects  xporeqnum attrib(link "login?screen=poreqheaderapp&command=Show&xporeqnum=?"), xdate,xregi,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Car No","Store/Plant Code","Name"
+	end list 
+	
+	
+	
+	list voucherl
+    caption "Pending Voucher List for Approval"
+    table acheader
+    order xvoucher
+	 select "xstatusjv='Balanced' and (xsuperiorgl='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+	 and '"+#position+"'<>'' and xstatus not in ('Approved','Open')"
+    rows 25
+    objects  xvoucher attrib(link "login?screen=acheaderappgm&command=Show&xvoucher=?"), ~
+             xdate,
+
+   // headers "Line No","Acc Code","Description","Sub Code","Description","Debit","Credit"//,"Amt"
+  end list
+	
+	list pocashadv 
+      caption "Pending Cash Advance Approval"
+      table poreqheader
+      order xporeqnum desc
+		select "(xsuperiorsp='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and left(xporeqnum,4) in ('PR--','JN--','DOC-') and xtype='Cash' and xstatusreq not in ('Approved')"
+	  rows 25
+      objects  xporeqnum attrib(link "login?screen=poreqheadercashapv&command=Show&xporeqnum=?"), xdate,xtype,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Purchase Type","Store/Plant Code","Name"
+	  end list
+	  
+	list po
+        caption "Pending PO/WO For Approval"
+        table poordheader
+        order xpornum desc
+       select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+	   and '"+#position+"'<>'' and left(xpornum,4) in ('PO--','WO--') and xstatus not in ('Approved')"
+	   rows 25
+        objects xpornum attrib(link "login?screen=poordheadercpo&command=Show&xpornum=?"), ~
+               xdate,xstatus
+        headers "PO /WO No","Date","Status"
+     end list
+
+	list cashadj 
+      caption "Pending Advance Adjustment Approval"
+      table poreqheader
+      order xporeqnum desc
+	  select "(xsuperiorsp='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+	  and '"+#position+"'<>'' and xtype='Cash' and left(xporeqnum,4) in ('PADJ') and xstatusreq  not in ('Approved','')"
+	  rows 25
+      objects  xporeqnum attrib(link "login?screen=poadvadjheaderapp&command=Show&xporeqnum=?"), xdate,xtype,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Purchase Type","Store/Plant Code","Name"
+	  end list
+	  
+     
+     list paf
+      caption "Payment Authorization Approval"
+         table appaymentreqh
+        order xpafnum desc
+		select "(xsuperiorsp='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+	    and '"+#position+"'<>'' and left(xpafnum,4)='PAF-' and xstatusreq  not in ('Approved','')"
+		rows 25
+        objects  xpafnum attrib(link "login?screen=appaymentreqhapp&command=Show&xpafnum=?"), xdate,xcus,~
+				 desc equals((select xorg from cacus where zid = appaymentreqh.zid and  xcus=appaymentreqh.xcus)),xpornum
+               
+		  headers "PAF No","Date","Supplier Code","Supplier Name","PO No."
+	end list
+	
+	list late
+        caption "Late Employees"
+        table pdathd
+        order xposition,xyearperdate
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and xstatuslate='Open'  and xemplate='1'"
+        rows 25
+        objects  xposition attrib(link "login?screen=pdatlateapp&command=Show&xposition=?&xyearperdate=?"),~
+                 xdate,name equals((select xname from pdmst where zid=pdathd.zid and xstaff=pdathd.xstaff)),xstatus,xstatuslate,~
+				 xstaff display(hide),xyearperdate display(hide)
+        headers "Employee ID","Date","Name","Status","Approval Status"
+     end list
+
+	list early
+        caption "Early Leave Employees"
+        table pdathd
+        order xposition,xyearperdate
+		select "(xidsup='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and xstatusel='Open'  and xempearly='1'"
+        rows 25
+        objects  xposition attrib(link "login?screen=pdatelapp&command=Show&xposition=?&xyearperdate=?"),~
+                 xdate,name equals((select xname from pdmst where zid=pdathd.zid and xstaff=pdathd.xstaff)),xstatus,xstatusel,~
+				 xstaff display(hide),xyearperdate display(hide)		 
+        headers "Employee ID","Date","Name","Status","Approval Status"
+     end list				 
+	  
+	 
+	 list imtorwr
+        caption "Pending WR For Approval"
+        table imtorheader
+        order xtornum desc
+		select "xstatustor<>'' and left(xtornum,2)='WR' and xidsup='"+#position+"'"
+        rows 25
+        objects  xtornum  attrib(link "login?screen=mowrheaderapp&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))		 
+        headers "Requisition No","Date","Store/Plant"
+     end list
+	 
+	    list docreq
+      caption "Pending Doc Requisition Approval"
+         table poreqheader
+        order xporeqnum desc
+	    select "left(xporeqnum,4)='DOC-' and xsuperiorsp='"+#position+"' and xstatusreq in ('Open','Approved_DPH','Approved_CMP')"
+		rows 25
+        objects  xporeqnum attrib(link "login?screen=poreqheaderserviceapp&command=Show&xporeqnum=?"), xdate,xregi,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Car No","Store/Plant Code","Name"
+	end list 
+	
+	
+	    list conv
+      caption "Pending Conveyance Form For Approval"
+         table acreqheader
+        order xacreqnum desc
+	    select "left(xacreqnum,4)='CON-' and (xsuperiorsp='"+#position+"' or xwh='"+#wh+"')  and xstatusreq<>''"
+		rows 25
+        objects  xacreqnum attrib(link "login?screen=acconveyancehapp&command=Show&xacreqnum=?"), xdate,xfwh, ~
+				 desc equals((select xlong from branchview where zid = acreqheader.zid and  xcode=acreqheader.xfwh)),xprime
+               
+		  headers "Requisition No","Date","Store/Plant Code","Name","Advance Amount"
+	end list
+	
+	 list ecf
+      caption "Pending Expense Claim Form for approval"
+         table acreqview
+        order xacreqnum desc
+	   select "left(xacreqnum,4)='ECF-' and (xsuperiorsp='"+#position+"' or xwh='"+#wh+"') and xstatusreq<>''"
+		rows 25
+        objects  xacreqnum attrib(link "login?screen=accashadjheaderapp&command=Show&xacreqnum=?"), xdate,xfwh, ~
+				 xlong,xprime,xamount
+               
+		  headers "Requisition No","Date","Store/Plant Code","Name","Advance Amount","Expense Amount"
+	end list
+	 
+     list qtc
+        caption "Pending Quality Certificate List for approval"
+        table pogrnheader
+        order xgrnnum
+       // fixed xgrnnum
+		select "left(xgrnnum,4)='QC--' and xstatusgrn='Recommended' and xsuperiorsp='"+#position+"'"
+        rows 25
+        objects  xgrnnum attrib(link "login?screen=poqtcheaderapp&command=Show&xgrnnum=?"), ~
+                 xdate 
+		headers "Quality Certificate No","Date"
+	end list
+	
+	list cnfapp
+      caption "Pending CnF Advance List for approval"
+         table poreqheader
+        order xporeqnum desc
+	   select "(left(xporeqnum,4)='AD--' or left(xporeqnum,4)='PAY-') and xsuperiorsp='"+#position+"' and xstatusreq<>''"
+		rows 25
+        objects  xporeqnum attrib(link "login?screen=opcashadvheaderapp&command=Show&xporeqnum=?"), xdate,xfwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xfwh))
+               
+		  headers "Requisition No","Date","Store/Plant Code","Name"
+	end list
+	
+	list cnfadj
+      caption "Pending CnF Advance Adjustment List for approval"
+         table poreqheader
+        order xporeqnum desc
+	   select "left(xporeqnum,4)='ADJ-' and xsuperiorsp='"+#position+"' and xstatusreq<>''"
+		rows 25
+        objects  xporeqnum attrib(link "login?screen=opadvadjheaderapp&command=Show&xporeqnum=?"),xordernum,xdate,xregi,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Job No","Date","Car No","Store/Plant Code","Name"
+	end list
+	
+	list billlist
+      caption "Pending CnF Bill List for Approval"
+        table opdoheader
+        order xdornum desc
+	    select "((left(xdornum,4)='BL--' and xstatusdor<>'' and xsuperiorsp='"+#position+"') or (left(xdornum,4)='BL--' and xstatusdor<>'' and xfwh='"+#wh+"')) and zid='"+#id+"' "
+		rows 10
+        objects  xdornum attrib(link "login?screen=opcnfbillheaderapp&command=Show&xdornum=?"),xdate,xordernum,xcus, ~
+				 desc equals((select xorg from cacus where zid = opdoheader.zid and  xcus=opdoheader.xcus))
+               
+		  headers "Bill No","Date","Job Number","Customer Code","Customer Name"
+	end list
+	
+	list leaveapp
+    caption "Leave Detail for Approval"
+    table pdleavehdview
+    order xyearperdate,xstaff
+    select "xsid='"+#position+"' and xstatus not in ('Open','Confirmed')"
+    rows 25
+    objects xyearperdate attrib(link "login?screen=pdleaveaproved&command=Show&xyearperdate=?&xstaff=?"),~
+            xstaff,xname,xdate,xtypeleave,xdatefrom,xdateto,xday,xstatus
+            
+    header "SI NO","Staff ID","Name","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Status"
+    totals "","","Total","","",sum
+  end list
+
+     form one
+        //caption "Requisition Approved By Dept. Head""
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+	//	select "xstatustor='Open' and xidsup='"+#position+"'"
+		select "left(xtornum,2)='SR'"
+        return "login"
+        pstyle 1
+        layout 1
+        
+	
+        embed onsubmit="submitit(this)"
+
+      end form
+
+      jscript myscript
+
+        <script language="javascript" type="text/javascript">
+     var time = new Date().getTime();
+     $(document.body).bind("mousemove keypress", function(e) {
+         time = new Date().getTime();
+     });
+
+     function refresh() {
+         if(new Date().getTime() - time >= 3000) 
+             window.location.reload(true);
+         else 
+             setTimeout(refresh, 3000000);
+     }
+
+     setTimeout(refresh, 3000000);
+        </script>
+     end jscript
+
+
+
+end screen

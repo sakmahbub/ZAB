@@ -1,0 +1,360 @@
+screen pdmsthrd
+     //sidebar list detail,list inv
+     sections form one, jscript myscript
+
+  	list detail
+        caption "Detail List"
+        table pdsalarydetail
+        order xstaff,xrow
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdsalarydetail&command=Show&xstaff=?&xrow=?"), ~
+                 xtype,xamount,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdsalarydetail.xtype))
+
+        header "Line No","Componant Type","Amount","Transaction Type"
+
+     end list
+
+  	list inv
+        caption "Investment Detail"
+        table pdinvdetail
+        order xstaff,xrow
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdinvdetail&command=Show&xstaff=?&xrow=?"), ~
+                 xtype,xamount
+
+        header "Line No","Investment Type","Amount"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Personnel Information</ACRONYM>"
+        table pdmst
+        order xstaff
+	 // select "xempcategory='"+#wh+"' and xempstatus='Normal'"
+        return "login"
+        layout 4
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete, *next,Top, Previous, Next, Bottom,Image_Upload,NID_Upload,"<p>" , *next,~
+		    Promotion History, Transfer History, Qualification,Experience,Change Designation,Posting,~
+                xstaff,xname attrib(search),xdatejoin,xgrade,xlocation,xdeptname,xdesignation,xbloodgroup,xdatecom,~ //xbank,xacc,~
+		    xempcategory,xposition,xbirthdate,xretdate display(const),xenddate,xmstat,xsex,xdistrict,xphone,xmadd,xpadd,~
+		    xplan,xemail,xsid,xmname,xempstatus,xhrc1,xhrc2,xhrc3,xhrc4//xtin,xsec,
+
+	field xplan
+	  caption Leave Plan
+	  display combo
+	  pick "select xname from pdlplanehd"
+	end field
+
+	  field xdeptname
+    	    event after
+	      if xdeptname .eq. "Medical Detailing Department"
+		else if xdeptname .eq. "Sales Department"
+		else
+		  set #field(xhrc1.display)="hide"
+	      end if
+	    end event
+	  end field
+	  
+        field xhrc1
+	    display combo
+	    caption Area
+          pick "select xhrc1 from pdhrc1"
+          widht 30
+          event after
+            set globals(xhrc1)=xhrc1
+            if xhrc1 .eq. ""
+                set #field(xhrc2.display)="hide"
+                set #field(xhrc3.display)="hide"
+                set #field(xhrc4.display)="hide"
+                //set #field(xhrc5.display)="hide"
+//                set #field(xdesc1.display)="hide"
+                set #field(xdesc2.display)="hide"
+                set #field(xdesc3.display)="hide"
+            end if
+            if xhrc2 .eq. ""
+                set #field(xhrc3.display)="hide"
+                set #field(xhrc4.display)="hide"
+                //set #field(xhrc5.display)="hide"
+//                set #field(xdesc2.display)="hide"
+            end if
+            if xhrc3 .eq. ""
+                set #field(xhrc4.display)="hide"
+                //set #field(xhrc5.display)="hide"
+//                set #field(xdesc3.display)="hide"
+            end if
+            if xhrc4 .eq. ""
+                set #field(xhrc5.display)="hide"
+            end if
+          end event
+        end field
+	  
+	field xhrc2
+  	  display combo
+	  caption Region
+	  pick "select xhrc2 from pdhrc2 where xhrc1='"+xhrc1+"'"
+	end field
+
+	field xhrc3
+  	  display combo
+	  caption FM Area
+	  pick "select xhrc3 from pdhrc3 where xhrc1='"+xhrc1+"' and xhrc2='"+xhrc2+"'"
+	end field
+
+	field xhrc4
+  	  display combo
+	  caption Territory
+	  pick "select xhrc4 from pdhrc4 where xhrc1='"+xhrc1+"' and xhrc2='"+xhrc2+"' and xhrc3='"+xhrc3+"'"
+	end field
+
+	field xdum
+	  attrib local
+	  display const
+	  caption
+	end field
+
+	field xempcategory
+	  pick "select xcode from xcodes where xtype='Employee Category' and xcode='" +#wh+"'"
+	end field
+
+	field xphone
+	  caption Contact Number
+	end field
+	
+        field Image_Upload
+          event after
+            set temp=#spsql(zsp_picinsert,#id,#user,xstaff,"pdmst","xstaff","pic")
+          end event
+        end field
+		
+		 field NID_Upload
+         event after
+            set temp=#spsql(zsp_picinsert,#id,#user,xstaff,"pdmst","xstaff","nid")
+         end event
+        end field
+
+      field xbatch
+        caption Building Type
+        display combo
+        pick "Old Building,New Building,N/A"
+      end field
+
+      field xsid
+        caption Superior ID
+      end field
+
+	field xmname
+	  attrib local
+	  caption Superior Name
+	  display const
+	  event after
+	    set xmname=pdmst.xname("xstaff='"+xsid+"'")
+	  end event
+	end field
+
+          field xstatus
+            embed  onblur
+            caption Service Charge Status
+            display combo
+            pick "Open,Closed"
+          end field
+
+          field xstaff
+            event after
+              set globals(xstaff)=xstaff
+	        set globals(xdesignation)=xdesignation
+		  set globals(xdeptname)=xdeptname
+		  set globals(xdistrict)=xdistrict
+		  set globals(xgrade)=xgrade
+	        set globals(xname)=xname
+		  set globals(xhrc1)=xhrc1
+		  set globals(xhrc2)=xhrc2
+		  set globals(xhrc3)=xhrc3
+		  set globals(xhrc4)=xhrc4
+            end event
+          end field
+
+          field xposition
+            attrib search
+            pick
+          end field
+
+          field xhaccomodation
+            display combo
+            pick "Yes,No"
+            default "No"
+          end field
+
+          field xbank
+            display combo
+          end field
+
+          field xacc
+            pick
+          end field
+
+          field xamount
+            caption Opening Balance of PF
+          end field
+
+          field xdeduction
+            caption Total Deduction
+          end field
+
+          field xretdate
+		//caption Retirement Date
+           default "2999-01-01"
+          end field
+
+          field xenddate
+		caption Resignation Date
+            default "2999-01-01"
+          end field
+
+          field xdatecom
+            default "2999-01-01"
+          end field
+
+       field xempstatus
+         default "Normal"
+       end field
+
+        field xdum
+          attrib local
+          display const
+          caption
+        end field
+
+        field xdum2
+          attrib local
+          display const
+          caption
+        end field
+
+        field xdum3
+          attrib local
+          display const
+          caption
+        end field
+
+        field Search
+          event before
+            class picase(PDSearch())
+          end event
+        end field
+
+        field add
+          event before
+		//set xdatecom=#sesql("select dateadd(month,6,'"+xdatejoin+"')")
+		set xretdate=#sesql("select dateadd(year,57,'"+xbirthdate+"')")
+          end event
+        end field
+
+        field update
+          event before
+		//set xdatecom=#sesql("select dateadd(month,6,'"+xdatejoin+"')")
+		set xretdate=#sesql("select dateadd(year,57,'"+xbirthdate+"')")
+          end event
+        end field
+
+        field Salary
+          embed onclick="clicked(this)"
+        end field
+
+        field Promotion
+          embed onclick="clicked(this)"
+        end field
+
+        field Transfer
+          embed onclick="clicked(this)"
+        end field
+
+	  field Qualification
+	    embed onclick="clicked(this)"
+	  end field
+
+	  field Experience
+	    embed onclick="clicked(this)"
+	  end field
+
+	  field Posting
+	    embed onclick="clicked(this)"
+	  end field
+
+	  field Change
+	    embed onclick="clicked(this)"
+	  end field
+
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	        if (detail=="Salary Detail"){
+            form.screen.value = "pdsalarydetail"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Promotion History"){
+            form.screen.value = "pdpromodt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Transfer History"){
+            form.screen.value = "pdtransdt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Qualification"){
+            form.screen.value = "pdeducation"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Experience"){
+            form.screen.value = "pdexperience"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Posting"){
+            form.screen.value = "pdposting"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="Change Designation"){
+            form.screen.value = "pdgradedt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        function pickAccount(link,name,rank){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xstaff.value=link.innerText
+            document.one.xname.value=name.innerText
+            document.one.xrank.value=rank.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

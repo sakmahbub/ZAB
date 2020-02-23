@@ -1,0 +1,172 @@
+screen bmbomheader
+	sidebar list one//,two
+	sections form detail,jscript myscript
+
+	list one
+		caption "BOM Component for "+xitem
+		table bmbomdetail
+		order xbomkey,xbomrow
+		fixed xbomkey
+		rows 20
+		objects  xbomrow attrib(link "login?screen=bmbomdetail&command=Show&xitem=?&xbomcomp=?"),xbomcomp,~
+				 desc equals((select xdesc from caitem where zid=bmbomdetail.zid and xitem=bmbomdetail.xbomcomp)),~
+				 xqtymix,xunit
+		header "Code","Component","Description","Qty","Unit"
+	end list
+
+
+	form detail
+		caption "BOM Header"
+		table bmbomheader
+		primarykey xbomkey
+		order xbomkey
+		return "login"
+		layout 2
+		pstyle 3
+		objects Add,Show,Clear,Update,Delete,*next,Top,Previous,Next,Bottom,Component Setting,~
+						xbomkey,xdesc width(30),xitem ,xitemdesc,xcolorcode,xcolorname,xdiv,~  //
+						xqtybase display(hide),xdate,xpreferbatchqty display(hide),zactive//xunit,
+
+		field xdiv
+			display hide
+			default #div
+		end field
+		
+		field xqtybase
+			//display const
+			default 1
+		end field
+		
+		field xpackweightnet
+			attrib local
+			caption Packing Weight
+			display const
+			event after
+				set xpackweightnet = caitem.xpackweightnet("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xunitpck
+			attrib local
+			caption Packing Unit
+			display const
+			event after
+				set xunitpck = caitem.xunitpck("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		
+		
+		field xitemdesc
+			attrib local
+			caption Description
+			display const
+			event after
+				set xitemdesc = caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xcolorname
+			attrib local
+			caption Description
+			display hide
+			event after
+				set xcolorname = cacolor.xcolor("xcolorcode='"+xcolorcode+"'")
+			end event
+		end field
+		
+		
+		field xbomkey
+			//embed Autocomplete="Off"
+		 event after
+		  set globals(xbomkey)=xbomkey
+		end event
+		end field
+		
+		
+		field zactive
+			default 1
+		end field
+		
+	
+		field xunit
+			caption Unit
+			pick "select xcode from xcodes where xtype='Unit of Measure'"
+			display const
+		end field
+		
+		field xitem
+		//embed autocomplete="off"
+			event after
+				set globals(xitem)=xitem
+			end event
+		end field
+
+	
+		field add
+			event before
+				set xqtybase="1"
+				//set xunit=caitem.xunit("xitem='"+xitem+"'")
+				set bomkey = bmbomheader.xbomkey("xcolorcode='"+xcolorcode+"'")// and zactive='1' and xbomtype='"+xbomtype+"'")
+				
+				if #result .eq. "true"
+					error "Cannot Proceed -- Active BOM No "+bomkey+" Exists For Same Color"
+				else if xcolorcode .eq. ""
+					error "No Color Code Selected"
+				else 
+					if xdesc .eq. ""
+					set xdesc= xcolorcode //caitem.xdesc("xitem='"+xitem+"'")
+					end if 
+					set trn = "BM--"
+					set xbomkey = #trn("BOM Number",trn,10)
+				
+				end if
+			end event
+		end field
+		
+		field update
+			event before
+				set xunit=caitem.xunit("xitem='"+xitem+"'")
+				set bomkey = bmbomheader.xbomkey("xitem='"+xitem+"' and zactive='1' and xbomtype='"+xbomtype+"' and xpreferbatchqty='"+xpreferbatchqty+"'")
+				if #result .eq. "true"
+					error "Cannot Proceed -- Active BOM No "+bomkey+" Exists For Same Item"
+				end if
+			end event
+		end field
+		
+		
+
+		embed onsubmit="return submitit(this)"
+
+
+		field Component
+			embed onclick="clicked(this)"
+		end field
+		
+			field Receipe
+			embed onclick="clicked(this)"
+		end field
+
+	end form
+
+	
+	jscript myscript
+		<script language="javascript" type="text/javascript">
+			var button
+			var result
+			function clicked(b){
+				button=b.value
+			}
+		
+			function submitit(form){
+				result = true
+				if (button=="Component Setting"){
+					form.screen.value = "bmbomdetail"
+					form.searchbutton.value = "Top"
+				}
+				return result
+			}
+		</script>
+	end jscript
+
+end screen

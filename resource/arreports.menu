@@ -1,0 +1,36 @@
+//AR Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Customer Ledger                  |#classPath+"/login?screen=*viewcrystal arleddetail(4;in,st,dt,dt;zid,cus,fdate,tdate;xcus=Customer=,xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Foreign Customer Ledger        |#classPath+"/login?screen=*viewcrystal arleddetarcur(4;in,st,dt,dt;zid,cus,fdate,tdate;xcus=Customer=,xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Summary Customer Ledger          |#classPath+"/login?screen=*viewcrystal arledsummary(4;in,st,dt,dt;zid,cus,fdate,tdate;xcus=Customer=,xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Ageing Report Details            |#classPath+"/login?screen=*viewcrystal aragedetailbyinvdate(4;in,st,st,st;zid,sp,cus,gcus;xhide=SRO,xcus=Customer=,xhide=SRO,xviewtype=Report View)"
+Ageing Report Summary            |#classPath+"/login?screen=*viewcrystal aragesummarybyinvdate(4;in,st,st,st;zid,sp,cus,gcus;xhide=SRO,xcus=Customer=,xhide=SRO,xviewtype=Report View)"
+Customer List (Reports)          |#classPath+"/login?screen=*viewcrystal cacus(1;in;zid;xviewtype=Report View)"
+
+// |#classPath+"/login?screen=*jspcrystal cacus()"
+
+
+//Ageing Report Details            |#classPath+"/login?screen=*viewcrystal aragedetailbyinvdate(3;in,st,dt;zid,cus,date;xcus=Customer=,xdate=Date,xviewtype=Report View)"
+//Ageing Report Summary            |#classPath+"/login?screen=*viewcrystal aragesummarybyinvdate(3;in,st,dt;zid,cus,date;xcus=Customer=,xdate=Date,xviewtype=Report View)"
+
+Money Receipt Summary $             |#classPath+"/login?screen=*viewcrystal armrstmt(4;in,st,st,st;@zid,@fdate,@tdate,@psp;xdate=From Date=#date,xdate=To Date=#date,xsp=SRO,xviewtype=Report View)"
+Money Receipt Summary BDT           |#classPath+"/login?screen=*viewcrystal armrstmtbdt(4;in,st,st,st;@zid,@fdate,@tdate,@psp;xdate=From Date=#date,xdate=To Date=#date,xsp=SRO,xviewtype=Report View)"
+Receivable & Collection Statement   |#classPath+"/login?screen=*viewcrystal arreceivablecol(4;in,st,st,st;zid,fdate,tdate,xcus;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer=,xviewtype=Report View)"
+//Receivable & Coll Stmt By SP		|#classPath+"/login?screen=*viewcrystal arreceivablecolbysp(5;in,st,st,st,st;zid,fdate,tdate,xcus,sp;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer=,xsp=Sales Person,xviewtype=Report View)"
+//Monthly Inv & Coll Stmt By SP		|#classPath+"/login?screen=*viewcrystal arledcollection(5;in,dt,dt,st,st;zid,fdate,tdate,cus,sp;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer=,xsp=Sales Person,xviewtype=Report View)"
+//Monthly Inv & Coll Stmt By SP		|#classPath+"/login?screen=*viewcrystal arledcollectionall(7;in,st,st,st,st,st,st;@zid,@pdate,@pcus,@psp,@pgcus,@parea,@pterritory;~
+//									xdate=Month=#date,xcus=Customer=,xsp=Sales Person,xgcus=Customer Group,xfield=Fields,xterritory=Territory,xviewtype=Report View)"
+
+
+////Customer Ledger                  |#classPath+"/login?screen=*jspcrystal arleddetail(xwh=Division,xcus=Customer=,xdate=From Date=#date,xdate=To Date=#date,xyear=Year)"
+////Summary Customer Ledger          |#classPath+"/login?screen=*jspcrystal arledsummary(xwh=Division,xcus=Customer=,xdate=From Date=#date,xdate=To Date=#date,xyear=Year)"
+//Money Receipt Listing            |#classPath+"/login?screen=*jspcrystal armrstmt(xcus=From Customer=,xcus=To Customer=,xdate=From Date=#date,xdate=To Date=#date)"
+//Ageing Report                    |#classPath+"/login?screen=*jspcrystal arage(xcus=From Customer=,xcus=To Customer=,xdate=From Date=#date,xdate=To Date=#date)"
+//Customer List                    |#classPath+"/login?screen=*jspcrystal cacus(xcus=Customer=000,xcus=Customer=zzz)"
+//Due Date Invoice List            |#classPath+"/login?screen=*crystal duedate(xdate=Date)"
+//Highest sale listing             |#classPath+"/login?screen=*crystal saletemp(xfdatevar=Fromt Date,xtdatevar=Trro Date)"
+
+//-------------------------------------------------------------------
+

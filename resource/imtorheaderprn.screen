@@ -1,0 +1,373 @@
+screen imtorheaderprn
+    
+	sidebar list imtor,list one,list imtoreject
+	sections form one, jscript myscript
+
+	list imtor
+        caption "Purchase Returned List"
+        table imtorheader
+        order xtornum desc
+		select "zauserid='"+#user+"' and left(xtornum,4)='PRN-' and xstatustor<>'Rejected'"
+        rows 10
+        objects  xtornum  attrib(link "login?screen=imtorheaderprn&command=Show&xtornum=?"),~
+                 xdate,xgrnnum,xstatustor,xidsupdesc equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xidsup)),~
+				 xidsupdesc2 equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xsuperior2))
+				 //xidsupdesc3 equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xsuperior3)
+				 
+        headers "Requisition No","Date","GRN No","Inspection Status","Approver","OR >>>>>> Approver"
+    end list
+	
+	list imtoreject
+        caption "Rejected Purchase Returned  List"
+        table imtorheader
+        order xtornum desc
+		select "zauserid='"+#user+"' and left(xtornum,4)='PRN-' and xstatustor='Rejected'"
+        rows 10
+        objects  xtornum  attrib(link "login?screen=imtorheaderprn&command=Show&xtornum=?"),~
+                 xdate,xstatustor
+				 
+        headers "Requisition No","Date","Purchase Returned Status"
+    end list
+   
+
+   list one
+        caption "<br><center><b>"Purchase Returned Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 100
+        objects ~
+        xrow,~// attrib(link "login?screen=imtordetailprn&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+		partno equals((select xtheircode from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyord
+
+        headers "Serial No","Item","Description","Part No","Purchase Returned Quantity"
+     end list
+
+
+
+     form one
+        caption "Purchase Returned Entry Header"
+        table imtorheader
+        primarykey xtornum
+        order xtornum desc
+        select "left(xtornum,4)='PRN-'"
+        return "login"
+        pstyle 3
+        layout 3
+        objects Add,Update,Delete,Show,Clear,Top,Next,Previous,Bottom,Details,Confirm,"<p>" ,~ //Transfer,
+        xtornum,xdate,xgrnnum,~
+        xfwh,xfbrname,xstatustor,xcus,xcusdesc display(const),xtwh display(hide),xtbrname display(hide),~
+		xstatusrec display(hide),xidsup display(hide),xstatusreq display(hide),xref,xlong,~
+		xstatusap display(hide),xstatusjv display(hide),xnote,,,~
+		signatorysec display(const),xpkey display(hide) attrib(local),,,~
+		xpreparer display(hide),preparer display(const),~		
+		xsignatory1 display(hide),signatory1  display(const),~
+		xsignatory2 display(hide),signatory2 display(const),~
+		xsignatory3 display(hide),signatory3 display(const),~
+		xsignatory4 display(hide),signatory4 display(const),~
+		xsignatory5 display(hide),signatory5 display(const),~
+		xsignreject display(hide),signreject display(const)
+
+		field xstatustor
+		caption Purchase Returned Status
+		display const
+		end field
+		
+		field xdate
+			caption Purchase Returned Date
+		end field
+		
+		field xgrnnum
+			caption GRN Number
+			pick list xgrnprn
+		end field
+		
+		field xnote
+		caption Reject Note
+		display const
+		end field
+	
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		//column 2
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='PRN Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='PRN Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='PRN Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='PRN Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='PRN Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		
+	    field xfwh
+    		caption From Store/Plant
+			display text
+			pick list xwh
+	    end field
+	    
+	    field xtwh
+    		caption To Store/Plant
+			default #wh
+			pick list xwh
+	    end field
+	    
+			
+       field xfbrname
+        attrib local
+        caption Store Name
+      display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Store Name
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+		field xcus
+			caption Supplier Code
+			pick list casup
+		end field
+	   
+		  field xcusdesc
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xcusdesc=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		  end field
+		  
+		field show
+		event after
+          set xpkey=xtornum
+		  end event
+        end field		  
+
+        field xtornum
+			caption  Purchase Returned No: 
+			pick list prnno
+          event after
+			class careports(getReport{imprnprint;2;in,st;zid,tornum;xtornum;Print PRN Report})
+            //class careports(getaspReport{imtranissueprint,1,xtornum,Print PRN Report})
+            //class careports(getReport{imtranreceprint,1,xtornum,Print Receive Challan})
+            set globals(xgrnnum)=xgrnnum
+			set globals(xtornum)=xtornum
+           if imtorheader.xstatustor("xtornum='"+xtornum+"'") .eq. "Confirmed"
+					set #field(Update.attrib) = "disabled"
+					set #field(Details.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+					set #field(Transfer.display) = "hidden"
+				end if
+		
+				if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+					set #field(Update.attrib) = "disabled"
+					set #field(Details.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+				end if
+				if xtornum .eq. ""
+					set #field(delete.attrib) = "disabled"
+					set #field(update.attrib) = "disabled"
+					set #field(Details.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+					set #field(Transfer.display) = "hidden"
+				end if
+				if xtornum .ne. ""
+					set #field(add.attrib) = "disabled"
+				end if
+				if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Approved"
+					set #field(Transfer.display) = "hidden"
+				end if
+					//set #field(top.attrib) = "disabled"
+					//set #field(next.attrib) = "disabled"
+					//set #field(previous.attrib) = "disabled"
+					//set #field(Bottom.attrib) = "disabled"
+					//set #field(delete.attrib) = "disabled"
+			
+           end event
+		 
+        end field
+
+
+        field add
+          event before
+			set backdate=#sql("select xdateexp from acdef")
+			set backentry=#sql("select xbacklock from acdef")
+			set wh=branchclientview.xcode("xcode='"+xfwh+"' and zactive=1")
+			//set xordernum = opdoheader.xordernum("xdornum='"+xdornum+"'")
+			set grnst = pogrnheader.xstatusgrn("xgrnnum='"+xgrnnum+"'")
+			set grnnum = pogrnheader.xgrnnum("xgrnnum='"+xgrnnum+"'")
+			if xfwh .eq. "" .or. wh .ne. xfwh
+					error "Plant/Store is Blank Or Not Exists!"
+			else if grnst .ne. "Confirmed" .and. xgrnnum .ne. ""
+				error "Cannot Proceed -- GRN Status Open!"
+			else if  xgrnnum .ne. "" .and. grnnum .ne. xgrnnum
+				error "GRN Not Exists!"
+			else if backentry .eq. "No" .and. xdate .le. backdate
+				error "Back Lock Entry does not allow!"
+			else
+	          	set trn = "PRN-"
+		        set xstatustor=""
+				set xstatusap="Open"
+				set xstatusjv="Open"
+				set xpreparer=pdmst.xstaff("xposition='"+#position+"'")
+	       	    set xtornum = #trn("Transfer Transaction",trn,10)
+				set xpkey=xtornum
+			end if
+			if xgrnnum .ne. ""
+				set xcus=pogrnheader.xcus("xgrnnum='"+xgrnnum+"'")
+			end if
+          end event
+		  event after
+		  //set temp=#sql("update pogrnheader set xstatusinsp='Confirmed' where xgrnnum='"+xgrnnum+"'")
+		  end event
+        end field
+		
+        field Update
+          event before
+			set backdate=#sql("select xdateexp from acdef")
+			set backentry=#sql("select xbacklock from acdef")
+			set grnst = pogrnheader.xstatusgrn("xgrnnum='"+xgrnnum+"'")
+			set grnnum = pogrnheader.xgrnnum("xgrnnum='"+xgrnnum+"'")
+			set wh=branchclientview.xcode("xcode='"+xfwh+"' and zactive=1")
+			if xpkey .ne. xtornum
+				error "Please press show first!"			
+			else if xfwh .eq. "" .or. wh .ne. xfwh
+				error "Plant/Store is Blank Or Not Exists!"
+			else if grnst .ne. "Confirmed" .and. xgrnnum .ne. ""
+				error "Cannot Proceed -- GRN Status Open!"
+			else if  xgrnnum .ne. "" .and. grnnum .ne. xgrnnum
+				error "GRN Not Exists!"
+			else if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+				error "Can not Proceed-- Already Confirmed!"
+			else if backentry .eq. "No" .and. xdate .le. backdate
+				error "Back Lock Entry does not allow!"
+			end if
+			if xgrnnum .ne. ""
+				set xcus=pogrnheader.xcus("xgrnnum='"+xgrnnum+"'")
+			end if
+			
+          end event
+		  event after 
+		  //set temp=#sql("update pogrnheader set xstatusinsp='Confirmed' where xgrnnum='"+xgrnnum+"'")
+		  end event
+        end field
+		
+		
+        field delete
+          event before
+			set grnnum =xgrnnum
+			set tornum =xtornum
+          end event
+		  event after
+		  //set temp=#sql("update pogrnheader set xstatusinsp='Open' where xgrnnum='"+grnnum+"'")
+		  end event
+        end field
+
+		field confirm
+            event before
+			set justificat=#sql("select xlong from imtorheader WHERE xtornum='"+xtornum+"'")
+			double prepqty=#sql("select sum(xqtyord) from imtordetail where xtornum='"+xtornum+"'")
+			if prepqty <0.01
+			error "Please add detail"
+			else if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "" .and. imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Rejected"
+				error "SR Already Confirm"
+			else if justificat .eq. ""
+				error "Please write Justification!"
+			end if
+            end event
+            event after
+			set temp =  #spsql(zabsp_Confirmed_Request,#id,#user,#position,xfwh,xtornum,"PRN")
+			//set temp = #spsql(zabsp_sendmail,#id,#user,xtornum,"Department","")
+	         action show
+            end event
+          end field
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtordetailprn"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

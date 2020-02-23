@@ -1,0 +1,62 @@
+screen pdotdetail
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "OT Detail"
+        table pdotdetail
+        order xyearperdate,xposition,xrow
+        fixed xyearperdate,xposition
+        rows 20
+        objects xrow attrib(link "login?screen=pdotdetail&command=Show&xyearperdate=?&xstaff=?&xrow=?"),~
+                 xtype,xstatus,xothours
+     end list
+
+     form one
+        caption "OT Detail For "+xposition
+	      table pdotdetail
+        order xyearperdate,xstaff,xrow
+        fixed xyearperdate,xstaff
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Return,Top,Next,Previous,Bottom,~
+                xrow attrib(row 0 1),xtype,xstatus display(const),xdate,xothours
+
+        embed onsubmit="submitit(this)"
+
+         field xtype
+           caption Approval Type
+           pick "Amount,Leave"
+         end field
+
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Return"){
+            form.screen.value = "pdotheader"
+            form.searchbutton.value = "Find xyearperdate=?&xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

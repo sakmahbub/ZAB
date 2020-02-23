@@ -1,0 +1,84 @@
+screen pdexperience
+
+     //sidebar  list confirm
+     sections form one,list detail,jscript myscript
+
+  	list detail
+        caption "List"
+        table pdexperience
+        order xstaff,xrow
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdexperience&command=Show&xstaff=?&xrow=?"), ~
+                 xnote
+
+        header "Row No","Experience Details"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Previous Experience Detail For "+xname+"</ACRONYM>"
+	  table pdexperience
+        order xstaff,xrow
+        fixed xstaff
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add, Update, Delete,Return,Clear,*next,Top,Next,Previous,Bottom, "<p>" ,~
+          xrow attrib(row 0 1),xnote
+
+
+	  field xyear
+	    caption Passing Year
+ 	  end field
+
+        field xdesignation
+	    display const
+          caption Current Designation
+        end field
+
+        field xdesigpromo
+          caption Promoted To
+          pick "select xcode from xcodes where xtype='Designation' and zactive=1"
+        end field
+
+        field xnote
+	    caption Previous Experience
+          width 100
+          height 2
+          //column 2
+        end field
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdmsthrd"
+            form.searchbutton.value = "Find xstaff=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

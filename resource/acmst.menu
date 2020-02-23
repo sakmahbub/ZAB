@@ -1,0 +1,37 @@
+//General Accounts Master.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Chart of Accounts                |#classPath+"/login?screen=acmst"
+		//Party/Buyer Entry              |#classPath+"/login?screen=cacus"
+		//Supplier Entry                   |#classPath+"/login?screen=casup"
+//Update Budget                  |#classPath+"/login?screen=acbudup"
+		//Bank Name Entry                  |#classPath+"/login?screen=cabank"
+//Fair Expense					 |#classPath+"/login?screen=xcodes(xtype=Fair Expense)"
+Account Group                    |#classPath+"/login?screen=achrc1"
+//Exchange Rate Table            |#classPath+"/login?screen=caexch"
+//-
+Voucher Posting By Date          |#classPath+"/login?screen=acpostdate"
+Year End Processing              |#classPath+"/login?screen=acyearend"
+
+//Year End Processing            |#classPath+"/login?screen=acyearendbr"
+//Posting                        |#classPath+"/login?screen=acpost"
+//UnPosting                      |#classPath+"/login?screen=acunpost"
+//Posting By Date                |#classPath+"/login?screen=acpostdate"
+//UnPosting By Date              |#classPath+"/login?screen=acunpostdate"
+//Opening Balances               |#classPath+"/login?screen=acheaderob"
+//Account Balances               |#classPath+"/login?screen=acbal"
+Country                          |#classPath+"/login?screen=xcodes(xtype=Country)"
+Concern Name         			 |#classPath+"/login?screen=xcodesconcern"
+		//Expense Code (Car Fuel & Repair) |#classPath+"/login?screen=pdexpense"
+AC Defaults                      |#classPath+"/login?screen=acdef"
+Sales Rate Default               |#classPath+"/login?screen=opratedefh"
+Chart of Account Serial          |#classPath+"/login?screen=acgroup"
+Product Group Update          	 |#classPath+"/login?screen=caitemacc"
+Department                       |#classPath+"/login?screen=xcodesdept"
+Payroll Transaction Type         |#classPath+"/login?screen=xcodestrntype"
+Payroll To Gl Interface          |#classPath+"/login?screen=pdtogli"
+PO To GL Interface               |#classPath+"/login?screen=potoapi"
+AR Interface                     |#classPath+"/login?screen=optoari"
+//-------------------------------------------------------------------
+

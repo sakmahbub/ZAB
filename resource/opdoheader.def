@@ -1,0 +1,31 @@
+product ZAB ERP
+
+table opdoheader
+  caption "DO Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xdornum,xdate,xcus,~
+          xstatusord,xref,xnote,xwh,xpornum,xstatusar,xtotamt,~
+          xdisc,xdiscf,xdatecom,xait,xamount,xvatrate,xdatedue,xavlperc,~
+          xsp,xpp,xvatamt,xaitamt,xdiscamt,xfm,xsm,xrsm,~
+	  xterritory,xfield,xregion,xarea,xpaymentterm,xproject,xyear,xper,~
+	  xmarket,xtype,xroute,xstatus,xprime,xdatepo,xdeltime,xdatedel,xsumnum,xcrnnum,~
+	  xexpamt,xnetret,xnetamt,xstatusdor,xordernum,xvoucher,xadamount,xtaxrate,xtaxamt,~
+	  xcomm,xcomm1,xcomm2,xcomm3,xnote1,xnote2,xnote3,xassessval,xassessval1,xassessval2,xassessval3,xcommin,~
+	   xsuperiorsp,xpreparer,xdphead,xcheaker,xmanager,xcpo,xgmdf,xed,xdmddc,xdatechk,xdatedph,~
+	  xdatecpo,xdatemanager,xdategm,xdatedf,xdateed,xdatedmddc,xfwh,xstatusjv,~	  
+	  zemail,xcur,xexch,xcrterms,xpaymenttype,xctype,xcrdcardno,xdoctype,xbank,xpaid,xbillno,xlong,~
+	  xvatf,xaitf,xorg,xperson,xpaystatus,xcardtype,xchgscard,xchgsamt,xserialall,xgiftvoucher,~
+	  xvoucheramt,xpromono,xbonuspoints,xearnedbonuspoints,xphone,~
+	  xearnedbonusamt,xissuebank,xpaytype,xcrnamt,xcashamt,xcardamt,xspdiscamt,xstatusprint,xcardno,xrptcount,~
+	  xdocrow,xstype,xdateplan,xstatusmor,xinvnum,xlcno,xartwdate,xpiref,xbuyer,xordernumso,xstyleno,xcontactphn,~
+	  xbookingno,xbono,xdeliveryto,xtruckno,xmadd,xstatusgl,xglvoucher,xqtydel,xpartialchano
+	  
+
+
+
+  primary key zid, xdornum
+  foreign key
+        zid references zbusiness.zid
+        zid,xcus references cacus.zid,xcus
+  end foreign key
+end table

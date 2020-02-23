@@ -1,0 +1,28 @@
+//Accounts Reports.menu     moreports.menu
+//-------------------------------------------------------------------
+option                           		|action  
+//-------------------------------------------------------------------
+OKA        	       |#classPath+"/login?screen=*viewcrystal OKA(3;in,st,st;@zid,@fbatch,@tbatch;xbatch=From Batch,xbatch=To Batch,xviewtype=Report View)"
+Current Stock (FG)       	    |#classPath+"/login?screen=*viewcrystal mocurstock(3;in,st,st;zid,item,color;xitemfg=Item Code,xcolorcode=Color Code,xviewtype=Report View)"
+Delivery Summary       	    |#classPath+"/login?screen=*viewcrystal opdocussumrpt(5;in,st,st,dt,dt;zid,cus,count,fdate,tdate;xcus=Customer ID,xcount=Count,xdate=From Date,xdate=To Date,xviewtype=Report View)"
+Ready Stock        	    |#classPath+"/login?screen=*viewcrystal moreadystock(2;in,st;@zid,@cus;xcus=Customer ID,xviewtype=Report View)"
+Outstanding Report	    |#classPath+"/login?screen=*viewcrystal sooutstandingrpt(3;in,st,dt;zid,cus,fdate;xcus=Customer ID,xdate=As on Date,xviewtype=Report View)"
+Item Sorting Report        |#classPath+"/login?screen=*viewcrystal itemsortingnewc(6;in,st,st,st,st,dt;zid,cus,so,item,colorcode,fdate;xcus=Customer ID,xordernumso=SO No.,xitemfg=Item Code,xcolorcode=Color Code,xdate=Date,xviewtype=Report View)"
+
+//Machine Wise Daily Production        	|#classPath+"/login?screen=*viewcrystal momachinewiseprd(3;in,st,st;@zid,@fdate,@tdate,rpt;xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+//Machine Wise Production Detail        	|#classPath+"/login?screen=*viewcrystal momachinewiseprddetail(2;in,dt;zid,fdate;xdate=From Date=#date,xviewtype=Report View)"
+//Date Wise PI Grey Status        		|#classPath+"/login?screen=*viewcrystal datewisepigreystatus(4;in,dt,dt,st;@zid,@fdate,@tdate,@piref,rpt;xdate=From Date=#date,xdate=To Date=#date,xpiref=PI Number,xviewtype=Report View)"
+//PI Wise Production Summary       		|#classPath+"/login?screen=*viewcrystal mopiwiseprdsum(2;in,st;@zid,@piref,rpt;xpiref=PI Number,xviewtype=Report View)"
+//PI Wise Production Detail        		|#classPath+"/login?screen=*viewcrystal mopiwisedailyprd(2;in,st;zid,piref,rpt;xpiref=PI Number,xviewtype=Report View)"
+//PI Wise Production Status	       		|#classPath+"/login?screen=*viewcrystal mopiwiseprdsumdate(4;in,dt,dt,st;@zid,@fdate,@tdate,@piref;xdate=From Date=#date,xdate=To Date=#date,xpiref=PI Number,xviewtype=Report View)"
+//PI Status       						|#classPath+"/login?screen=*viewcrystal oppistatus(4;in,dt,dt,st;@zid,@fdate,@tdate,@piref;xdate=From Date=#date,xdate=To Date=#date,xpiref=PI Number=,xviewtype=Report View)"
+//Item Ledger Detail (VS)          		|#classPath+"/login?screen=*viewcrystal imtrndetail(6;in,st,st,st,dt,dt;zid,wh,fgitem,fitem,fdate,tdate;xwhvs=Store=,xgitem=Item Group,xitem=Item,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+//Item Ledger Summery  (VS)          		|#classPath+"/login?screen=*viewcrystal imledsum(6;in,st,st,st,dt,dt;zid,xwh,fgitem,fitem,fdate,tdate,rpt;xwhvs=Virtual Store=,xgitem=Item Group,xitem=Item,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+//Monthly Stock Balance (VS)         		|#classPath+"/login?screen=*viewcrystal opmstockbaldetail(7;in,st,st,st,st,dt,dt;zid,xwh,fgitem,fitem,titem,fdate,tdate,rpt;xwhvs=Virtual Store=,xgitem=Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+//Customer Wise FG Detail Inspection      |#classPath+"/login?screen=*viewcrystal mocuswisedetailinsp(4;in,dt,dt,st;zid,fdate,tdate,cus,rpt;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xviewtype=Report View)"
+//PI Wise FG Detail Inspection       		|#classPath+"/login?screen=*viewcrystal mopiwisedetailinsp(2;in,st;zid,piref,rpt;xpiref=PI Number,xviewtype=Report View)"
+///PI Register								|#classPath+"/login?screen=*viewcrystal comorderdetail(5;in,dt,dt,st,st;zid,fdate,tdate,cus,type,rpt;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xordertype=Order Type==combo,xviewtype=Report View)"
+//Order Register      					|#classPath+"/login?screen=*viewcrystal comorderdetailcf(5;in,dt,dt,st,st;zid,fdate,tdate,cus,type,rpt;xdate=From Date=#date,xdate=To Date=#date,xcus=Customer ID,xordertype=Order Type==combo,xviewtype=Report View)"
+//Batch Wise Recipe Setting.      		|#classPath+"/login?screen=*viewcrystal mopiwiserecipe(2;in,st;zid,batch,rpt;xbatch=Batch No=,xviewtype=Report View)"
+//Costing	Reports Details  				|#classPath+"/login?screen=*viewcrystal imcosting(2;in,st;@zid,@ppiref,rpt;xpiref=PI Number,xviewtype=Report View)"
+//Costing Summary(Raw Materials)			|#classPath+"/login?screen=*viewcrystal imcostingsummary(2;in,st;@zid,@ppiref,rpt;xpiref=PI Number,xviewtype=Report View)"

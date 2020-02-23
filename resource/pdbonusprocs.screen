@@ -1,0 +1,91 @@
+screen pdbonusprocs
+     caption "Payment Processing"
+     sections form one
+
+     form one
+        caption "<ACRONYM>Bonus Process</ACRONYM>"
+        return "login"
+        layout 2
+        pstyle 3
+
+        objects Process,xempcategory,xdum,xfstaff,xtstaff,xyear,xper //,processtype
+
+        field xdum
+          attrib local
+          display const
+          caption
+        end field
+	
+	  field xempcategory
+	    display const
+	    default #wh
+	  end field
+
+        field processtype
+          attrib local
+          display combo
+          default "Service Process"
+          caption Type Of Process
+          pick "Bonus Process,Service Process"
+        end field
+
+        field Process
+          event after
+            //if processtype .eq. "Bonus Process"
+              //class pdsheraton(processBonus{xyear,xper,xempcategory})
+            //else if processtype .eq. "Service Process"
+              //class pdsheraton(processChargeService{xyear,xper,xempcategory})
+            //end if
+		 //print xempcategory
+            set temp = #spsql(zabsp_bonuspro, #id,#user,xfstaff,xtstaff,xyear,xper,xempcategory) //#id,#user,xyear,xper,xempcategory
+          end event
+        end field
+
+        field xyear
+          attrib local
+          default #sub(#date,0,4)
+        end field
+
+        field xper
+          attrib local
+          default #sub(#date,5,2)
+        end field
+
+        field xfstaff
+         // default 
+        end field
+
+        field tdate
+          caption To Date
+          attrib local
+          display text
+          default #date
+        end field
+
+        field fstaff
+          caption From Staff
+          attrib local
+          display text
+        end field
+
+        field tstaff
+          caption To Staff
+          attrib local
+          display text
+        end field
+
+        field fyearperdate
+          caption dummy
+          attrib local
+          display text
+        end field
+
+        field tyearperdate
+          caption dummy
+          attrib local
+          display text
+        end field
+
+     end form
+
+end screen

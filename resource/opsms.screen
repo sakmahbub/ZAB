@@ -1,0 +1,32 @@
+screen opsms
+
+  sections form one
+
+  form one
+    caption "SMS"
+    return "login"
+    layout 2
+    pstyle 3
+
+    objects Create File//,Cancel//, xyear,xper,xdate,xsp
+
+	field xper
+		caption Month
+	end field
+
+    field Create
+      event after
+        set temp = #spsql(zabsp_PRCS_CreateSMSText)
+        class opsms(createExcel)
+      end event
+    end field
+
+    field Cancel
+      event after
+        class opsms(cancelExcel)
+      end event
+    end field
+
+  end form
+
+end screen

@@ -1,0 +1,88 @@
+screen oplctogli
+
+     sidebar list one
+	 sections  form one, jscript myscript
+
+
+     list one
+        caption "List"
+        table oplctogli
+        order xtype,xgcus
+        rows 20
+        objects xtype attrib(link "login?screen=oplctogli&command=Show&xtype=?&xgcus=?"),~
+                xgcus,xacc,desc equals((select xdesc from acmst where zid=oplctogli.zid and xacc=oplctogli.xacc)),~
+				xaccsales,salesdesc equals((select xdesc from acmst where zid=oplctogli.zid and xacc=oplctogli.xaccsales))
+				
+		header "Trn No","Customer Group","Account No","Description","Sales Account","Description"
+    end list
+
+
+
+    form one
+        caption "OP LC To GL Interface"
+        table oplctogli
+        order xtype,xgcus
+        return "login"
+        layout 4
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,~ 
+                *next,Top,Next,Previous,Bottom,"<p>" ,~
+                xtype,xgcus,xacc,xaccdesc,xaccsales,xdescsales
+        
+		field xacc
+			caption Account Receivable
+		end field
+		
+		field xtype
+          caption Transacton Type
+          display combo
+          pick "LC Bill,LC Realization"
+        end field
+
+        field xaccdesc
+          attrib local
+          display const
+          caption Description
+          event after
+            set xaccdesc=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+        field xdescsales
+          attrib local
+          display const
+          caption Description
+          event after
+            set xdescsales=acmst.xdesc("xacc='"+xaccsales+"'")
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

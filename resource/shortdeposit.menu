@@ -1,0 +1,14 @@
+//Short Deposit.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Master                           |#classPath+"/login?menu=shortdepot"
+Short Deposit Adj. Entry                    |#classPath+"/login?screen=shortdepositadj"
+//Salary Adjustment                    |#classPath+"/login?screen=salaryadj"
+//Petty Cash Adjust.                    |#classPath+"/login?screen=pettycashadj"
+//Expense Adjustment                    |#classPath+"/login?screen=expenseadj"
+//Transaction                    |#classPath+"/login?menu=actrn"
+//Reports                          |#classPath+"/login?menu=acreports"
+//Codes & Parameters               |#classPath+"/login?menu=accodes"
+//-------------------------------------------------------------------
+

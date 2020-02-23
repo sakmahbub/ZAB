@@ -1,0 +1,86 @@
+screen binmaster
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table binmaster
+        order xbinref
+        rows 50
+        objects  xbinref attrib(link "login?screen=binmaster&command=Show&xbinref=?"),~
+                xwh,xarea,xrowno,xshelf,zactive
+
+        headers "Bin Ref","WareHouse No","Area","Row No","Rack No","Active?"
+     end list
+
+     form one
+
+     caption "Bin Master"
+        table binmaster
+        order xbinref
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Delete,*next,~
+                Top,Previous,Next, Bottom,"<p>" ,~
+                xbinref,,xwh,xwhdesc,xarea,xrowno,xshelf,xbin,xlong,zactive
+
+		field xwh
+		caption WareHouse No
+        end field
+		
+        field xarea
+          caption Area
+		  pick code Area No
+        end field				
+		
+        field xrowno
+          caption Row No
+		  pick code Row No
+        end field
+		
+        field xshelf
+          caption Rack / Shelf
+		  pick code Rack No
+        end field		
+		
+        field xbin
+          caption Bin No
+		  display combo
+		  pick code Bin No
+        end field			
+		
+       field xwhdesc
+        attrib local
+        caption WareHouse Name
+        display const
+        event after
+          set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+		
+        field add
+          event before
+		  if xwh .eq. ""
+			error "Please select WareHouse !"
+		  else if xarea .eq. ""
+			error "Please select Area !"
+		  else if xrowno .eq. ""
+			error "Please select Row No !"
+		  else if xshelf .eq. ""
+			error "Please select Shelf No !"
+		  else if xbin .eq. ""
+			error "Please select Bin No !"
+		  else
+          set xbinref=xwh+xarea+xrowno+xshelf+xbin
+		   //print xtrn
+		   //set xbin= #trn("Bin No","BN--",12)
+		  end if
+         end event
+        end field
+
+
+     end form
+
+
+end screen

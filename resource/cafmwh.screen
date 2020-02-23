@@ -1,0 +1,157 @@
+
+screen cafmwh
+  caption "Field Manager"
+  sidebar list one	
+  sections form one, jscript myscript
+
+     list one
+      caption "FM List"
+        table cafm
+        order xfm desc
+    
+	select "left(xfm,4)='FM--' and xwh='"+#wh+"'"
+	rows 40
+        objects  xfm attrib(link "login?screen=cafmwh&command=Show&xfm=?"), ~
+                 xname,xfield,region equals((select xregion from carsm where xrsm=cafm.xrsm)),~
+		     area  equals((select xarea from casm where xsm=cafm.xsm))
+
+		
+
+        header "FM Code","Name","Field","Region","Zone"
+        //totals "","Totals","","","","","","",sum,sum,sum,sum
+     end list
+
+  form one
+    caption "Field Manager Entry"// of "+xsm+" "+xrsm
+    table cafm
+    primarykey xfm
+    order xfm
+    select "left(xfm,4)='FM--' and xwh='"+#wh+"'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Clear,Top,Previous,Next,Bottom,"<p>",~
+            xfm,xname,xfield,xregion,xrsm,xrsmname,xsm,xsmname,zactive,xdum,xwh display(hide)
+
+
+    field xfield
+      caption Fields
+      display combo
+      pick "select xcode from xcodes where xtype='Fields' and zactive=1"
+    end field
+
+	field xdum
+		attrib local
+		display const
+		caption
+	end field
+	
+	field xregion
+      caption Region
+      display combo
+      pick "select xcode from xcodes where xtype='Region' and zactive=1"
+    end field
+
+    field xsm
+      caption Sales Manager
+      display const
+    end field
+
+    field xsmname
+	attrib local
+      caption Sales Manager Name
+	display const
+	event after
+		set xsmname=casm.xname("xsm='"+xsm+"'")
+	end event
+    end field
+
+    field xrsm
+		display const
+      caption Regional Sales Manager
+	//event after
+		//set xrsm=carsm.xrsm("xregion='"+xregion+"'")
+	//end after
+    width 12
+	end field
+
+    field xrsmname
+	attrib local
+      caption  Regional Sales Manager Name
+	display const
+	event after
+		set xrsmname=carsm.xname("xrsm='"+xrsm+"'")
+	end event
+    end field
+
+    field xfm
+      default "FM--"
+      caption
+//      display trn Sales Representative
+      event after
+        set globals(xsm)=xsm
+        set globals(xrsm)=xrsm
+        set globals(xfm)=xfm
+      end event
+    end field
+
+    field add
+ 	event before
+        if xregion .eq. ""
+          error "Cannot Proceed -- Please Select Region"
+        else if xfield .eq. ""
+          error "Cannot Proceed -- Please Provide Field Name"
+	  else
+		set xwh=#wh		
+		set xfm = #trn("Sales Representative","FM--",8)
+		set xrsm=carsm.xrsm("xregion='"+xregion+"'")
+	      set xsm=#sql("select xsm from carsm where xrsm='"+xrsm+"'")
+        end if
+	end event
+   	//set xwh=#wh
+    end field
+
+    field update
+      event before
+	      set xsm=#sql("select xsm from carsm where xrsm='"+xrsm+"'")
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field RSM
+      embed onclick="clicked(this)"
+    end field
+
+    field PPO
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var ret
+    var toppo
+    function clicked(b){
+      ret=b.value
+      toppo=b.value
+      }
+      function submitit(form){
+        if (ret=="RSM"){
+          form.screen.value = "carsm"
+          form.searchbutton.value = "Find xsm=?"
+          form.searchbutton.value = "Find xrsm=?"
+          //return false
+        }
+        if (toppo=="PPO"){
+          form.screen.value = "cappo"
+          form.searchbutton.value = "Find xsm=?"
+          form.searchbutton.value = "Find xrsm=?"
+          form.searchbutton.value = "Find xfm=?"
+        }
+      }
+      </script>
+  end jscript
+
+end screen

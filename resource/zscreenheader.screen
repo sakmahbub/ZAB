@@ -1,0 +1,78 @@
+screen zscreenheader
+
+     sidebar list one
+     sections form one, jscript myscript
+
+
+     list one
+        caption "<ACRONYM>Screen Header List</ACRONYM>"
+        table zscreenheader
+        order zscreen
+        rows 20
+        //objects  zscreen,~
+		objects  zscreen attrib(link "login?screen=zscreenheader&command=Show&zscreen=?"),~
+                 xdesc,xoption,zactive
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        headers "Screen","Description","Module Name","Status"
+     end list
+	 
+     form one
+        caption "Screen Header Entry"
+        table zscreenheader
+    //    primarykey zscreen
+        order zscreen
+        return "login"
+        pstyle 3
+        layout 2	
+        objects Show, Add, Update, Delete,*next,Detail, Top,Bottom,Clear,"<p>" ,~
+                zscreen,xdesc,xoption,zactive
+
+        embed onsubmit="return submitit(this)"
+
+        field xoption
+			caption Module Name
+          display combo
+          pick "General Accounts,Commercial,Sales & Delivery,Purchase & Procurement,Inventory Management,Production,HR & Payroll"
+        end field
+		
+		field zscreen
+			pick list zscreen
+			event after
+				set globals(zscreen)=zscreen
+			end event
+		end field
+        
+		field xtype
+          display combo
+          pick "button,field"
+        end field
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "zscreendetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+end screen

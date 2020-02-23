@@ -1,0 +1,18 @@
+     list xcur
+        table xcur
+        order xcur
+        //select none
+        navigators alpha
+        rows 4
+        //objects  xcur attrib(link "Main?page=xcur&command=Show&xcur=?"), 
+        objects xcur attrib(link "abc" embed onclick="return updateParent(this:'xcur')"), ~
+                xname,xexch, zactive
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

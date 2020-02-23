@@ -1,0 +1,85 @@
+screen pdreviewhd
+     caption "Review Header"
+     sidebar list dept
+     sections form one, jscript myscript
+
+	list dept
+        caption "Review Department List"
+        table pdreviewhd
+				select xyear=#sub(#date,0,4)
+        order xdeptname
+				fixed xyear
+        rows 20
+        objects  xdeptname attrib(link "login?screen=pdreviewhd&command=Show&xdeptname=?&xsec=?"), ~
+                 xsec,xyear
+	  //header "Point","Description","Percent"
+      end list
+
+     form one
+      caption "<ACRONYM>Review Header</ACRONYM>"
+	table pdreviewhd
+      order xyear,xdeptname,xsec
+      return "login"
+      layout 2
+      pstyle 3
+      objects Add,Update, Delete, Show,Clear,Pointing,*next, Top, Previous, Next, Bottom,~
+      	  xyear,xdeptname,xsec,xnote,xstatus display(const)
+	
+	field xyear
+	  default #sub(#date,0,4)
+	  event after
+	    if xstatus .eq. "Reviewed"
+		set #field(update.display)="hide"
+		set #field(delete.display)="hide"
+		set #field(add.display)="hide"
+	    end if
+	  end event
+	end field
+
+	field xstatus
+	  default "Open"
+	end field
+	
+	field xdeptname
+	  event after
+	    set sec=#sql("select xsec from pdreviewhd where xyear="+xyear+" and xdeptname='"+xdeptname+"'")
+	    if sec .eq. "Nothing"
+	    	set global(xsec)=sec
+	    else
+	    	set global(xsec)=xsec
+	    end if
+	    set global(xdeptname)=xdeptname
+	    set global(xyear)=xyear
+	    set global(xstatus)=xstatus
+ 	  end event
+	end field
+	
+	embed onsubmit="submitit(this)"
+      
+	field pointing
+	  embed onclick="clicked(this)"
+	end field
+
+    end form
+     
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdreviewdt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+end screen

@@ -1,0 +1,190 @@
+screen imtrnloanre
+
+ 
+      \\sidebar list cost
+      sections form imtrn,jscript myscript
+
+     list cost
+        caption "Cost For: "+xitem
+        table caitemcostprice
+        order xitem,xyearperdate
+        fixed xitem
+        select "zactive='1'"
+        rows 20
+        objects  xcost attrib(link "abc" embed onclick="return pickPrice(this)"), ~
+                 xdate
+        totals "","Totals",sum,"",sum
+     end list
+
+form imtrn
+  caption "Loan Receipt Entry."
+  table imtrn
+  order ximtrnnum
+  select "(left(ximtrnnum,3)='LNR')"
+  //select "(left(ximtrnnum,2)='LN') and xwh='"+#wh+"'"
+  return "login"
+  layout 2
+  pstyle 3
+  objects Add,Clear,Show,Update,Delete,*next,Top,Previous,Next,Bottom,~
+          ximtrnnum display(trn Inventory Transaction),xdate,xitem,xdesc,~
+          xqty,xunit display(const),xwh,xbrname,xdocnum display(hide), ~
+          xdocrow display(hide),xnote,xstatusjv display(hide),xcostrow display(hide), ~
+          xsign display(hide),xref
+
+   field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+  field xorg
+    caption Name
+    display const
+    attrib local
+    event after
+      set xorg = casup.xorg("xsup='"+xsup+"'")
+    end event
+  end field
+
+ field xdateexp
+	default "2999-01-01"
+ end field
+
+  field xval
+    caption Value
+  end field
+
+  field ximtrnnum
+	caption Loan Receipt Trn No.
+    defualt "LNRE"
+  end field
+
+  field xdesc
+    caption Product Name
+    attrib local
+    display const
+    event after
+            class careports(getReport{imreceipt,2,xwh,xdate,Print Received Entry})
+    	set xdesc = caitem.xdesc("xitem='"+xitem+"'")
+    end event
+  end field
+
+  field xdocrow
+    caption Row
+  end field
+
+  field xbatch
+    pick imbat
+  end field
+
+  field xdocnum
+    pick imtrndoc
+  end field
+
+  field xitem
+    event after
+    	if xstatusjv .eq. "Confirmed"
+    		set #field(add.display)="hidden"
+      	set #field(update.display)="hidden"
+      	set #field(delete.display)="hidden"
+	end if
+      set globals(xitem)=xitem
+    end event
+  end field
+
+  \\field xnote
+	\\width 80
+	\\height 3
+	\\column 2
+  \\end field
+  
+  field Add
+    event before
+	//set xwh = #wh
+     set xstatusjv = "Open"
+	if xitem .eq. ""
+		error "Cannot Proceed -- Pleser Select Product"
+	else if xqty .lt. "1"
+		error "Cannot Proceed -- Invalid Quantity"
+	else if xwh .eq. ""
+		error "Cannot Proceed -- Please Select Branch/Store"
+	end if
+     //if ximtrnnum_ONE .ne. "RE--" .or. ximtrnnum_ONE .ne. "TDCL"
+      // error "Pls Choose RE-- Or TDCL You Choose Wrong Transaction Code '"+ximtrnnum_ONE+"'"
+     //end if
+     set xsign=1
+    end event
+    event after
+      set command = "add"
+		set temp = #spsql(sp_validateAfterIMtrn,#id,#user,ximtrnnum,xitem,xqty,command)
+		set temp=#spsql(zabsp_imstock,#id,#user,xwh,xitem,xqty,"1","Add")
+      action Show
+    end event
+  end field
+
+
+  field update
+    event before
+        set xstatusjv="Open"
+	//*************IM STOCK TABLE 
+	double qty
+
+	set qty=#sql("select xqty from imtrn where ximtrnnum='"+ximtrnnum+"' and xitem='"+xitem+"'")
+
+	set temsql1=#sql("update imstock set xavail=xavail-"+qty+" where xitem='"+xitem+"' and xwh='"+xwh+"'")
+	set temsql2=#sql("update imstock set xinhand=xinhand-"+qty+" where xitem='"+xitem+"' and xwh='"+xwh+"'")
+	//****************END*************
+    end event
+    event after
+      set command = "update"
+      set temp = #spsql(sp_validateAfterIMtrn,#id,#user,ximtrnnum,xitem,xqty,command)
+	set temp=#spsql(zabsp_imstock,#id,#user,xwh,xitem,xqty,"1","Update")
+      action Show
+    end event
+  end field
+
+  field delete
+    event before
+      set temp=#spsql(zabsp_imstock,#id,#user,xwh,xitem,xqty,"1","Delete")
+    end event
+  end field
+
+
+ embed onsubmit="return submitit(this)"
+end form
+
+     jscript myscript
+
+        <script language=javascript type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="clicked"){
+            form.screen.value = "imtrn"
+          }
+              detail = ''
+              return result
+
+        }
+        function pickPrice(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+		//document.one.xdateexp.value=date.text
+          }else{
+            document.imtrn.xrate.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+end screen

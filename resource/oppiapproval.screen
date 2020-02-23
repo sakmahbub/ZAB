@@ -1,0 +1,217 @@
+screen oppiapproval
+	
+	 sidebar list applist,list one,list terms
+     sections form one,jscript myscript
+
+     list applist
+        caption "PI For Approval"
+        table opordheader
+        order xordernum desc
+		select "xstatuspi <> 'DO Created'"
+        rows 20
+        objects  xordernum attrib(link "login?screen=oppiapproval&command=Show&xordernum=?"),xpiref,xpidate
+		
+        headers "Order No","PI / File Ref","Date"
+     end list
+
+     list one
+        caption "Order Detail List For "+xordernum
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        rows 20
+        objects  xorderrow, ~
+                xitem,desc equals((select xdesc from caitem where caitem.zid=oporddetail.zid and caitem.xitem=oporddetail.xitem)),~
+                xqtyord,xrate,xlineamt
+
+        headers "Row","Item","Description","Qty","Rate"//,"Line Amount"
+	  total "Total","","",sum,"",sum
+     end list
+
+     list terms
+        caption "PI Terms & Condition For "+xordernum
+        table oppiterms
+        order xordernum,xrow
+        fixed xordernum
+        rows 20
+        objects  xrow, ~
+                xcode,xnote
+     end list
+
+
+     form one
+        caption "Order Status"
+	    table opordheader
+        order xordernum desc
+        return "login"
+//      select "(xtype = 'LC' or xtype='Sample') and xstatuspi='Open'"
+       // select "xstatuspi='Open'"
+	   select "xstatuspi <> 'DO Created'"
+        layout 4
+        pstyle 3
+        objects Approval,Hold,Show,Clear,"<p>" ,~
+          xordernum,xtrn,xpiref,xpirefr,xpidate,xcus,xorg,xbuyer,xbname,~
+		  xlcno display(hide),xlctype display(hide),xlcissuedate display(hide),xshipdate display(hide),xexpirydate display(hide),~
+		  xopenbank display(hide),xadvisingbank display(hide),xcur display(hide),xexch display(hide),~
+		  xtype display(hide),xstatusord display(const),xstatuspi display(const)
+		
+        
+			field xordernum
+				event after
+					set globals(xordernum)=xordernum
+					if xstatusord .ne. "Open"
+						set #field(Create.display) = "hidden"
+					end if
+				end event
+			end field
+
+		
+		field xtrn
+			display combo
+			pick "select xtrn from xtrn where xtypetrn='Job Order No'"
+		end field
+		
+		field xstype
+			default "Dyeing"
+			caption Sale Type
+			pick code
+		end field
+		
+		field xpiref
+			pick 
+			width 30
+		end field
+		
+
+		field xbuyer
+			pick xcus
+		end field
+		  
+		  field xbname
+		  	attrib local
+		  	dispaly const
+		  	caption Buyer Name
+			event after
+				set xbname=cacus.xorg("xcus='"+xbuyer+"'")
+			end event
+		  end field
+
+
+		field xorg
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")+"<br>"+cacus.xmadd("xcus = '"+xcus+"'")
+          end event
+        end field
+
+          field add
+            event before
+				if xcus .eq. ""
+					error "Cannot Proceed -- Please Choose Customer"
+				else
+				  set xtype = "LC"
+				  set xstatusord = "Open"
+				  set xstatuspi = "Open"
+                  set trn = "CO--"
+                  set xordernum = #trn("CO Number",trn,10)   
+				  if xtrn .ne. "PI--"
+					set xpiref = #trn("Job Order No",xtrn,8)
+				  end if
+				end if
+            end event
+          end field
+
+          field update
+            event before
+			  set xlineamt = xrate*xqtyord
+				  set xstatusord = "Open"
+				  set xstatuspi = "Open"
+            end event
+          end field
+
+          field Approval
+            event before
+           // if xstatuspi .ne. "Open"
+            //	error "Cannot Proceed -- Order is not authorised for approval"
+            //end if
+            end event
+            event after
+	            set temp = #sql("update opordheader set xstatuspi='Approved' where xordernum='"+xordernum+"'")
+	            action show
+            end event
+          end field
+		  
+		  field Hold
+            event before
+         //   if xstatuspi .ne. "Open"
+          //  	error "Cannot Proceed -- Order is not authorised for approval"
+          //  end if
+            end event
+            event after
+	            set temp = #sql("update opordheader set xstatuspi='Hold' where xordernum='"+xordernum+"'")
+	            action show
+            end event
+          end field
+
+          field LC
+            embed onclick="clicked(this)"
+          end field
+
+		  
+          field Document Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Terms
+            embed onclick="clicked(this)"
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Amendment
+            embed onclick="clicked(this)"
+          end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Terms & Condition"){
+            form.screen.value = "oppiterms"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="LC Info"){
+            form.screen.value = "opordlcinfo"
+            form.searchbutton.value = "Top"
+          }
+  	      if (detail=="Detail"){
+            form.screen.value = "opordlcdetail"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Amendment"){
+            form.screen.value = "oplcamend"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Print PI"){
+            form.screen.value = "*crystal oppi(xordernum=PI Number=xordernum)"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

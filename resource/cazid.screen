@@ -1,0 +1,28 @@
+screen cazid
+     caption "OP Defaults"
+     //sidebar text two,list two, text three
+     sections form one
+
+
+     form one
+        caption "Business Entry"
+        table cazid
+		order zbid
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,Top,"<p>" ,~
+          zbid,zorg,xcus,xorg
+		  
+		field xorg
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")+"<br>"+cacus.xmadd("xcus = '"+xcus+"'")
+          end event
+        end field
+
+     end form
+
+end screen

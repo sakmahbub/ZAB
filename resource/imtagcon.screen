@@ -1,0 +1,89 @@
+screen imtagcon
+
+     caption "IM to GL Transfer"
+     sections list account, form one, jscript myscript
+
+     form one
+        caption "Tag Confirm"
+        //table glyearend
+       primarykey xyear
+        order xyear
+        //fixed xsup
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Process,Show,~
+                xdate,xtagnum
+				
+				
+        field xtagnum
+          pick list xtagnum
+        end field
+
+        field xdate
+          caption Confirm Date
+        end field
+
+        field Process
+		event before
+		if xtagnum .eq. ""
+			error "Please check Tag No!"
+		else if imtag.xstatustag("xtagnum='"+xtagnum+"'") .eq. "Confirmed"
+			error "Already Confirmed!"
+		end if
+		end event
+		event after
+        set temp = #spsql(zabsp_IM_processStockTake,#id,#user,xdate,xtagnum)
+        end event
+        end field
+
+
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+        field Details
+          embed onclick="clicked(this)"
+        end field
+		
+          field Process
+            embed onclick="clicked(this)"
+          end field
+		  
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        function clicked(b){
+
+          button=b.value
+        }
+        function submitit(form){
+          if (button=="Details"){
+            form.screen.value = "pogdt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+		   if (button=="Process"){
+           if(confirm('Are You Confirm ?')){
+			form.searchbutton.value = "Process"
+			}else{
+			form.searchbutton.value = "Show"
+			}
+          }
+        }
+        function pickAccount(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xacc.value=link.text
+          }else{
+            document.one.xacc.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

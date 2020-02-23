@@ -1,0 +1,24 @@
+product ZAB ERP
+
+table caitemdeleted
+  caption "Deleted Items Master"
+  columns ztime,zutime,zauserid,zuuserid,zid, xitem, ~
+          xdesc,~
+          xgitem, xcitem,xcatitem,~
+          xrate,xunitpur,xcost,xvatamt,xrateexp,xhscode,~
+          xunit,xlong,xtitem,xreordlvl,xlmax,xlmin,xbin,xstype,xalias,xmrp,xdealerp,xpacking,xdisc,xcartoon,xdateeff,~
+	  xdateexp,xspecification,xpackqty,zactive,xdiscstatus,xbnprintstatus,xpsize,xpnature,~
+	  xbrand,xcfpur,xcfsel,xcfiss,xcfpck,~
+	  xunitsel,xunitiss,xshelf,xvatrate,xminrate,xgrade,xminqty,xtaxrate,xcountry,xtheircode,xpartno,~
+	  xunitpck,xmodel,xwper,xserialnum,xgritem,xserialtype,xtype,xcus,xitmedept,xitemsubdept,xpackweightnet,xsubcat,xsupptaxamt,xtypeitem,xstocktype,xstockcat,xnote,xmaxqty
+	 
+
+  primary key zid, xitem
+  foreign key
+        zid references zbusiness.zid
+        
+  end foreign key
+
+  list xdesc,xstype
+
+end table

@@ -1,0 +1,136 @@
+screen acopenheader
+
+     sidebar list header, text three
+     sections form one,  jscript myscript
+
+    list header
+        caption "<br><center><b>"Voucher List"</b>"
+        table acheader
+        order xvoucher
+        select "xper=0"
+        rows 10
+        objects ~
+         xvoucher attrib(link "login?screen=acopenheader&command=Show&xvoucher=?"), ~
+         xref,xdate,xyear,xper,xstatusjv
+     end list
+
+
+
+     form one
+        caption "<ACRONYM>AC Opening Header</ACRONYM>"
+        table acheader
+        order xvoucher
+        select "xper=0"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Details, Clear,Show,Add, Update, Delete,*next, Top, Bottom,"<p>" ,~
+               xvoucher display(trn GL Voucher),xdate,xref,  xyear display(const), xper ,~
+               xstatusjv,xlong //,            xcur, xexch
+
+        field xcur1
+          default "BDT"
+          display hide
+        end field
+
+        field xexch1
+          default "1"
+          display hide
+        end field
+
+        field xdate
+          event before
+           set xyear=#year(xdate,acdef)
+          end event
+        end field
+
+        field xper
+          display constant
+          default '0'
+        end field
+
+        field xlong
+          caption Header Description
+          width 80
+          column 2
+        end field
+
+
+        field xstatusjv
+           display constant
+        end field
+
+
+        field xvoucher
+         default "OB--" 
+         event after
+            set globals(xvoucher)=xvoucher
+            set globals(xexch)=xexch
+          end event
+        end field
+
+
+        field clear
+         event after
+            set #field(Details.display) = "hidden"
+            set #field(Delete.display) = "hidden"
+            set #field(Update.display) = "hidden"
+            set #field(Show.display) = "hidden"
+         end event
+        end field
+
+
+        field Add
+          event before
+            if xvoucher_ONE .ne. "OB--"
+              error "Please Choose 'OB--' You Choose Wrong Transaction Code "+xvoucher_ONE
+            end if
+            set xexch = #exch(xdate,xcur)
+            set xstatusjv="Balanced"
+          end event
+          event after
+            class gltrn(acValidateAfterHeader{xvoucher,xexch})
+          end event
+        end field
+
+        field Update
+          event after
+            class gltrn(acValidateAfterHeader{xvoucher,xexch})
+          end event
+        end field
+
+        field Delete
+          event after
+            class gltrn(acValidateAfterHeader{xvoucher,xexch})
+          end event
+        end field
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "acopendetail"
+            form.searchbutton.value = "Find xvoucher=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

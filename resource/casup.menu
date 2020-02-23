@@ -1,0 +1,16 @@
+//Suppliers.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Suppliers                       |#classPath+"/login?screen=casup"|common
+//Suppliers (Update)            |#classPath+"/login?screen=casupupdate"|common
+Supplier Groups                 |#classPath+"/login?screen=xcodesgsup"
+Supplier Category               |#classPath+"/login?screen=xcodes(xtype=Supplier Category )"
+Both Party                      |#classPath+"/login?screen=cabothparty" 
+Delivery Location Entry         |#classPath+"/login?screen=xcodesdelivery"
+Terms & Condition               |#classPath+"/login?screen=xcodes(xtype=PO Terms & Condition)"
+//Supplier Code                 |#classPath+"/login?screen=xtrn(xtypetrn=Supplier Code)"
+//Party Code                    |#classPath+"/login?screen=xtrn(xtypetrn=Party Code)"
+
+//-------------------------------------------------------------------
+

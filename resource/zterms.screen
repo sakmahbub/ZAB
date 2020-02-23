@@ -1,0 +1,94 @@
+screen zterms
+
+     sidebar list terms
+     sections form one,  jscript myscript
+
+     list terms
+        caption "Terms and Conditions"
+        table zterms
+        rows 20
+        objects  xrow attrib(link "login?screen=zterms&command=Show&xpornum=?&xrow=?"),xtype,xnote
+                
+
+
+      headers "Row","Transaction Type","Terms"
+//	  total "Total","","","","",sum	
+     end list
+
+
+     form one
+        caption "All Terms & Condition"
+        table zterms
+        order xrow
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add, Update, Delete,Clear, Show,*next,Top, Previous, Next, Bottom,"<p>",~
+                xrow attrib(row 0 1),xtype,xnote,,xdefault,,zactive
+                
+        embed onsubmit="return submitit(this)"
+        
+        field xnote
+        	captoin Terms & Conditions
+			 height 5
+             column 2
+        end field
+		field xtype
+        	caption Transaction Type
+			
+			//set xtype=xcodes.xtype("xtype='transaction type'")
+			pick "select xcode from xcodes where xtype='Transaction Type'"
+			
+        end field
+		field xdefault
+        	captoin Default
+        end field
+        
+	    field add
+	    	//event before
+        		//set xnote=xcodes.xlong("xtype='PO Terms and Condition' and xcode='"+xcode+"'")
+	    	//end event
+	    end field
+		
+		
+	    //field update
+	    	//event before
+        	//	set xnote=xcodes.xlong("xtype='PO Terms and Condition' and xcode='"+xcode+"'")
+	    	//end event
+	    //end field
+		
+	    
+		
+	    field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "opordlcheader"
+            form.searchbutton.value = "Find xpornum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

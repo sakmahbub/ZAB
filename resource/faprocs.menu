@@ -1,0 +1,8 @@
+//so.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Depreciation Process             |#classPath+"/login?screen=fadepprocs"
+FA To GL Transfer                |#classPath+"/login?screen=fatogl"
+//-------------------------------------------------------------------
+

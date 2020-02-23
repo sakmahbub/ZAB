@@ -1,0 +1,14 @@
+product CorollaSoft
+
+table popidetail
+  caption "PI Detail"
+  columns ztime,zutime,zemail,zid,zauserid,zuuserid,xporeqnum,xrow, xitem,xquality,xlong, ~
+          xqtyord,xunit
+
+  primary key zid, xporeqnum,xrow
+  foreign key
+        zid references zbusiness.zid
+        zid,xporeqnum references popiheader.zid,xporeqnum
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+end table

@@ -1,0 +1,21 @@
+product ZAB ERP
+
+table branchviewloan
+  caption "Branch View"
+  columns zid,xtype,xlong,xcode
+
+  primary key zid,xcode
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+	sql CREATE VIEW branchviewloan(zid,xtype,xlong,xcode,xmadd,xphone,xfax,xemail,xtypeobj,zactive,xwh) ~
+	AS ~
+	SELECT cast(a.zid as varchar(50)),b.xtype,b.xlong,b.xcode,b.xmadd,b.xphone,b.xfax,b.xemail,b.xtypeobj,b.zactive,b.xwh ~
+	FROM zbusiness a JOIN ~
+	xcodes b ON a.zid=b.zid ~
+	WHERE b.xtype='Branch'
+
+end table
+

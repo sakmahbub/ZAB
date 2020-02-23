@@ -1,0 +1,145 @@
+screen casupupdate
+
+     sidebar list one,lst two
+     sections  form one, jscript myscript
+	
+	list one
+    caption "Agreement Product List"
+    table cacusprice
+    order xcus,xitem
+    fixed xcus
+    rows 20
+    objects  xitem attrib(link "login?screen=casupitem&command=Show&xcus=?&xitem=?"), ~
+             desc equals((select xdesc from caitem where zid=cacusprice.zid and xitem=cacusprice.xitem)),xrate
+	headers "Item","Description","Rate"
+    end list
+
+	 list two
+        caption "Tearms & Condition : "+xcus
+        table cacusterms
+        order xcus,xrow
+        fixed xcus
+        rows 20
+        objects  xrow attrib(link "login?screen=casupterms&command=Show&xpornum=?&xrow=?"), ~
+                xcode,xnote //equals((select xlong from xcodes where xtype='PO Terms & Condition' and xcode=xcodes.xcode))
+
+
+//        headers "Row","Item","Description","Qty","Rate","Disc %","Disc Fixed","Line Amount"
+//	  total "Total","","","","",sum	
+     end list
+	
+
+     form one
+        caption "Supplier Master"
+      	table cacus
+        primarykey xcus
+        order xcus
+        select "xtype='Supplier'"
+        return "login"
+        layout 2
+        pstyle 3 
+        objects Show,Clear,Supplier Update, Top,Previous,Next,Bottom,~
+                xcus,xorg
+
+	field xstatuscus
+		default "Open"
+	end field
+
+	field xcus
+		caption Supplier Code
+	 event after
+		 set globals(xcus)=xcus
+	 end event
+	pick list casup
+    end field
+
+        field xgsup
+      //    def "Local"
+        end field
+
+    field add
+      event before
+        if xgsup .eq. ""
+          error "Cannot Proceed -- Please Choose Supplier Group"
+        else if xorg .eq. ""
+          error "Cannot Proceed -- Supplier Description is Blank"
+
+        //*********** GETTING TRN NO ****************
+        else
+			set xtype="Supplier"
+			set xstatuscus="Open" 
+			set xallowcrinv="No"
+			set xallbndisc="No"
+			 set xcus = #trn("Supplier Code","SUP-",10)
+
+        end if
+      end event
+    end field
+	
+	
+	  field Update
+      event before
+        if xgsup .eq. ""
+          error "Cannot Proceed -- Please Choose Supplier Group"
+        else if xorg .eq. ""
+          error "Cannot Proceed -- Company name is Blank"
+
+        //*********** GETTING TRN NO ****************
+        else
+			set xtype="Supplier"
+        end if
+      end event
+    end field
+
+
+field delete 
+	event before
+	  
+       set sup=acdetail.xsub("xcus='"+xcus+"'")
+	   if xcus .eq. sup
+	   error "Can not delete record"
+	   end if
+	   end event
+end field
+
+   field Supplier
+        embed onclick="clicked(this)"
+    end field
+ 
+       embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+         <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "casup"
+            form.searchbutton.value = "Find xcus=?"
+          }
+          if (but == "Supplier Update"){
+            form.screen.value = "casupupdatedet"
+            form.searchbutton.value = "Find xcus=?"
+          }
+
+          if (but == "Trams & Condition"){
+            form.screen.value = "casupterms"
+			form.searchbutton.value = "Find xcus=?"
+            //form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,70 @@
+screen artoac
+     caption "AR to Accounts Transfer"
+     sections  form one, jscript myscript
+
+
+
+
+     form one
+        return "login"
+        layout 1
+        pstyle 3
+        objects Clear,Process,"<p>" ,~
+               xftrn,xttrn,xdate
+
+        field xftrn
+          attrib local
+          caption From Transaction
+          display text
+          pick list artrn
+        end field
+
+        field xttrn
+          attrib local
+          caption To Transaction
+          display text
+          pick list artrn
+        end field
+
+        field xdate
+          attrib local
+          caption Date
+          display text
+        end field
+
+        field process
+          event after
+            class opjamuna(transferarac)
+          end event
+        end field
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

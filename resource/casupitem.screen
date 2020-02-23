@@ -1,0 +1,85 @@
+screen casupitem
+
+  sidebar list one //,list two
+  sections form one,  jscript myscript
+  
+  	
+  list one
+    caption "Agreement Product List"
+    table cacusprice
+    order xcus,xrow
+    fixed xcus
+    rows 20
+    objects  xrow attrib(link "login?screen=casupitem&command=Show&xcus=?&xrow=?"),xitem, ~
+             desc equals((select xdesc from caitem where zid=cacusprice.zid and xitem=cacusprice.xitem)),xrate
+	headers "Row","Item","Description","Rate"
+  end list
+  
+  form one
+    caption " Agreement Product List : "+xcus
+    table cacusprice
+    primary key xcus,xitem
+    order xcus,xrow
+    fixed xcus
+    pstyle 3
+    return "login"
+    layout 3
+    objects Add, Update, Delete,Clear,Show, *next,Return,Top,Previous,Next,Bottom,~
+            xrow attrib(row 0 1),xitem,xrate,xdateeff,xdateexp
+	
+	field xdesc
+		attrib local
+		display const
+		caption Description
+		event after
+			set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+		end event
+	end field
+	
+	field xdateeff
+		default "1999-01-01"
+	end field
+
+    	field xdateexp
+		default "2999-01-01"
+	end field
+
+  field Add
+        event before
+        end event
+  end field
+
+    embed onsubmit="return submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+  
+  end form
+  
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var but
+      var result
+
+      function clicked(b){
+        but = b.value
+      }
+      function submitit(form){
+        result = true
+        if (but == "Return"){
+          form.screen.value = "casup"
+          form.searchbutton.value = "Find xcus=?"
+        }
+        but = ''
+        return result
+      }
+      </script>
+  end jscript
+  
+end screen
+
+
+
+

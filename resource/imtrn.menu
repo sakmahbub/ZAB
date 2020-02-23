@@ -1,0 +1,13 @@
+//Inventory Transaction.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Stock Parameters                 |#classPath+"/login?screen=imstkp"
+//Inventory Status                 |#classPath+"/login?screen=imext"
+Inventory Transaction (Issue)      |#classPath+"/login?screen=imtrnis"
+Inventory Transaction (Receive)      |#classPath+"/login?screen=imtrnre"
+Inventory Transaction (LOT Receive)      |#classPath+"/login?screen=imtrnlot"
+//Receive Transactions               |#classPath+"/login?screen=imtrnreceive"
+//Issue Transactions               |#classPath+"/login?screen=imtrnissue"
+//-------------------------------------------------------------------
+

@@ -1,0 +1,13 @@
+//Item Codes.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Item Groups                      |#classPath+"/main?page=xcodes(xtype=Item Group)"
+Item Group Parameters            |#classPath+"/main?page=xcodesp(xtype=Item Group)"
+Item Class                       |#classPath+"/main?page=xcodes(xtype=Item Class)"
+Warehouses                       |#classPath+"/main?page=xcodes(xtype=Warehouse)"
+ABC Codes                        |#classPath+"/main?page=xcodes(xtype=ABC Code)"
+Supercession Code                |#classPath+"/main?page=xcodes(xtype=Supercession Code)"
+Units of Measure                 |#classPath+"/main?page=xcodes(xtype=Unit of Measure)"
+//-------------------------------------------------------------------
+

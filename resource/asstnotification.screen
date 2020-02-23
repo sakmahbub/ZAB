@@ -1,0 +1,92 @@
+screen asstnotification
+
+  caption "Notifications"
+    
+ 	sidebar list pocashadv
+	sections list po,list voucherl,jscript myscript
+	 
+	list po
+        caption "PO Approval Review"
+        table poordheader
+        order xpornum desc
+       select "left(xpornum,4) in ('PO--','WO--') and xstatus not in ('Approved','Open') ~
+	   and (xidsup in ('00808','00173') or xsuperior2 in ('00808','00173') or xsuperior3 in ('00808','00173'))"
+	   rows 250
+        objects xpornum attrib(link "login?screen=poordheadercpo&command=Show&xpornum=?"),xdate,xstatus, ~
+				xidsupdesc equals((select xname from pdmst where zid=poordheader.zid and xposition=poordheader.xidsup)),~
+				 xidsupdesc2 equals((select xname from pdmst where zid=poordheader.zid and xposition=poordheader.xsuperior2)),~
+				 preparer equals((select xname from pdmst where zid=poordheader.zid and xstaff=poordheader.xpreparer))
+               
+        headers "PO /WO No","Date","Status","Approver","OR >>>>>> Approver","Preparer"
+     end list
+
+	list voucherl
+    caption "Voucher Approval Review"
+    table acheader
+    order xvoucher
+	 select "xstatusjv='Balanced' and (xsuperiorgl in ('00808','00173') or xsuperior2 in ('00808','00173') or xsuperior3 in ('00808','00173')) ~
+	 and '"+#position+"'<>'' and xstatus not in ('Approved','Open')"
+    rows 25
+    objects  xvoucher attrib(link "login?screen=acheaderappgm&command=Show&xvoucher=?"), ~
+             xdate,xidsupdesc equals((select xname from pdmst where zid=acheader.zid and xposition=acheader.xsuperiorgl)),~
+			 xidsupdesc2 equals((select xname from pdmst where zid=acheader.zid and xposition=acheader.xsuperior2)),~
+			 preparer equals((select xname from pdmst where zid=acheader.zid and xstaff=acheader.xpreparer))
+
+    headers "Voucher No","Date","Approver","OR >>>>>> Approver","Preparer"
+  end list
+  
+  
+	list pocashadv 
+      caption "Pending Cash Advance Approval Review"
+      table poreqheader
+      order xporeqnum desc
+		select "(xsuperiorsp in ('00808','00173') or xsuperior2 in ('00808','00173') or xsuperior3 in ('00808','00173')) ~
+		and '"+#position+"'<>'' and left(xporeqnum,4) in ('PR--','JN--','DOC-') and xtype='Cash' and xstatusreq not in ('Approved')"
+	  rows 50
+      objects  xporeqnum attrib(link "login?screen=poreqheadercashapv&command=Show&xporeqnum=?"), xdate,xtype,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh)),~
+				 xidsupdesc equals((select xname from pdmst where zid=poreqheader.zid and xposition=poreqheader.xsuperiorsp)),~
+				xidsupdesc2 equals((select xname from pdmst where zid=poreqheader.zid and xposition=poreqheader.xsuperior2)),~
+				preparer equals((select xname from pdmst where zid=poreqheader.zid and xstaff=poreqheader.xpreparer))
+               
+		  headers "Requisition No","Date","Purchase Type","Store/Plant Code","Name","Approver","OR >>>>>> Approver","Preparer"
+	  end list
+  
+     form one
+        //caption "Requisition Approved By Dept. Head""
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+	//	select "xstatustor='Open' and xidsup='"+#position+"'"
+		select "left(xtornum,2)='SR'"
+        return "login"
+        pstyle 1
+        layout 1
+        
+	
+        embed onsubmit="submitit(this)"
+
+      end form
+
+      jscript myscript
+
+        <script language="javascript" type="text/javascript">
+     var time = new Date().getTime();
+     $(document.body).bind("mousemove keypress", function(e) {
+         time = new Date().getTime();
+     });
+
+     function refresh() {
+         if(new Date().getTime() - time >= 3000) 
+             window.location.reload(true);
+         else 
+             setTimeout(refresh, 50000);
+     }
+
+     setTimeout(refresh, 50000);
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,26 @@
+
+product ZAB ERP
+
+table fagltrnview
+  caption "FA To GL View"
+  columns zid,xyear,xper,xcat,xvoucher,xprime
+  primary key zid,xyear,xper,xcat,xvoucher
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view fagltrnview (zid,xyear,xper,xcat,xvoucher,xprime) ~
+                  as select zid,xyear,xper,xcat,left(xvoucher,4),sum(xprime) ~
+
+                  from fatrn where xstatusjv='Open' and xaction <>'Disposal' group by zid,xyear,xper,xcat,left(xvoucher,4)
+
+
+
+                  //~
+                  //(select fatrn.xyear from fatrn where  famst.zid=fatrn.zid and famst.xcode=fatrn.xcode),~
+                  //(select fatrn.xper from fatrn where  famst.zid=fatrn.zid and famst.xcode=fatrn.xcode),~
+                  //xcat,~
+                  //left((select fatrn.xper from fatrn where  famst.zid=fatrn.zid and famst.xcode=fatrn.xcode),4),~
+                  //(select sum(fatrn.xprime) from fatrn where  famst.zid=fatrn.zid and famst.xcode=fatrn.xcode) ~
+                  //from famst group by zid,xyear,xper,xcat//,left(xvoucher,4)
+end table

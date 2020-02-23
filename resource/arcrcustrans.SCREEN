@@ -1,0 +1,76 @@
+screen arcrcustrans
+
+     sections form one,jscript myscript
+
+
+     form one
+        caption "Credit Out Standing Inv. Transfer"
+        table cacus
+		primarykey xcacus
+        order xcacus
+        //select "left(xvoucher,2)='DO' and xwh='"+#wh+"'"// and xpaymentterm='Credit'"
+        return "login"
+        pstyle 3
+        layout 2 
+        objects Clear,Transfer,"<p>" ,~
+                xfwh,xtwh,xterritory
+
+		
+	field xfwh
+		caption From Depot
+	end field
+
+	field xtwh
+		caption To Depot
+		default #wh
+	end field
+
+        field Transfer
+        	event before
+			set balprime = arhed.xbalprime("xvoucher='"+xvoucher+"'")
+
+        	if balprime .eq. 0.00
+        			error "Cannot Proceed -- Check Credit Outstanding"
+			else
+				set temp = #spsql(zabsp_Custransfer_depo2depo,#id,#user,xterritory,xfwh,xtwh)
+							print "<font color=red size=+3>Transfered</font>"
+        		end if
+        	end event
+          event after
+			action show
+		end if
+		
+//		set temp=#spsql(zsp_Chk_ReplaceaDo,#id,#user,xroute,xdatedel,xpaymentterm) 100010,'zab','','19'
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "opsumprocdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

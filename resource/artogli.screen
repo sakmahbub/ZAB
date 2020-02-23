@@ -1,0 +1,102 @@
+screen artogli
+
+     sidebar list one
+     sections  form one, jscript myscript
+
+
+     list one
+        caption "List"
+        table artogli
+        order xtrn,xgcus
+        rows 40
+        objects xtrn attrib(link "login?screen=artogli&command=Show&xtrn=?&xgcus=?"),~
+                xgcus,xacc,xdeptname
+
+    end list
+
+     form one
+        caption "<ACRONYM>AR To GL Interface</ACRONYM>"
+        table artogli
+        primarykey  xtrn,xgcus
+        order xtrn,xgcus
+        return "login"
+        layout 4
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,~
+                *next,Top,Previous,Next,Bottom,"<p>" ,~
+                xtrn,xgcus,xacc,xdesc,xdeptname,xdeptdesc
+
+        field xdeptname
+          caption Cost Center
+        end field
+
+        field xdeptdesc
+          attrib local
+          caption Cost Center Name
+          display const
+          event after
+            set xdeptdesc = xcodes.xlong("xtype='Cost Center' and xcode='"+xdeptname+"'")
+          end event
+        end field
+
+        field xdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xdesc=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+        field xstatusjv
+           default "Open"
+           display combo
+           pick "Cheque In Hand"
+        end field
+
+        field xtrn
+          caption AR Transaction Code
+          display combo
+          pick "select xtrn from xtrn where xtypetrn='AR Transactions'"
+        end field
+
+        field xaccdr
+          display text
+          pick list accdr
+        end field
+
+        field xacccr
+          display text
+          pick list acccr
+        end field
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

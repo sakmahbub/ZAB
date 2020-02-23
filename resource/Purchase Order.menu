@@ -1,0 +1,9 @@
+//Purchase Order.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+PO by PO Number                  |#classPath+"/main?page=*crystal poordn(xpornum=From PO No=0=text,xpornum=To PO No=zzz=text)"
+PO by Supplier                   |#classPath+"/main?page=*crystal poords(xsup=From Supplier=0,xsup=To Supplier=zzz)"
+PO by Supplier                   |#classPath+"/main?page=*crystal poordd(xdate=From PO Date,xdate=To PO Date)"
+//-------------------------------------------------------------------
+

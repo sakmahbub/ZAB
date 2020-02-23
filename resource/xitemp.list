@@ -1,0 +1,14 @@
+     list xitemp
+        caption "Items containing: "//+zvalue+" of "+#wh
+        table caitem
+        order xitem
+		//select "xwh='"+#wh+"'"
+        select "(xitem like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%')"// and xwh='"+#wh+"'"
+        rows 30
+		//searchselect "xwh='"+#wh+"'"// and xgitem<>'Finished Goods'"
+		//searchselect "xgitem<>'Finished Goods'"
+        objects xitem attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdesc
+     end list
+
+

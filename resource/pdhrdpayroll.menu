@@ -1,0 +1,9 @@
+//HR & Payroll Menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+HR Department                    |#classPath+"/login?menu=pdhrd"
+Payroll                          |#classPath+"/login?menu=pdpayroll"
+Leave Management                 |#classPath+"/login?menu=pdleave"
+Settings                   	 |#classPath+"/login?menu=pdsetting"
+//-------------------------------------------------------------------

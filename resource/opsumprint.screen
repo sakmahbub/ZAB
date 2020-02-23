@@ -1,0 +1,363 @@
+screen opsumprint
+
+     sidebar list inv //,list do
+     sections form one, jscript myscript
+
+      list inv
+        caption "Summary List"
+        table opdosumview
+        order xsumnum desc
+	  select "xwh='"+#wh+"'"	
+        rows 40
+        objects  xsumnum attrib(link "login?screen=opsumprint&command=Show&xsumnum=?"),xdatedel,xroute,xpaymentterm
+                 
+
+     end list
+
+
+     list inv1
+        caption "Summary List"
+        table opdosumallview
+	  order xsumnum desc
+        select "xwh='"+#wh+"'"
+        rows 40
+        objects  xsumnum attrib(link "login?screen=opsumprint&command=Show&xsumnum=?"),~
+			xpaymentterm,xdatedel,xdate
+
+        header "Summary No","Customer Type","Delivery Date","Invoice Date"
+     end list
+
+
+     form one
+     
+      caption "Summary Print"
+      table opdosumallview
+      primarykey xdornum
+      order xsumnum desc
+      select "xwh='"+#wh+"'"
+      return "login"
+      layout 2
+      pstyle 3
+      objects ~//Top,Previous,Next,Bottom,
+              Show,Clear,"<p>",~
+		  xdatedel,xsumnum,xpaymentterm//,xbonusprint
+              
+	
+
+field xsumnum
+	pick list opdosumnum
+end field
+
+field xitem
+	pick list xitemnpl
+end field
+
+	field xbonusprint
+		caption Print Bonus
+		attrib local
+		display combo
+		pick "Yes,No"
+		Default "No"
+	end field
+
+    field xdatedue
+		default "2999-01-01"
+	end field
+
+
+      field xwh
+        display hide
+        default #wh
+      end field
+
+      field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+      end field
+
+
+      field xdum
+        attrib local
+        display const
+        caption
+      end field
+
+      field xdum1
+        attrib local
+        display const
+        caption
+      end field
+
+      field xorg
+        attrib local
+        display const
+        caption Customer Name
+        event after
+          set xorg=cacus.xorg("xcus='"+xcus+"'")
+        end event
+      end field
+
+      field xname
+        attrib local
+        display const
+        caption MIO Name
+        event after
+          set xname=cappo.xname("xsp='"+xsp+"'")
+        end event
+      end field
+
+      field xalias
+        attrib local
+        display hide
+        caption Name Of Delivery Man
+        event after
+          set xalias=cappo.xname("xsp='"+xpp+"'")
+        end event
+      end field
+
+      field xamount
+        caption Advance
+      end field
+
+      field xdatecom
+        caption Ledger Date
+      end field
+
+      field xpaymentterm
+        display const
+      end field
+
+
+      field xstatusar
+        caption Post To Ledger
+      end field
+
+      field xnote
+        width 40
+        height 3
+      end field
+
+      field xsumnum
+         event after
+          class careports(getjspReport{opinvproductsum,2,#wh,xsumnum,Print Product Summary})
+		//class careports(getboReport{1793,2,#wh,xsumnum,Print Product Summary})
+          class careports(getjspReport{opinvcussum,2,#wh,xsumnum,Print Customer Summary})
+		//class careports(getboReport{1791,2,#wh,xsumnum,Print Customer Summary})	
+          class careports(getjspReport{opbillbatch,3,#wh,xsumnum,xbonusprint,Print Invoice})
+		//class careports(getboReport{1765,2,#wh,xsumnum,Print Invoice})	
+            set globals(xdornum)=xdornum
+     	      if xstatusord .eq. "Confirmed" .and. xstatusar .eq. "Confirmed"
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Confirm.display)="hidden"
+       	      end if
+          end event
+        end field
+
+        field add
+          event before
+          	set custype = cacus.xpaymentterm("xcus='"+xcus+"'") 
+       	   	set datefrom = #sql("select xdateeff from cacus where xcus='"+xcus+"'")
+       	   	set dateto = #sql("select xdateexp from cacus where xcus='"+xcus+"'")
+       	   	if custype .eq. "Credit"
+  				if xdate .lt. #sub(datefrom,0,10) .or. xdate .gt. #sub(dateto,0,10) 
+					error "Cannot Proceed -- Credit Time Expired"
+       			else if cacus.xallowcrinv("xcus='"+xcus+"'") .eq. "No"
+      				set invtoinv = cacus.xinvtoinvcr("xcus='"+xcus+"'")
+       				if invtoinv .eq. "Yes"
+            			double bal = 0.00
+       					set bal = cacreditview.xcrused("xcus='"+xcus+"'")
+       					if bal > 0
+       						error "Cannot Proceed -- Invoice To Invoice Credit Limit Exceeds  "+bal 
+       					end if
+		  			end if
+		  		end if
+	        else if xcus .eq. ""
+      	        error "Cannot Proceed -- Please Choose Customer"
+			else if xdate .lt. #date
+				error "Cannot Proceed -- Invoice On Previous Date Not Allowed"
+			else if xdatedel .lt. #date
+				error "Cannot Proceed -- Delivery on Previous Date Not Allowed"
+			else if xdeltime .eq. ""
+				error "Cannot Proceed -- Please Select Delivery Time"
+			end if
+				set xtotamt = 0
+				set xvatamt = 0
+				set xaitamt = 0
+				set xdisc = 0
+				set xdiscamt = 0
+				set xprime = 0
+				set xsumnum =""
+				set xpp=""
+	    			set xyear = #sub(xdate,0,4)
+	 	   		set xper = #sub(xdate,5,2)
+				set xtype = "NPL"
+        	    //*********** GETTING INFO FROM CACUS ****************
+
+	            set xwh=cacus.xwh("xcus='"+xcus+"'")
+      	    	set xstatusord = "Open"
+            	set xstatusar = "Open"
+            	set xstatus = "Open"
+
+	            //*********** GETTING TRN NO ****************
+				set customer = cacus.xcus("xcus='"+xcus+"'")
+				if #result .eq. "true"
+            		set year = #sub(xdate,2,2)
+		            set trn = "DO"+#wh
+            		set xdornum = #trn("DO Number",trn,10)
+		            set xdornum = #sub(xdornum,0,4)+year+#sub(xdornum,4,10)
+				end if
+          end event
+          event after
+            set com = "add"
+            set temp = #spsql(sp_validateAfterHeaderDOPj,#id,#user,xdornum,xdate,xcus,com)
+            action Show
+          end event
+        end field
+
+
+        field add1
+          event before
+          	set custype = cacus.xpaymentterm("xcus='"+xcus+"'") 
+          	if custype .eq. "Credit"
+          	   	//set datefrom = #sql("select xdateeff from cacus where xcus='"+xcus+"'")
+          	   	//set dateto = #sql("select xdateexp from cacus where xcus='"+xcus+"'")
+				//print #sub(datefrom,0,10)
+				//print #sub(dateto,0,10)          	    
+				//print xdate
+	   			//if xdate .gt. #sub(datefrom,0,10) .and. xdate .lt. #sub(dateto,0,10)
+				//	error "Cannot Proceed -- Credit Time Expired"
+				//end if 
+          		if cacus.xallowcrinv("xcus='"+xcus+"'") .eq. "No"
+          			set invtoinv = cacus.xinvtoinvcr("xcus='"+xcus+"'")
+          			if invtoinv .eq. "Yes"
+	            		double bal = 0.00
+          				set bal = cacreditview.xcrused("xcus='"+xcus+"'")
+          				//print bal
+          				if bal > 0
+          					error "Cannot Proceed -- Invoice To Invoice Credit Limit Exceeds  "+bal 
+          				end if
+          			end if
+          		end if
+			end if          	
+            if xcus .eq. ""
+              error "Cannot Proceed -- Please Choose Customer"
+			else if xdate .lt. #date
+				error "Cannot Proceed -- Invoice On Previous Date Not Allowed"
+			else if xdatedel .lt. #date
+				error "Cannot Proceed -- Delivery on Previous Date Not Allowed"
+			else if xdeltime .eq. ""
+				error "Cannot Proceed -- Please Select Delivery Time"
+//			else if xpp .eq. ""
+//				error "Cannot Proceed -- Please Select Delivery Person"
+			else
+				set xtotamt = 0
+				set xvatamt = 0
+				set xaitamt = 0
+				set xdisc = 0
+				set xdiscamt = 0
+				set xprime = 0
+	    		set xyear = #sub(xdate,0,4)
+	 	   		set xper = #sub(xdate,5,2)
+				set xtype = "NPL"
+        	    //*********** GETTING INFO FROM CACUS ****************
+
+	            set xwh=cacus.xwh("xcus='"+xcus+"'")
+      	    	set xstatusord = "Open"
+            	set xstatusar = "Open"
+            	set xstatus = "Open"
+
+	            //*********** GETTING TRN NO ****************
+				set customer = cacus.xcus("xcus='"+xcus+"'")
+print #result
+				if #result .eq. "true"
+            		set year = #sub(xdate,2,2)
+		            set trn = "DO"+#wh
+            		set xdornum = #trn("DO Number",trn,10)
+print xdornum
+		            set xdornum = #sub(xdornum,0,4)+year+#sub(xdornum,4,10)
+print xdornum
+				end if
+            end if
+          end event
+          event after
+            set com = "add"
+            set temp = #spsql(sp_validateAfterHeaderDOPj,#id,#user,xdornum,xdate,xcus,com)
+            action Show
+          end event
+        end field
+
+        field update
+          event before
+		if xdate .lt. #date
+			error "Cannot Proceed -- Invoice On Previous Date Not Allowed"
+		else if xdeltime .eq. ""
+			error "Cannot Proceed -- Please Select Delivery Time"
+		//else if xpp .eq. ""
+		//	error "Cannot Proceed -- Please Select Delivery Person"
+		end if
+            set xwh=cacus.xwh("xcus='"+xcus+"'")
+    		set xyear = #sub(xdate,0,4)
+   		set xper = #sub(xdate,5,2)
+          end event
+          event after
+            set com = "update"
+            set temp = #spsql(sp_validateAfterHeaderDOPj,#id,#user,xdornum,xdate,xcus,com)
+            action Show
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field New
+          embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opdodetail"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="New Customer"){
+            form.screen.value = "cacusnew"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+
+        function pickDetail(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text;
+            document.one.xbalance.value=primebal.text;
+            document.one.xdate.value=date.text;
+          }else{
+              document.one.xamount.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

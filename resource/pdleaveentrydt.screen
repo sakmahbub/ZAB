@@ -1,0 +1,224 @@
+screen pdleaveentrydt
+    caption "Leave Enter By HRD"
+    sidebar list useleave,list trn,list asigneplan
+    sections form one,list trn1,jscript myscript
+
+  list asigneplan
+    caption "Asigned Leave Plane" //desc equals((select xdesc from caitem where xitem=opdodetail.xitem))
+    table pdmst
+    order xstaff,xplan
+    fixed xstaff
+    rows 1
+    objects xplan,dayde equals((select xdaydeduct from pdlplanehd where xname=pdmst.xplan)),~
+            hourde equals((select xhourdeduct from pdlplanehd where xname=pdmst.xplan))
+      
+    header "Plane Name","Day Deduct","Hour Deduct"
+  end list
+
+  list useleave
+    caption "Used & Available Leave"
+    table pdleaveasigne
+    order xstaff,xyear,xtypeleave
+    fixed xstaff,xyear	
+    rows 20
+    objects  xtypeleave attrib(link "abc" embed onclick="return picltype(this)"),xavailable,xmleave,xused,xbalance
+    //header "Leave Type","Available Leave","Monthly","Used Leave","Balance Leave"
+    totals "Total",sum,sum,sum,sum
+  end list
+
+  list trn
+    caption "Availed Leave Detail"
+    table pdleaveheader
+    order xstaff,xyear,xtypeleave
+    fixed xstaff,xyear
+    //select "xstaff='"+xstaff+"' and xyear="+xyear
+    rows 20
+    objects  xyearperdate attrib(link "login?screen=pdleaveentrydt&command=Show&xstaff=?&xyearperdate=?"),~
+       xdate,xtypeleave,xdatefrom,xdateto,xday,xhour,xstatus
+
+    header "S.No","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Hour","Status"
+    totals "","","Total","","",sum
+  end list
+
+  list trn1
+    caption "Leave Detail "+xstaff+" "+xyearperdate
+    table pdleavedetail
+    order xyearperdate,xstaff
+    fixed xyearperdate,xstaff
+    //select "xstaff='"+xstaff+"' and xyearperdate="+xyearperdate
+    rows 20
+    objects xdate,xtypeleave
+    header "Date","Leave Type"
+
+  end list
+
+  form one
+    caption "<ACRONYM>Detail</ACRONYM>"
+    table pdleaveheader
+    primarykey xyearperdate,xstaff
+    order xstaff,xyearperdate
+    fixed xstaff
+    return "login"
+    layout 2
+    pstyle 3
+    
+    objects Update,Confirm Leave,Return,Delete,Cancel,~ //,Top,Next,Previous,Bottom,
+            xstaff display(const),xname,xtypeleave,xdatefrom,xdateto,xdaterpt,xdum,xdaydeduct,xhourdeduct,~
+            xyear display(hide),xstatus display(hide),xyearperdate display(hide),xyesno display(hide)
+
+
+    field xname
+      attrib local
+      display const
+      event before
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+      end event
+    end field
+    
+    field xdaterpt
+      caption Reporting Date
+    end field
+    
+    field xdum
+      attrib local
+      display const
+      caption
+    end field
+
+		field xtypeleave
+			//attrib readonly
+			display text
+			column 2
+			width 70
+			pick
+		end field
+
+		field xdaydeduct      
+			default 1
+		end field
+
+    field xstatus
+      default "Approved"
+      event after
+        if xstatus .eq. "Confirmed"
+          set #field(add.display)="hidden"
+          set #field(update.display)="hidden"
+          set #field(delete.display)="hidden"
+          set #field(confirm.display)="hidden"
+        else if xstatus .eq. "Canceled"
+          set #field(add.display)="hidden"
+          set #field(update.display)="hidden"
+          set #field(delete.display)="hidden"
+          set #field(confirm.display)="hidden"
+          set #field(cancel.display)="hidden"
+        else if xstatus .eq. "Approved"
+          //set #field(cancel.display)="hidden"
+        end if
+      end event
+    end field
+
+    field Confirm
+      event before
+        if pdleaveheader.xtypeleave("xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'") .eq. ""
+          error "You must choose leave type from top right corner of the screen then click update"
+        else if pdleaveheader.xdatefrom("xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'") .eq. ""
+          error "You must give from date"
+        else if pdleaveheader.xdateto("xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'") .eq. ""
+          error "You must give to date"
+        end if
+      end event
+      event after
+        set temp = #spsql(zabsp_leaveconf,#id,#user,xstaff,xyearperdate,xyear)
+        action show
+      end event
+    end field
+
+    field cancel
+      event after
+        set temp=#spsql(zabsp_leavecancel,#id,#user,xstaff,xyearperdate,xyear,xtypeleave)
+        //action show
+      end event
+    end field
+
+    field update
+      event before
+        double totday = 0.00
+        double avleave = 0.00
+        set xhourdeduct=xdaydeduct*24    
+        set temp1 = #sql("select xstaff from pdleaveview where xdate='"+xdatefrom+"' and xstaff='"+xstaff+"' and xstatus='Confirmed' and xtypeleave='"+xtypeleave+"'")
+        
+        if #result .eq. "true"
+          error "Cannot Proceed--Leave Already Taken on "+#sub(xdatefrom,8,2)+"-"+#sub(xdatefrom,5,2)+"-"+#sub(xdatefrom,0,4)
+        end if
+
+        set temp2 = #sql("select xstaff from pdleaveview where xdate='"+xdateto+"' and xstaff='"+xstaff+"' and xstatus='Confirmed' and xtypeleave='"+xtypeleave+"'")
+        if #result .eq. "true" and temp1. eq. ""
+          error "Cannot Proceed--Leave Already Taken on "+#sub(xdateto,8,2)+"-"+#sub(xdateto,5,2)+"-"+#sub(xdateto,0,4)
+        end if
+
+        if xtypeleave .eq. ""
+          error "You must choose leave type from top right corner of the screen"
+        end if
+        
+        if xtypeleave .eq. "Maternity Leave"
+          set xyesno="No"
+        end if
+        
+        if xtypeleave .ne. "Unpaid Leave" .and. xtypeleave .ne. "Tour"
+          set avleave = #sql("select xbalance from pdleaveasigne where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear="+xyear)
+          set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"')")
+          set totday=totday+1
+          set totday=totday*xdaydeduct
+          if totday > avleave
+            error "Cannot Proceed--Applied leave greater then available leave"
+          end if
+        end if
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+
+    function clicked(b)
+    {
+      detail=b.value
+    }
+    function submitit(form)
+    {
+      if (detail=="Return")
+      {
+        form.screen.value = "pdleaveentryhd"
+        form.searchbutton.value = "Find xstaff=?&xyearperdate=?"
+        //return false
+      }
+    }
+    function picltype(link)
+    {
+      if (navigator.appName.indexOf("Netscape") >= 0)
+      {
+        //document.one.xinvnum.value=link.text
+        //document.one.xbalance.value=primebal.text
+        //document.one.xdate.value=date.text
+      }
+      else
+      {
+        document.one.xtypeleave.value=link.innerText
+        //document.one.xvatrate.value=vatamt.innerText
+        //document.one.xcost.value=cost.innerText
+        //document.one.xeta.value="1"
+      }
+      return false
+    }
+    </script>
+  end jscript
+
+end screen

@@ -1,0 +1,15 @@
+     list pdemptrn
+        table pdtrndetail
+        order xrow desc
+        select "((xrow like '%"+zvalue+"%' or xstaff like '%"+zvalue+"%'  or xstaff like '%"+zvalue+"%') and xvoucher='"+xvoucher+"')"
+		searchselect "xvoucher='"+xvoucher+"'"
+        rows 20
+        objects xrow attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xstaff,xtype,xamount,xothours,xdayssalded
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        headers "Row","EMP. ID","TRN Type","Amount","OT","Day Deduction"
+     end list

@@ -1,0 +1,44 @@
+screen poordcommodity
+     caption "Commodity & Specification"
+     sections form one,jscript myscript
+
+     form one
+        caption "Commodity & Specification"
+	      table poordheader
+        fixed xpornum
+        order xpornum
+        //select
+        return "login"
+        layout 3
+        pstyle 1
+        objects Return,Clear,Update,"<p>" ,~
+          xcommodity,xgrowth,xgrade,xstaple,xmic,xorigin
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	      if (detail=="Return"){
+            form.screen.value = "poordheader"
+            form.searchbutton.value = "Find xpornum=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

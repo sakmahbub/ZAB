@@ -1,0 +1,28 @@
+
+product ZAB ERP
+
+table pogrnbalview
+
+  caption "Sales Return View for Enter sales return"
+  columns zid,xdornum,xitem,xdesc,xunit,xrate,xqtyord,xvatrate,xdiscdet,xrow
+  primary key zid,xdornum,xitem
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pogrnbalview(zid,xpornum,xitem,xdesc,xunitpur,xdisc,xdiscf,xrate,xqtyord,xrow) ~	
+	
+	as select po.zid,po.xpornum,po.xitem,ca.xdesc,po.xunitpur,po.xdisc,po.xdiscf,po.xrate,sum(po.xqtyord-isnull(temptable.xqtygrn,0))as xqtyord,~
+	po.xrow from poorddetail po ~
+      	inner join caitem ca on po.xitem=ca.xitem ~
+      	left join(select ch.xpornum,cd.xitem,cd.xrow,sum(isnull(cd.xqtygrn,0))as xqtygrn ~
+			from pogrnheader ch ~
+			inner join pogrndetail cd on ch.xgrnnum=cd.xgrnnum ~
+                  	group by ch.xpornum,cd.xitem,cd.xrow)temptable on po.xrow=temptable.xrow and ~
+			po.xpornum=temptable.xpornum ~
+			group by po.zid,po.xpornum,po.xitem,ca.xdesc,po.xunitpur,po.xdisc,po.xdiscf,po.xrate,po.xrow ~
+                  having sum((po.xqtyord-isnull(temptable.xqtygrn,0)))<>0 
+
+	
+end table
+

@@ -1,0 +1,14 @@
+     list damnum
+        caption "Damage Request List"</b>"
+        table imtorheader
+        order xtornum desc
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4)='DAM-')"
+		searchselect "left(xtornum,4)='DAM-'"
+        rows 10
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xordernum
+		 
+		headers "Damage Number","Date" ,"Ref"
+     end list
+
+

@@ -1,0 +1,13 @@
+//Common Codes.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+DO Update by SP                 |#classPath+"/login?screen=opdoerrorupdate"
+DO Update By Manual               |#classPath+"/login?screen=opdoheaderupdate"
+CRNo Wise Status Update               |#classPath+"/login?screen=opdoerrorcrupdate"
+//MR Allocate Edit                   |#classPath+"/login?screen=arcascreditadmin"
+//Arhed Update                 |#classPath+"/login?screen=arhedupdate"
+//Field Manager                    |#classPath+"/login?screen=cafm"
+//Bank                             |#classPath+"/login?screen=cabank"
+//-------------------------------------------------------------------
+

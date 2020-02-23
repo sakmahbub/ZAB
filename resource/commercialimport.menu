@@ -1,0 +1,15 @@
+//op.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Notifications             		   		|#classPath+"/login?screen=comnotification"
+Purchase Order                 |#classPath+"/login?screen=poordheadercashdir"
+Import LC Entry                    |#classPath+"/login?screen=poordlcinfo"
+PO link with LC                    |#classPath+"/login?screen=poordheadeerlc"
+Document Retirement        		   |#classPath+"/login?screen=pogrnheaderinv"
+LC Update(Admin)		        			|#classPath+"/login?screen=poordlcinfoadmin"
+Reports                            |#classPath+"/login?menu=commercialrep"
+Codes & Parameter                  |#classPath+"/login?menu=lccodes"
+
+//-------------------------------------------------------------------
+

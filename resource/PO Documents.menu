@@ -1,0 +1,8 @@
+//PO Documents.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Purchase Orders                  |#classPath+"/main?menu=Purchase Order"
+Goods Receipt Notes              |#classPath+"/main?menu=GRN"
+//-------------------------------------------------------------------
+

@@ -1,0 +1,12 @@
+     list qotnum
+        table poquotheader
+        order xqotnum desc
+		select "(xqotnum like '%"+zvalue+"%' and xporeqnum='"+xporeqnum+"')"
+        rows 20
+	searchselect "xporeqnum='"+xporeqnum+"'"
+        objects xqotnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xsup,xdate
+
+     end list
+
+

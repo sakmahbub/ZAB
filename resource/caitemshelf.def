@@ -1,0 +1,17 @@
+product ZAB ERP
+
+table caitemshelf
+  caption "Rack Master"
+  columns ztime,zutime,zauserid,zuuserid,zid, xitem, ~
+          xwh,xshelf
+	 
+
+  primary key zid,xitem,xwh
+  foreign key
+        zid references zbusiness.zid
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+
+  list xdesc,xstype
+
+end table

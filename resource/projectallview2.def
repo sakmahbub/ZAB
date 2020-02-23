@@ -1,0 +1,21 @@
+product ZAB ERP
+
+table projectallview2
+  caption "Branch View"
+  columns zid,xtype,xlong,xcode
+
+  primary key zid,xcode
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+	sql CREATE VIEW projectallview2(zid,xtype,xlong,xcode,xmadd,xphone,xfax,xemail,xproject,zactive) ~
+	AS ~
+	SELECT a.zid,b.xtype,b.xlong,b.xcode,b.xmadd,b.xphone,b.xfax,b.xemail,b.xcode,b.zactive ~
+	FROM zbusiness a JOIN ~
+	xcodes b ON a.zid=b.zid ~
+	WHERE b.xtype='Project'
+
+end table
+

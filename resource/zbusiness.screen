@@ -1,0 +1,66 @@
+screen zbusiness
+     caption "Your Business"
+     sections form business
+
+     form business
+        caption "Company Profile <span class=l>Id: "+#id+"</span>"
+        table zbusiness
+        //order
+        //fixed
+        //select
+        return "login"
+        layout 3
+        pstyle 3
+        objects Top,Update,Upload,~
+          
+          zorg width(50), xphone, ~
+          xmadd,xpadd,xfax,~
+          xcontact, ~
+          xcity, xemail,xsignatory,xdesignation,~
+          xstate,xurl,~
+          xzip, ~
+          xcountry ,xcur ,xbimage,xdformat,xdsep,~
+		  xtimage,xvatregno,xtin,~
+          xcustom, ~
+		  zactive display(hidden), zemail display(hidden),~
+		  xcat
+		  
+	field xcat
+		caption Business Category
+		pick "Power Plant,Distribution,Accounts,Construction"
+	end field
+
+	
+	field xbimage
+		//display area
+		width 100
+	end field
+	
+	field xtimage
+		width 90
+		caption LOGO URL
+	end field
+
+	field xcustom
+		columns 2
+	end field
+	
+	field xpadd
+		caption Factory Address
+	end field
+	        field Upload
+          event after
+             set temp=#spsql(zsp_picinsert,#id,#user,"zbusiness","xbusinessimage","")
+          end event
+        end field
+
+     field xcountry
+      display text
+      picklist
+      event after
+        set #org=zorg
+      end event
+     end field
+     end form
+
+end screen

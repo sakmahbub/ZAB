@@ -1,0 +1,17 @@
+product ZAB DB
+
+table pdotdetail
+  caption "OT Detail"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xyearperdate,xstaff,xrow,xtype,xstatus,xdate,xothours,xyear,xper,xdatecom,xposition
+
+
+
+  primary key zid,xyearperdate,xstaff,xrow
+
+  foreign key
+      zid references zbusiness.zid
+      zid,xyearperdate,xstaff references pdotheader.zid,xyearperdate,xstaff
+  end foreign key
+
+end table

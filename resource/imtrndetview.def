@@ -1,0 +1,21 @@
+product ZAB ERP
+
+table imtrndetview
+  caption "OP DO CRN View"
+
+columns ztime,zutime,zauserid,zuuserid,zid,ximtrnnum,xitem,xwh,xdate,xqty,xval,xvalpost,xdocnum,xdocrow,xnote,xsign,~
+	xunit,xrate,xref,xstatusjv,xvoucher,xvatrate,xvatamt,xcostrow,xtp,xcostcode,xqtystk,xdoctype,xbatch,xdateexp,xissueto
+
+  primary key zid,ximtrnnum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+
+  sql create view imtrndetview(zid,ximtrnnum, xitem,xwh,xdate,xqty,xval,xdocnum,xdocrow,xnote,xsign,xrate,xref,xrateavg,xqtybac,~
+								xtrn,xproject,xassetcode,xbinref,xgrnnum) ~
+	as select a.zid,a.ximtrnnum,a.xitem,a.xwh,a.xdate,a.xqty,a.xval,a.xdocnum,a.xdocrow,a.xnote,a.xsign,a.xrate,a.xref,a.xrateavg,a.xqtybac, ~
+		a.xtrn,a.xproject,a.xassetcode,a.xbinref,b.xgrnnum from imtrn a left join imtorheader b on a.zid =b.zid  and a.xdocnum = b.xtornum
+								
+end table

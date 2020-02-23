@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table pdmstdetail
+  caption "AC Detail"
+  columns  ztime,zutime,zauserid,zuuserid, zid, xstaff,xrow,xdate,~
+          xlong
+           
+  primary key zid,xstaff,xrow
+  foreign key
+        zid references zbusiness.zid
+        zid,xstaff references pdmst.zid,xstaff
+
+  end foreign key
+end table

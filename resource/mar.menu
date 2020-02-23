@@ -1,0 +1,12 @@
+//General Accounts.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Territory                           |#classPath+"/login?screen=xcodesterritorycode"
+Fields                           |#classPath+"/login?screen=xcodfields"
+Region                           |#classPath+"/login?screen=xcoderegion"
+////Currencies                       |#classPath+"/login?screen=xcur"
+Reports                          |#classPath+"/login?menu=marreports"
+//Codes & Parameters               |#classPath+"/login?menu=accodes"
+//-------------------------------------------------------------------
+

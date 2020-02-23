@@ -1,0 +1,19 @@
+product ZAB
+
+table opcrnview
+  caption "Sales Return View"
+  columns ztime,zutime,zauserid,zuuserid,zid
+
+  primary key zid,xdornum
+
+  foreign key
+        zid references zbusiness.zid
+        //zid,xsm,xrsm references carsm.zid,xsm,xrsm
+  end foreign key
+
+  sql create view opcrnview(zid,xordernum,xcrnnum,xdate,xitem,xwh,xrate,xvaterate,xsm,xrsm,xfm,xsp,xpp,xqty) ~
+	as select dt.zid,hd.xordernum,hd.xcrnnum,hd.xdate,xitem,hd.xwh,dt.xrate,dt.xvatrate,hd.xsm,hd.xrsm,hd.xfm,hd.xsp,hd.xpp,sum(xqtyord) ~
+	from opcrndetail dt ~
+	inner join opcrnheader hd on dt.xcrnnum=hd.xcrnnum ~
+	group by dt.zid,hd.xordernum,hd.xcrnnum,hd.xdate,xitem,hd.xwh,dt.xrate,dt.xvatrate, hd.xsm,hd.xrsm,hd.xfm,hd.xsp,hd.xpp 
+end table

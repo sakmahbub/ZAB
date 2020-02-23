@@ -1,0 +1,12 @@
+     list ardolist
+        table arhed
+        order xvoucher
+        select "xvoucher like '%"+zvalue+"%'"
+       // select "xwh='"+#wh+"' and xdornum like '%"+zvalue+"%' and xtype='NPL' and xstatusord='Confirmed'" AND ISNULL(z.xbalprime,0) <> 0
+		rows 20
+		searchselect "left(xvoucher,2)='DO' and xbalprime <> 0"
+		        objects xvoucher attrib(link "abc" embed onclick="return updateParent(this:'xvoucher')"), ~
+                xcus,xdate,xwh
+     end list
+
+

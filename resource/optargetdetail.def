@@ -1,0 +1,12 @@
+product ZAB
+
+table optargetdetail
+  caption "MIO Wise Target"
+  columns ztime,zutime,zid,zauserid,zuuserid,xyear,xper,xsp,xitem,xqty,xval,xrate
+
+  primary key zid, xyear,xper,xsp,xitem
+  foreign key
+        zid references zbusiness.zid
+        zid,xyear,xper,xsp references optargetheader.zid,xyear,xper,xsp
+  end foreign key
+end table

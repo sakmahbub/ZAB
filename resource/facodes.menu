@@ -1,0 +1,25 @@
+//op.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Asset Serial                     |#classPath+"/login?screen=faassetserial"
+Transactions                     |#classPath+"/login?screen=xtrn(xtypetrn=FA Transactions)"
+Transfer Transactions            |#classPath+"/login?screen=xtrn(xtypetrn=FA Transfer Trn)"
+Estimeted Life Change Trn        |#classPath+"/login?screen=xtrn(xtypetrn=Estimated Life Trn)"
+Asste Group                      |#classPath+"/login?screen=xcodes(xtype=Asset Group)"
+Asset Category                   |#classPath+"/login?screen=xcodesfacat"
+Asste Type                       |#classPath+"/login?screen=xcodes(xtype=Asset Type)"
+Depreciation Method              |#classPath+"/login?screen=xcodes(xtype=Depreciation Method)"
+Section                          |#classPath+"/login?screen=xcodes(xtype=Section)"
+Suppliers                        |#classPath+"/login?screen=casup"|common
+Supplier Groups                  |#classPath+"/login?screen=xcodesgsup"
+Supplier Code                    |#classPath+"/login?screen=xtrn(xtypetrn=Supplier Code)"
+//Manufacturer                     |#classPath+"/login?screen=xcodes(xtype=Manufacturer)"
+Manufacturer                     |#classPath+"/login?screen=camanufacturer"
+Manufacturer Code                |#classPath+"/login?screen=xtrn(xtypetrn=Manufacturer Code)"
+-House Keeping
+Depreciation Log                 |#classPath+"/login?screen=fadeplog"
+FA To GL Interface               |#classPath+"/login?screen=fagli"
+Related Codes                    |#classPath+"/login?screen=xtrnp(xtypetrn=FA Transactions)"
+//-------------------------------------------------------------------
+

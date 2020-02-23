@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table lcscciview
+  caption "CI View"
+  columns zid,xlcno,xcus,xlcissuedate,xordertype,xprime,xstatus
+  primary zid,xlcno,xcus,xlcissuedate,xordertype,xprime,xstatus
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view lcscciview (zid,xlcno,xcus,xlcissuedate,xordertype,xprime,xstatus)~
+                  as select a.zid,a.xlcno,a.xcus,a.xlcissuedate,a.xordertype,a.xprime,a.xstatus from  lcinfo a ~				  
+					where a.xtype='Export' and a.xlcno not in (select xlcno from opinvheader)
+					
+end table

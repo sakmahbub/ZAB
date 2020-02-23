@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table fadeplog
+  caption "Depreciation Log"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+  xdate,xyear,xper,xstatusfa
+
+
+  primary key zid, xyear,xper
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+
+end table

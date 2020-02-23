@@ -1,0 +1,11 @@
+     list cusorg
+        caption "<br><center><b>"Customer List"</b>"
+        table cacus
+        order xorg
+        navigators alpha //group xsub "select xsub from gldetail where (xprime<xarap)"
+        rows 10
+        objects ~
+         xorg attrib(link "abc" embed onclick="return updateParent(this:'xorg')"),xcus
+     end list
+
+

@@ -1,0 +1,19 @@
+product ZAB ERP
+
+table pdhrc1
+  caption "PD Level 1"
+  columns ztime,zutime,zauserid,zuuserid,zid,xhrc1,xdesc
+
+  primary key zid, xhrc1
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  check
+    //country  = 'US' or country = 'SG'
+  end check
+  //field xcus
+    //extend
+    //attrib trn Sales Order, 10
+  //end field
+  //sql
+end table

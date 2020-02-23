@@ -1,0 +1,217 @@
+screen arcascreditadmin
+
+     sidebar list invoice,list allocation
+     sections form one,jscript myscript
+
+
+     list invoice
+        caption "<br><center><b>"Unallocated Voucher List"</b>"
+        table arallocation
+        order xcus,xvoucher
+        fixed xcus
+        select "xprime> 0"
+        rows 10
+        objects ~
+        xvoucher,xprime,xdate
+
+        headers "Invoice Number","Balance","Date"
+     end list
+
+     list allocation
+        caption "Allocated Voucher List"
+        table aralc
+        order xvoucher,xinvnum
+        fixed xvoucher
+        rows 10
+        objects ~
+        xinvnum attrib(link "login?screen=arcascreditadmin&command=Show&xinvnum=?"), ~
+        xdate,xbalance,xamount
+	  header "Invoice No","Inv Date","Invoice Balance","Allocated Amt"
+        totals "","Totals","",sum
+     end list
+
+     form one
+        caption "Money Receipt Entry -Admin"
+        table arhed
+	primarykey xvoucher
+        order xvoucher
+        select "left(xvoucher,2)='MR'"// and xwh='"+#wh+"'"// and xpaymentterm='Credit'"
+        return "login"
+        pstyle 3
+        layout 2        // display(trn AR Transactions)
+        objects Add,Clear,Show,Update,Delete, *next,Top,Previous,Next,Bottom,Allocate,"<p>" ,~
+                xvoucher,xdate,xcus,xorg,xwh,xsp,~
+                xprime,xbalprime,xpaymenttype,xref,xdateref,xvatamt,xaitamt,xdiscprime display(hide),~
+                xstatusjv display(hide),xnote,xbank,xdocnum display(hide),~
+
+                //hide
+                xsign display(hidden),xdeptname display(hide),~
+                xchgsprime display(hide),xpaymentterm display(hide),xtype display(hide)
+	
+	field xdate
+		caption MR Date
+		//display const
+	end field
+
+	field xprime
+		caption Total Paid Amount
+	end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+        //field xcus
+          //pick list cacuscredit
+        //end field
+
+        //field xwh
+          //default #wh
+        //end field
+
+        field xvatamt
+          caption VAT paid by Customer
+          display text
+        end field
+
+        field xaitamt
+          caption AIT paid by Customer
+          display text
+        end field
+
+        field xorg
+          attrib local
+          display constant
+          caption Name
+          event after
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+	 field xbank
+		width 30
+		//pick 
+	 end field
+
+        field xbankname
+          attrib local
+          display const
+          caption Bank Name
+          event after
+            set xbankname=acmst.xdesc("xacc='"+xbank+"'")
+          end event
+        end field
+
+        field xname
+          display constant
+          event after
+          end event
+        end field
+
+        field xnote
+		height 3
+          width 20
+        end field
+
+
+        field xvoucher
+	   width 15	
+         caption M.R. Number
+	   event after    
+		set globals(xvoucher)=xvoucher
+            set globals(xcus)=xcus
+	     	      if xstatusjv .eq. "Confirmed"
+		         	set #field(add.display)="hidden"
+         			//set #field(update.display)="hidden"
+            	end if
+				if xdate .lt. '"+#date+"'
+					set #field(update.display)="hidden"
+				end if
+		class careports(getReport{armrprint,1,xvoucher,Print Money Receipt})
+          end event
+        end field
+
+        field add
+          event before
+            set xstatusjv="Open"
+		set xtype="NPL"
+            //set xsp=cacus.xsp("xcus='"+xcus+"'")
+            set cacuscredit=cacus.xpaymentterm("xcus='"+xcus+"'")
+	    	set xpaymentterm = cacuscredit	
+            if xprime == 0
+              error "Cannot Proceed -- Amount is Blank"
+            else if cacuscredit .eq. "Cash"
+              error "Cannot Proceed -- Cash Customer Not Allowed"
+            else
+		      //*********** GETTING TRN NO ****************
+			set customer = cacus.xcus("xcus='"+xcus+"'")
+			if #result .eq. "true"
+	            	set year = #sub(xdate,2,2)
+      	      	set trn = "MR"+xwh 
+            		set xvoucher = #trn("AR Transactions",trn,10)
+	            	set xvoucher = #sub(xvoucher,0,4)+year+#sub(xvoucher,4,10)
+			end if
+            end if
+          end event
+          event after
+            set command = "add"
+            set temp = #spsql(sp_validateAfterARcas,#id,#user,xvoucher,xcus,command)
+            action Show
+          end event
+        end field
+
+        field Update
+          event before
+            set temp = #sql("select xinvnum from aralc where xvoucher='"+xvoucher+"'")
+            if #result .eq. "false"
+              set xbalprime=xprime
+            end if
+          end event
+          event after
+            set command = "update"
+            set temp = #spsql(sp_validateAfterARcas,#id,#user,xvoucher,xcus,command)
+            action Show
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Allocate
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Details"){
+            form.screen.value = "arcastrn"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+          if (detail == "Allocate"){
+            form.screen.value = "aralccreditadmin"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+        }
+        </script>
+     end jscript
+
+
+
+end screen

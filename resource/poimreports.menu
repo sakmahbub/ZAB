@@ -1,0 +1,43 @@
+//Inventory Reports.menu
+//-------------------------------------------------------------------
+option                                |action
+//-------------------------------------------------------------------
+//Inventory Ledger                    |#classPath+"/login?screen=*wcrystal imledw(xdate=From date=#date,xdate=To Date=#date,xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group)"
+//Stock Movement Summary                |#classPath+"/login?screen=*wcrystal imledsum(xdate=From date=#date,xdate=To Date=#date,xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group)"Monthly Stock Balance            |#classPath+"/login?screen=*crystal opmstockbalanceall(xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group=zzz,xwh=Branch,xwh=Branch)"
+
+//Stock Movement Summary           |#classPath+"/login?screen=*crystal imledsum(xwh=Branch,xwh=Branch,xgitem=Item Group,xgitem=Item Group,xitem=From Item=,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date)"
+//Stock Movement Summary By Type   |#classPath+"/login?screen=*crystal imledsumtype(xwh=Branch,xwh=Branch,xgitem=Item Group,xgitem=Item Group,xitem=From Item=,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xtype=Type)"
+//Transferred Item List With Value |#classPath+"/login?screen=*crystal imtransfer(xfwh=From Warehouse,xtwh=To Warehouse,xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz)"
+//Transaction Listing By Type      |#classPath+"/login?screen=*crystal imtrnlisttype2(xfwh=From Warehouse,xtwh=To Warehouse,xdate=From Date=,xdate=To Date=,xitem=From Item=,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group,xtrn=Transaction Type)"
+//Inventory Sum. Satement For COGS |#classPath+"/login?screen=*crystal imcostsumtype(xwh=Branch,xwh=Branch,xdate=From Date=,xdate=To Date=,xtype=Type)"
+//Inventory Value By Branch        |#classPath+"/login?screen=*crystal imbrstock(xwh=Branch=,xitem=From Item,xitem=To Item=zzz)"
+//Monthly Stock Balance            |#classPath+"/login?screen=*crystal opmstockbalanceall(xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group=zzz,xwh=Branch,xwh=Branch)"
+//Monthly Stock Balance                |#classPath+"/login?screen=*wcrystal opmstockbalance(xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group=zzz)"
+Monthly Stock Bal (RM / PM)                |#classPath+"/login?screen=*wcrystal opmstockbalance(xdate=From Date=#date,xdate=To Date=#date,xitem=Item*,xgitem=Item Group*)"
+Stock Movement Detail                 |#classPath+"/login?screen=*crystal imtrndetail(xgitem=Item Group,xgitem=Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date)"
+//Receive-Issue Product Ledger          |#classPath+"/login?screen=*wcrystal imtrnreciss(xgitem=Item Group,xgitem=Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date)"
+Transferred Product List by TP      |#classPath+"/login?screen=*crystal imtransfer(xfwh=From Warehouse,xtwh=To Warehouse,xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz)"
+//Item Stock By Branch(For Branch)      |#classPath+"/login?screen=*wcrystal imbrstock(xitem=From Item,xitem=To Item=zzz)"
+//Branch Stock By Item		        |#classPath+"/login?screen=*wcrystal imitemstock(xitem=From Item,xitem=To Item=zzz)"
+
+//Stock Receive Detail                |#classPath+"/login?screen=*crystal imredetail(xdate=From date=#date,xdate=To Date=#date,xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group)"
+//Stock Issue Detail                  |#classPath+"/login?screen=*crystal imisdetail(xdate=From date=#date,xdate=To Date=#date,xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group,xwh=Warehouse=)"
+//Stock Receive Summary               |#classPath+"/login?screen=*crystal imresum(xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group,xdate=From date=#date,xdate=To Date=#date,xwh=Warehouse=)"
+//Stock Issue Summary                 |#classPath+"/login?screen=*crystal imissum(xdate=From date=#date,xdate=To Date=#date,xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group,xagent=From Contractor=,xagent=To Contractor=)"
+//Stock Status                        |#classPath+"/login?screen=*crystal imstockstmt(xgitem=From Group,xgitem=To Group=zzz,xitem=From Item,xitem=To Item=zzz,xdate=From Date=#date,xdate=To Date=#date)"
+
+Current Product Stock                 |#classPath+"/login?screen=*wcrystal imstockbal(xitem=From Item=0,xitem=To Item=zzz,xgitem=From Group=0,xgitem=To Group=zzz)"
+//Transaction Listing                 |#classPath+"/login?screen=*crystal imtrnlist(ximtrnnum=From Transaction No=0,ximtrnnum=To Transaction No=zzzzzzz,xdate=From Date=,xdate=To Date=,xitem=From Item=0=text,xitem=To Item=zzz)"
+Transaction Listing By Date           |#classPath+"/login?screen=*wcrystal imtrnlistdate(xdate=From Date=,xdate=To Date=,xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group)"
+Transaction Listing By Type      	    |#classPath+"/login?screen=*crystal imtrnlisttype2(xwh=From Warehouse,xwh=To Warehouse,xdate=From Date=,xdate=To Date=,xitem=From Item=,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group,xtrn=Transaction Type)"
+Product List by Type                  |#classPath+"/login?screen=*crystal caitemall(xgitem=From Product Type,xgitem=To Product Type=zzz)"
+//Transaction Listing By Type           |#classPath+"/login?screen=*wcrystal imtrnlisttype(xdate=From Date=,xdate=To Date=,xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group,xtrn=Transaction Type)"
+//Transaction Listing By Status         |#classPath+"/login?screen=*crystal imtrnbystatus(xdate=From Date=,xdate=To Date=,xwh=Branch,xtype=Type)"
+//Inventory Sum. Satement For COGS      |#classPath+"/login?screen=*wcrystal imcostsum(xdate=From Date=,xdate=To Date=,xtype=Type)"
+//Stock Take Listing                    |#classPath+"/login?screen=*wcrystal imstocktakelisting(xtagnum=From Tag Number,xtagnum=To Tag Number=z,xfwh=Store)"
+//Stock Take Variance Summary           |#classPath+"/login?screen=*wcrystal imstvariationsum(xfwh=From Store,xtwh=To Store)"
+//Stock Take Variance Detail            |#classPath+"/login?screen=*wcrystal imstvariationdet(xfwh=From Store,xtwh=To Store)"
+//Monthly Stock Balance                 |#classPath+"/login?screen=*crystal opmstockbalanceall(xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group=zzz,xwh=Branch,xwh=Branch)"
+
+//-------------------------------------------------------------------
+

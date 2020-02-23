@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table cadiscount
+  caption "Discount Table"
+  columns ztime, zutime,zauserid,zuuserid, zid,xcode,xamount,xdisc,xgitem,xfamt,xtamt
+
+
+  primary key zid, xcode,xgitem
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table pdtaxchallan
+  caption "PD Tax Challan"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xrow,xyear,xper,xchallan,xempcategory,xdate,xbank,xamount,xnote,xyearcombo,xpercombo
+
+  primary key zid,xyear,xper,xchallan,xempcategory
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

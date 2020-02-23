@@ -1,0 +1,291 @@
+screen optoarinter
+
+	 sidebar list dolist,list accdet,list detail// list bclink, list lcno,
+     sections form one, jscript myscript
+
+	list detailtttttttt
+        caption "DO List"
+        table opdoheader
+        order xdornum,ztime 
+		select "xstatusdor = 'Confirmed' and xstatusgl='Open'"
+        //fixed xinvnum
+        rows 100
+        objects  xdornum attrib(link "login?screen=optoarinter&command=Show&xdornum=?"),~
+					xdate,xstatusdor,xordernumso,xpornum//,descc equals((select sum(xqtydel) from opdodetail where opdodetail.zid=opdoheader.zid and opdodetail.xdornum=opdoheader.xdornum)),xtotamt,xordernum,xlcno
+
+        headers "DO No.","DO Date","DO Status","SO","PO"//,"DO Qty","DO Amount","Proforma Invoice No.","Letter of Credit (LC) No."
+    	 // total "Total","","",sum
+     end list
+	 
+
+list dolist
+        caption "DO  for Create AR"
+        table opdoheader
+        order xdate 		
+		select " xstatusdor='Confirmed' and xstatusgl='Open'"
+        rows 1000
+        objects  xdornum attrib(link "login?screen=optoarinter&command=Show&xdornum=?"), ~
+                 xdate,xcus,cusname equals((select xorg from cacus where cacus.zid=opdoheader.zid and cacus.xcus=opdoheader.xcus)),~
+				 xordernumso,xpornum,doqty equals((select sum(xqtydel) from opdodetail where opdodetail.zid=opdoheader.zid and opdodetail.xdornum=opdoheader.xdornum)),~
+				 doamt equals((select sum(xlineamt) from opdodetail where opdodetail.zid=opdoheader.zid and opdodetail.xdornum=opdoheader.xdornum))//,xstatusdor
+
+      headers "DO No.","DO Date","Cus ID","Name","SO","PO","DO Qty","DO Amt"//,"DO Status",
+	  // headers "CI No","CI Ref","CI Date","CUS ID","Name","LC No.","GL Status"//,"DO No","Del Date",,"AR Status"
+     end list
+	 
+
+	 
+
+	 list bclink
+        caption "CI No."
+        table opdoheader
+        order xdornum
+		select "xtype='Normal' and xdornum='"+xdornum+"'"
+		fixed xinvnum
+        return "login"
+        rows 20
+		objects  xinvnum attrib(link "login?screen=optoartrn&command=Show&xinvnum=?"),~
+					xdornum,xdate
+				 
+     end list
+	 
+	list accdet
+    caption "Voucher Detail List"
+    table acdetail
+    order xvoucher,xrow
+    select "xvoucher='"+xglvoucher+"'"
+	//fixed xvoucher
+    rows 50
+    objects  xvoucher attrib(link "login?screen=acheader&command=Show&xvoucher=?"), ~
+			 xrow attrib(link "login?screen=acdetail&command=Show&xvoucher=?&xrow=?"), ~
+             xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)),~
+			 xsub,subdesc equals((select xorg from acsubview where zid=acdetail.zid and xsub=acdetail.xsub and xacc=acdetail.xacc)),xdebit,xcredit
+
+    totals "","","","","Total","",sum,sum
+    headers "Voucher No","Line No","Acc Code","Description","Sub Code","Description","Debit","Credit"
+  end list
+	 
+	 
+
+	 list lcno1
+        caption "LC No."
+        table lcinfo
+        order xlcno
+		//select "xtype='Normal' and xdornum='"+xdornum+"'"
+		fixed xlcno
+        return "login"
+        rows 20
+		objects  xlcno attrib(link "login?screen=optoartrn&command=Show&xinvnum=?"),~
+					xcur,xexch
+				 
+     end list	 
+ 
+     form one
+        caption "DO Header(AR)"
+        table opdoheader
+        order xdornum desc
+		select "xtype='Normal' and xstatusdor = 'Confirmed'"
+	//	fixed xinvnum
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Update,Transfer To A/R,"<p>" ,~
+               xdornum ,xdate display(const),xcus display(const),xorg,~
+			   xordernumso display(const),xpornum display(const),xordernum display(const),xpiref display(const),~
+			   
+			   xcur,xexch,xlcno display(const),~
+			   xinvnum display(const),xinvref display(const),~
+			   xwh display(hide),xwhdesc ,xstatusdor display(const),~
+			   xpaymentterm display(const),xglvoucher display(const),xvoucher display(hide),~
+			   xstatusar display(const),xstatusgl display(const),xstatusjv display(hide),~
+			   xnote,~
+			  xtype display(hide)
+				
+		field xdate
+			caption DO Date
+		end field
+		
+		field xordernum
+			caption PI No.
+		end field
+		
+		field xpiref
+		caption PI Ref No.		
+		attrib local
+			event after
+				set xpiref=opordheader.xpiref("xordernum='"+xordernum+"'")
+			end event
+		end field
+		
+		field xcur
+			default "USD"
+		end field
+		field xexch
+			default 1
+		end field
+		
+		field xinvnum
+			caption CI Number
+		end field
+	
+		field xinvref
+			attrib local
+				caption CI Ref
+				display constant
+			event after
+				set xinvref=opinvheader.xinvref("xinvnum = '"+xinvnum+"'")          
+			end event
+		end field
+		
+		field xstatusjv
+			caption Status GL
+		end field
+ 		
+        field xorg
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")
+          end event
+        end field
+	
+        field xwhdesc
+          attrib local
+          caption Store
+          display hide
+          event after
+            set xwhdesc = branchview.xlong("xcode = '"+xwh+"'")
+          end event
+        end field
+
+		
+		   
+	
+	
+		
+
+        field xnote
+          width 35
+          column 2
+        end field
+
+        field xdornum
+		     set globals(xdornum)=xdornum
+            //  set globals(xinvnum)=xinvnum
+			event after 
+				set globals(xinvnum) = xinvnum
+				set globals(xglvoucher) = xglvoucher
+				
+				set statusjv =  opinvheader.xstatusjv("xinvnum='"+xinvnum+"'")
+
+				if xglvoucher .ne. ""
+					class careports(getReport{acvoucher;2;in,st;zid,svoucher;xglvoucher;Print Voucher})
+				end if
+				if xdornum .ne. ""
+					//class careports(getReport{opbill;2;in,st;zid,inv;xdornum;Print Bill})
+				end if
+				
+				if xstatusdor .eq. "Open" 
+					//set #field(update.attrib) = "disabled"
+					set #field(Transfer.display) = "hidden"
+				end if
+				if xstatusar .eq. "Confirmed" .and. xstatusgl .eq. "Confirmed"
+					set #field(Update.attrib) = "disabled"
+					set #field(Transfer.display) = "hidden"
+					set #field(DO.display) = "hidden"
+					set #field(xcur.display) = "const"
+					set #field(xexch.display) = "const"
+				end if
+				
+				
+			end event
+		   
+        end field
+		
+
+        
+        field Update
+			event before
+			
+			if xexch <1.01
+				error "Cannot Proceed -- Exchnage Rate is "+xexch
+			end if
+				//set pichck=opordheaderso.xinvnum("xordernum='"+xordernumso+"'")
+			//if pichck .eq. ""
+				//	error "Cannot Proceed -- Please Create PI of SO "
+			//else
+			//	set xordernum=opordheaderso.xinvnum("xordernum='"+xordernumso+"'")
+			//end if
+			
+			end event
+			event after
+				action show
+			end event
+			
+		end field
+
+
+       
+
+
+        field Transfer To A/R
+			event before
+				double exch = 0.000
+				double amt = 0.000
+				set status =  opdoheader.xdornum("xdornum='"+xdornum+"' and xstatusar='Confirmed' and xstatusgl='Confirmed'")
+				set exch =  opdoheader.xexch("xdornum='"+xdornum+"'")
+				set amt =  #sql("select sum(xlineamt) from opdodetail where xdornum='"+xdornum+"'")
+				set pichck=opordheaderso.xinvnum("xordernum='"+xordernumso+"'")
+				if xdornum .eq. ""
+					error "Cannot Proceed -- Please Choose DO "
+				//else if pichck .eq. ""
+				//	error "Cannot Proceed -- Please Create PI of SO "
+				else if exch  <1.01
+					error "Cannot Proceed -- Exchnage Rate is "+exch
+				else if amt <= 0	
+					error "Cannot Proceed -- Invoice Amount is "+amt
+				else if status .eq. xdornum
+					error "Cannot Proceed -- Invoice Already Transferred"					
+					
+				end if
+			end event
+          event after 
+				if xstatusar .eq. "Open"
+					set temp = #spsql(zabsp_OP_transferDOtoAR,#id,#user,xdornum,"opdoheaderar")
+					set temp = #spsql(zabsp_OP_transferDOtoGL,#id,#user,xdornum,"optoarinter")
+					set voucher = opdoheader.xglvoucher("xdornum='"+xdornum+"'")
+					
+				end if 
+				action Show
+          end event
+        end field
+		
+		 field Detail
+          embed onclick="clicked(this)"
+        end field
+		 
+		embed onsubmit="return submitit(this)" 
+		  
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Back"){
+            form.screen.value = "opdodetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

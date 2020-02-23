@@ -1,0 +1,295 @@
+screen moreqheadergrey
+
+  	sidebar list one,list imtor,list imtorcon//list trndetail,
+	sections form one, jscript myscript
+
+	
+     
+	  list one
+        caption "Select Process for Requistion "+xbatch
+        table moreqview
+        order xbatch,xrow 
+		select "xtype='Grey Fabric'"
+        fixed xbatch
+        rows 20
+        objects xrow attrib(name xrow#),xmoprcs attrib(link "abc" embed onclick="return pickRecipe(this:xrow#)"),~
+                xfabriccolor
+				
+		headers "Row No","Process Name","Color"
+     end list
+	 
+          
+	 list imtor
+        caption "Select Batch For Issue: "+xbatch
+        table imtorheader
+        order xtornum
+		select "xstatustor<>'Confirmed' and xfwh='02'"
+		fixed xbatch
+        rows 20
+        objects  xtornum  attrib(link "login?screen=moreqheadergrey&command=Show&xtornum=?"),~// ,xdate,xbatch,~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh)),~
+				 prcs equals((select distinct(xprcstype) from mohrecipesetting where zid=imtorheader.zid and xrow=imtorheader.xdocrow and xbatch=imtorheader.xbatch)),~
+				 color equals((select distinct(xfabriccolor) from mohrecipesetting where zid=imtorheader.zid and xrow=imtorheader.xdocrow and xbatch=imtorheader.xbatch)),~
+				 qty equals((select sum(xqtyreq) from imtordetail where zid=imtorheader.zid and xtornum=imtorheader.xtornum))
+				 
+        headers "Requisition No","Date","Color Process","Process","Color","Qty"
+    end list          
+	 list imtorcon
+        caption "Issued Transaction "
+        table imtorheader
+        order xtornum
+		select "xstatustor='Confirmed' and xfwh='02'"
+		fixed xbatch
+        rows 20
+        objects  xtornum  attrib(link "login?screen=moreqheadergrey&command=Show&xtornum=?"),~// ,xdate,xbatch,~
+                 xdate,xbatch,xdocrow,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh)),~
+				 color equals((select distinct(xfabriccolor) from moreqview where zid=imtorheader.zid and xrow=imtorheader.xdocrow and xbatch=imtorheader.xbatch))
+				 
+        headers "Requisition No","Date","Batch No","Row No","Process","Color"
+    end list
+              
+    list one1
+        caption "<br><center><b>"Transfer Order Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=imtormoreqdetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyreq,xqtycom,xqtyord,xstype
+
+        headers "Serial No","Item","Description","Qunatity Required","Available Quantity","Quantity Delivered","Stock Check Status"
+     end list
+              
+    list trndetail
+        caption "<br><center><b>"Transfer Order Detail List for: "</b>"+xtornum
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=moreqheadergrey&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyreq,xqtyord
+
+        headers "Serial No","Item","Description","Qunatity Required","Quantity Delivered"
+     end list
+
+	 
+     form one
+        caption "Grey Fabric Requisition For: "+xbatch
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+		fixed xbatch
+		//select "xstatustor<>'Confirmed' and xfwh='02'"
+		select "xfwh='02'"
+        return "login"
+        pstyle 3
+        layout 3
+        objects Add,Update,Delete,Show,Clear,Return, ~
+        Select Item For Requisition,"<p>",~
+        xtornum ,~
+        xdate,xdatecom,~
+        xfwh display(const),xfbrname,xref,xtwh display(const),xtbrname,xstatustor display(constant),xlong display(hide),~
+		xdocrow,xmoprcs display(text),xordernum display(hide),xpiref display(hide),xcus display(hide)
+				
+		field xdocrow
+			caption Recipe Row
+		end field
+		
+       field xfbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Store' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Store' and xcode='"+xtwh+"'")
+        end event
+       end field
+		
+        field xtornum
+          event after
+			set global(xtornum)=xtornum
+			set global(xdocrow)=xdocrow
+			set global(xmoprcs)=xmoprcs
+			set global(xordernum)=xordernum
+            //class careports(getaspReport{imtranissueprint,1,xtornum,Print Transfer Challan})
+			class careports(getReport{imtranissueprint;2;in,st;zid,tornum;xtornum;Print Transfer Challan})
+			if xstatustor .eq. "Confirmed"
+              set #field(Check.display)="hidden"
+              set #field(Confirm.display)="hidden"
+			end if
+           end event
+        end field
+
+
+        field xdate
+          caption Transfer Date
+        end field
+
+        field xdatecom
+          display constant
+          caption Receive Date
+        end field
+
+
+        field xlong
+          height 3
+          width 110
+          column 2
+        end field
+
+        field Create
+          event before
+            if xstatustor .eq. "Confirmed"
+              error "Cannot Proceed -- Requisition Already Checked"
+            end if
+          end event
+          event after
+            set temp = #spsql(zabsp_IM_createGreyRequisition,#id,#user,xtornum,xdate)
+            action Show
+          end event
+        end field
+
+        field Check
+          event before
+            if xstatustor .eq. "Confirmed"
+              error "Cannot Proceed -- Requisition Already Checked"
+            end if
+          end event
+          event after
+            set temp = #spsql(zabsp_IM_CheckMORequisition,#id,#user,xtornum,xdate,xfwh,xstatustor)
+            action Show
+          end event
+        end field
+
+        field Confirm
+          event before
+            if xstatustor .eq. "Confirmed"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,"imtormoreqheader",6)
+            action Show
+          end event
+        end field
+
+        field Transfer
+          event before
+            if xstatustor .ne. "Open"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,6)
+           // action Show
+          end event
+        end field
+
+        field Receive
+          event before
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Transfered"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,8)
+           // action Show
+          end event
+        end field
+
+        field add
+			event before
+				if xmoprcs .eq. ""
+					error "Cannot Proceed -- Please Select Process From Side List"
+				//else if xfwh .eq. ""
+				//	error "Cannot Proceed -- Please Choose From Store"
+				//else if xtwh .eq. ""
+				//	error "Cannot Proceed -- Please Choose To Store"
+				else
+					set xmoprcs = #trim(xmoprcs)
+					
+					set fabcolor = mohrecipesetting.xfabriccolor("xbatch='"+xbatch+"' and xrow="+xdocrow)
+					set xfwh = "02"
+					set xtwh = #sql("select xcode from branchview where xlong='"+xmoprcs+"'")
+					set trn = "TO--"
+					set xstatustor="Open"
+					set xordernum = moheader.xordernum("xbatch='"+xbatch+"'")
+					set xpiref = opordheader.xpiref("xordernum='"+xordernum+"'")
+					set xcus = opordheader.xcus("xordernum='"+xordernum+"'")
+					set xtornum = #trn("Transfer Transaction",trn,10)
+				end if
+			end event
+        end field
+        field update
+          event before
+			if xtornum .eq. ""
+				error "Cannot Update -- Transfer Order not Created"
+			else			  
+			//	set xcus = opordheader.xcus("xordernum='"+xordernum+"'")
+			//set xfwh = moheader.xwh("xbatch='"+xbatch+"'")
+			set xfwh = "02"
+			set xtwh = #sql("select xcode from branchview where xlong='"+xmoprcs+"'")
+			//set 
+			end if
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+        
+		field Select
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+
+        function clicked(b){
+          but=b.value
+        }
+
+        function submitit(form){
+          if (but=="Select Item For Requisition"){
+            form.screen.value = "moreqdetailgrey"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+          if (but=="Return"){
+            form.screen.value = "mostorereqheader"
+            form.searchbutton.value = "Find xbatch=?"
+          }
+        }
+		function pickRecipe(link,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xmoprcs.value=link.text
+            document.one.xdocrow.value=row.text
+          }else{
+            document.one.xmoprcs.value=link.innerText
+            document.one.xdocrow.value=row.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+
+
+end screen

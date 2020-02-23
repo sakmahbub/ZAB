@@ -1,0 +1,11 @@
+//poord.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+-Requisition
+Requisition Entry                |#classPath+"/login?screen=poreq"
+-Purchase Order
+Purchase Order Entry             |#classPath+"/login?screen=poordq"
+PO for Consign Stock             |#classPath+"/login?screen=imtor"
+//-------------------------------------------------------------------
+

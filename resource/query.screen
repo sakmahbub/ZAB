@@ -1,0 +1,143 @@
+screen query
+
+     sections form one,jscript myscript
+
+     form one
+        caption "Query / Help"
+		table query
+        order zhistoryid desc
+        return "login"
+        layout 3
+        pstyle 3
+        objects Clear,Show,Top,Next,Previous,Bottom,Execute,"<p>" ,~
+					//Query_SP,Query_VW,*next, Delete_TB,Delete_SP,Delete_VW,
+               zhistoryid,xdate display(const),xpassword,xref,zcommand,xpecify,zstatement
+
+
+        field zcommand
+          caption Command
+		  display combo
+		  pick "Check,Query,Delete"
+		  default "Check"
+        end field
+
+			field zstatement
+				caption Remarks
+				column 3
+				width 100
+			end field
+		
+		field zhistoryid
+          caption Query ID
+        end field
+
+		field xpassword
+          caption Security Key
+		  //display text
+		  width 30
+        end field
+		
+		field xpecify
+			//caption Remarks
+			default "Table"
+		end field
+		
+        field xref
+          caption Subject Name
+		  display text
+		  pick ""
+        end field
+
+        field xtype
+          pick "Attendance"
+          display combo
+          event after
+             //class careports(getjspReport{pdattemp,0,Check Uploaded File})
+          end event
+        end field
+
+
+        field Execute
+		 event before
+			if xpassword .ne. "Key"
+				error "Access Denied"
+			else
+						set temp = #spsql(zabsp_CHECK_sp_table_view_Esixt_Delete,#id,#user,xref,zcommand,xpecify,xdate)
+			end if
+		end event
+          event after
+				//set stat = #sql("select max(zhistoryid) from query where xref='"+xref+"'")
+			set stat = #sql("select max(zhistoryid) from query")
+			//print stat
+
+			set statement=query.zstatement("zhistoryid='"+stat+"'")
+			print statement
+			set zhistoryid=stat
+			action show
+          end event
+		//  action show
+        end field
+		
+		field Confirm
+		 event before
+		    set status=pdatlog.xstatus("xdate='"+xdate+"' and xempcategory='"+xempcategory+"'")
+			if xempcategory .eq. ""
+				error "Please select Employee Category"
+			else if status .eq. "Confirmed"
+				error "Attendance File Already Confirmed"
+			end if
+		set xfile="C:\uploads\"+xfile
+		//print xfile
+		end event
+          event after
+          //  set temp = #spsql(zab_sp_Pd_attnd,#id,#user,"All Employee",xdate,xfile,"Confirmed")
+          end event
+        end field
+
+
+        field Delete_Upload
+          event after
+			set temp = #spsql(zab_sp_Pd_attnd,#id,#user,"All Employee",xdate,xfile,"Delete")
+            //set temp = #spsql(sp_deleteUpload,#id,#user,xtype,#wh)
+          end event
+        end field
+
+
+
+        embed onsubmit="return submitit(this)"
+
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Bonus"){
+            form.screen.value = "caitembonus"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Cost Price"){
+            form.screen.value = "caitemcostprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Sell Price"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

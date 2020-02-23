@@ -1,0 +1,41 @@
+
+product ZAB ERP
+
+table pdvarianceview
+  caption "Leave View"
+  columns zid,xyear,xper,xstaff,xname,xtype,xamount,xarrear,xadjustment,xtrntype,xlong,xposition,xempcategory
+
+  primary key zid,xvoucher,xrow
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdvarianceview (zid,xyear,xper,xstaff,xname,xtype,xamount,xarrear,xadjustment,xtrntype,xlong,xposition,xempcategory) ~
+                  as select a.zid,a.xyear,a.xper,a.xstaff,b.xname,a.xtype,a.xamount,a.xarrear,a.xadjustment,'Added','Main',a.xposition,b.xempcategory ~
+                  from pdbal a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff and year(b.xdatejoin)=a.xyear and month(b.xdatejoin)=a.xper ~
+                  and a.xtype in('Basic','House Rent','F. Medical','Conveyance') ~
+                  union all ~
+
+                  select a.zid,a.xyear,a.xper,a.xstaff,b.xname,a.xtype,a.xamount,a.xarrear,a.xadjustment,'Removed','Main',a.xposition,b.xempcategory ~
+                  from pdbal a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff and year(b.xenddate)=a.xyear and month(b.xenddate)=a.xper ~
+                  and a.xtype in('Basic','House Rent','F. Medical','Conveyance') ~
+                  union all ~
+
+                  select a.zid,a.xyear,a.xper,a.xstaff,(select xname from pdmst where zid=a.zid and xstaff=a.xstaff),~
+                  a.xtype,a.xamount,a.xarrear,a.xadjustment,'Arrear','Other',a.xposition,'' ~
+                  from pdbal a join pdtrnview b on a.zid=b.zid and a.xstaff=b.xstaff and a.xyear=b.xyear and a.xper=b.xper and b.xarrear>0 ~
+                  and a.xtype in('Basic','House Rent','F. Medical','Conveyance') ~
+                  union all ~
+
+                  select a.zid,a.xyear,a.xper,a.xstaff,(select xname from pdmst where zid=a.zid and xstaff=a.xstaff),~
+                  a.xtype,a.xamount,a.xarrear,a.xadjustment,'Adjustment','Other',a.xposition,'' ~
+                  from pdbal a join pdtrnview b on a.zid=b.zid and a.xstaff=b.xstaff and a.xyear=b.xyear and a.xper=b.xper and b.xadjustment>0 ~
+                  and a.xtype in('Basic','House Rent','F. Medical','Conveyance') ~
+                  union all ~
+
+                  select a.zid,a.xyear,a.xper,a.xstaff,(select xname from pdmst where zid=a.zid and xstaff=a.xstaff),~
+                  a.xtype,a.xamount,a.xarrear,a.xadjustment,'Type','Other',a.xposition,'' ~
+                  from pdbal a join pdtrnview b on a.zid=b.zid and a.xstaff=b.xstaff and a.xyear=b.xyear and a.xper=b.xper and b.xamount>0 ~
+                  and a.xtype in('Basic','House Rent','F. Medical','Conveyance')
+end table

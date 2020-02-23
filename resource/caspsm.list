@@ -1,0 +1,10 @@
+list caspsm
+  table casm
+  order xsm
+  select "((xsm like '%"+zvalue+"%' or xname like '%"+zvalue+"%'))"
+  rows 10
+  objects xsm attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+               xname
+end list
+
+

@@ -1,0 +1,18 @@
+//codes.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Currencies                       |#classPath+"/login?screen=xcur"
+//Exchange Rate History            |#classPath+"/login?screen=caexch"
+//Codes                            |#classPath+"/login?screen=xcodes"
+//Transactions                     |#classPath+"/login?screen=xtrn"
+Local Settings                   |#classPath+"/login?screen=xlocals"
+//Correct/Update Uploaded Data     |#classPath+"/login?screen=caupd"
+//Update IM Opening Balance        |#classPath+"/login?screen=imstockup"
+//Upload GL data                   |#classPath+"/login?screen=glup"
+//Chart of Account Map             |#classPath+"/login?screen=glmap"
+Correct Inventory from DO        |#classPath+"/login?screen=opdobybatch"
+//Correct exch from DO        |#classPath+"/login?screen=opinbybatch"
+
+//-------------------------------------------------------------------
+

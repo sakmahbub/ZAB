@@ -1,0 +1,14 @@
+product ZAB ERP
+ 
+table pdloantrn
+  caption "Loan & Advance Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xvoucher,xdate,xstaff,xloanamt,xinstallment,xinsamt,xtype,~
+          xdateeff,xyear,xper,xstatus,xinterest,xtotamt,xlastinsamt,xpaidinstallment,xpaid,xposition,xstatustag,xamount,xnote
+
+  primary key zid,xvoucher
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

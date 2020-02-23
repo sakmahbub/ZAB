@@ -1,0 +1,14 @@
+
+     list opordcrnable
+           table opdoheader
+	// table opdoheaderview 
+        order xdornum desc
+        select "xdornum like '%"+zvalue+"%' and xtype='NPL'"
+        rows 30
+	//searchselect "xwh='"+#wh+"'"
+        objects xdornum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xcus,xdate,xsumnum
+
+     end list
+
+

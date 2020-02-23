@@ -1,0 +1,12 @@
+ list pdreqapnum
+        table pdreqheader
+        order xpdreqnum desc
+        select "xpdreqnum like '%"+zvalue+"%' and left(xpdreqnum,4) in ('ERQ-')"
+		searchselect "left(xpdreqnum,4) in ('ERQ-')"
+        rows 20
+        objects xpdreqnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xtwh,xregi,xdate
+
+     end list
+
+

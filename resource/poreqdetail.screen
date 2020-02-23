@@ -1,0 +1,270 @@
+screen poreqdetail
+
+     sidebars list one,list quot
+     sections form detail, jscript myscript
+
+     list one
+        caption "Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=poreqdetail&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=poreqdetail.zid and xitem=poreqdetail.xitem)),xunitpur,xqtyreq
+
+
+        headers "Line No","Item","Description","Unit","Qty Req"
+     end list
+
+     list quot
+        caption "Quotation Detail For: "+caitem.xdesc("xitem='"+xitem+"'")
+        table poreqquotdetail
+        order xporeqnum,xrow,xqotrow
+        fixed xporeqnum,xrow
+        rows 20
+        objects  xqotrow attrib(link "login?screen=poreqquotdetail&command=Show&xporeqnum=?&xrow=?&xqotrow=?"), ~
+                 xspec,xquotation1,xquotation2,xquotation3,xquotation4,xquotation5
+
+
+        //headers "Line No","Item","Description","Unit","Qty Req"
+     end list
+
+
+     form detail
+        caption "Quotation Entry Detail For: "+xporeqnum+"<br>"+xsup+" "+casup.xorg("xsup='"+xsup+"'")
+        table poreqdetail
+		primarykey xporeqnum,xrow
+        order xporeqnum,xrow
+        fixed xporeqnum
+        return "login"
+        layout 2
+        pstyle 3 //Upload_One,Upload_Two,Upload_Three,*next,Upload_Four,Upload_Five,
+        objects Update,Show,Clear,*next, Return,Top, Previous, Next, Bottom,Quotation Entry,Upload_One,Upload_Two,Upload_Three,*next,Upload_Four,Upload_Five,~//Delete,Add,
+                xrow attrib(row 0 1),xdum,~//xdatereq,~
+                xitem display(const),xdesc,xqtyreq display(const),xqtyapv display(hide),xunitpur display(const),xnote,xqotnum display(hide),xrate display(hide),~
+                xpaymentterm display(hide),xqtyord display(hide),~
+				xepqty display(hide),xpmqty display(hide),xcpoqty display(hide),xgmdfqty display(hide),xedqty display(hide),xprepqty display(hide),xfile
+				
+		field xqotnum
+			caption Approved Quotation
+			//display combo
+			pick ",Quotation One,Quotation Two,Quotation Three,Quotation Four,Quotation Five"
+			
+		end field
+		
+		field xrow
+        	event before
+			if xstatusreq .ne. "Open"
+			 //set #field(Add.display)="hidden"
+             // set #field(Update.display)="hidden"
+			  // set #field(Delete.display)="hidden"
+             end if
+			end event
+			event after
+				set globals(xrow)=xrow
+				set globals(xitem)=xitem
+			end event
+        end field
+        
+		
+		
+		field xitem
+        	pick list xitem
+        end field
+	
+		field xdatereq
+		
+			default #date
+			  	caption Required Date
+        end field
+
+
+        field xdum
+        	attrib local
+        	display const
+        	caption 
+        end field
+        
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+        
+  //       field xcfpur
+  //      	attrib local
+  //      	display const
+  //      	caption Pack Size
+  //      	event after
+  //      		set xcfpur=caitem.xcfpur("xitem='"+xitem+"'")
+  //      	end event
+  //      end field
+        
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		
+		field Upload_One
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqdetail","xquotimage1",xporeqnum)
+          end event
+		end field
+		
+			field Upload_Two
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqdetail","xquotimage2",xporeqnum)
+          end event
+		end field
+		
+		field Upload_Three
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqdetail","xquotimage3",xporeqnum)
+          end event
+		end field
+		
+		field Upload_Four
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqdetail","xquotimage4",xporeqnum)
+          end event
+		end field
+		
+		
+		field Upload_Five
+			event before
+			//	print xfile
+			end event
+		 event after
+		  print "Successful"
+            set temp=#spsql(zsp_picinsert,#id,#user,"poreqdetail","xquotimage5",xporeqnum)
+          end event
+		end field
+       
+
+	   field add
+          event before
+		if xqtyreq < 0.0001
+			error "Cannot Proceed -- Qty Must be greater than 0"
+		end if
+          	//if poreqheader.xwh("xporeqnum='"+xporeqnum+"'") .eq. ""
+	        //  	set wh = caitem.xwh("xitem='"+xitem+"'")
+	        //  	print "bingo"+wh  
+          	//	set temp =  #sql("update poreqheader set xwh='"+wh+"' where xporeqnum='"+xporeqnum+"'")
+          	//end if
+			
+          	if caitem.xstype("xitem='"+xitem+"'") .ne. "Stock-N-Sell"
+          		error "Cannot Proceed -- Please Choose Right Type of Item"
+          	end if
+            set xunitpur = caitem.xunit("xitem='"+xitem+"'")
+            set xrate = caitem.xrate("xitem='"+xitem+"'")
+		set xavail = imstock.xavail("xitem='"+xitem+"'")
+		//print xavail
+           
+			set xepqty=xqtyreq
+			set xpmqty=xqtyreq
+			set xcpoqty=xqtyreq
+			set xgmdfqty=xqtyreq
+			set xedqty=xqtyreq
+			 set xqtyapv=xqtyreq
+			 set xprepqty=xqtyreq
+            set xpaymentterm = "Credit"
+          end event
+          event after
+          end event
+
+        end field
+
+        field update
+          event before
+			// set xfile="F:\uploads\"+xfile
+			 set xfile=xfile
+		if xqtyreq < 0.0001
+			error "Cannot Proceed -- Qty Must be greater than 0"
+		end if
+            set xunitpur = caitem.xunit("xitem='"+xitem+"'")
+            set xrate = caitem.xrate("xitem='"+xitem+"'")
+		set xavail = imstock.xavail("xitem='"+xitem+"'")
+            set xepqty=xqtyreq
+			set xpmqty=xqtyreq
+			set xcpoqty=xqtyreq
+			set xgmdfqty=xqtyreq
+			set xedqty=xqtyreq
+			 set xqtyapv=xqtyreq
+			  set xprepqty=xqtyreq
+            set xpaymentterm = "Credit"
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        field Quotation
+          embed onclick="clicked(this)"
+        end field
+        field Upload_One
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        
+
+function handleFileSelect(evt) {
+	//var files = evt.target.files;
+	alert('')
+}
+  document.getElementById('xfile').addEventListener('change', handleFileSelect, false);
+		
+		
+		
+		var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "poreqheader"
+            form.searchbutton.value = "Find xporeqnum=?"
+          }
+          if (button=="Quotation Entry"){
+            form.screen.value = "poreqquotdetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+
+		
+        </script>
+     end jscript
+
+
+end screen

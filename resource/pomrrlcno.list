@@ -1,0 +1,18 @@
+     list pomrrlcno
+        table poordheader
+        order xpornum
+        select "(xmlcno like '%"+zvalue+"%')"
+        navigators alpha
+        rows 10
+        //objects  xcur attrib(link "login?screen=xcur&command=Show&xcur=?"),
+        objects xmlcno attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xsup,xorg
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

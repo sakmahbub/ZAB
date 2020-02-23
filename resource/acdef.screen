@@ -1,0 +1,52 @@
+screen acdef
+     caption "GL Defaults"
+     sections form one
+
+
+     form one
+        caption "<ACRONYM>Account Defaults</ACRONYM>"
+	  table acdef
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Update, Delete,*next,Top,Bottom,"<p>" ,~
+          xyear,xper,xoffset,~
+          xaccpl,xaccrule,xgetper,xlength,xyesno,xday,xpreventry,xbacklock,xdateexp
+
+field xlength
+	caption Trn Length
+end field
+
+field xyesno
+	caption Follow Approval?
+end field
+
+field xday
+	caption Previous Voucher Entry</br>Days Consider
+end field
+
+field xbacklock
+	caption Back Lock Entry?
+end field
+
+field xdateexp
+	caption Back Lock Date
+end field
+
+
+	    field xaccpl
+    		pick xacc
+	      end field
+
+	field Update
+	  event before
+	  if xaccrule .eq. ""
+	  error "Please Press Top Button"
+	  end if
+	  end event
+	end field
+   
+     embed onsubmit="submitit(this)"
+end form
+
+end screen

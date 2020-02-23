@@ -1,0 +1,132 @@
+screen poordcost
+     caption "Cost Detail For "+xpornum
+     sidebar list one,list two
+     sections form one,  jscript myscript
+
+     list one
+        caption "Cost Detail For LC No :"+xmlcno
+        table poordcost
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow attrib(link "login?screen=poordcost&command=Show&xpornum=?&xrow=?"), ~
+                xcostcode,xcost,xbalance
+
+
+        headers "Row","Code","Cost","Balance"
+	  total "","Total",sum,""
+     end list
+
+
+     list two
+        caption "Insurance Sub Code"
+        table acsub
+        order xacc,xsub
+        //fixed xacc
+    	  select "xacc='"+xcostcode+"'"
+        rows 20
+        objects  xsub attrib(link "abc" embed onclick="return pickSub(this)"), ~
+                xdesc
+
+     end list
+
+
+     form one
+        caption "C<ACRONYM>ost</ACRONYM> D<ACRONYM>etail</ACRONYM> F<ACRONYM>or</ACRONYM> "+xmlcno
+        table poordcost
+        order xpornum,xrow
+        fixed xpornum
+        //select
+        pstyle 3
+        return "login"
+        layout 3
+        objects Return,Clear,Add, Update, Delete,*next,Show, Top, Previous, Next, Bottom,"<p>",~
+                xrow attrib(row 0 10;search), xcostcode,xdesc,xcost,~
+                xbalance display(const),xsub,xlong
+
+        embed onsubmit="return submitit(this)"
+
+        field xsub
+          caption Insurance Account
+        end field
+
+        field xlong
+          width 75
+          column 3
+        end field
+
+        field xdesc
+          attrib local
+          display const
+          event after
+            set xdesc=pocostmst.xdesc("xcostcode='"+xcostcode+"'")
+          end event
+        end field
+
+        field xcostcode
+          pick list pocost
+          event after
+            if xcostcode .ne. "02"
+ //             set #field(xsub.display)="hidden"
+            end if
+          end event
+        end field
+
+        field add
+          event before
+//            set xbalance = xprime
+          end event
+          event after
+            class posssteel(UpdatePOCostLC{xpornum,xrow,xcostcode})
+          end event
+        end field
+
+        field update
+          event after
+            class posssteel(UpdatePOCostLC{xpornum,xrow,xcostcode})
+          end event
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "poordheader"
+            form.searchbutton.value = "Find xpornum=?"
+          }
+          return result
+        }
+        function pickSub(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xsub.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

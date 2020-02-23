@@ -1,0 +1,16 @@
+//Accounts Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//View SR Status           |#classPath+"/login?screen=*jspcrystal imreqstatus(xtornum=SR No)"
+View Cash Advance Request           |#classPath+"/login?screen=*jspcrystal prletter(xwrreqcash=JN No)"
+View Comparative Statement          |#classPath+"/login?screen=*jspcrystal poquotcomp(xwrreqother=JN No)"
+View Requisition Details           |#classPath+"/login?screen=*jspcrystal poreqprint(xwrreq=JN No)"
+//PO Report            |#classPath+"/login?screen=*jspcrystal poscmstmt(xdate=From Date=#date,xdate=To Date=#date,xwh=Division,xpurtype=Purchase Type,xreptype=Report Type)"
+WO Report            |#classPath+"/login?screen=*jspcrystal poscmstmt(xdate=From Date=#date,xdate=To Date=#date,xwh=Division,xptypepo=Purchase Type,xreptypepo=Report Type,xwo= >)"
+WO Report Graph            |#classPath+"/login?screen=*jspcrystal poscmstmbar(xdate=From Date=#date,xdate=To Date=#date,xpurtype=Purchase Type,xwo= >)"
+Supplier-wise WO Report            |#classPath+"/login?screen=*jspcrystal pomrsumval(xdate=From Date=#date,xdate=To Date=#date,xsup=Supplier=,xitem=Item,xwo= >)"
+//Supplier-wise WO Report            |#classPath+"/login?screen=*jspcrystal pomrrsum(xdate=From Date=#date,xdate=To Date=#date,xsup=Supplier=,xwo= >)"
+View WO           |#classPath+"/login?screen=*jspcrystal poprint(xwonum=WO No)"
+Quality Certificate   |#classPath+"/login?screen=*jspcrystal poqtc(xqcnum=Quality Certificate No)"
+WR Status     |#classPath+"/login?screen=*jspcrystal imwrstatus(xwrstatus=WR No)"

@@ -1,0 +1,13 @@
+     list casup
+        table cacus
+        order xcus
+		linksql select xorg from cacus
+        select "((xcus like '%"+zvalue+"%' or xorg like '%"+zvalue+"%') and xtype in('Supplier','Both'))"
+        rows 10
+		searchselect "xtype in('Supplier','Both')"
+        objects xcus attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xorg,xtype,xgsup,xmadd
+		headers "Supplier ID","Supplier Name","Party Type","Group","Supplier Address"
+     end list
+
+

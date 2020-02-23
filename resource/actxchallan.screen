@@ -1,0 +1,125 @@
+screen actxchallan
+     sections  form one, jscript myscript
+     sidebar list point
+     sections form one
+	 
+	 
+	list point
+        caption "Challan Details"
+        table actxchallan
+        order xcalltrn
+		select "xtype='Party'"
+        rows 20
+        objects xcalltrn attrib(link "login?screen=actxchallan&command=Show&xcalltrn=?&xbranch=?"), ~
+				xdate,xchallan,xdistrict1,xbranch
+				header "Transaction No","Challan Date","Challan No","District","Branch"
+      end list	 
+	 
+     form one
+        caption "Challan Information for Party"
+      	table actxchallan
+        primarykey xcalltrn
+        order xcalltrn
+        select "xtype='Party'"
+        return "login"
+        layout 2
+        pstyle 3 
+        objects Add,Update,Delete,*next,*next,Show,Clear,*next,*next, Top,Previous,Next,Bottom,"<p>" ,~ 
+				xcalltrn,xchallan,xdate,xyear,xper,xdistrict1,xbranch,~
+				xpbdetails,xaccdetails,xpmethod,xcomments1,xtype display(hide)				
+
+
+				
+
+  	field xcalltrn
+		caption Transaction No
+	pick actxchallan
+      event after
+			class careports(getReport{actxtdscoF;4;in,in,in,st;zid,year,per,xcalltrn;xyear,xper,xcalltrn;Print Challan})
+			class careports(getReport{actxtdscoB;3;in,in,in;zid,year,per;xyear,xper;Print(Back Page)})
+      end event
+	end field  
+	
+    field xchallan
+		caption Challan No
+	pick 
+      event after
+      end event
+    end field
+	
+	field xdate
+	  caption Challan Date
+	end field	
+	
+	field xyear
+	  caption Year
+	end field	
+
+	field xper
+	  caption Month
+	end field		
+	
+	field xdistrict1
+	  caption Branch District
+	end field
+		
+	field xbranch
+	  caption Branch Name
+	end field
+	
+
+	field xpbdetails
+	caption Paid By Details
+	end field
+	
+
+	field xptdetails
+	caption Paid To Details
+	end field
+	
+	
+	field xaccdetails
+	caption Payment Details
+	end field
+	
+	field xpmethod
+	caption Payment Method
+	end field
+	
+
+	field xcomments1
+	caption Comments
+	end field	
+	
+	field add
+		event before
+		set xtype="Party"
+		set xcalltrn = #trn("Challan TRN Number","CAL-",10)
+			
+		if xyear .eq. 0
+			error "Cannot Proceed -- Please Enter Year"
+		else if xper .eq. 0
+		  error "Cannot Proceed -- Please Enter Month"
+		end if
+		
+		end event
+	end field
+  
+	field Update
+		event before
+		end event
+    end field
+
+	field delete 
+	 event before
+	 end event
+	end field
+
+	
+	
+	
+	
+	
+     end form
+
+end screen

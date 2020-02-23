@@ -1,0 +1,207 @@
+screen imwelfaredetail
+
+     sidebar list one 
+     sections form one, jscript myscript
+
+     list one
+      caption "Detail List"
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=imwelfaredetail&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=opdodetail.zid and xitem=opdodetail.xitem)),~
+                 xqtyord,xrate,xdiscdetamt,xvatamt,xlineamt,(xlineamt+xvatamt-xdiscdetamt)
+
+        header "Line No","Product <br>Code","Product <br>Name","Qty","Rate","Disamt","Vat <br>Amt","TP","Net <br> Amt "
+        totals "","Totals","","","",sum,sum,sum,sum
+     end list
+
+
+     form one
+      caption "Welfare Detail For<br> "+xdornum
+      table opdodetail
+      primarykey xdornum
+      order xdornum,xrow
+      fixed xdornum
+      return "login"
+      layout 2
+      pstyle 3
+      objects Add,Show,Clear,Update,Delete,*next,Back, Top,Previous,Next, Bottom,"<p>",~
+              xrow attrib(row 0 1),xpacking display(const),xcrlimit,xcusname, xitem, xqtyord,xdesc,xqtybonus display(hide),~
+              xrate,xlineamt display(hide),xdiscdet,xdiscdetamt display(hide),~
+              xvatrate,xvatamt display(hide),xlong,~
+              xeta display(hide),xcost display(hide),xnetamt display(hide)
+				
+
+      embed onsubmit="return submitit(this)"
+
+	field xcusname
+        attrib local
+        display const
+        caption Customer
+	  event after
+		set cusname=opdoheader.xcus("xdornum='"+xdornum+"'")
+		set xcusname = "Code: "cusname+", Name: "+cacus.xorg("xcus='"+cusname+"'")+", Type: "+opdoheader.xpaymentterm("xdornum='"+xdornum+"'")
+	  end event	 
+      end field
+
+	field xcrlimit
+        attrib local
+        display const
+        caption Credit Available
+        event after
+        	set paymentterm=opdoheader.xpaymentterm("xdornum='"+xdornum+"'")
+        	if paymentterm .eq. "Credit"
+        		set cus = opdoheader.xcus("xdornum='"+xdornum+"'")
+          		set xcrlimit = cacreditview.xbalance("xcus='"+cus+"'")
+          	else 
+          		set xcrlimit = 0
+          	end if
+          //if crlimit<0
+          //	set xcrlimit=0
+          //end if
+        end event
+      end field
+
+	field xdesc
+        attrib local
+        display const
+        caption Product Name
+        event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        end event
+      end field
+
+      field xeta
+        attrib local
+        caption
+        default "0"
+      end field
+
+  	  field xitem
+		pick list xitemstk
+	  	  event after
+  		    set statusord = opdoheader.xstatusord("xdornum='"+xdornum+"'")
+	  	    set statusar = opdoheader.xstatusar("xdornum='"+xdornum+"'")
+	        if statusord .eq. "Confirmed" .or. statusar .eq. "Confirmed"
+			      set #field(add.display)="hidden"
+	     		 set #field(update.display)="hidden"
+		    	  set #field(delete.display)="hidden"
+    		  end if
+     	      	if opdoheader.xsumnum("xdornum='"+xdornum+"'") .ne. ""
+		         	set #field(add.display)="hidden"
+         		set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Confirm.display)="hidden"
+       	      end if
+	   	  end event
+	    end field
+
+      field xlong
+//        width 70
+        column 2
+      end field
+
+	field add
+		event before
+			set xlineamt=xrate*xqtyord
+			set xvatamt=xvatrate*xqtyord
+			set xdiscdetamt=xdiscdet*xqtyord
+			set xnetamt=xlineamt+xvatamt-xdiscdetamt
+		end event
+
+		event after
+				//*************UPDATE OPDOHEADER *************
+				set lineamt =#sql("select sum(xlineamt) from opdodetail where xdornum='"+xdornum+"'")
+				set discamt=#sql("select sum(xdiscdetamt) from opdoddetail where xdornum='"+xdornum+"'")
+				set vatamt=#sql("select sum(xvatamt) from opdoddetail where xdornum='"+xdornum+"'")
+				set temp=#sql("update opdoheader set xtotamt="+lineamt+" where xdornum='"+xdornum+"'")
+				set temp=#sql("update opdoheader set xvatamt="+vatamt+" where xdornum='"+xdornum+"'")
+				set temp=#sql("update opdoheader set xdiscamt="+discamt+" where xdornum='"+xdornum+"'")
+				set temp=#sql("update opdoheader set xprime=xtotamt+xvatamt-xdiscamt where xdornum='"+xdornum+"'")
+		end event
+		end field
+
+      field update
+		event before
+			set xlineamt=xrate*xqtyord			
+			set xvatamt=xvatrate*xqtyord
+			set xdiscdetamt=xdiscdet*xqtyord
+			set xnetamt=xlineamt+xvatamt-xdiscdetamt
+		end event
+
+		event after
+				//*************UPDATE OPDOHEADER *************
+				set lineamt =#sql("select sum(xlineamt) from opdodetail where xdornum='"+xdornum+"'")
+				set discamt=#sql("select sum(xdiscdetamt) from opdoddetail where xdornum='"+xdornum+"'")
+				set vatamt=#sql("select sum(xvatamt) from opdoddetail where xdornum='"+xdornum+"'")
+				set temp=#sql("update opdoheader set xtotamt="+lineamt+" where xdornum='"+xdornum+"'")
+				set temp=#sql("update opdoheader set xvatamt="+vatamt+" where xdornum='"+xdornum+"'")
+				set temp=#sql("update opdoheader set xdiscamt="+discamt+" where xdornum='"+xdornum+"'")
+				set temp=#sql("update opdoheader set xprime=xtotamt+xvatamt-xdiscamt where xdornum='"+xdornum+"'")
+		end event
+      end field
+
+	
+	field Delete
+	  event before
+	  	set row= xrow
+	  	set dornum=xdornum
+	    	set titem=#sql("select xtitem from caitem where xitem='"+xitem+"'")
+	    	set date=#sql("select xdate from opdoheader where xdornum='"+xdornum+"'")
+	    	if titem .eq. "Gift Item"
+			error "Cannot Delete Gift Item"
+	    	end if
+	    //if stype .eq. "Stock-N-Sell"  	
+	    	set date=#sql("select xdate from opdoheader where xdornum='"+xdornum+"'")
+          //set temp = #spsql(zabsp_ValidedAfterDetailDO,#id,row,dornum,"delete")
+          	set temp = #spsql(zab_sp_giftitem,#id,xdornum,xitem,date,xqtyord,#user,#wh,"Delete")
+	    //end if
+	  end event
+	end field
+
+      field Back
+        embed onclick="clicked(this)"
+      end field
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Back"){
+            form.screen.value = "imwelfareheader"
+            form.searchbutton.value = "Find xdornum=?"
+          }
+          return result
+        }
+        function pickPrice(link,vatamt,cost){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xrate.value=link.innerText
+            document.one.xvatrate.value=vatamt.innerText
+            document.one.xcost.value=cost.innerText
+            document.one.xeta.value="1"
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

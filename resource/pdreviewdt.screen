@@ -1,0 +1,144 @@
+screen pdreviewdt
+  caption "Review Detail"
+  sidebar list staff, list ent
+  sections form one, jscript myscript
+
+  list staff
+    caption "Staff List By Department"
+    table pdmst
+    order xstaff
+    select "xdeptname='"+xdeptname+"' and xempcategory='"+#wh+"' and xempstatus='Normal' and xsec='"+xsec+"'"
+    rows 20
+    objects xstaff attrib(link "abc" embed onclick="return pickItem(this)"),~
+	      xname,xdesignation,xgrade,xdatejoin
+    totals "Total Employee",count
+    header "Employee Code","Name","Designation","Grade","Join In Date"
+  end list
+
+  list ent
+    caption "Review Point Enter List"
+    table pdreviewdt
+    fixed xyear,xdeptname,xsec
+    order xyear,xempid,xtype
+    rows 1000
+    objects  xempid attrib(link "login?screen=pdreviewdt&command=Show&xyear=?&xempid=?&xtype=?"), ~
+             xpoint,xtype,xyesno,xamount
+    totals "Total",count
+    header "Employee ID","Point","Type","Avail Transport","Amount"
+  end list
+
+  form one
+    caption "<ACRONYM>Review Pointing</ACRONYM>"
+	table pdreviewdt
+      fixed xyear,xdeptname,xsec
+      order xyear,xempid,xtype
+      return "login"
+      layout 2
+      pstyle 3
+      objects Add,Update, Delete, Show,Clear,*next, Top, Previous, Next, Bottom, Return,~
+      	  xempid,xname display(const),xdesignation display(const),xdatejoin display(const),xpoint,xdesc display(const),xtype,xamount,xyesno,xnote
+
+	field xtype
+	  caption Review by Type if Any
+	  display combo
+	  pick "Basic,House Rent,Allowance,Normal"
+	end field
+
+      field xempid
+        event before
+          set status = pdreviewhd.xstatus("xyear="+xyear+" and xdeptname='"+xdeptname+"' and xsec='"+xsec+"'")
+          if status .eq. "Reviewed"
+            set #field(add.display)="hide"
+            set #field(update.display)="hide"
+            set #field(delete.display)="hide"
+          end if
+        end event
+      end field
+
+	field xname
+	  attrib local
+	  caption Employee Name
+	  event after
+	    set xname=pdmst.xname("xstaff='"+xempid+"'")
+	  end event
+	end field
+	
+	field xdesignation
+	  attrib local
+	  caption Designation
+	  event after
+		set xdesignation=pdmst.xdesignation("xstaff='"+xempid+"'")
+	  end event
+	end field
+
+	field xdatejoin
+	  atrrib local
+	  caption Date of Join
+	  event after
+	    set xdatejoin=#date
+	    set xdatejoin=#sql("select xdatejoin from pdmst where xstaff='"+xempid+"'")
+	  end event
+	end field
+
+	field xnote
+	  column 2
+	end field
+
+	field xpoint
+	  display combo
+	  caption Point
+	  pick "select xpoint from pdpoint"
+	end field
+
+	field xyesno
+	  column 2
+	  caption Avail Company Transport
+		default No
+	end field
+	
+	field xdesc
+	  attrib local
+	  caption Percent
+	  event after
+	    set xdesc=#sql("select xpercent from pdpoint where xpoint='"+xpoint+"'")+"%"
+	  end event
+	end field
+
+    	field Return
+        embed onclick="clicked(this)"
+    	end field
+
+    embed onsubmit="return submitit(this)"
+
+	
+    end form
+
+  jscript myscript
+
+  <script language="javascript" type="text/javascript">
+  var button
+  var result
+  function clicked(b){
+    button=b.value
+  }
+  function submitit(form){
+    result = true
+    if (button=="Return"){
+      form.screen.value = "pdreviewhd"
+      form.searchbutton.value = "Find xyear=?&xdeptname=?"
+    }
+  }
+  function pickItem(link){
+    if (navigator.appName.indexOf("Netscape") >= 0){
+      document.one.xcur.value=link.text
+      document.one.xexch.value=exch.text
+    }else{
+      document.one.xempid.value=link.innerText
+    }
+    return false
+  }
+
+  </script>
+  end jscript
+
+end screen

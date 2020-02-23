@@ -1,0 +1,10 @@
+product ZAB ERP
+
+table userview
+  caption "Signatory One"
+  columns zid,zemail,xname,xdeptname,xdesignation
+
+  sql create view userview(zid,zemail,xposition,xname,xdeptname,xdesignation,zactive,xaccess,xrole) ~
+    as select a.zid,b.zemail,a.xposition,a.xname,a.xdeptname,a.xdesignation,b.zactive,b.xaccess,b.xrole from pdmst a ~
+	join xusers b on a.zid=b.zid and a.xposition=b.xposition
+end table

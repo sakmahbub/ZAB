@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table pmconstaskdetail1
+  caption "pm detail"
+  columns ztime,zutime,zauserid,zuuserid,zid,xwh,xhrc1,xhrc2,xtaskname,xdatefrom,xdatecom, ~
+          xdurdate,xdate,xptype,xdesc,xref, ~
+          xstatustask
+
+   primary key zid,xwh,xhrc1,xhrc2
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xwh,xhrc1 references pmconstaskheader.zid,xwh,xhrc1
+  end foreign key
+end table

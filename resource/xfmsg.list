@@ -1,0 +1,17 @@
+     list xfmsg
+        table camsg
+        order xlong
+        select "(xcode like '%"+zvalue+"%' or xlong like '%"+zvalue+"%')"
+        navigators alpha
+        rows 20
+        objects xlong attrib(link "abc" embed onclick="return updateParent(this:'xfmsg')"), ~
+                xcode
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

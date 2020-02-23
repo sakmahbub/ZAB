@@ -1,0 +1,12 @@
+product ZAB ERP
+
+table zterms
+  caption "Terms and Conditions"
+  columns ztime, zutime,zauserid,zuuserid, zid,xrow,xdesc, xtype,xdefault,xnote,zactive
+
+  primary key zid, xrow,xtype
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  end table

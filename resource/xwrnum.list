@@ -1,0 +1,15 @@
+     list xwrnum
+        caption "WR List"</b>"
+        table poreqprview
+        order xtornum desc
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4) in ('WR--'))"
+		searchselect "left(xtornum,4) in ('WR--')"
+        rows 20
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+		 xporeqnum,xdate,xtype,xlong,xregi
+		 
+	header "WR No","JN No","WR Date","Purchase Type","Division","Car/Other"
+     end list
+
+

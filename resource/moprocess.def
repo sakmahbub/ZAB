@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table moprocess
+  caption "MO Process"
+  columns  ztime,zutime,zauserid,zuuserid, zid, xbatch,xrow,xmoprcs,xqty,xdate,xstatus,xunit,xdocrow,xwh,xmodate,xmotime,~
+		xbalance,xfabriccolor,xreciperow,xqtycom,xstatusis,xqtyover,xitemraw,xqtyreprcs,xqtyreprcsbal,xqtyreover,xreprcsrow
+           
+           
+  primary key zid, xbatch,xrow
+  
+  foreign key
+        zid references zbusiness.zid
+        zid,xbatch references moheader.zid,xbatch
+   end foreign key
+end table

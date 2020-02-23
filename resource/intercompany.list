@@ -1,0 +1,12 @@
+     list intercompany
+        table cacusview
+        order xcus
+        select "(xcus like '%"+zvalue+"%' or xorg like '%"+zvalue+"%')"
+       // searchselect "xgroup='10201040000'"
+		rows 20
+        objects xcus attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xorg
+        headers "Inter Company/Party Code","Inter Company/Party Name"
+     end list
+
+

@@ -1,0 +1,14 @@
+     
+list opcrnlist
+        caption "CRN List"</b>"
+        table opcrnheader
+        order xcrnnum desc
+        select "(xcrnnum like '%"+zvalue+"%')"
+        rows 10
+        objects ~
+         xcrnnum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xcus,xordernum
+		 
+		 headers "CRN No","Date","Cus","Invoice No"
+     end list
+
+

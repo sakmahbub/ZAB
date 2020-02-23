@@ -1,0 +1,117 @@
+screen imtoapi
+     caption "IM to Accounts Transfer"
+
+     sections  form one,list one, jscript myscript
+
+     list one
+        caption "IM To AP Interface"
+        table imtoapi
+        order xtrn,xgitem
+        rows 20
+        objects xtrn,xgitem attrib(link "login?screen=imtoapi&command=Show&xtrn=?&xgitem=?"), ~
+                xacc,xacccr
+
+
+//        headers "Code","Description","Percent","Account"
+     end list
+
+
+     form one
+        caption "<ACRONYM>IM To AP Interface</ACRONYM>"
+        table imtoapi
+        primarykey xtrn,xgitem
+        order xtrn,xgitem
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,*next,Top,Previous,Next,Bottom,"<p>" ,~
+                xtrn,xdum,xgitem,xgsup,xacc,xdesc,xacccr,xdesccr
+
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+        field xdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xdesc=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+        field xdesccr
+          attrib local
+          caption Description
+          display const
+          event after
+            set xdesccr=acmst.xdesc("xacc='"+xacccr+"'")
+          end event
+        end field
+
+
+         field xdeptdesc
+          attrib local
+          caption Department Name
+          display const
+          event after
+            set xdeptdesc = xcodes.xlong("xtype='Department Name' and xcode='"+xdeptname+"'")
+          end event
+        end field
+
+        field xdeptcrdesc
+          attrib local
+          caption Department Name
+          display const
+          event after
+            set xdeptcrdesc = xcodes.xlong("xtype='Department Name' and xcode='"+xdeptnamecr+"'")
+          end event
+        end field
+
+
+
+        field xtrn
+       	def "JV01"
+       end field
+
+        field xacc
+          caption Debit Account//Purchase Account
+//          pick "select xtrn from xtrn where xtypetrn = 'AR Transactions'"
+        end field
+
+        field xacccr
+          caption Credit Account//LC Retirement Account
+          display text
+          pick list xacc
+        end field
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+end screen

@@ -1,0 +1,15 @@
+//AR Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Customer Ledger                  |#classPath+"/login?screen=*crystal arled(xcus=From Customer=0,xcus=To Customer=zzz,xdate=From Date=#date,xdate=To Date=#date)"
+Summary Customer Ledger          |#classPath+"/login?screen=*crystal arledsummary(xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date)"
+Statement of Account             |#classPath+"/login?screen=*crystal arstmt(xdate=From Date=#date,xdate=To Date=#date,xcus=Customer=0)"
+Detail Pending Report            |#classPath+"/login?screen=*crystal aragedetail(xwh=Branch,xsp=Sales Person,xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date)"
+Summary Pending Report           |#classPath+"/login?screen=*crystal aragesummary(xwh=Branch,xsp=Sales Person,xcus=From Customer,xcus=To Customer,xdate=From Date=#date,xdate=To Date=#date)"
+Ageing Report                    |#classPath+"/login?screen=*crystal arage(xcus=From Customer=0,xcus=To Customer=zzz,xdate=From Date=#date,xdate=To Date=#date)"
+Allocation Report                |#classPath+"/login?screen=*crystal arallocation(xvoucher=From Order,xvoucher=To Order)"
+Money Receipt Listing            |#classPath+"/login?screen=*crystal armrstmt(xdate=From Date=#date,xdate=To Date=#date,xcus=From Customer=,xcus=To Customer=)"
+Customer List                    |#classPath+"/login?screen=*crystal cacus(xcus=Customer=000,xcus=Customer=zzz)"
+//-------------------------------------------------------------------
+

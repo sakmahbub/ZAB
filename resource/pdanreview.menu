@@ -1,0 +1,12 @@
+//pdanreview.menu
+//-------------------------------------------------------------------
+option                           	|action
+//-------------------------------------------------------------------
+Review		                   |#classPath+"/login?screen=pdreviewhd"             |ca        |   |100
+Point	Setup			   |#classPath+"/login?screen=pdpoint"                |ca        |   |100
+Process				   |#classPath+"/login?screen=pdreview"               |ca        |   |100
+-------------REPORTS-------------  |#classPath+"/login?screen=test"               |ca        |   |100
+Reviewed Report			   |#classPath+"/login?screen=*wcrystal pdreviewed(xyear=Year)"
+Revised Letter			   |#classPath+"/login?screen=*wcrystal pdrevisedlater(xyear=Year,xdeptname=Department Name,xsign1=Singnatory,xdesig1=Desgingation,xsign1=Second Singnatory,xdesig1=Second Designation,xdisgi1=Copy Designation)"
+//-------------------------------------------------------------------
+

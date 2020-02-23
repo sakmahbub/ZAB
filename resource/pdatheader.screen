@@ -1,0 +1,141 @@
+screen pdatheader
+
+    sidebar list detail
+     sections form one,jscript myscript
+	 
+
+  	list detail
+        caption "Detail List"
+        table pdatdt
+        order xstaff,xyearperdate,xrow
+        fixed xstaff,xyearperdate
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=pdatdetail&command=Show&xvoucher=?&xrow=?"), ~
+                xtimein,xtype
+        header "Line No","Time","Status"
+     end list
+
+     form one
+        caption "Attendance Header"
+	    table pdathd
+		primarykey xposition,xyearperdate
+        order xposition,xyearperdate
+		//fixed xyearperdate,xstaff
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Show,Update, Delete,*next,Detail,Top,Next,Previous,Bottom,"<p>" ,~
+                xposition,xname,xdate,xstaff display(hide),xstatus,~
+				xempcategory display(hide),xemplate attrib(local),xempearly attrib(local),xnote,xyearperdate attrib(readonly)
+
+		
+		field xstaff
+         event before
+		 set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+		 end event
+        end field
+		
+		field xstatus
+		display combo
+		caption Status
+		pick "OD,Leave,Present,Absent,Late,Early Leave,Late & Early Leave,Weekend,Punch Inactive"
+        end field
+		
+		field xemplate
+         event after
+		 set xemplate=pdathd.xemplate("xposition='"+xposition+"' and xyearperdate='"+xyearperdate+"'")
+		 end event
+        end field	
+
+		field xempearly
+         event after
+		 set xempearly=pdathd.xempearly("xposition='"+xposition+"'  and xyearperdate='"+xyearperdate+"'")
+		 end event
+        end field		
+		
+        field xposition
+          pick list xposition
+		  event after
+		  set globals(xstaff)=xstaff
+		  set globals(xposition)=xposition
+		    set globals(xyearperdate)=xyearperdate
+		  end event
+        end field
+		
+		field xyearperdate
+          caption Day 
+		  event before
+		  set xyearperdate=#sub(xdate,0,4)+#sub(xdate,5,2)+#sub(xdate,8,2)
+		  end event
+        end field
+
+        field xname
+          attrib local
+          display const
+          caption Name
+          event after
+            set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+
+           field add
+            event before
+			//set xstatus="OD"
+		//	set xempcategory=pdmst.xempcategory("xstaff='"+xstaff+"'")
+			set empcat=pdmst.xempcategory("xstaff='"+xstaff+"'")
+			//set xempcategory=empcat
+			set status=pdatlog.xstatus("xyearperdate='"+xyearperdate+"' and xempcategory='"+empcat+"'")
+			//if status .eq. "Confirmed"
+			//error "Attendance File Already Confirmed"
+			//end if
+              set xyear=#sub(xdate,0,4)
+              set xper=#sub(xdate,5,2)
+            end event
+          end field
+
+          field update
+            event before
+			//set xstatus="OD"
+			//set xempcategory=pdmst.xempcategory("xstaff='"+xstaff+"'")
+			set empcat=pdmst.xempcategory("xstaff='"+xstaff+"'")
+			set xempcategory=empcat
+			set status=pdatlog.xstatus("xyearperdate='"+xyearperdate+"' and xempcategory='"+empcat+"'")
+	//		if status .eq. "Confirmed"
+	//		error "Attendance File Already Confirmed"
+	//		end if
+              set xyear=#sub(xdate,0,4)
+              set xper=#sub(xdate,5,2)
+            end event
+          end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdatdetail"
+            form.searchbutton.value = "Top"
+          } 
+		  return result
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

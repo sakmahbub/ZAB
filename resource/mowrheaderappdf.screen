@@ -1,0 +1,218 @@
+screen mowrheaderappdf
+
+  caption "Transfer Order Entry Header"
+     	sidebar list imtor,list reqlist,list one
+	sections form one, jscript myscript
+     
+	 list imtor
+        caption "Work Requisition "
+        table imtorheader
+        order xtornum desc
+		select "xstatustor<>'' and xidsup='"+#user+"' and left(xtornum,2)='WR'"
+        rows 5
+        objects  xtornum  attrib(link "login?screen=mowrheaderappdf&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","To Branch"
+     end list
+	 
+	 list reqlist
+        caption "Last 5 Approved Requisition"
+        table imtorview
+        order xtornum desc
+		select "xposition='"+#user+"' and left(xtornum,2)='WR'"
+		rows 5
+       objects xtornum attrib(link "abc" embed onclick="return pickItem(this)"),~
+	   xdate attrib(name xdate#),xdateapp attrib(name xdateapp#)
+       headers "Requisition No","Date","Approved Date"
+     end list
+	 
+   list one
+        caption "Work Requisition List For : "+xtornum
+        table imtordetail
+        order xtornum,xrow desc
+        fixed xtornum
+        rows 30
+        objects ~
+        xrow attrib(link "login?screen=moreqdetaildph&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xbrand,~
+        xqtyreq,xunit
+
+		totals "","","Total","",sum
+		
+        headers "Serial No","Item","Description","Brand","Quantity Required","UOM",
+     end list
+
+     form one
+        caption "Work Requisition Approved By DF"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+	    select "left(xtornum,2)='WR'"
+        return "login"
+        pstyle 3
+        layout 3
+        objects Show,Clear,Approved,Update,~//Detail,
+        "<p>" ,~
+        xtornum ,xdate,xdatecom display(hide),xref,~
+        xfwh display(const),xfbrname,xregi display(const),xtwh display(const),xtbrname,,xstatustor display(hide),xporeqnum display(hide),~
+		xdocrow display(hide),xstatusreq display(hide),~
+		zauserid display(hide),preparer display(const),xdphead display(hide),dphead display(const),~
+		xdirector display(hide),df display(const),xlong,xidsup display(hide)
+			
+       field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+		
+		field xregi
+		pick list xcardept
+			caption Car No/Other
+			event before
+			end event
+		end field
+		
+		  field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xposition='"+zauserid+"'")
+		  end event
+        end field
+		
+		field dphead
+          caption Department Head
+		  attrib local
+		  event after
+		  set dphead=pdmst.xname("xstaff='"+xdphead+"'")
+		  end event
+        end field
+		
+		
+		field df
+          caption Director of Finance
+		  attrib local
+		  event after
+		  set df=pdmst.xname("xstaff='"+xdirector+"'")
+		  end event
+        end field
+		
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+		caption Requisition No.
+		pick list xwrnum
+          event after
+			set globals(xtornum)=xtornum
+			set globals(xstatustor)=xstatustor
+			set globals(xidsup)=xidsup
+           // class careports(getjspReport{poreqprint,1,xtornum,View Requisition})
+			if xstatustor .eq. "" .or. xidsup .ne. #user
+            set #field(Approved.display)="hidden"
+			set #field(Delail.display)="hidden"
+			set #field(Update.display)="hidden"
+			end if
+           end event
+        end field
+
+
+        field xdate
+          caption Transfer Date
+        end field
+		
+		  field xdum
+        	attrib local
+        	display const
+        	caption 
+        end field
+
+
+        field xlong
+		caption Note
+          height 3
+          width 70
+          column 3
+        end field
+		
+		field Approvedss
+            event before
+			 set xsuperior=pdmst.xidsup("xposition='"+#user+"'")
+            end event
+            event after
+            if xstatustor .eq. "Approved_DPH"
+			  set temp =  #sql("update imtorheader set xidsup='"+xsuperior+"' where xtornum='"+xtornum+"'")
+			  set temp = #spsql(zabsp_DATETIME_Update,#id,#user,xtornum,"imtorheader","xdateed","xdirector","xstatustor","xtornum","Approved")
+			//  set temp = #spsql(zabsp_sendmail,#id,#user,xtornum,"Director",xtwh)
+	        end if 
+			 action show
+            end event
+        end field
+		
+		field Approved
+             event before
+			 set xsuperior=pdmst.xidsup("xposition='"+#user+"'")
+            end event
+            event after
+			 set temp = #spsql(zabsp_apvprcs,#id,#user,xtornum,0,xstatustor,"SR/WR Approval")
+			 set temp = #spsql(zabsp_sendmail,#id,#user,xtornum,"Director",xtwh)
+	         action show
+            end event
+          end field  
+		
+		field update
+		event before
+		if xstatustor .eq. ""
+		error "Please select WR No"
+		end if
+		end event
+		end field
+		  
+		
+        embed onsubmit="submitit(this)"
+
+       field Detail
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+      jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+
+        function clicked(b){
+          but=b.value
+        }
+
+        function submitit(form){
+          if (but=="Detail"){
+            form.screen.value = "mowrdetailapp"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xtornum.value=link.text
+          }else{
+            document.one.xtornum.value=link.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+
+
+end screen

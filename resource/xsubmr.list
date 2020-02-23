@@ -1,0 +1,13 @@
+     list xsubmr
+	 caption "Sub Account"
+        table acsubview
+        order xbank,xsub
+		linkobjects xbank
+        select "((xsub like '%"+zvalue+"%' or xorg like '%"+zvalue+"%'))"// and xacc='"+xacc+"')"
+        rows 20
+        objects xsub attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xorg,xmadd,xbank
+
+     end list
+
+

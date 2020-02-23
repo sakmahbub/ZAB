@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table pdattemp
+  caption "PD Attendance Temp"
+
+  columns xposition,xtimein,xmodel
+
+  primary key xposition,xtimein,xmodel
+
+  //foreign key
+   //     zid references zbusiness.zid
+//		zid,xstaff references pdmst.zid,xstaff
+ // end foreign key
+
+end table

@@ -1,0 +1,20 @@
+product ZAB ERP
+
+table pdathd
+  caption "PD Attendance Header"
+
+  columns ztime,zutime,zauserid,zuuserid,zid,xyearperdate,xstaff,xposition,xdate,xwh,xnote,xstatus,xstatusel,xstatuslate,~
+		  xpreparer,xsignatory1,xsigndate1,xsignatory2,xsigndate2,xsignatory3,xsigndate3,~
+		  xsignatory4,xsigndate4,xsignatory5,xsigndate5,xsignatory6,xsigndate6,xsignatory7,xsigndate7,~
+		  xsignatory8,xsigndate8,xsignatory9,xsigndate9,xidsup,xsuperior2,xsuperior3,xsignreject,xdatereject,~
+		  xnote1,xemplate,xempearly,xsignreject2,xdatereject2,xsignreject3,xdatereject3,xshift,xroster,xempabsent,xstatusabsent
+		  
+
+  primary key zid,xyearperdate,xstaff
+
+  foreign key
+        zid references zbusiness.zid
+		zid,xstaff references pdmst.zid,xstaff
+  end foreign key
+
+end table

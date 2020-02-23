@@ -1,0 +1,20 @@
+product ZAB
+
+table moprcsissueview
+  caption "Payment View"
+  columns ztime,zutime,zauserid,zuuserid,zid
+
+  primary key zid,xfm
+
+  foreign key
+        zid references zbusiness.zid
+        //zid,xsm,xrsm references carsm.zid,xsm,xrsm
+  end foreign key
+  sql create view moprcsissueview(zid,xbatch,xrow,xmoprcs,xfabriccolor,xqty,xqtyreprcs,xmodate,xmotime,xreciperow,xunit,xqtyreq,xqtyalc) ~
+                as select  a.zid, a.xbatch,a.xrow,a.xmoprcs,a.xfabriccolor,ISNULL(a.xqty,0),ISNULL(a.xqtyreprcs,0),a.xmodate, ~
+				a.xmotime,a.xreciperow,a.xunit,SUM(ISNULL(b.xqtyreq,0)),SUM(ISNULL(b.xqtyalc,0)) ~
+from moprocess a JOIN mohrecipesettingdetail b ~
+ON a.zid=b.zid AND a.xbatch=b.xbatch AND a.xreciperow=b.xrow GROUP BY a.zid, a.xbatch,a.xrow,a.xmoprcs, ~
+a.xfabriccolor,a.xqty,a.xqtyreprcs,a.xmodate,a.xmotime,a.xreciperow,a.xunit// ~
+//HAVING (SUM(ISNULL(b.xqtyreq,0))-SUM(ISNULL(b.xqtyalc,0)))>0
+end table

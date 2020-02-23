@@ -1,0 +1,22 @@
+product ZABDB
+
+table lcinfo
+  caption "LC Info"
+  columns ztime,zutime,zid,zauserid,zuuserid,~
+          xlcno,xshipdate,xlcissuedate,xexpirydate,xopenbank,xadvisingbank,xcur,xexch,~
+		  xlcstatus,xlctype,xprime,xbase,xcus,xbblcno,xbblcdate,xhscode,xircno,~
+		  xmaturitydate,xfdbcno,xfdbcdate,xfbpno,xfbpdate,xbillno,xbilldate,xbillamt,~
+		  xavlperc,xstatusjv,xdocnum,xexchlcreal,xprimetotamt,xbasetotamt,xvoucher,xrealdate,~
+		  xtype,xsup,xlcmargin,xpaymentterm,xait,~
+		  xnegotiateamt,xaitf,xpornum,xpiref,xpidate,xcurbuyer,xexchbuyer,xprimebuyer,~
+		  xttcur,xttexch,xttbase,xttbuyer,xstatusap,xstatus,xexchother,xstatusimgl,xstatuspor,xdatepi,xfreightcost,~
+		  xdestination,xport,xpirf,xbankbin,xincoterm,xordertype,xshipmode,xttdate,xtt,xfdd,xordernum,xfreighttype,~
+		  xinspolicyno,xinscoverno,xpireff,xponum,xshipmentby,xtransshipment,xpartialship,xpaydate,xbankdcno,xbblcdatetext,xmadd,xscref,xshipmentcus,xscprodtype,xappbankbin
+
+  primary key zid,xlcno
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table
+

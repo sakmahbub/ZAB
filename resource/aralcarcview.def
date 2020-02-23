@@ -1,0 +1,20 @@
+product ZAB ERP
+
+table aralcarcview
+  caption "OP DO CRN View"
+
+columns ztime,zutime,zauserid,zuuserid,zid,xvoucher,xinvnum,xdate,xdatedue,xbalance,xamount
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+
+    sql create view aralcarcview(ztime,zutime,zauserid,zuuserid,zid,xvoucher,xinvnum,xdate,xdatedue,xbalance,xamount) ~
+	as select ztime,zutime,zauserid,zuuserid,zid,xvoucher,xinvnum,xdate,xdatedue,xbalance,xamount from aralc ~
+union all ~
+	select ztime,zutime,zauserid,zuuserid,zid,xvoucher,xinvnum,xdate,xdatedue,xbalance,xamount from aralcarc
+
+end table

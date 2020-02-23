@@ -1,0 +1,56 @@
+screen acbudget
+
+     caption "Account Budget"
+     sidebar list budget
+	 sections form one,  jscript myscript
+
+	 
+	list budget
+    caption "Budget List"
+    table acbudget
+    order xyear,xper,xwh,xacc
+    rows 50
+    objects  xyear attrib(link "login?screen=acbudget&command=Show&xyear=?&xper=?&xwh=?&xacc=?"), ~
+             xper,xwh,xacc,desc equals((select xdesc from acmst where acmst.zid=acbudget.zid and acmst.xacc=acbudget.xacc)),xbudgetamt
+    headers "Year","Period","Division","Account","Description","Amount"
+  end list
+	 
+
+
+     form one
+        caption "Account Budget"
+        table acbudget
+        primarykey xyear,xper,xwh, xacc
+        order xyear,xper,xwh, xacc
+        return "login"
+        layout 1
+     	pstyle 3
+        objects Add,Delete,Update,Clear,Show,Top,Previous,Next, Bottom,"<p>",~
+                xyear,xper,xwh,xacc,xaccdesc,xbudgetamt//,xauditedamt
+field xwh
+	caption Plant/ Office
+end field
+
+   field xaccdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xaccdesc=acmst.xdesc("xacc='"+xacc+"'")
+      end event
+    end field
+	
+       embed onsubmit="submitit(this)"
+		
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+     end jscript
+
+
+
+end screen

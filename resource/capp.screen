@@ -1,0 +1,96 @@
+screen capp
+  sections  form one
+
+  form one
+    caption "PPO Master"
+    table casp
+    primarykey xsp
+    order xsp
+    select "left(xsp,4)='PPO-'"
+    return "login"
+    layout 2
+    pstyle 3
+      objects Show,Clear,Add, Update,Delete,*next,Top,Previous,Next,Bottom,"<p>" ,~
+              xsp,xname,xwh,xbrname,xfield,xterritory,xregion,xarea,zactive//xfm,xfmname,
+
+      field xterritory
+        //pick "select xcode from xcodes where xtype='Territory' and xwh='"+xwh+"'"
+      end field
+
+      field xfield
+        attrib local
+        caption Field
+        display const
+        event after
+          set xfield=xcodes.xfield("xtype='Territory' and xcode='"+xterritory+"'")
+        end event
+      end field
+
+      field xregion
+        attrib local
+        caption Region
+        display const
+        event after
+          set xregion=xcodes.xregion("xtype='Territory' and xcode='"+xterritory+"'")
+        end event
+      end field
+
+      field xarea
+        attrib local
+        caption Area
+        display const
+        event after
+          set xarea=xcodes.xarea("xtype='Territory' and xcode='"+xterritory+"'")
+        end event
+      end field
+
+      field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+      end field
+
+      field xwh
+        event before
+          //print xwh
+          class careports(getReport{ppo,1,xwh,PPO List})
+          //class careports(getReport{opchalan,1,xdornum,Print Challan})
+        end event
+      end field
+
+      field xfmname
+  	    attrib local
+  	    display const
+        caption Field Manager Name
+        event after
+          set xfmname = casp.xname("xsp='"+xfm+"'")
+        end event
+      end field
+
+
+      field xsp
+        default "PPO-"
+        display trn Sales Representative
+      end field
+
+      field add
+        event before
+          if xsp_ONE .ne. "PPO-"
+            error "Cannot Proceed -- You Chose Wrong Code"
+          end if
+        end event
+      end field
+
+      field xorg
+	      caption Customer Name
+      end field
+
+  embed onsubmit="submitit(this)"
+
+end form
+
+
+end screen

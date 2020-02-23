@@ -1,0 +1,12 @@
+     list business
+        caption "Business containing: "+zvalue
+        table businessview
+        order zorg
+        select "(zorg like '%"+zvalue+"%' or zbid like '%"+zvalue+"%') or zid=10"
+        //searchselect "(zorg like '%"+zvalue+"%' or zbid like '%"+zvalue+"%') or zid=10"
+		rows 20
+        objects zbid attrib(link "abc" embed onclick="return updateParent(this:'$')"),zorg,zid
+                
+     end list
+
+

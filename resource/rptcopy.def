@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table rptcopy
+  caption "Reports Signatory"
+  columns  ztime,zutime,zauserid,zuuserid,zid,xtypetrn,~
+  xrow,xdesc
+        
+  primary key zid,xtypetrn,xrow
+  foreign key
+        zid references zbusiness.zid
+		zid,xtypetrn references pdsignatoryrpt.zid,xtypetrn
+  end foreign key
+end table

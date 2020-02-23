@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table pdtogli
+  caption "PD To GL Interface"
+  columns  ztime,zutime,zauserid,zuuserid,zid,xtype,~
+           xempcategory,xcostcentre,xbank,xaccdr,xacccr,xtrn
+
+  primary key zid,xtype,xempcategory,xcostcentre,xbank
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

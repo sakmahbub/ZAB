@@ -1,0 +1,74 @@
+screen opsumprocheaderedit
+
+    	sidebar list summary
+	sections form one,jscript myscript
+
+      list summary
+        caption "Summary List"
+        table opdosumview
+        order xsumnum,xroute
+	 // select "xwh='"+#wh+"'"	
+        rows 20
+        objects  xsumnum attrib(link "login?screen=opsumprocheaderedit&command=Show&xsumnum=?"),xroute,xpaymentterm
+                 
+
+     end list
+
+    form one
+        caption "Final Summary Process"
+        table opdoheader
+        primarykey xsumnum
+//        order xroute,xsumnum 
+        order xsumnum 
+       // select "xwh='"+#wh+"'"// and xstatusord='Open'"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Detail,Clear,Show,"<p>" ,~
+                xroute,xsumnum
+
+field xsumnum
+	pick list opdosumnum
+end field
+
+        field xroute
+          event after
+            set globals(xroute)=xroute
+            set globals(xsumnum)=xsumnum
+            class careports(getReport{opinvproductsum,2,#wh,xsumnum,Print Product Summary})
+            class careports(getReport{opinvcussum,2,#wh,xsumnum,Print Customer Summary})
+            class careports(getReport{opbillbatch,2,#wh,xsumnum,Print Invoice})
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "opsumprocdetailedit"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

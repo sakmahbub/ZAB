@@ -1,0 +1,21 @@
+//users.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Manage Users                      |#classPath+"/login?screen=xusers"
+.......... Codes & Parameter .........    |#classPath+"/login?screen= "
+User Permits Entry               	|#classPath+"/login?screen=xpermits"
+//Menu Priviledge                	|#classPath+"/login?screen=xprivilege"
+Define Role Name                 	|#classPath+"/login?screen=xrolesdef"
+Manage Roles                    	|#classPath+"/login?screen=xrolesman"
+Module Entry                    	|#classPath+"/login?screen=xcodes(xtype=Module)"
+Menu Entry                    		|#classPath+"/login?screen=xcodes(xtype=Menu)"
+Option Entry                    		|#classPath+"/login?screen=xcodes(xtype=Option)"
+Screen Entry                     |#classPath+"/login?screen=zscreenheader"
+//Menu Entry               		|#classPath+"/login?screen=xmenuchild"
+.......... Report .........    |#classPath+"/login?screen= "
+User List Report             |#classPath+"/login?screen=*viewcrystal userlist(2;in,st;zid,user;zemail=User ID,xviewtype=Report view)"
+Menu Access Report             |#classPath+"/login?screen=*viewcrystal menuaccess(3;in,st,st;zid,access,menu;xalist=Access Code,xmenu=Menu,xviewtype=Report view)"
+//-------------------------------------------------------------------
+
+

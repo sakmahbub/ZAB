@@ -1,0 +1,61 @@
+screen caind
+     caption "Indentor master"
+     //sidebar text two,list two, text three
+     sections  form one, jscript myscript
+
+
+     form one
+        caption "Indentor Master"
+      	table caind
+        primarykey xind
+        order xind
+        //select
+        return "login"
+        layout 2
+        pstyle 3 
+        objects Clear,Add, Update, Delete,*next,Show, Top,Bottom,Next,Previous,"<p>" ,~
+                xind,xorg,xmadd, xpadd,~
+                xemail, xphone,xmobile, xfax, xurl, ~
+                xgsup display(hide),xcontact//,xstatussup
+
+        field xman
+		Caption Ind. ID
+        end field
+
+	field xorg
+		caption Ind. Description
+	end field
+
+	field add
+		event before
+          		set trn = "IND-"
+          		set xind = #trn("Indentor Code",trn,10)
+		end event
+	end field
+ 
+       embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "opordq"
+            form.searchbutton.value = "Find xman=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,318 @@
+screen poreqheadercashacc
+	
+     sidebars list reqlist,list reqlistjn,list reqlistdoc,list one,list accdet
+     sections form one,list one,jscript myscript	  
+	 
+	list reqlist
+		caption "Advance list for Purchase Requisition"
+        table poreqheader
+        order xporeqnum desc
+		select "xstatusreq in ('Approved','PO Created') and xtype in ('Cash','Bank') and xstatusap='Open' and left(xporeqnum,4) in ('PR--')"
+		rows 4
+        objects  xporeqnum attrib(link "login?screen=poreqheadercashacc&command=Show&xporeqnum=?"), xdate,xtype,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Purchase Type","Plant/Office Code","Name"
+	end list
+	
+	list reqlistjn
+		caption "Advance List for Work Requisition"
+        table poreqheader
+        order xporeqnum desc
+		select "xstatusreq in ('Approved','PO Created') and xtype in ('Cash','Bank') and xstatusap='Open' and left(xporeqnum,4) in ('JN--')"
+		rows 4
+        objects  xporeqnum attrib(link "login?screen=poreqheadercashacc&command=Show&xporeqnum=?"), xdate,xtype,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Purchase Type","Plant/Office Code","Name"
+	end list
+	
+	list reqlistdoc
+		caption "Advance List for Documentation"
+        table poreqheader
+        order xporeqnum desc
+		select "xstatusreq in ('Approved','PO Created') and xtype in ('Cash','Bank') and xstatusap='Open' and left(xporeqnum,4) in ('DOC-')"
+		rows 4
+        objects  xporeqnum attrib(link "login?screen=poreqheadercashacc&command=Show&xporeqnum=?"), xdate,xtype,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Purchase Type","Division Code","Name"
+	end list
+	 
+	 
+	 list one
+        caption "Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow,~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and  xitem=poreqdetail.xitem)),xqtyreq,xqtyapv,xunitpur,xrate,xlineamt
+
+		totals "","","Totals","","","","",sum
+        headers "Line No","Item","Description","Qty Req","Qty Apv","UOM","Rate","Amount"
+     end list
+	
+	list accdet
+    caption "Voucher Detail List"
+    table acdetail
+    order xvoucher,xrow
+    fixed xvoucher
+    rows 50
+    objects  xvoucher attrib(link "login?screen=acheader&command=Show&xvoucher=?"), ~
+			 xrow attrib(link "login?screen=acdetail&command=Show&xvoucher=?&xrow=?"), ~
+             xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)),~
+			 xsub,subdesc equals((select xorg from acsubview where zid=acdetail.zid and xsub=acdetail.xsub and xacc=acdetail.xacc)),xdebit,xcredit
+
+    totals "","","","","Total","",sum,sum
+    headers "Voucher No","Line No","Acc Code","Description","Sub Code","Description","Debit","Credit"
+  end list
+	
+     form one
+		caption "Advance for Purchase"
+        table poreqheader
+        order xporeqnum desc
+        select "xstatusreq in ('Approved','PO Created') and xtype in ('Cash','Bank') and left(xporeqnum,4) in ('PR--','JN--','DOC-')"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Show,Clear,Update,*Next,Top, Previous, Next, Bottom,Confirm,"<p>",~
+                xporeqnum,xdate display(const),xorg display(hide),xqotnum display(hide),~
+				xstatusreq display(const),xvoucher display(const),~
+				xtwh,descs display(const),~
+				xacccr,accdesc display(const),~
+				xpaymentterm,xnote,xtype display(hide),~
+				xstatusap display(hide),~
+				signatorysec display(const),,~
+				xpreparer  display(hide),preparer  display(const),~
+				xsignatory1 display(hide),signatory1  display(const),~
+				xsignatory2 display(hide),signatory2 display(const),~
+				xsignatory3 display(hide),signatory3 display(const),~
+				xsignatory4 display(hide),signatory4 display(const),~
+				xsignatory5 display(hide),signatory5 display(const)
+
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+		  
+		   field xtwh
+			caption Plant/Office
+          end field
+		  
+		  field descs
+		  caotion Plant/Office Name
+		  attrib local
+           event after
+		   set descs=branchview.xlong("xcode='"+xtwh+"'")
+		   end event
+          end field
+		  
+		  field accdesc
+		  caotion Account Name
+		  attrib local
+           event after
+		   set accdesc=acmst.xdesc("xacc='"+xacccr+"'")
+		   end event
+          end field
+          
+		   field xdum
+            attrib local
+			caption
+          end field
+		  
+		     field xpaymentterm
+            display combo
+			caption Payment Type
+			pick "Cash,Cheque"
+          end field
+		  
+          field xnote
+            column 1
+            width 60
+            height 2
+          end field
+		
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatory</span>
+		display const
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='Cash Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='Cash Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='Cash Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='Cash Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='Cash Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+		pick list poreqnumacc
+        	width 15
+          event after
+		  class careports(getReport{acvoucher;2;in,st;zid,svoucher;xvoucher;Print voucher})
+		  class careports(getReport{prletter;2;in,st;zid,reqnum;xporeqnum;View Advance Letter})
+		  // class careports(getjspReport{cnfadvletterpdf,1,xporeqnum,View Advance Letter(C&F)})
+            set globals(xporeqnum)=xporeqnum
+			  set globals(xvoucher)=xvoucher
+			 set globals(xstatusreq)=xstatusreq
+			  set globals(xstatusap)=xstatusap
+			  if poreqheader.xstatusap("xporeqnum='"+xporeqnum+"'") .ne. "Open"
+         			set #field(update.attrib)="disabled"
+         			set #field(delete.attrib)="disabled"
+         			set #field(Confirm.display)="hidden"
+       	      end if
+          end event
+        end field
+
+         field Confirm
+            event before
+			set xtransaction=#sub(xporeqnum,0,4)
+			if xpaymentterm .eq. "Cheque"
+			set rel="BP--"
+			else if xpaymentterm .ne. "Cheque"
+			if xtransaction .eq. "PR--"
+			set rel=xtrnp.xrel("xtypetrn='Requisition Number' and xtrn='PR--' and zactive=1")
+			else if xtransaction .eq. "DOC-"
+			set rel=xtrnp.xrel("xtypetrn='Requisition Number' and xtrn='JN--' and zactive=1")
+			else if xtransaction .eq. "AD--"
+			set rel=xtrnp.xrel("xtypetrn='Advance Number' and xtrn='AD--' and zactive=1")
+			else if xtransaction .eq. "JN--"
+			set rel=xtrnp.xrel("xtypetrn='Requisition Number' and xtrn='JN--' and zactive=1")
+			end if
+			end if
+			//set trn=#trim(rel)+#trim(xtwh)
+			//set trn2=#sql("select xtrn from xtrn where xtrn='"+trn+"'")
+			//if trn2 .ne. trn
+			//error "Please select division for payment"
+			if poreqheader.xacccr("xporeqnum='"+xporeqnum+"'") .eq. ""
+			error "Please Select Credit Account!"
+            end if
+			end event
+            event after
+			set temp = #spsql(zabsp_PR2GL_transfer,#id,#user,#position,xporeqnum,rel,xtwh,xdate,8,"poreqheadercashacc")
+			action show
+		   end event
+          end field
+
+
+		field update
+			event before
+			if xstatusreq .eq. ""
+			error "Please Show first"
+			else if poreqheader.xstatusap("xporeqnum='"+xporeqnum+"'") .eq. "Confirmed"
+			error "Voucher Already Confirmed!"
+			end if
+		//	if xqotnum .ne. ""
+		//	set xsup=poquotheader.xsup("xqotnum='"+xqotnum+"'")
+		//	else if xsup .ne. ""
+		//	set xqotnum=poquotheader.xqotnum("xsup='"+xsup+"' and xporeqnum='"+xporeqnum+"'")
+		//	end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poreqdetailcash"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

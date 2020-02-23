@@ -1,0 +1,206 @@
+screen mostoreisdetail
+
+     sidebar list moprcs,list issue,list issuesreprcs//, list one//,list detail //,list moprcs////,
+     sections form one,  jscript myscript
+	
+	 list issues
+        caption "Production Process"
+        table moprcsissueview
+        order xbatch//,xrow
+		select "((xqtyreq-xqtyalc)>0)"// or xqtyreprcs>0"
+		//select "xqtyreprcs>0"
+        fixed xbatch
+        rows 50
+        objects  xrow attrib(link "login?screen=mostoreisdetail&command=Show&xbatch=?&xrow=?"), ~
+                 xmoprcs,xfabriccolor,xmodate,xmotime,xqty,xunit
+       // totals "","Totals","","","",sum,""
+
+        headers "Row","Process","Fabric Color","Start Date","End date","Process Qty","Unit"
+     end list
+              
+     list moprcs
+        caption "Selected Processes for Batch "+xbatch
+        table mohrecipesetting
+        order xbatch,xrow
+        fixed xbatch
+        rows 20
+        objects  xrow,xmoprcs attrib(link "login?screen=mostoreisdetail&command=Show&xbatch=?&xrow=?"), ~
+                 xdate,xfabriccolor,xprcstype,xstatusrec
+
+        headers "Row No","Process Name","Date","Color","Process","Process Type"
+     end list	 
+	 
+	 	 
+	 list moprcsOld
+        caption "Selected Processes for Batch "+xbatch
+        table mohrecipesetting
+        order xbatch,xrow
+        fixed xbatch
+        rows 20
+        objects  xrow,xmoprcs attrib(link "login?screen=mostoreisdetail&command=Show&xbatch=?&xrow=?"), ~
+                 xdate,xfabriccolor,xstatusrec
+
+        headers "Row No","Process Name","Date","Color",""
+     end list
+
+
+	  list issuesreprcs
+        caption "Production Reprocess"
+        table moprcsissueview
+        order xbatch//,xrow
+		//select "((xqtyreq-xqtyalc)>0)"// or xqtyreprcs>0"
+		select "xqtyreprcs>0"
+        fixed xbatch
+        rows 20
+        objects  xrow attrib(link "login?screen=mostoreisdetail&command=Show&xbatch=?&xrow=?"), ~
+                 xmoprcs,xfabriccolor,xmodate,xmotime,xqtyreprcs,xunit
+       // totals "","Totals","","","",sum,""
+
+        headers "Row","Process","Fabric Color","Start Date","End date","Reprocess Qty","Unit"
+     end list
+	  
+     list issue
+        caption "Consumption List For:"+" <br>"+xmoprcs+" (Color: "+xfabriccolor+") Process: "+xprcstype+""
+        table imtrn
+        order xbatch,xdocrow,ximtrnnum
+		select "xbatch='"+xbatch+"' and xrow='"+xrow+"' and left(ximtrnnum,4)='IS--'"// and xwh='"+xwh+"'"
+        rows 20
+        objects  ximtrnnum attrib(link "login?screen=mostoreistrn&command=Show&xbatch=?&ximtrnnum=?") ,xitem, ~
+                 desc equals((select xdesc from caitem where zid=imtrn.zid and xitem=imtrn.xitem)),~
+				 xqty,xitemrow
+        headers "Transaction No","Item","Description","Issue Qty"//,"Rate","Value"
+     end list
+
+	 
+
+ 
+     form one
+        caption "Store Issue For <br>Batch: "+xbatch+" Process: "+xmoprcs
+        table mohrecipesetting
+        order xbatch,xrow
+        fixed xbatch
+		//select "(xqty-xbalance)>0"
+        pstyle 3
+        return "login"
+        layout 3
+        objects Complete,Clear,Show,Issue Material,Reprocess Material Issue,~
+                //xrow attrib(row 0 1),xmoprcs,xfabriccolor,xpiref
+                xrow,xmoprcs ,xfabriccolor,~
+				xprcstype				
+		
+		field xfabriccolor
+			//pick "select xfabriccolor from opfabriccolorview where xpiref='"+xpiref+"'"
+			pick "select distinct xfabriccolor from opfabriccolorview where xordernum='"+xordernum+"'"			
+		end field
+		field xmoprcs
+			pick "select distinct xmoprcs from mohrecipesetting where xbatch='"+xbatch+"'"
+		end field
+
+		field xprcstype
+			//width 70
+			column 3
+			display combo
+			pick "select xprcstype from opfabriccolorview where xordernum='"+xordernum+"'"		
+		end field
+		
+		field xrow
+			event after
+				set glabals(xrow)=xrow
+				set globals(xbatch)=xbatch
+				set glabals(xreciperow)=xreciperow
+				set globals(xmoprcs)=xmoprcs
+				set globals(xreprcsrow)=xreprcsrow
+				set globals(xpiref)=xpiref
+				set globals(xfabriccolor)=xfabriccolor
+				set globals(xprcstype)=xprcstype
+				
+			end event
+		end field
+		field xdum
+			attrib local
+			display const
+			caption 
+		end field
+
+
+		
+		field xpiref
+			attrib local
+			display hide
+			event after
+				set xpiref = moheader.xpiref("xbatch='"+xbatch+"'")
+			end event
+			caption 
+		end field
+
+
+		
+		field add
+		event before
+          	set xstatus = "Open"
+          	end event 
+		end field
+		
+		field xdesc
+			attrib local
+			display const
+			caption Description
+			event after
+				set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		
+        embed onsubmit="return submitit(this)"
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+        field Issue
+          embed onclick="clicked(this)"
+        end field
+		
+		
+        field Reprocess
+          embed onclick="clicked(this)"
+        end field
+		
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "mostoreisheader"
+            form.searchbutton.value = "Find xbatch=?"
+          }
+          if (but == "Issue Material"){
+            form.screen.value = "mostoreistrn"
+            form.searchbutton.value = "Bottom"
+			form.searchbutton.value = "Find xbatch=?"
+          }
+		   if (but == "Reprocess Material Issue"){
+            form.screen.value = "moreprcsstoreistrn"
+            form.searchbutton.value = "Top"
+          }
+              but = ''
+              return result
+        }
+        </script>
+     end jscript
+
+
+end screen
+
+
+
+

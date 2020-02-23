@@ -1,0 +1,185 @@
+screen cacusnew
+     
+     sections  form one,jscript myscript
+//     sidebar list one	
+
+  list one
+    caption "Discount List"
+    table cacusdisc
+    order xcus,xitem
+    fixed xcus
+    rows 20
+    objects  xitem attrib(link "login?screen=cacusdisc&command=Show&xcus=?&xitem=?"), ~
+             desc equals((select xdesc from caitem where zid=cacusdisc.zid and xitem=cacusdisc.xitem)),xdisc
+	headers "Item","Description","Discount"
+  end list
+  
+  form one
+     form one
+        caption "Customer Master"
+      	table cacus
+        primarykey xcus
+        order xcus
+        fixed xcus
+        select "left(xcus,2)='"+#wh+"'"
+        return "login"
+        layout 2
+        pstyle 3
+        display (trn Customer Code)
+        objects Show,Clear,Add,Update,Discount Info,Special Rate,*next,Return,Top,Previous,Next,Bottom,Project Flag,"<p>" ,~
+                xorg,xmadd,xphone,xfax,xemail,xpaymentterm,xcrterms,xcrlimit,xcrused,xdateeff,xdateexp,xref,~
+                xroute,xmarket,xterritory,xsp display(const),xspname,xgcus,~
+                xinvtoinvcr,xallowcrinv,xallbndisc,xstatuscus display(hide)
+
+
+       field xcus
+		event after
+			set globals(xcus)=xcus
+		end event
+	    end field
+	
+	    field xnote
+		weight 90
+		height 2
+		column 2
+	    end field
+ 	
+	    field xdateeff
+		default "2999-01-01"
+	    end field
+
+	    field xdateexp
+		default "2999-01-01"
+	    end field
+
+	    field xdum
+		attrib local
+		caption 
+		display const
+	    end field
+
+	    field xspname
+		attrib local
+		caption MIO Name
+		display const
+		event after
+			set xspname = cappo.xname("xsp='"+xsp+"'")
+		end event
+	    end field
+
+	    field xsoname
+		attrib local
+		caption Sales Officer Name
+		display const
+		event after
+			set xsoname = cappo.xname("xsp='"+xso+"'")
+		end event
+	    end field
+
+	    field xprjname
+		attrib local
+		caption Project Name
+		display const
+		event after
+			set xprjname = xcodes.xlong("xtype='Project Flag' and xcode='"+xproject+"'")
+		end event
+	    end field
+
+		field xwh
+            displey const
+             default #wh
+           end field
+
+          field xmarket
+		//display const
+            pick "select xcode from xcodes where xtype='Market' and xwh='"+#wh+"'"
+          end field
+
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+        set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+
+
+    field add
+      event before
+        if xgcus .eq. ""
+          error "Cannot Proceed -- Please Choose Customer Group"
+        else if xorg .eq. ""
+          error "Cannot Proceed -- Customer Description is Blank"
+        //*********** GETTING TRN NO ****************
+        else
+	  	  set xsp=cappo.xsp("xterritory='"+xterritory+"'")	
+	  	  set xstatuscus="Open"	
+          set trn = #wh+"--"
+          set xcus = #trn("Customer Code",trn,10)
+        end if
+      end event
+    end field
+
+    field update
+        event before
+	  	  set xsp=cappo.xsp("xterritory='"+xterritory+"'")	
+		end event
+    end field	
+
+    field xcrused
+  	  attrib local
+  	  display const
+    	caption Credit Used
+      event after
+		set xcrused=cacreditview.xcrused("xcus='"+xcus+"'")
+      end event
+    end field
+
+
+    field xorg
+    	caption Customer Name
+    end field
+
+    field Return
+        embed onclick="clicked(this)"
+    end field
+
+	
+    field Special
+        embed onclick="clicked(this)"
+    end field
+
+    field Project
+        embed onclick="clicked(this)"
+    end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "opdoheader"
+            form.searchbutton.value = "Find xdornum=?"
+          }
+
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

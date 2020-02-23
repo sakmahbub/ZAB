@@ -1,0 +1,103 @@
+screen oppromoheader
+
+     sidebar list detail,list itempromo
+     sections form one,jscript myscript
+
+
+  	list detail
+        caption "Detail List"
+        table oppromodetail
+        order xpromono,xrow
+        fixed xpromono
+        rows 20
+        objects  xrow attrib(link "login?screen=oppromodetail&command=Show&xpromono=?&xrow=?"), ~
+                xminqty,xmaxqty,xaward
+
+     end list
+	 
+  	list itempromo
+        caption "Applicable for : "+xpromono
+        table oppromoitem
+        order xpromono,xrow
+        fixed xpromono
+        rows 20
+        objects  xrow attrib(link "login?screen=oppromoitem&command=Show&xpromono=?&xrow=?"), ~
+                xtypetrn,xcatitem,xsubcat,xitem,~
+				desc equals((select xdesc from caitem where zid=oppromoitem.zid and xitem=oppromoitem.xitem))
+		headers "Row","Transaction","Item Category","Sub Category","Item","Description"
+     end list
+	
+
+     form one
+        caption "Promotion Header"
+	    table oppromoheader
+		primarykey xpromono
+		order xpromono desc
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add,Show,Update,Delete,*next,Detail,Promo Item,Top,Next,Previous,Bottom,"<p>" ,~
+          xpromono,xconsignment,xdateeff,xdateexp,xnote
+		  
+          field xpromono
+		  pick list xpromono
+			event after
+			set global(xpromono)=xpromono
+			end event
+          end field
+
+          field xconsignment
+			caption Promotion Name
+			width 60
+          end field
+		  
+          field xnote
+			width 85
+			column 2
+          end field
+		  
+        field add
+			event before
+					set xpromono = #trn("Promotion Number","PROM",10)
+				end if
+			end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+		
+        field Promo Item
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "oppromodetail"
+            form.searchbutton.value = "Top"
+          }
+		  
+          if (detail=="Promo Item"){
+            form.screen.value = "oppromoitem"
+            form.searchbutton.value = "Top"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,133 @@
+screen mowastage
+
+     sidebar list fin
+     sections form one,  jscript myscript
+
+     list fin
+        caption "Wastage List For <br>Batch "+xbatch
+        table modailyprdtrn
+        order xbatch,xrow
+		fixed xbatch
+		select "xtype='Wastage'"
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=mowastage&command=Show&xbatch=?&xrow=?"), ~
+        xdate,xfmoprcs,xtmoprcs,xqty
+//         headers Invoice List
+     end list
+
+
+
+     form one
+        caption "Wastage Issue"
+        table modailyprdtrn
+        order xbatch,xrow
+		fixed xbatch
+		select "xtype='Wastage'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add, Show,Clear,Update,Delete,~
+        		Complete,"<p>",~
+                xrow attrib(row 0 1),xdate,xfmoprcs,xdum,xitem,xdesc,xwh,xwhname,xqty,xtype display(hide)
+		
+		field xitem
+			caption Wastage Item Code
+			pick list xitemfin
+			default moheader.xitem("xbatch='"+xbatch+"'")
+		end field
+		
+		field xwh
+			caption Wastage Store
+			display text
+			pick list xwh
+			//default "04"//modef.xfwh("zid='"+#id+"'")
+		end field
+
+		field xdesc
+			attrib local
+			dispaly const
+			caption Description
+			event after
+				set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xwhname
+			attrib local
+			dispaly const
+			caption Store Name
+			event after
+				set xwhname=xcodes.xlong("xtype='Store' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+		field xdum
+			attrib local
+			dispaly const
+			caption
+		end field
+		
+        field add
+         event before
+			set xtype="Wastage"
+			if xwh .eq. ""
+				error "Cannot Proceed -- Please Select Store "
+			end if
+        	//double qty = #sql(double,"select sum(xqty) from moprocess where xbatch='"+xbatch+"' and xmoprcs='"+xfmoprcs+"'")
+        	//double qtyprd = #sql(double,"select sum(xqty) from modailyprdtrn where xbatch='"+xbatch+"' and xfmoprcs='"+xtmoprcs+"'")
+        	//double bal = qtyprd+xqty
+        	//if qty<bal
+        	//	error "Cannot Proceed Qty Exceeds "
+        	//end if
+          end event 	 
+          event after
+            set temp = #spsql(zabsp_MO_issueFinishedGoods,#id,#user,xbatch,xrow,xwh,xqty,xdate,xitem)
+           // action Show
+          end event
+        end field
+
+ 		
+        embed onsubmit="submitit(this)"
+        
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+        field Recipe
+          embed onclick="clicked(this)"
+        end field
+        
+        field Production
+          embed onclick="clicked(this)"
+        end field
+
+	
+	
+
+        
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Complete"){
+            form.screen.value = "mowastageissueheader"
+            form.searchbutton.value = "Find xbatch=?"
+          }
+
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

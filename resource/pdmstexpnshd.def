@@ -1,0 +1,14 @@
+product ZAB ERP
+ 
+table pdmstexpnshd
+  caption "Expenses"
+  columns ztime,zutime,zauserid,zuuserid,zid,xstaff,xbank,xacc,xyear,xper,xempcategory
+
+  primary key zid,xstaff,xyear,xper
+  
+  foreign key
+    zid references zbusiness.zid
+    zid,xstaff references pdmst.zid,xstaff
+  end foreign key
+  
+end table

@@ -1,0 +1,10 @@
+//op.module
+module OP
+     caption "Order Processing"
+     description ""
+
+     transactions Quotation, Customer Order (Delivery Order;Purchase Order;Works Order;Invoice), ~
+     Delivery Order(Invoice), Invoice
+     codes 
+end module
+

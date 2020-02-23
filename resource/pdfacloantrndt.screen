@@ -1,0 +1,70 @@
+screen pdfacloantrndt
+
+  sections form one,jscript myscript
+
+  form one
+    caption "<ACRONYM>Loan & Advance Details "+xvoucher+"</ACRONYM>"
+    table pdloantrndt
+    order xvoucher,xrow
+    fixed xvoucher
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Clear,Add,Update,Delete,*next, Top, Previous, Next, Bottom,Return,~
+            xrow attrib(row 0 1),xdate,xyear display(const),xper display(const),xschamt,xamount display(const)
+
+    field xrow
+      event before
+        set status = pdloantrn.xstatus("xvoucher='"+xvoucher+"'")
+        if status .eq. "Close" .or. status .eq. "Continue"
+          set #field(add.display)="hide"
+          set #field(update.display)="hide"
+          set #field(delete.display)="hide"
+        end if
+      end event
+    end field
+
+    feild xamount
+      caption Balance Amount
+    end field
+
+    field Add
+      event before
+        set xyear=#sub(xdate,0,4)
+        set xper=#sub(xdate,5,2)
+      end event
+    end field
+
+    field Update
+      event before
+        set xyear=#sub(xdate,0,4)
+        set xper=#sub(xdate,5,2)
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+
+    function clicked(b){
+      detail="clicked"
+    }
+    function submitit(form){
+      if (detail=="clicked"){
+        form.screen.value = "pdfacloantrn"
+        form.searchbutton.value = "Find xvoucher=?"
+        //return false
+      }
+    }
+    </script>
+  end jscript
+
+end screen

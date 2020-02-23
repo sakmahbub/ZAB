@@ -1,0 +1,15 @@
+product ZAB
+
+table cacar
+
+  caption "Car Master"
+  columns ztime,zutime,zauserid,zuuserid,zid,xregi,xbrand,xmodel,~
+          xregidate, xcapacity,xrunby,trucktype1,trucktype2,trucktype3,truckno1, ~
+          truckno2,xcaruser,xempcategory
+          
+  primary key zid,xregi
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

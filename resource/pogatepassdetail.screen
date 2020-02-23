@@ -1,0 +1,127 @@
+screen pogatepassdetail
+
+     sidebars list one
+     sections form detail, jscript myscript
+
+     list one
+        caption "Gate Pass Approval Detail List."
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=pogatepassdetail&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xqtyreq,xunitpur,xnote
+
+		headers "Line No","Item","Description","Quantity","Unit","Remarks"
+     end list
+
+
+     form detail
+        caption "Gate Pass Approval Detail For : "+xporeqnum 
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+               Add,Update,Delete,Show,Clear,*next, Return,Top, Previous, Next, Bottom,~
+                xrow attrib(row 0 1),xunitpur display(const),~
+                xitem,xdesc,xqtyreq,xqtyapv display(hide),xrate display(hide),xlineamt display(hide),xpurpose,xnote,xqtypor display(hide)
+
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+		
+		 field xqtyreq
+          caption Quantity
+        end field
+		
+		 field xdum
+		 attrib local
+		display const
+          caption
+        end field
+		
+		 field xrate
+          caption Purchase Price
+        end field
+		
+		field xunitpur
+          caption Unit 
+        end field
+		
+		 field xrow
+        event after
+		if xstatusreq .ne. ""
+		set #field(Update.display)="hidden"
+		set #field(Add.display)="hidden"
+		set #field(Delete.display)="hidden"
+		end event
+        end field
+		
+          field xnote
+		  caption Remarks
+            column 2
+            width 80
+            height 2
+          end field
+
+        field add
+          event before
+            set xunitpur = caitem.xunit("xitem='"+xitem+"'")
+            set xqtyapv=xqtyreq
+			set xqtypor=0
+			set xlineamt=xqtyapv*xrate
+          end event
+          event after
+          end event
+
+        end field
+
+        field update
+          event before
+            set xunitpur = caitem.xunit("xitem='"+xitem+"'")
+			set xlineamt=xqtyapv*xrate
+          end event
+          event after
+		// set temp =  #sql("update poreqheader set xep='"+ep+"' where xporeqnum='"+xporeqnum+"'")
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "pogatepassheader"
+            form.searchbutton.value = "Find xporeqnum=?"
+          }
+          return result
+        }
+
+        </script>
+     end jscript
+
+
+end screen

@@ -1,0 +1,13 @@
+//Operation Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Monthly Stock Balance            |#classPath+"/login?screen=*wcrystal opmstockbalance(xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group=zzz)"
+Stock Movement Detail                 |#classPath+"/login?screen=*wcrystal imtrndetail(xgitem=Item Group,xgitem=Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date)"
+Transferred Item List With Value      |#classPath+"/login?screen=*crystal imtransfer(xfwh=From Warehouse,xtwh=To Warehouse,xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz)"
+Item Stock By Branch(For Branch)      |#classPath+"/login?screen=*wcrystal imbrstock(xitem=From Item,xitem=To Item=zzz)"
+Branch Stock By Item		        |#classPath+"/login?screen=*wcrystal imitemstock(xitem=From Item,xitem=To Item=zzz)"
+Transaction Listing By Date           |#classPath+"/login?screen=*wcrystal imtrnlistdate(xdate=From Date=,xdate=To Date=,xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group)"
+Transaction Listing By Type           |#classPath+"/login?screen=*wcrystal imtrnlisttype(xdate=From Date=,xdate=To Date=,xitem=From Item=0=text,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group,xtrn=Transaction Type)"
+//-------------------------------------------------------------------
+

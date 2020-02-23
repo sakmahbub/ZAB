@@ -1,0 +1,21 @@
+product ZAB ERP
+
+table poreqhdview
+  caption "Poreqheader View"
+  columns zid,xporeqnum,xtype,xstaff,xname,xdate
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view poreqhdview (zid,xporeqnum,xdate,xstatusreq,xnote,xdeptname,xwh,xqotnum,xtornum,xtype,xstatus,xtwh,xlong,xsuperiorsp,xpreparer,xname,xproject,xdesc) ~
+                  as select a.zid,a.xporeqnum,a.xdate,a.xstatusreq,a.xnote,a.xdeptname,a.xwh,a.xqotnum,a.xtornum, ~
+					a.xtype,a.xstatus,a.xtwh,br.xlong,a.xsuperiorsp,a.xpreparer,b.xname,a.xproject,p.xlong from poreqheader a ~
+					join pdmst b on a.zid = b.zid and a.xpreparer = b.xstaff ~
+					left join projectallview p  on a.zid = p.zid and a.xproject = p.xcode ~
+					left join branchview br  on a.zid = br.zid and a.xtwh = br.xcode
+
+
+end table

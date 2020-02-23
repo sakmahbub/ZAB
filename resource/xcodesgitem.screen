@@ -1,0 +1,114 @@
+screen xcodesgitem
+
+     sidebar list one
+     sections form one, jscript myscript
+
+
+     list one
+        table xcodes
+        order xcode
+        select "xtype='Item Group'"
+        rows 20
+        objects  xcode attrib(link "login?screen=xcodesgitem&command=Show&xcode=?"),~
+                xvatrate, zactive,xlong,xprops
+
+        //headers none
+     end list
+
+     form one
+
+     caption "<ACRONYM>Item Group</ACRONYM>"
+        table xcodes
+        order xcode
+        select "xtype='Item Group'"
+        return "login"
+        layout 2
+        pstyle  3
+        objects Show,Clear,Add,Update,Delete,*next,~
+                Top,Bottom,"<p>" ,~
+                xtype,xcode width(50),~
+                xacc,xdesc,xaccvat, xvatdesc,xtrcode,xlong,xprops,zactive
+
+        field xdesc
+          attrib local
+          display const
+          caption Description
+          event after
+            set xdesc=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+        field xvatdesc
+          attrib local
+          display const
+          caption Description of VAT A/C
+          event after
+            set xvatdesc=acmst.xdesc("xacc='"+xaccvat+"'")
+          end event
+        end field
+
+
+        field xtype
+          display const
+          caption Type
+          default "Item Group"
+        end field
+		
+		
+		field xtrcode
+		  caption Short Code
+		  display text
+        end field
+
+
+        field xlong
+          width 40
+          height 2
+        end field
+
+        field xprops
+          width 40
+          height 2
+        end field
+
+        field add
+          event before
+            set xtype="Item Group"
+          end event
+        end field
+
+        field Budget
+          embed onclick="clicked(this)"
+        end field
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+    	    if (detail=="Budget"){
+            form.screen.value = "acbudget"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,17 @@
+product ZAB ERP
+
+table pdvariance
+  caption "PD Variance"
+
+  columns ztime,zutime,zauserid,zuuserid,zid,xyear,xper,~
+          xstaff,xrow,xtype,xamount,xvoucher,xstatus,xadjustment,~
+          xarrear,xothours,xsign,xtaxyear,xtaxper,xposition,xtypetrn,xcomp,xdayssalded,xempcategory
+
+  primary key zid,xyear,xper,xstaff,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xstaff references pdmst.zid,xstaff
+  end foreign key
+
+end table

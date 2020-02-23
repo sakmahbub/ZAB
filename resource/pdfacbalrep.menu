@@ -1,0 +1,24 @@
+//pdfacbalrep.menu
+//-------------------------------------------------------------------
+option                              |action
+//-------------------------------------------------------------------
+//Bank Statement      		    |#classPath+"/login?screen=*crystal pdbankstmt(xyear=Year,xper=Period,xbank=Bank=,xbank=Bank=,xempcategory=Employee Category)"
+Salary Transfer Letter to Bank      |#classPath+"/login?screen=*wcrystal pdbankletter2(xbank=Bank,xyear=Year,xper=Period,xsign1=First Singnatory,xdesig1=First Desgingation,xsign2=Second Singnatory,xdesig2=Second Desgingation)"
+Only Bonus Sheet For All Dept       |#classPath+"/login?screen=*wcrystal pdbonussht(xyear=Year,xper=Period)"
+//Statment of Transaction   	    |#classPath+"/login?screen=*crystal pdtypestmt(xyear=Year,xper=Period,xempcategory=Employee Category)"
+-----Salaray Report---------
+Salary Sheet For All	   	    |#classPath+"/login?screen=*wcrystal pdsalaryshtforall(xyear=Year,xper=Period)"
+Salary Sheet With Leave Encash      |#classPath+"/login?screen=*wcrystal pdsalaryshtleave(xyear=Year,xper=Period)"
+Salary Sheet With Bonus             |#classPath+"/login?screen=*wcrystal pdsalaryshtbonus(xyear=Year,xper=Period)"
+//Salary Sheet By Grade   	    |#classPath+"/login?screen=*wcrystal pdsalshofhd(xyear=Year,xper=Period,xgrade=Grade,xgrade=Grade)"
+//Salary Sheet By Group   	    |#classPath+"/login?screen=*wcrystal pdsalaryshtbygrp(xyear=Year,xper=Period,xgroup=Group)"
+//Salary Sheet By Department   	    |#classPath+"/login?screen=*wcrystal pdsalaryshtbydept(xyear=Year,xper=Period,xdeptname=Department Name,xdeptname=Department Name)"
+//Statment of Transaction By Type   |#classPath+"/login?screen=*crystal pdtypestmtsingle(xyear=Year,xper=Period,xempcategory=Employee Category,xtype=PD Transaction Type)"
+-----Pay Advice Report------
+Pay Advice By Employee		    |#classPath+"/login?screen=*wcrystal pdpayadvicebyemp(xstaff=From Employee,xstaff=To Employee,xyear=Year,xper=Period)"
+Pay Advice By Department 	    |#classPath+"/login?screen=*wcrystal pdpayadvicebydept(xdeptname=Department Name,xdeptname=Department Name,xyear=Year,xper=Period)"
+//Pay Advice By Group	 	    |#classPath+"/login?screen=*wcrystal pdpayadvicebygrp(xgroup=Group,xyear=Year,xper=Period)"
+//Pay Advice By Grade	 	    |#classPath+"/login?screen=*wcrystal pdpayadvicebygrade(xgrade=Grade,xgrade=Grade,xyear=Year,xper=Period)"
+//Pay Slip (Without Eid Gratia)     |#classPath+"/login?screen=*crystal pdpayslipnoeid(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//Salary Summary	            |#classPath+"/login?screen=*crystal pdsalsumdept(xyear=Year,xper=Period,xempcategory=Employee Category)"
+//-------------------------------------------------------------------

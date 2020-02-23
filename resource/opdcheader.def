@@ -1,0 +1,15 @@
+product ZABDB
+
+table opdcheader
+  caption "Delivery Chalan Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,xdocnum,xdate,xcus,~
+          xstatusdoc,xref,xdornum,xordernum,xwh,xnote,xtype,xstype,xstatusdor,xprime,xterritory,xvatamt
+
+  primary key zid, xdocnum
+  foreign key
+        zid references zbusiness.zid
+        //zid,xdornum references opdoheader.zid,xdornum
+        //zid,xordernum references opordheader.zid,xordernum
+        zid,xcus references cacus.zid,xcus
+  end foreign key
+end table

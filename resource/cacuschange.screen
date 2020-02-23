@@ -1,0 +1,94 @@
+screen cacuschange
+
+     sections form one,jscript myscript
+
+     form one
+        caption "Party Change Process"
+        order
+        return "login"
+        layout 3
+        pstyle 3
+        objects Process,"<p>",~
+                xcus,xsup,xpassword
+
+		field xcus
+		caption Old Party 
+		pick list cassup
+		end field
+		
+		field xsup
+		caption New Party
+		pick list cassup
+		end field
+		
+		
+		field Process
+		 event before
+		// if xsuperiorsp .eq. ""
+		// error "Please Enter Employee ID"
+		// else  if xcode .eq. ""
+		// error "Please enter New Business ID"
+	    //else if xsid .eq. ""
+		//    error "Please New Superior ID"
+		//else 
+		if xpassword .ne. "zab@123"
+			error "Wrong Password!"
+		else if xcus .eq. ""
+			error "Select Old Party!"
+		else if xsup .eq. ""
+			error "Select New Party!"
+		 else
+		 print "Party Changed & Old Party Deleted"
+		 end if
+		end event
+          event after
+            set temp = #spsql(zabsp_Emp_Transfer,#id,#user,"",xcus,xsup,"Party Change","")
+          end event
+        end field
+
+
+        field Delete_Upload
+          event after
+            set temp = #spsql(sp_deleteUpload,#id,#user,xtype,#wh)
+          end event
+        end field
+
+
+
+        embed onsubmit="return submitit(this)"
+
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Bonus"){
+            form.screen.value = "caitembonus"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Cost Price"){
+            form.screen.value = "caitemcostprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Sell Price"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

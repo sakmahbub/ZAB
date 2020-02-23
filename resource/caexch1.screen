@@ -1,0 +1,68 @@
+screen caexch1
+     caption "Exchange Rate Table"
+     //sidebar text two,list two, text three
+     sections  list one, form one, jscript myscript
+
+
+
+     list one
+        table caexch
+        order xdate//,xcur
+        //fixed xvoucher
+        //select none
+	navigators alpha //group xacc
+        //navigators alpha,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 20
+//        objects  xcur attrib(link "login?screen=caexched&command=Show&xdate=?&xcur=?"),xdate,xexch
+        objects  xcur,xdate,xexch
+
+        //headers none
+     end list
+
+
+
+
+
+     form one
+        table caexch
+        
+        order xdate//,xcur
+        //select
+        return "login"
+        layout 1
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete, Top, Bottom,"<p>" ,~
+               xdate,xcur,xexch
+
+
+
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

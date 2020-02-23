@@ -1,0 +1,17 @@
+     list caind
+        table caind
+        order xind
+        select "(xind like '%"+zvalue+"%' or xorg like '%"+zvalue+"%')"
+        navigators alpha
+        rows 15
+        objects xind attrib(link "abc" embed onclick="return updateParent(this:'xind')"), ~
+                xorg
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

@@ -1,0 +1,80 @@
+screen artoacprocess
+
+     sections form detail, jscript myscript
+
+
+     form detail
+        caption "AR T<ACRONYM>o</ACRONYM> GL T<ACRONYM>ransfer</ACRONYM>"
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Clear,Transfer,~
+                xdate,xdatedue,xfvoucher,xtvoucher
+
+        field xdate
+          caption From Date
+//          def "2000-01-01"
+        end field
+
+        field xdatedue
+          caption To Date
+        end field
+
+        field xfvoucher
+          attrib local
+          caption From Voucher
+          pick list artoac
+          display text
+        end field
+
+        field xtvoucher
+          attrib local
+          caption To Voucher
+          pick list artoac
+          display text
+          default "z"
+        end field
+
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+        field Transfer
+          event before
+            class gltrn(TransferToGLBatch({arhed}))
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcrnheader"
+            form.searchbutton.value = "Find xcrnnum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

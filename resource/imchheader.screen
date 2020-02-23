@@ -1,0 +1,131 @@
+screen imchheader
+     caption "Transfer Order Entry Header"
+     sections form one, jscript myscript
+
+
+     form one
+        caption "Chalan Entry Header"
+        table imchheader
+        primarykey ximtrnnum
+        order ximtrnnum desc
+        return "login"
+        pstyle 3
+        layout 2
+        objects Details, Clear,Show,Add,Update,Delete,~
+        *next, Top,Previous,Next,Bottom,Confirm,"<p>" ,~
+        ximtrnnum,~
+        xdate,~
+        xwh,xbrname,xref,xstatus display(constant)//xbatch
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+	field confirm
+	    event before
+           if xstatus .eq. "Confirmed"
+              error "Cannot Proceed -- CH. Already Confirmed"
+            end if
+	     if xstatus .eq. ""
+		  error "Cannot Proceed -- Try again" 
+		end if
+          end event
+          event after
+            set temp = #spsql(sp_imchConfirm,#id,#user,ximtrnnum,xdate,xwh,xstatus,8)
+            action Show
+          end event
+	end field
+
+       field xtbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field ximtrnnum
+          event after
+            class careports(getReport{imChalanprint,1,ximtrnnum,Print Chalan})
+            set globals(ximtrnnum)=ximtrnnum
+            if xstatus .eq. "Transfered"
+              set #field(transfer.display)="hidden"
+//              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+//              set #field(update.display)="hidden"
+            end if
+            if xstatus .eq. "Confirmed"
+              set #field(transfer.display)="hidden"
+              set #field(receive.display)="hidden"
+//              set #field(add.display)="hidden"
+              set #field(delete.display)="hidden"
+//              set #field(update.display)="hidden"
+            end if
+            if xstatus .eq. ""
+              set #field(transfer.display)="hidden"
+              set #field(receive.display)="hidden"
+            end if
+          end event
+        end field
+
+
+        field add
+          event before
+          	if xwh .eq. ""
+          		error "Cannot Proceed -- Branch is Blank"
+          		
+          	else 
+	            set xstatus="Open"
+    	        set trn = "CH--"
+      			set ximtrnnum = #trn("Inventory Transaction",trn,10)
+          	end if
+          end event
+        end field
+
+        field xdate
+          caption Order Date
+        end field
+
+
+        field xlong
+          height 3
+          width 110
+          column 2
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imchdetail"
+            form.searchbutton.value = "Find ximtrnnum=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

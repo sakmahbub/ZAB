@@ -1,0 +1,107 @@
+screen caitemshelf
+
+
+  sidebar list one
+  sections form one,  jscript myscript
+  
+  	
+  list one
+    caption "Rack List For :"+xitem
+    table caitemshelf
+    order xwh,xitem
+    fixed xitem
+    rows 20
+    objects  xwh attrib(link "login?screen=caitemshelf&command=Show&xcus=?&xwh=?"), ~
+             desc equals((select xlong from branchview where zid=caitemshelf.zid and xcode=caitemshelf.xwh)),xshelf
+	headers "Division Code","Division Name","Rack No"
+  end list
+
+     form one
+         caption "Rack Entry "+xitem
+		table caitemshelf
+		primary key xitem,xwh
+		order xwh
+		fixed xitem
+        layout 2
+        pstyle 3
+        return "login"
+        objects Add, Update, Delete,Clear,Show,Complete,~
+           xwh,whdesc,xshelf
+	
+	embed onsubmit="return submitit(this)"
+	
+	
+	field xdesc
+		attrib local
+		display const
+		caption Product Name
+		event after
+			set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+		end event
+	end field
+	
+	field whdesc
+		attrib local
+		display const
+		caption Division Name
+		event after
+			set whdesc=branchview.xlong("xcode='"+xwh+"'")
+		end event
+	end field
+
+	 
+	   field xshelf
+       pick code Rack No
+       end field
+
+	   field xwh
+       def #wh
+       end field
+
+
+
+		field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "caitem"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          return result
+        }
+		   function pickItem(link,row,rqty){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+			document.one.xdocrow.value=row.text
+			document.one.xqtypur.value =rqty.text
+          }else{
+            document.one.xitem.value=link.innerText   
+			document.one.xdocrow.value=row.innerText
+			document.one.xqtypur.value =rqty.innerText	
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

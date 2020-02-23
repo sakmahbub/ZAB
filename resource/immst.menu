@@ -1,0 +1,51 @@
+//im.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Product Master(FG)         |#classPath+"/login?screen=caitemfg"
+
+//Product Master(FG)         |#classPath+"/login?screen=caitem"
+Product Master			     |#classPath+"/login?screen=caitemother"
+Product Master(Fabric)       |#classPath+"/login?screen=caitemfabric"
+
+Item Group                   |#classPath+"/login?screen=xcodesgitem"
+Item Category                |#classPath+"/login?screen=xcodes(xtype=Item Category)"
+Sub Category                 |#classPath+"/login?screen=xcodes(xtype=Sub Category)"
+Fabric Type   				 |#classPath+"/login?screen=xcodes(xtype=Fabric Type)"
+Fabric Color  		  	     |#classPath+"/login?screen=xcodes(xtype=Fabric Color)"
+Construction				 |#classPath+"/login?screen=xcodes(xtype=Construction)"
+Size				 		 |#classPath+"/login?screen=xcodes(xtype=size)"
+Brand				 		 |#classPath+"/login?screen=xcodes(xtype=brand)"
+Unit Of Measurement          |#classPath+"/login?screen=xcodes(xtype=Unit of Measure)"
+//Count                		 |#classPath+"/login?screen=xcodes(xtype=Count)"
+Length           			 |#classPath+"/login?screen=xcodes(xtype=Length)"
+Interlining           		 |#classPath+"/login?screen=xcodes(xtype=interlining)"
+Composition					 |#classPath+"/login?screen=xcodes(xtype=Composition)"
+Width         			     |#classPath+"/login?screen=xcodes(xtype=Width)"
+//Oil         			     |#classPath+"/login?screen=xcodes(xtype=Oil)"
+Item Transaction Codes       |#classPath+"/login?screen=xtrn(xtypetrn=Item Code)"
+
+
+
+
+//Product Update             |#classPath+"/login?screen=caitemupdate"
+//Color Master 				 |#classPath+"/login?screen=cacolor"
+//Color Category 		     |#classPath+"/login?screen=xcodes(xtype=Color Category)"
+//Color Sub Category 		 |#classPath+"/login?screen=xcodes(xtype=Color Sub Category)"
+//Raw Material Category      |#classPath+"/login?screen=xcodes(xtype=Raw Material Category)"
+//Cost Master                |#classPath+"/login?screen=caitemcost"
+//Service Item Master        |#classPath+"/login?screen=caitemservice"
+//
+//Item Type                  |#classPath+"/login?screen=xcodes(xtype=Item Type)"
+//Brand                      |#classPath+"/login?screen=xcodes(xtype=Brand)"
+//Quotation Specification    |#classPath+"/login?screen=xcodes(xtype=Quotation Specification)"
+//Product Size               |#classPath+"/login?screen=xcodes(xtype=Product Size)"
+//Cost group                 |#classPath+"/login?screen=xcodes(xtype=Cost Group)"
+//Product Master             |#classPath+"/login?screen=caitem"
+//Product Type               |#classPath+"/login?screen=xcodes(xtype=Product Type)"
+//Item Class                 |#classPath+"/login?screen=xcodes(xtype=Item Class)"
+//Rack No                    |#classPath+"/login?screen=xcodes(xtype=Rack No)"
+//Item Code                  |#classPath+"/login?screen=xtrn(xtypetrn=Item Code)"
+//Item Group                 |#classPath+"/login?screen=xcodesgitem"
+//-------------------------------------------------------------------
+

@@ -1,0 +1,41 @@
+screen acbal
+
+     caption "Account Balance"
+     sections form one,  jscript myscript
+
+
+
+     form one
+        caption "Account Balance"
+        table acbal
+        primarykey xvoucher,xrow 
+        order xvoucher,xrow
+        return "login"
+        layout 2
+     	  pstyle 3
+        objects Clear,Show,Top,Previous,Next, Bottom,"<p>" ,~
+                xvoucher,xrow,xacc,xdesc,~
+                xprime,xlong,xref,xdate,xyear,xper,xsub
+
+        field xdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xdesc = acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+     end jscript
+
+
+
+end screen

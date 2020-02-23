@@ -1,0 +1,123 @@
+screen imtrndm
+
+//sidebar
+sections form imtrn,jscript myscript
+
+form imtrn
+  caption "Damage Entry"
+  table imtrn
+  order ximtrnnum
+  select "left(ximtrnnum,2)='DM' and xwh='"+#wh+"'"
+  return "login"
+  layout 2
+  pstyle 3
+  objects Clear,Show,Add,Top,Update,Delete,*next, ~
+          ximtrnnum display(trn Inventory Transaction),xdate,xitem,xdesc,~
+          xqty,xrate,xref display(hide),xval,xunit,xwh display(hide),xdocnum display(hide), ~
+          xdocrow display(hide),xnote,~
+          xsign display(hide)
+
+  field ximtrnnum
+	event after
+    	if xstatusjv .eq. "Confirmed"
+    	set #field(add.display)="hidden"
+      	set #field(update.display)="hidden"
+      	set #field(delete.display)="hidden"
+	end if
+	end event
+  end field
+		
+  field xval
+    caption Value
+  end field
+
+  field xval
+    caption Value
+  end field
+
+  field ximtrnnum
+    def "DM"+#wh
+  end field
+
+  field xdesc
+    caption Description
+    attrib local
+    display const
+    event after
+    	set xdesc = caitem.xdesc("xitem='"+xitem+"'")
+    end event
+  end field
+
+  field xdocrow
+    caption Row
+  end field
+
+  field xnote
+    width 80
+    height 3
+    column 2
+  end field
+
+
+  field xdocnum
+    pick imtrndoc
+  end field
+
+  field Add
+    event before
+     set xstatusjv = "Open"
+     set xwh = #wh
+     if ximtrnnum_ONE .ne. "DM"+#wh
+      error "Pls Choose 'DM'"+#wh+" You Choose Wrong Transaction Code '"+ximtrnnum_ONE+"'"
+     end if
+     set xsign=-1
+    end event
+    event after
+      set temp = #spsql(sp_validateAfterIMtrn,#id,#user,ximtrnnum,xitem,xqty)
+	set temp = #sql("update imtrn set xrate=0,xval=0 where ximtrnnum='"+ximtrnnum+"'") 
+      action Show
+    end event
+  end field
+
+
+  field update
+    event before
+//      set xunit = caitem.xunit("xitem = '"+xitem+"'")
+//      set xrate = caitem.xcost("xitem = '"+xitem+"'")
+//      set xval = xrate*xqty
+    end event
+    event after
+      set temp = #spsql(sp_validateAfterIMtrn,#id,#user,ximtrnnum,xitem,xqty)
+	set temp = #sql("update imtrn set xrate=0,xval=0 where ximtrnnum='"+ximtrnnum+"'") 
+      action Show
+    end event
+  end field
+
+
+
+
+ embed onsubmit="return submitit(this)"
+end form
+
+     jscript myscript
+
+        <script language=javascript type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="clicked"){
+            form.screen.value = "imtrn"
+          }
+              detail = ''
+              return result
+
+        }
+        </script>
+     end jscript
+
+
+end screen

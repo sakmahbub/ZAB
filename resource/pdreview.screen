@@ -1,0 +1,51 @@
+screen pdreview
+  caption "Salary Review Processing"
+  sections form one
+
+  form one
+    caption "<ACRONYM>Salary Review Process</ACRONYM>"
+    return "login"
+    layout 2
+    pstyle 3
+
+    objects Review, xempcategory,xreviewtype,xyear,xper,xarea attrib(local)
+
+    field xreviewtype
+      attrib local
+      display combo
+      caption Review Type
+	default Trial
+	pick "Trial,Final"
+    end field
+
+    field xyear
+      attrib local
+      default #sub(#date,0,4)
+    end field
+
+    field xarea
+      //attrib local
+      caption Month of Arear
+			display  text
+    end field
+
+    field xper
+      atriib local
+      caption Which Month of Review (Applicable for Final Run)
+    end field
+
+    field xempcategory
+      event before
+        class careports(getReport{pdreview,3,#wh,xyear,xper,Print Salary Review})
+      end event
+    end field
+
+    field Review
+      event before
+        set temp = #spsql(zabsp_review, #id,#user,xempcategory,xreviewtype,xyear,xper,xarea) //100010,'admin','Management','Final',2011,0
+      end event
+    end field
+
+  end form
+
+end screen

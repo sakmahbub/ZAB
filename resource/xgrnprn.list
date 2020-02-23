@@ -1,0 +1,14 @@
+     list xgrnprn
+        caption "Items containing: "+zvalue
+        table pogrnheader
+        order xgrnnum desc
+        select "(xgrnnum like '%"+zvalue+"%' or xdate like '%"+zvalue+"%') and left(xgrnnum,4)='GRN-' and xstatusgrn='Confirmed'"  
+		searchselect "left(xgrnnum,4)='GRN-'  and xstatusgrn='Confirmed'" 
+        rows 20
+        objects xgrnnum attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdate,xlcno,xwh//,desc equals((select xlong from branchview where zid=pogrnheader.zid and xcode=pogrnheader.xwh))
+     
+ headers "GRN No","Date","LC No","Plant/Store"//,"Plant/Store Name"	 
+	 end list
+
+

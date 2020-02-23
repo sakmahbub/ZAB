@@ -1,0 +1,21 @@
+//fa.column
+//-------------------------------------------------------------------------------------------------------------------
+name     |caption              |storage |length|scale|display|hei|w|form|def|help|doc|det|valid|attrib|font|calc|pick
+//-------|---------------------|--------|------|-----|--------|-|--|----|---|----|---|---|-----|------|----|----|----
+//FA
+xfagroup  |Asset Group         |varchar |    50|    0|combo   |1|20|    |   |    |   |   |     |      |    |    |code
+xfatype   |Asset Type          |varchar |    50|    0|combo   |1|20|    |   |    |   |   |     |      |    |    |code
+xfacat    |Asset Category      |varchar |    50|    0|combo   |1|20|    |   |    |   |   |     |      |    |    |code
+xdepmethod|Depreciation Method |varchar |    50|    0|combo   |1|20|    |   |    |   |   |     |      |    |    |code
+xdisposeamt|Disposal Amount    |decimal |    20|    2|text    |1|20|    |   |    |   |   |     |      |    |    |
+xstatusfa |Asset Status        |varchar |    50|    0|text    |1|20|    || |   |   |     |      |    |    |
+xbookval  |Book Value          |decimal |    20|    2|text    |1|20|    |   |    |   |   |     |      |    |    |
+xsalval   |Salvage Value       |decimal |    20|    2|text    |1|20|    |   |    |   |   |     |      |    |    |
+xdepamt   |Depreciation        |decimal |    20|    2|text    |1|20|    |   |    |   |   |     |      |    |    |
+xaccdepamt|Accumulated Depreciation|decimal|20|    2|text    |1|20|    |   |    |   |   |     |      |    |    |
+xresalval |Revised Salvage Value|decimal|    20|    2|text    |1|20|    |   |    |   |   |     |      |    |    |
+xrelife   |Revised Estimated Life|int   |    -1|    0|text    |1|10|    |   |    |   |   |     |      |    |    |
+xlifeused |Life Used           |int     |    -1|    0|text    |1|10|    |   |    |   |   |     |      |    |    |
+xliferemain|Life Remain        |int     |    -1|    0|text    |1|10|    |   |    |   |   |     |      |    |    |
+xstatusfa |Asset Status        |varchar |    50|    0|text    |1|20|    |"Live"| |   |   |     |      |    |    |
+xmanufacturer   |Manufactured By               |varchar |    50|    0|text|1|10|    |   |    |   |   |     ||||list camanufac

@@ -1,0 +1,11 @@
+     list pdleavestaff
+        table pdleaveheader
+        order xyearperdate
+        select "(xyearperdate like '%"+zvalue+"%' or xstaff like '%"+zvalue+"%') and xstatus<>'Confirmed'"
+        searchselect "xstatus<>'Confirmed'"
+ 		rows 20
+        objects xyearperdate attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xstaff,xtypeleave,xsid,xstatus
+     end list
+
+

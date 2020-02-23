@@ -1,0 +1,255 @@
+screen comexportnotification
+
+  caption "Notifications"
+    
+ 	sidebar  list notconfirmpi,list lcsccilistopen //list imsrtopr,list prpending,list prestmcost,list prquot
+	sections list pilcnolink ,list lcsccilist//list polist ,,list reqlistag,,list wolist,list polistlc,list prn,list paf,list poreject,list imsprreview,list po,jscript myscript
+
+
+
+
+	list pilcnolink
+        caption "Comfirmed PI But Not Linked With LC/SC: "
+        table opordheader
+        order xordernum desc
+		select "xpilinkso='Confirmed' and isnull(xlcno,'')=''"
+		rows 500
+        objects  xordernum,~ //attrib(link "login?screen=poordlcinfo"),~ //&xpornum=?
+                xpidate,xpiref,xcus,org equals((select xorg from cacus where zid=opordheader.zid and xcus=opordheader.xcus)
+	totals count(xordernum)
+      headers "PI No","PI Date","PI Ref","Cus ID","Name"
+     end list
+	 
+	 
+	list notconfirmpi
+        caption "Not Confirmed PI "
+        table opordheader
+        order xordernum desc
+		select "xpilinkso='Open' and isnull(xlcno,'')=''"
+		rows 500
+        objects  xordernum,~ //attrib(link "login?screen=poordlcinfo"),~ //&xpornum=?
+                xpidate,xpiref,xcus,org equals((select xorg from cacus where zid=opordheader.zid and xcus=opordheader.xcus)
+	totals count(xordernum)
+      headers "PI No","PI Date","PI Ref","Cus ID","Name"
+     end list
+	 
+	
+	 
+	 list lcsccilist	 
+	 caption "Confirmed LC/SC But Not Create CI List: "
+        table lcscciview
+        order xlcissuedate desc
+		select "xstatus='Applied' "
+		rows 10
+        objects  xlcno ,~//attrib(link "login?screen=poordlcinfo&command=Show&xlcno=?"),~
+               xlcissuedate,xcus,org equals((select xorg from cacus where zid=lcscciview.zid and xcus=lcscciview.xcus)
+			   totals count(xlcno)
+      headers "LC/SC No","Issue Date","Customer ID","Customer Name"//,"PR No","SR No","Plant/Store","Department","Preparer"
+     end list
+	 
+	 
+	 
+	  list lcsccilistopen	 
+	 caption "Not Confirmed LC/SC List: "
+        table lcinfo
+        order xlcissuedate desc
+		select "xtype='Export' and xstatus='Open'"
+		rows 10
+        objects  xlcno ,~//attrib(link "login?screen=poordlcinfo&command=Show&xlcno=?"),~
+               xlcissuedate,xcus,org equals((select xorg from cacus where zid=lcinfo.zid and xcus=lcinfo.xcus),xordertype
+			   totals count(xlcno)
+      headers "LC/SC No","Issue Date","Customer ID","Customer Name","Type"//,"PR No","SR No","Plant/Store","Department","Preparer"
+     end list
+	 
+		list wolist
+        caption "Approved Work Order(WO) List: "
+        table poview
+        order xpornum desc
+		Select "left(xpornum,2)='WO'"
+		rows 10
+        objects  xpornum attrib(link "login?screen=poordheadercash&command=Show&xpornum=?"),~
+                 xdate,xtype,xorg,xporeqnum,xtornum,xlong,xregi,~
+				 preparer equals((select xname from pdmst where zid=poview.zid and xstaff=poview.xpreparer)) 
+      headers "PO No","PO Date","PO Type","Supplier Name","PR No","SR No","Plant/Store","Department","Preparer"
+     end list	 
+	 
+		list polistlc
+        caption "Approved PO List (LC) "
+        table poviewlc
+        order xpornum desc
+		Select "left(xpornum,2)='PO'"
+		rows 10
+        objects  xpornum attrib(link "login?screen=poordheadercash&command=Show&xpornum=?"),~
+                 xdate,xtype,xorg,xporeqnum,xtornum,xlong,xregi,~
+				 preparer equals((select xname from pdmst where zid=poviewlc.zid and xstaff=poviewlc.xpreparer)) 
+      headers "PO No","PO Date","PO Type","Supplier Name","PR No","SR No","Plant/Store","Department","Preparer"
+     end list	 
+
+	list prn
+    caption "Approved Purchase Return List"
+    table imtorprnview
+    order xtornum desc
+	select "xstatustor='Approved' and xposition='"+#position+"'"
+	rows 10
+    objects  xtornum attrib(link "login?screen=imtorprnconfirm&command=Show&xtornum=?"),~
+			xdate,xlong,xorg,xgrnnum,xpornum,xname
+      headers "PRN No","PRN Date","Plant/Store","Supplier","GRN No","PO No","PO Preparer"
+     end list
+	 
+	 
+     list paf
+      caption "Approved Payment Authorization Form"
+         table appaymentreqh
+        order xpafnum desc
+		select "xstatusreq in ('Approved')"
+		rows 25
+        objects  xpafnum attrib(link "login?screen=appaymentreqh&command=Show&xpafnum=?"), xdate,xcus,~
+				 desc equals((select xorg from cacus where zid = appaymentreqh.zid and  xcus=appaymentreqh.xcus)),xpornum
+               
+		  headers "PAF No","Date","Supplier Code","Supplier Name","PO No."
+	end list	 
+	 
+	list poreject
+        caption "Open/Rejected PO/WO List"
+        table poordheader
+        order xpornum desc
+       select "zauserid='"+#user+"' and xstatus in ('Rejected','Open')"
+	   rows 25
+        objects xpornum attrib(link "login?screen=poordheadercash&command=Show&xpornum=?"), ~
+               xdate,xstatus,xnote1,~
+			    preparer equals((select xname from pdmst where zid=poordheader.zid and xstaff=poordheader.xpreparer))
+        headers "PO /WO No","Date","Status","Reject Note","Preparer"
+     end list
+
+	list imsprreview
+        caption "Store Purchase Requisition Review"
+        table imtorheader
+        order xtornum desc
+		select "left(xtornum,3)='SPR' and xstatustor not in ('Approved','') and xstatusreq='Create PO'"
+		rows 50
+        objects  xtornum  attrib(link "login?screen=imsprheaderreview&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xfwh)),xtitem
+				 
+        headers "Requisition No","Date","Plant/Store","Product Type"
+     end list
+	 
+	list po
+        caption "PO Approval Review"
+        table poordheader
+        order xpornum desc
+       select "left(xpornum,4) in ('PO--','WO--') and xstatus not in ('Approved','Open')"
+	   rows 50
+        objects xpornum attrib(link "login?screen=poordheadercpo&command=Show&xpornum=?"),xdate,xstatus, ~
+				xidsupdesc equals((select xname from pdmst where zid=poordheader.zid and xposition=poordheader.xidsup)),~
+				 xidsupdesc2 equals((select xname from pdmst where zid=poordheader.zid and xposition=poordheader.xsuperior2)),~
+				 preparer equals((select xname from pdmst where zid=poordheader.zid and xstaff=poordheader.xpreparer))
+               
+        headers "PO /WO No","Date","Status","Approver","OR >>>>>> Approver","Preparer"
+     end list
+
+
+	list imsrtopr
+        caption "Approved SPR List For Create Purchase Requisition(PR)"
+        table imtorview
+        order xrow
+       select "xstatustor in ('Approved') and left(xtornum,4)='SPR-' and xstatusreq = 'Create PO' and xdesignation='MD'"
+		rows 8
+        objects  xtornum attrib(link "login?screen=imtorreqpr&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorview.zid and xcode=imtorview.xwh)),~
+				 xtitem,xtypeobj,xreqtype,xdateapp,xrow display(hide)
+				 
+        headers "Requisition No","Date","Plant/Store","Product Type","Requisition Type","Request To","Approved Date"
+     end list
+	 
+	 
+	 
+	  list prpending
+      caption "Pending PR for Select Purchase Type"
+         table poreqheader
+        order xporeqnum desc
+		select "xstatusreq='Open'"
+		rows 8
+        objects  xporeqnum attrib(link "login?screen=poreqhed&command=Show&xporeqnum=?"),xtornum,xdate,xtype,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","SPR No","Date","Purchase Type","Plant/Store Code","Name"
+	end list
+
+
+	 list prestmcost
+      caption "PR for Estimated Cost"
+         table poreqheader
+        order xporeqnum desc
+		select "xstatusreq='Recommended For Estimated Cost' and xtype='Cash'"
+		rows 8
+        objects  xporeqnum attrib(link "login?screen=poreqheadercash&command=Show&xporeqnum=?"),xtornum,xdate,xtype,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","SPR No","Date","Purchase Type","Plant/Store Code","Name"
+	end list
+	
+   list prquot
+        caption "PR for Quotation Entry"
+        table poreqheader
+        order xporeqnum
+		select "xstatusreq='Recommended For Quotation' and xtype='CS'"
+        rows 8
+		objects  xporeqnum attrib(link "login?screen=poreqheader&command=Show&xporeqnum=?"),xtornum,~
+            xdate,xtype,xstatusreq,~
+			preparer equals((select xname from pdmst where zid=poreqheader.zid and xstaff=poreqheader.xpreparer))
+			//xidsupdesc equals((select xname from pdmst where zid=poreqheader.zid and xposition=poreqheader.xsuperiorsp)),~
+			//xidsupdesc2 equals((select xname from pdmst where zid=poreqheader.zid and xposition=poreqheader.xsuperior2))
+	 headers "PR No","SPR No","Date","Type","Status","Preparer"//,"Approver","OR >>>>>> Approver"
+	 end list
+	 
+	   list reqlistag
+        caption "Approved Purchase Requisition List for Create PO" 
+        table poreqview
+        order xporeqnum desc
+		select "xqtyapv-xqtypor>0 and xtype in ('Agreement','Cash','CS','Direct PO') and left(xporeqnum,2)='PR' and xstatusreq='Approved'"
+        rows 15
+		 objects  xporeqnum  attrib(link "login?screen=poreqheadercrpo&command=Show&xporeqnum=?"),xtornum,~
+                 xdate,xtype,xwh,xdesc,~
+		 preparer equals((select xname from pdmst where zid=poreqview.zid and xstaff=poreqview.xpreparer))
+        headers "Requisition No","SPR No","Date","Purchase Type","Store/Plant Code","Store/Plant Name","Preparer"
+     end list
+ 
+  
+     form one
+        //caption "Requisition Approved By Dept. Head""
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+	//	select "xstatustor='Open' and xidsup='"+#position+"'"
+		select "left(xtornum,2)='SR'"
+        return "login"
+        pstyle 1
+        layout 1
+        
+	
+        embed onsubmit="submitit(this)"
+
+      end form
+
+      jscript myscript
+
+        <script language="javascript" type="text/javascript">
+     var time = new Date().getTime();
+     $(document.body).bind("mousemove keypress", function(e) {
+         time = new Date().getTime();
+     });
+
+     function refresh() {
+         if(new Date().getTime() - time >= 3000) 
+             window.location.reload(true);
+         else 
+             setTimeout(refresh, 3000000);
+     }
+
+     setTimeout(refresh, 3000000);
+        </script>
+     end jscript
+
+
+
+end screen

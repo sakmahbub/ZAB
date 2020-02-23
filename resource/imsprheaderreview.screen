@@ -1,0 +1,400 @@
+screen imsprheaderreview
+
+  sidebar list imtor,list one
+	sections form one, jscript myscript
+
+	 list imtor
+        caption "Store Purchase Requisition List"
+        table imtorheader
+        order xtornum desc
+		select "left(xtornum,3)='SPR' and xstatustor not in ('Approved','') and xstatusreq='Create PO'"
+        rows 10
+        objects  xtornum  attrib(link "login?screen=imsprheaderreview&command=Show&xtornum=?"),~
+                 xdate,xstatustor,xtitem,xidsupdesc equals((select xname from pdmst where zid=imtorheader.zid and xposition=imtorheader.xidsup))
+				 
+        headers "Requisition No","Date","SPR Status","Type of Product","Approver"
+    end list
+              
+    list one
+        caption "<br><center><b>"Requisition Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        select "left(xtornum,3)='SPR'"
+		rows 30
+        objects ~
+        xrow,~// attrib(link "login?screen=moreqdetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xserial,~
+        xqtyreq,xunit
+
+        headers "Serial No","Item","Description","Part No","Quantity Required","Unit"
+     end list
+
+
+
+     form one
+        caption "Store Purchase Requisition Review"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+		select "left(xtornum,3)='SPR' and xstatustor not in ('Approved','') and xstatusreq='Create PO'"
+        return "login"
+        pstyle 3
+        layout 3
+        objects	Add,Update,Delete,*Next,*Next,*Next,Show,Clear,*Next,*Next,*Next,~
+				Top,Next,Previous,Bottom,*next,"<p>",~
+        xtornum,xdate display(const),xdatereq display(const),~
+        xfwh display(const),xfbrname,xref display(const),xtwh display(hide),xtbrname,xregi display(const),~
+		xstatusrec display(hide),xidsup display(hide),xstatustor,xstatusreq display(const),~
+		xtitem display(const),xlong display(const),~
+		xnote  display(const),,,~
+		signatorysec display(const),,,~
+		xpreparer display(hide),preparer display(const),~		
+		xsignatory1 display(hide),signatory1  display(const),~
+		xsignatory2 display(hide),signatory2 display(const),~
+		xsignatory3 display(hide),signatory3 display(const),~
+		xsignatory4 display(hide),signatory4 display(const),~
+		xsignatory5 display(hide),signatory5 display(const),~
+		xsignreject display(hide),signreject display(const),~
+		xnote5
+		
+				
+		field xdate
+		attrib local
+			caption Requisition Date
+		  event after
+		  set xdate=#sql("select xdate from imtorheader where xtornum='"+xtornum+"'")
+		  end event
+		end field
+		
+		field xdatereq
+			caption Required By Date
+		end field
+		
+		field xshift
+			caption Shift Name
+			pick code Shift Name
+		end field
+		
+		field xstatustor
+		caption SPR Status
+		display const
+		end field
+		
+		field xstatusreq
+		caption PR Status
+		display const
+		end field
+		
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		//column 2
+		end field
+		
+		field xdum
+			display const
+			attrib local
+			caption
+		end field
+		
+		field xregi
+		pick list xcardept
+			caption Department Name
+			event before
+			end event
+		end field
+		
+		field xpreparer
+		  attrib local
+		  event after
+		  set xpreparer=imtorheader.xpreparer("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xsignatory1
+		  attrib local
+		  event after
+		  set xsignatory1=imtorheader.xsignatory1("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xsignatory2
+		  attrib local
+		  event after
+		  set xsignatory2=imtorheader.xsignatory2("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xsignatory3
+		  attrib local
+		  event after
+		  set xsignatory3=imtorheader.xsignatory3("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xsignatory4
+		  attrib local
+		  event after
+		  set xsignatory4=imtorheader.xsignatory4("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xsignatory5
+		  attrib local
+		  event after
+		  set xsignatory5=imtorheader.xsignatory5("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xsignreject
+		  attrib local
+		  event after
+		  set xsignreject=imtorheader.xsignreject("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xfwh
+		  attrib local
+		  event after
+		  set xfwh=imtorheader.xfwh("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xtwh
+		  attrib local
+		  event after
+		  set xtwh=imtorheader.xtwh("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xstatustor
+		  attrib local
+		  event after
+		  set xstatustor=imtorheader.xstatustor("xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='SPR Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+
+		
+		  field appname
+        attrib local
+        caption Approved Person
+        display const
+        event after
+          set appname=pdmst.xname("xposition='"+xidsup+"'")
+        end event
+       end field
+		
+       field xfbrname
+        attrib local
+        caption Store Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Store Name
+        display hide
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	field xnote
+      caption Reject Note
+	display const
+    end field
+	
+	field xnote5
+    caption Note from SCM
+	column 2
+	width 70 
+    end field
+
+        field xtornum
+		caption SPR No.
+		pick list sprno
+          event after
+			set global(xtornum)=xtornum
+			set global(xdocrow)=xdocrow
+			class careports(getReport{imsprprint;2;in,st;zid,tornum;xtornum;View SPR Status})
+			if imtorheader.xstatustor("xtornum='"+xtornum+"'") .eq. "Confirmed"
+					set #field(Update.attrib) = "disabled"
+					set #field(Detail.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+				end if
+		
+				if imtorheader.xstatustor("xtornum='"+xtornum+"'") .eq. "Approved"
+					set #field(Update.attrib) = "disabled"
+					set #field(Detail.display) = "hidden"
+					set #field(Confirm.display) = "hidden"
+				end if	
+			set #field(Add.attrib) = "disabled"
+			set #field(Delete.attrib) = "disabled"
+           end event
+        end field
+
+        field xlong
+		caption Justification
+          height 2
+          width 50
+          //column 2
+        end field
+		
+		field confirm
+            event before
+			set justificat=#sql("select xlong from imtorheader WHERE xtornum='"+xtornum+"'")
+			double prepqty=#sql("select sum(xprepqty) from imtordetail where xtornum='"+xtornum+"'")
+			if prepqty <0.01
+			error "Please add detail"
+			else if xstatustor .ne. ""
+				error "SPR Already Confirm"
+			else if justificat .eq. ""
+				error "Please write Justification!"
+			end if
+            end event
+            event after
+			set temp =  #spsql(zabsp_Confirmed_Request,#id,#user,#position,xfwh,xtornum,"SPR")
+			//set temp = #spsql(zabsp_sendmail,#id,#user,#position,xtornum,"Department","")
+	         action show
+            end event
+          end field
+		
+		
+        field add
+			event before
+				//set xidsup=pdmst.xidsup("xposition='"+#position+"'")
+				set cardept=cacardept.xregi("xregi='"+xregi+"'")
+				set trn = "SPR-"
+				set xstatusreq="Create PO"
+				//set xstatustor="Open"
+				set xstatusrec="Open"
+				set xpreparer=pdmst.xstaff("xposition='"+#position+"'")
+				if xregi .ne. "" .and.  xregi .ne. cardept
+					error "Please select car or department"
+				else if xfwh .eq. ""
+					error "Please select Branch/Store for Requisition Product"
+				else if xregi .eq. ""
+					set xregi =pdmst.xdeptname("xposition='"+#position+"'")
+					set xtornum = #trn("Transfer Transaction",trn,10)
+				end if
+			end event
+        end field
+		
+        field update
+          event before
+		        //set xidsup=pdmst.xidsup("xposition='"+#position+"'")
+		        set cardept=cacardept.xregi("xregi='"+xregi+"'")
+				//if xregi .ne. "" .and.  xregi .ne. cardept
+				//error "Please select department"
+				//else 
+				if xfwh .eq. ""
+				error "Please select Branch/Store for Requisition Product"
+			end if
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+        
+		field Select
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+
+        function clicked(b){
+          but=b.value
+        }
+
+        function submitit(form){
+          if (but=="Detail"){
+            form.screen.value = "imsprdetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickRecipe(link,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xmoprcs.value=link.text
+            document.one.xdocrow.value=row.text
+          }else{
+            document.one.xmoprcs.value=link.innerText
+            document.one.xdocrow.value=row.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+
+
+end screen

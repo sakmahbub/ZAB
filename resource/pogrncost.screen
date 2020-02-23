@@ -1,0 +1,88 @@
+screen pogrncost
+     caption "Cost Detail For "+xgrnnum
+     sidebar list one
+     sections form one,  jscript myscript
+
+     list one
+        caption "Invoice Cost Detail List"
+        table pogrncost
+        order xgrnnum,xrow
+        fixed xgrnnum
+        //select none
+        //navigators alpha
+        //,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 20
+        objects  xrow attrib(link "login?screen=pogrncost&command=Show&xgrnnum=?&xrow=?"), ~
+                xcostcode,xcost
+
+
+        headers "Row","Code","Cost"
+        total "","Total",sum
+     end list
+
+
+     form one
+        caption "C<ACRONYM>ost</ACRONYM> D<ACRONYM>etail</ACRONYM> F<ACRONYM>or</ACRONYM> "+xinvnum
+        table pogrncost
+        order xgrnnum,xrow
+        fixed xgrnnum
+        //select
+        pstyle 3
+        return "login"
+        layout 3
+        objects Return,Clear,Add, Update, Delete,*next,Show, Top, Previous, Next, Bottom,"<p>",~
+                xrow attrib(row 0 10;search), xcostcode,xdesc,xcost,xlong
+
+        embed onsubmit="return submitit(this)"
+
+
+        field xlong
+          width 75
+          column 3
+        end field
+
+        field xdesc
+          attrib local
+          display const
+          event after
+            set xdesc=pocostmst.xdesc("xcostcode='"+xcostcode+"'")
+          end event
+        end field
+
+        field xcostcode
+          pick list pocost
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "pogrnlcheader"
+            form.searchbutton.value = "Find xgrnnum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

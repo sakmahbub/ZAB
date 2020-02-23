@@ -1,0 +1,147 @@
+screen pogrndetailac
+
+     sidebar list detail
+     sections form one,  jscript myscript
+
+     list detail
+        caption "GRN Detail List For "+xgrnnum
+        table potoacchkview
+        order xgrnnum
+        fixed xgrnnum
+        rows 20
+        objects  xtype,xgitem,xgsup,xaccdr,xdescdr,xacccr,xdesccr,xaccvat,xdescvat,xaccait,xdescait,xlineamt
+
+        headers "Type","Item Group","Supplier Group","Debit Account","Account Description","Credit Account","Account Description","VAT Account","Account Description","AIT Account","Account Description","Amount"
+		total "","","","","","","","","","","Total",sum
+     end list
+
+
+
+     form one
+        caption "GRN Detail For "+xgrnnum
+        table pogrndetail
+		primarykey xgrnnum,xrow
+        order xgrnnum,xrow
+        fixed xgrnnum
+        pstyle 3
+        return "login"
+        layout 2
+        objects Show,Clear,*next,Return,Top, Previous, Next, Bottom,"<p>",~
+                xrow attrib(row 0 1),xunitpur,xitem attrib(readonly),xdesc,xdisc attrib(readonly),xdiscf attrib(readonly),~
+                xrate attrib(readonly),xqtygrn,xqtybonus,xlineamt display(const),xcfpur
+
+        embed onsubmit="return submitit(this)"
+		
+		field xtype
+			caption Adjustment Type
+			pick "Complementary Adjustment,Expiry Adjustment"
+		end field
+		
+		field xunitpur
+			display text
+			attrib readonly
+		end field
+		
+		field xitem
+			pick 
+		end field
+		
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+        
+        field xqtydel
+          caption Delivered Qty.
+        end field
+
+        field xlong
+          width 70
+          column 2
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        field Add
+          event before
+          end event
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailGRN,#id,#user,xgrnnum,xrow,xrate,xqtygrn,xdisc,xdiscf,xdocrow)
+            action show
+          end event
+        end field
+
+        field update
+          event before
+          end event
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailGRN,#id,#user,xgrnnum,xrow,xrate,xqtygrn,xdisc,xdiscf,xdocrow)
+            action show
+          end event
+        end field
+
+        field delete
+          event before
+          	set grnnum= xgrnnum
+          	set docrow=xdocrow
+          	set row=xrow
+          end event	
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailGRN,#id,#user,grnnum,row,xrate,xqtygrn,xdisc,xdiscf,docrow)
+            action show
+          end event
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "pogrnheaderac"
+            form.searchbutton.value = "Find xgrnnum=?"
+          }
+          return result
+        }
+        function pickItem(link,unit,rate,disc,discf,qtyord,qtybonus,row,cfpur){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+          link.innerText
+            document.one.xitem.value=link.innerText
+            document.one.xunitpur.value=unit.innerText
+            document.one.xrate.value=rate.innerText
+            document.one.xdisc.value=disc.innerText
+            document.one.xdiscf.value=discf.innerText
+            document.one.xqtygrn.value=qtyord.innerText
+            document.one.xqtybonus.value=qtybonus.innerText
+            document.one.xdocrow.value=row.innerText
+            document.one.xcfpur.value=cfpur.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

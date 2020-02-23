@@ -1,0 +1,20 @@
+product ZAB ERP
+
+table potermview
+  caption "PO Terms View"
+  columns zid,xtype,xlong,xcode
+
+  primary key zid,xcode
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+	sql CREATE VIEW potermview(zid,xcode,xlong,xtype,zactive) ~
+	AS ~
+	SELECT a.zid,b.xcode,b.xlong,b.xtype,b.zactive ~
+	FROM zbusiness a JOIN ~
+	xcodes b ON a.zid=b.zid ~
+	WHERE b.xtype='PO Terms and Condition'
+
+end table

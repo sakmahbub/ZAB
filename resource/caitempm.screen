@@ -1,0 +1,131 @@
+screen caitempm
+     caption "Item Master"
+     sections form detail,jscript myscript
+
+     form detail
+        caption "Item Master (Packing Material)"
+        table caitem
+        primarykey xitem
+        order xitem
+        select "xgitem='Packing Material'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,*next,Top,Next,Previous, Bottom,"</b></font><p>" ,~
+                xitem,~// width(50), ~
+                xdesc width(50),~
+                xtitem display(hide),xcatitem,xgitem,xunit,xhscode,xspecification,xstype display(hide),~
+                xlong display(hide),zactive
+
+      
+       field xdum
+        attrib local
+        caption 
+        display const
+       end field
+
+
+	field xstype
+		default "Stock-N-Sell"
+	end field
+	
+	field add
+		event before
+				//set xgitem="Packing Material"
+				set xstype="Stock-N-Sell"
+	            set trn = "PM--"
+           		set xitem = #trn("Item Code",trn,8)
+           		//print xitem
+		end event
+		event after
+			print "<font color=blue size=+3>New Product: "+xitem+", "+xdesc+" </font>"
+		end event
+	end field
+
+	field update
+        	event after
+			print "<font color=blue size=+3>Updated: "+xitem+", "+xdesc+" </font>"
+		end event
+	end field
+
+        field xitem
+        //  display trn Item Code
+        end field
+
+        field xlong
+           width 100
+           column 2
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Bonus
+          embed onclick="clicked(this)"
+        end field
+
+        field Discount
+          embed onclick="clicked(this)"
+        end field
+
+        field Gift
+          embed onclick="clicked(this)"
+        end field
+
+        field Cost Price
+          embed onclick="clicked(this)"
+        end field
+
+        field Sell Price
+          embed onclick="clicked(this)"
+        end field
+
+        field Package
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Bonus"){
+            form.screen.value = "caitembonus"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Discount"){
+            form.screen.value = "caitembonusrbb"
+            form.searchbutton.value = "Find xitem=?"
+          }
+           if (detail=="Gift"){
+            form.screen.value = "cagiftitem"
+            form.searchbutton.value = "Find xitem=?"
+          }
+           if (detail=="Package"){
+            form.screen.value = "caitempackage"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Cost Price"){
+            form.screen.value = "caitemcostprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Sell Price"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

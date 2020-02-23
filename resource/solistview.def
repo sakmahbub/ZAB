@@ -1,0 +1,16 @@
+product ZAB ERP
+
+table solistview
+  caption "SO List View"
+  columns zid,xordernum,xorderdate,xcus,xorg,xpornum,xinvnum,xbuyer,xtype,xstatusord,xstatusso,xstatusdor 
+  primary zid,xordernum,xorderdate,xcus,xorg,xpornum,xinvnum,xbuyer,xtype,xstatusord,xstatusso,xstatusdor
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view solistview (zid,xordernum,xorderdate,xcus,xorg,xpornum,xinvnum,xbuyer,xtype,xstatusord,xstatusso,xstatusdor)~
+                  as select a.zid,a.xordernum,a.xorderdate,a.xcus,b.xorg,a.xpornum,a.xinvnum,a.xbuyer,a.xtype,a.xstatusord,a.xstatusso,~
+					a.xstatusdor from  opordheaderso a ~		
+					left join cacus b on a.zid=b.zid and a.xcus=b.xcus ~					
+					where a.xstatusord='Comfirmed'
+end table

@@ -1,0 +1,246 @@
+screen opadvadjheader
+	
+     sidebars list one
+     sections form one, jscript myscript
+	 
+ list one
+        caption "Advance Against JOB Detail List."
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=opadvadjdetail&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xlineamt,xadjustment
+
+		headers "Line No","Item","Description","Advance Amount" ,"Adjustment Amount"
+		totals "","Total","",sum,sum
+     end list
+
+
+     form one
+		caption "Adjustment Against Advance Header"
+        table poreqheader
+        order xporeqnum desc
+		//select "xstatusreq='Approved' or xstatusreq='PO Created'"
+		//select "xstatusreq='Approved' and xtype='Cash'"
+        select "left(xporeqnum,4)='ADJ-'"//" and zauserid='"+#user+"'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Add,Show,Clear,Update,Delete,*Next,Details,Confirm,"<p>",~//Top, Previous, Next, Bottom,
+                xporeqnum,xdate,xsup display(hide),xorg display(hide),xqotnum display(hide),xfwh,xfbrname,xtwh display(hide),~
+				xtype display(hide),xstatusreq display(const),~//xdum  display(const),~
+				xordernum,xstaff,sname,xnote,xsuperiorsp display(hide),~
+				xep display(hide),xstatus display(hide),xstatusap display(hide),xstatusgl display(hide),xcus display(hide)
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+		  
+		   field sname
+            attrib local
+            display const
+            caption Name
+            event after
+              set sname= pdmst.xname("xstaff= '"+xstaff+"'")
+            end event
+          end field
+		  
+		   field xdum
+            attrib local
+            caption
+          end field
+		  
+		   field xordernum
+            event before
+             //set xordernum=poreqheader.xordernum("xporeqnum='"+xadvnum+"'")
+			 set xcus=poreqheader.xcus("xordernum='"+xordernum+"'")
+			 // set xstaff=poreqheader.xstaff("xporeqnum='"+xadvnum+"'")
+            end event
+          end field
+          
+		  	field xtype
+			caption Service Type
+			pick "Cash,Agreement"
+			//default "Other"
+			end field
+			
+ 	   field xadvnum
+		  pick list advancenum
+		  end field
+		  
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xregi
+           caption Car No. / Other
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+		caption Adjustment Number
+		pick list adjustentnum
+        	width 15
+          event after
+		  //class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+		  class careports(getjspReport{cnfadjletter,1,xporeqnum,View Adjustment Letter})
+            set globals(xporeqnum)=xporeqnum
+			 set globals(xordernum)=xordernum
+			 set globals(xstaff)=xstaff
+			 set globals(xsuperiorsp)=xsuperiorsp
+			  set globals(xstatusreq)=xstatusreq
+			  if xstatusreq .ne. ""
+		         	//set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Confirm.display)="hidden"
+       	      end if
+          end event
+        end field
+		
+		field xfwh
+		default #wh
+		event before
+		 //
+		end event
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	   	field confirm
+            event before
+			double lineamt=#sql("select sum(xlineamt) from poreqdetail where xporeqnum='"+xporeqnum+"'")
+			if lineamt <1
+			error "Please add detail"
+			else if xstatusreq .ne. ""
+			error "Adjustment Already Confirm"
+			end if
+            end event
+            event after
+			 set temp =  #sql("update poreqheader set xstatusreq='Open' where xporeqnum='"+xporeqnum+"'")
+			// set temp = #spsql(zabsp_sendmail,#id,#user,xporeqnum,"Department2","")
+	         action show
+            end event
+          end field
+		
+		  field add
+			event before
+				set xsuperiorsp=pdmst.xsuperioradj("xposition='"+#user+"'")
+				//set xordernum=poreqheader.xordernum("xadvnum='"+xadvnum+"'")
+				set trn = "ADJ-"
+				set xstatusreq=""
+				set xtype="Cash"
+				set xstatusrec="Open"
+				set xstatus="Open"
+				set xstatusap="Open"
+				set xstatusgl="Open"
+				//set xcus=poreqheader.xcus("xadvnum='"+xadvnum+"'")
+				set xtwh=xfwh
+				set xep=pdmst.xstaff("xposition='"+#user+"'")
+				if xfwh .eq. ""
+				error "Please select Division for Adjustment"
+				else if xordernum .eq. ""// .or. #sub(xadvnum,0,2) .ne. "AD" 
+				error "Please Select Job No."
+				else if xstaff .eq. ""// .or. #sub(xadvnum,0,2) .ne. "AD" 
+				error "Please Select Employee ID"
+				else
+				set year = #sub(xdate,2,2)
+				set poreqnum = #trn("Adjustment Number",trn,10)   
+				set xporeqnum= #sub(poreqnum,0,4)+year+#sub(poreqnum,6,4)
+				
+				//set xporeqnum = #trn("Adjustment Number",trn,10)
+				end if
+			end event
+        end field
+		
+		field update
+			event before
+			if xordernum .eq. ""
+			error "Please Show first"
+			end if
+			set xsuperiorsp=pdmst.xsuperioradj("xposition='"+#user+"'")
+			set xtwh=xfwh
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opadvadjdetail"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

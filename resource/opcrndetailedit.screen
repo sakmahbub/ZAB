@@ -1,0 +1,167 @@
+screen opcrndetailedit
+     caption "Sales Return Entry - Detail"
+     sidebar list order,list one
+     sections form one,jscript myscript
+
+
+     list order
+    	caption "Item List For Order No "+xordernum
+        table opreturnview
+        order xdornum,xrow
+        //fixed xdornum
+        select "xdornum='"+xordernum+"'"
+        rows 20
+        objects xitem attrib(link "abc" embed onclick="return pickItem(this:xunit#:xrate#:xqtyord#:xvatrate#:xdiscdet#:xrow#)"),~
+        xdesc,~ 
+                xunit attrib(name xunit#),xrate attrib(name xrate#),~
+                xqtyord attrib(name xqtyord#),xvatrate attrib(name xvatrate#),xdiscdet attrib(name xdiscdet#),xrow attrib(name xrow#)
+        header "Item Code","Description","Unit","Rate","Qty","Vat","Disc%","Row"
+     end list
+
+     list one
+	      caption "List For Sales Return Adjustment No "+xcrnnum
+        table opcrndetail
+        order xcrnnum,xrow
+        fixed xcrnnum
+        rows 20
+        objects xrow attrib(link "login?screen=opcrndetailedit&command=Show&xcrnnum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where caitem.zid=opcrndetail.zid and caitem.xitem=opcrndetail.xitem)),~
+                xqtyord,xrate,xlineamt
+
+        totals count,"","Totals",sum,"",sum
+        header "Line No","Item Code","Description","Qty Ordered","Rate","Line Amount"
+     end list
+
+
+     form one
+        caption "<ACRONYM>Details For Sales Return<br> "+xcrnnum+""
+        table opcrndetail
+        primarykey xcrnnum,xrow
+        order xcrnnum,xrow
+        fixed xcrnnum
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Add,Update, Delete,Show,Clear,*next,Top,Previous,Next, Bottom,Return,~
+                xrow attrib(row 0 1;search),xunit,~
+                xitem attrib(readonly), xdesc display(const),~
+                xqtyord,xrate attrib(readonly),xdiscdet attrib(readonly),~
+                xlineamt display(const), xlong,xvatrate attrib(readonly),xvatamt display(const),~
+                xdocrow attrib(readonly),xqtybonus
+
+      field xdesc
+        attrib local
+        display const
+        caption Description
+        event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        end event
+      end field
+
+
+      field xqtyord
+      caption Quantity Returned
+      end field
+
+        field xlong
+      //    width 50
+          height 3
+//        column 2
+        end field
+
+        field add
+          event before
+            if xrate == 0
+              error "Cannot Proceed -- Rate is Blank"
+		else if xdocrow == 0
+              error "Cannot Proceed -- Please Choose Again"
+            else
+              class oppharma(validateBeforeDetailCRN({xcrnnum}))
+            end if
+          end event
+          event after
+          //  set temp = #spsql(sp_validateAfterDetailCRN,#id,#user,xcrnnum,xrow,xqtyord,xrate,xvatrate,xitem,xdocrow)
+           // action Show
+          end event
+        end field
+
+        field update
+          event before
+            class oppharma(validateBeforeDetailCRN({xcrnnum}))
+          end event
+          event after
+          //  set temp = #spsql(sp_validateAfterDetailCRN,#id,#user,xcrnnum,xrow,xqtyord,xrate,xvatrate,xitem,xdocrow)
+           // action Show
+          end event
+        end field
+
+        field delete
+          event before
+            set crnnum = xcrnnum
+            set row = xrow
+            double qtyord = xqtyord
+            double rate = xrate
+            double vat = xvatrate
+            set item = xitem
+            set docrow = xdocrow
+          end event
+          event after
+           // set temp = #spsql(sp_validateAfterDetailCRN,#id,#user,crnnum,row,qtyord,rate,vat,item,docrow)
+//            action Show
+          end event
+        end field
+
+        field xdesc
+          event before
+            set xdesc = ""+caitem.xdesc("xitem='"+xitem+"'")
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcrnheaderedit"
+            form.searchbutton.value = "Find xcrnnum=?"
+          }
+          return result
+        }
+        function pickItem(link,unit,rate,qtyord,vat,disc,row){
+
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xunit.value=unit.innerText
+            document.one.xrate.value=rate.innerText
+            document.one.xqtyord.value=qtyord.innerText
+            document.one.xvatrate.value=vat.innerText
+            document.one.xdiscdet.value=disc.innerText
+            document.one.xdocrow.value=row.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+
+end screen

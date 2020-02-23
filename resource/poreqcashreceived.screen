@@ -1,0 +1,169 @@
+screen poreqcashreceived
+	
+     sidebars list reqlist,list reqapp,list one
+     sections form one, jscript myscript	  
+	 
+	  list reqlist 
+      caption "PR / JN List"
+      table poadvrecview
+      order xporeqnum desc
+	  select "xstatusap='Confirmed' and xstatusrec='Open' and xsuperiorsp='"+#position+"'"
+	  rows 10
+      objects  xporeqnum attrib(link "login?screen=poreqcashreceived&command=Show&xporeqnum=?"),xdate,xtwh, ~
+				 xdesc
+               
+		  headers "Requisition No","Date","Division Code","Name"
+	  end list
+	  
+	  
+	  list reqapp
+        caption "Last 5 Cash received"
+        table poadvrecview
+	    //order xporeqnum desc
+		order xdaterec desc
+		select "xsuperiorsp='"+#position+"' and xstatusrec='Cash Received'"
+		rows 5
+       objects xporeqnum attrib(link "abc" embed onclick="return pickItem(this)"),~
+	    xsignatory1 attrib(name xsignatory1#),xdaterec attrib(name xdaterec#),xdesc attrib(name xdesc#)
+       headers "Requisition No","CPO Approved","Cash Received","Division Name"
+     end list
+	 
+	 list one
+        caption "Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow,~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and  xitem=poreqdetail.xitem)),xbrand,xqtyreq,xqtyapv,xunitpur,xrate,xlineamt
+
+		totals "","","Total","","","","","",sum
+        headers "Line No","Item","Description","Brand","Qty Req","Qty Apv","UOM","Rate","Amount"
+     end list
+
+     form one
+		caption "Cash Receive against PR/JN"
+        table poreqheader
+        order xporeqnum desc
+		select "xstatusreq<>'Open' and xtype='Cash' and left(xporeqnum,4) in ('JN--','PR--') and xstatusap='Confirmed'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Show,Clear,Cash_Received,"<p>",~
+                xporeqnum,xdate display(const),xpreparer display(hide),preparer display(const),xvoucher display(const),~
+				xstatusrec display(const),xdaterec  display(const),xnote
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+          
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		
+		  field preparer
+		   attrib local
+          caption Prepared By
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+          end field
+		
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+        	width 15
+          event after
+		  class careports(getjspReport{prletter,1,xporeqnum,View Cash Advance Request})
+            set globals(xporeqnum)=xporeqnum
+			 set globals(xstatusreq)=xstatusreq
+			  if xstatusrec .ne. "Open"
+         			set #field(Cash_Received.display)="hidden"
+       	      end if
+          end event
+        end field
+
+         field Cash_Received
+            event before
+			set xsuperior=#sql("select xsuperiorsp from poadvrecview where xporeqnum='"+xporeqnum+"'")
+			if xsuperior .ne. #position .or. xstatusrec .ne. "Open"
+			error "Cannot Proceed - Applied only for PR / JN Preparer."
+			end if
+            end event
+            event after
+			set temp = #spsql(zabsp_DATETIME_Update,#id,#position,xporeqnum,"poreqheader","xdaterec","xpreparer","xstatusrec","xporeqnum","Cash Received")
+	        action show
+		   end event
+          end field
+
+
+		field update
+			event before
+			if xstatusreq .eq. ""
+			error "Please Show first"
+			end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poreqdetailcash"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

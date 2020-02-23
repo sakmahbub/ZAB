@@ -1,0 +1,17 @@
+     list caman
+        table caman
+        order xman
+        select "(xman like '%"+zvalue+"%' or xorg like '%"+zvalue+"%')"
+        navigators alpha
+        rows 10
+        objects xman attrib(link "abc" embed onclick="return updateParent(this:'xman')"), ~
+                xorg
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

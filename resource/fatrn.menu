@@ -1,0 +1,9 @@
+//so.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Transactions                     |#classPath+"/login?screen=fatrn"
+Transfer Transactions            |#classPath+"/login?screen=fato"
+//Estimated Life Change             |#classPath+"/login?screen=fatrnl"
+//-------------------------------------------------------------------
+

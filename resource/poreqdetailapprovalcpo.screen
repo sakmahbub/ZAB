@@ -1,0 +1,154 @@
+screen poreqdetailapprovalcpo
+
+     sidebars list one
+     sections form detail, jscript myscript
+
+     list one
+        caption "Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=poreqdetailapprovalcpo&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=poreqdetail.zid and xitem=poreqdetail.xitem)),xunitpur,xpmqty,xcpoqty
+
+
+        headers "Line No","Item","Description","Unit","Qty Req","Qty Approved"
+     end list
+
+
+     form detail
+        caption "Requisition Detail For: "+xporeqnum+"<br>"+xsup+" "+casup.xorg("xsup='"+xsup+"'")
+        table poreqdetail
+	  primarykey xporeqnum,xrow
+        order xporeqnum,xrow
+        fixed xporeqnum
+        return "login"
+        layout 2
+        pstyle 3
+        objects Update,Show,Clear,*next, Return,Top, Previous, Next, Bottom,~// Add,Delete,
+                xrow attrib(row 0 1),xdatereq,~
+                xitem,xdesc,xqtyreq display(hide),xepqty display(hide),xpmqty display(const),~
+				xcpoqty,xunitpur display(const),xnote,xrate display(hide),~
+                xpaymentterm display(hide),xqtyord display(hide),~
+				xgmdfqty display(hide),xedqty display(hide),xqtyapv display(hide)
+           
+        field xitem
+        	pick list xitem
+        end field
+	
+		field xdatereq
+			default #date
+			  	caption Required Date
+        end field
+		
+		field xpmqty
+		caption Qty Required
+		end field
+
+        field xdum
+        	attrib local
+        	display const
+        	caption 
+        end field
+        
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+        
+  //       field xcfpur
+  //      	attrib local
+  //      	display const
+  //      	caption Pack Size
+  //      	event after
+  //      		set xcfpur=caitem.xcfpur("xitem='"+xitem+"'")
+  //      	end event
+  //      end field
+        
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+
+        field add
+          event before
+		if xqtyreq < 0
+			error "Cannot Proceed -- Qty is Negetive"
+		
+		end if
+
+          	//if poreqheader.xwh("xporeqnum='"+xporeqnum+"'") .eq. ""
+	        //  	set wh = caitem.xwh("xitem='"+xitem+"'")
+	        //  	print "bingo"+wh  
+          	//	set temp =  #sql("update poreqheader set xwh='"+wh+"' where xporeqnum='"+xporeqnum+"'")
+          	//end if
+			
+          	if caitem.xstype("xitem='"+xitem+"'") .ne. "Stock-N-Sell"
+          		error "Cannot Proceed -- Please Choose Right Type of Item"
+          	end if
+            set xunitpur = caitem.xunit("xitem='"+xitem+"'")
+            set xrate = caitem.xrate("xitem='"+xitem+"'")
+		set xavail = imstock.xavail("xitem='"+xitem+"'")
+		//print xavail
+         //   set xqtyapv=xqtyreq
+            set xpaymentterm = "Credit"
+          end event
+          event after
+          end event
+
+        end field
+
+        field update
+          event before
+		if xcpoqty < 0
+			error "Cannot Proceed -- Qty is Negetive"
+		else if xcpoqty>xpmqty
+		error "Cannot Proceed -- Qty Exceed"
+		end if
+            set xunitpur = caitem.xunit("xitem='"+xitem+"'")
+            set xrate = caitem.xrate("xitem='"+xitem+"'")
+			set xavail = imstock.xavail("xitem='"+xitem+"'")
+			set xgmdfqty=xcpoqty
+			set xedqty=xcpoqty
+			 set xqtyapv=xcpoqty
+            set xpaymentterm = "Credit"
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "poreqheaderapprovalcpo"
+            form.searchbutton.value = "Find xporeqnum=?"
+          }
+          return result
+        }
+
+        </script>
+     end jscript
+
+
+end screen

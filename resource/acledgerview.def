@@ -1,0 +1,22 @@
+
+product ZAB ERP 
+
+table acledgerview
+  caption "Ac Bal View"
+  columns zid,xacc,xsub,xyear,xprime,xacctype,xwh,xhwh
+  primary key zid,xacc,xsub,xyear
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view acledgerview (zid, xvoucher,xrow,xacc,xprime,xlong,xref,xdate,xyear,xper,xsub,xwh,xhwh,xdeptname,xdeptcode,xnote,xinvnum,xtype,xlcno,xhlong,~
+		   xdebit,xcredit,xoldsub,xoldsubdesc,xaccusage,xaccold,xgrnnum,xdatechq,xchequeno,xfileref,xstaff,xcountry,xregi,xfairexp,xaccolddesc,xoldvoucher,xproject,xstatusjv) ~
+                  as select zid, xvoucher,xrow,xacc,xprime,xlong,xref,xdate,xyear,xper,xsub,xwh,xhwh,xdeptname,xdeptcode,xnote,xinvnum,xtype,xlcno,xhlong,~
+				  xdebit,xcredit,xoldsub,xoldsubdesc,xaccusage,xaccold,xgrnnum,xdatechq,xchequeno,xfileref,xstaff,xcountry,xregi,xfairexp,xaccolddesc,xoldvoucher,xproject,'Posted' ~
+				  from acbal ~
+				  union all ~
+				  select d.zid, d.xvoucher,d.xrow,d.xacc,d.xprime,d.xlong,h.xref,h.xdate,h.xyear,h.xper,d.xsub,d.xwh, left(CASE WHEN isnull(d.xwh,'') = '' then h.xwh else isnull(d.xwh,'') END,2),d.xdeptname,'',h.xnote,h.xinvnum,h.xtype,h.xlcno,h.xlong,~
+				  d.xdebit,d.xcredit,d.xoldsub,d.xoldsubdesc,d.xaccusage,d.xaccold,h.xgrnnum,h.xdatechq,h.xchequeno,h.xfileref,d.xstaff,d.xcountry,d.xregi,d.xfairexp,d.xaccolddesc,h.xoldvoucher,h.xproject,'Balanced' ~
+				  from acdetail d join acheader h on h.zid = d.zid and h.xvoucher = d.xvoucher	and h.xstatusjv ='Balanced'		  
+
+end table

@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table imtdet
+  caption "Tag Detail"
+  columns ztime,zutime,zid,zauserid,zuuserid,~
+  xtagnum,xrow,xitem,xqty,xwh,xstatustag,xserial
+
+  primary key zid,xtagnum,xrow
+  foreign key
+        zid references zbusiness.zid
+        zid,xtagnum references imtag.zid,xtagnum
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+end table

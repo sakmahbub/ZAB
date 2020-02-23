@@ -1,0 +1,9 @@
+//AR Codes & Parameter.menu
+//---------------------------------------------------------------------------------------
+option                  |action                                          |modules|models
+//---------------------------------------------------------------------------------------
+AR Transaction Code              |#classPath+"/login?screen=xtrn(xtypetrn=AR Transactions)"
+Related Transaction Codes        |#classPath+"/login?screen=xtrnp(xtypetrn=AR Transactions)"
+GL Interface                     |#classPath+"/login?screen=artogli"
+//-------------------------------------------------------------------
+

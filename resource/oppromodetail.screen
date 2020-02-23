@@ -1,0 +1,64 @@
+screen oppromodetail
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Detail List : "+xpromono
+        table oppromodetail
+        order xpromono,xrow
+        fixed xpromono
+        rows 20
+        objects  xrow attrib(link "login?screen=oppromodetail&command=Show&xpromono=?&xrow=?"), ~
+                xminqty,xmaxqty,xaward
+
+     end list
+
+
+     form one
+        caption "Promotion Detail : "+xpromono
+	      table oppromodetail
+        order xpromono,xrow
+        fixed xpromono
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Update, Delete,*next,Return,Top,Next,Previous,Bottom,"<p>" ,~
+          xrow attrib(row 0 1),xdum display(const),xminqty,xmaxqty,xaward,xnote
+
+		field xdum
+		caption
+		attrib local
+		end field
+		  
+		  
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "oppromoheader"
+            form.searchbutton.value = "Find xpromono=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

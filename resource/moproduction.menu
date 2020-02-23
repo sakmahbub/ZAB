@@ -1,0 +1,9 @@
+moproduction.menu
+//-------------------------------------------------------------------
+option                           |action                                        |modules|models|width
+//-------------------------------------------------------------------
+//Production Planning	            |#classPath+"/login?screen=moheader"
+Start Process                    |#classPath+"/login?screen=mostartprocess"
+Daily Production Transaction     |#classPath+"/login?screen=modailyprdn"
+//Finished Goods Issue             |#classPath+"/login?screen=mofingoodsissueheader"
+//-------------------------------------------------------------------

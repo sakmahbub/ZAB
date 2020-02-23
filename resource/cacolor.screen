@@ -1,0 +1,127 @@
+screen cacolor 
+
+     sections form detail,jscript myscript
+     sidebar list item,list one
+	
+	  list itemtt
+        caption "Color List"
+        table cacolor
+        order xcolorcode desc
+		
+        rows 200
+       objects  xcolorcode attrib(link "login?screen=cacolor&command=Show&xcolorcode=?"), ~
+         xcolor,xcolorcat,xcolorsubcat,xlong,zactive
+     end list
+	 
+	  list one
+        caption "Color Detail List For "+xcolorcode
+        table cacolordetail
+        order xcolorcode,xbcolor
+        fixed xcolorcode
+		
+        rows 250
+        objects  xbcolor,~ //attrib(link "login?screen=cacolordetail&command=Show&xcolorcode=?&xbcolor=?"), ~
+		xnote
+        
+     end list
+
+	 
+     form detail
+        caption "Color Master"
+        table cacolor       
+        order xcolorcode        
+        return "login"
+        layout 1
+        pstyle 3
+        objects Show,Clear,*next,*next,*next,Add,Update,Delete,*next,*next,*next,Top,Next,Previous, Bottom,Detail,"</b></font><p>" ,~
+                xcolorcode,xcolor display(hide),xcolorcat,xcolorsubcat,xcolortype,xcolorfmate,zapproved display(hide),xlong
+		
+		
+	   
+	   field xcolorcode
+			display text
+				pick list cacolor
+	    event after
+		    set globals(xcolorcode)=xcolorcode
+		end event
+	   end field
+	   
+	   field xcolorfmate
+		pick "Standard,Speical"
+	   end field
+	   
+	   field xcolortype
+		//default "Color"
+		display combo
+	   end field
+	   
+	    
+	   field zactive
+		caption Is Approved?
+	   end field
+	   
+	    
+	   
+	   
+	   field Add
+		event before
+			if xcolorcode .eq. ""
+				error "Please Enter Color Code"	
+			else if xcolortype .eq. ""
+				error "Please Select Color Type"
+			else if xcolorfmate .eq. ""
+				error "Please Select Color Format"			
+			else if xcolorcat .eq. ""
+				//error "Please Select Color Category"
+			else if xcolorsubcat .eq. ""
+				//error "Please Select Color Sub Category"
+			end if
+			
+			//if xcolorcode .eq. "998"
+				//set xcolortype="Black"
+			// else if xcolorcode .eq. "997"
+				//set xcolortype="Off-White"
+			 //else if  xcolorcode .eq. "999"
+				//set xcolortype="White"
+			//else 
+				//set xcolortype="Color"
+			//end if 
+		end event	
+		
+	   end field
+	   
+	   
+	   field Detail
+          embed onclick="clicked(this)"
+        end field
+	   
+
+        embed onsubmit="return submitit(this)"
+
+      
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Detail"){
+            form.screen.value = "cacolordetail"
+            form.searchbutton.value = "Top"
+          }
+          
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

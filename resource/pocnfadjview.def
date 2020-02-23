@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table pocnfadjview
+  caption "poreq View"
+  columns zid,xvoucher,xdate,xyear,xper,xamount
+
+  sql create view pocnfadjview(zid,xporeqnum,xordernum,xdate,xrow,xitem,xdesc,xlineamt) ~
+    as select a.zid,a.xporeqnum,a.xordernum,a.xdate,b.xrow,b.xitem,c.xdesc,b.xadjustment from poreqheader a ~
+	JOIN poreqdetail b ON a.zid=b.zid and a.xporeqnum=b.xporeqnum ~
+	JOIN caitem c ON b.zid=c.zid and b.xitem=c.xitem WHERE left(a.xporeqnum,4)='ADJ-' ~
+	UNION ALL ~
+	select a.zid,a.xporeqnum,a.xordernum,a.xdate,b.xrow,b.xitem,c.xdesc,b.xlineamt from poreqheader a ~
+	JOIN poreqdetail b ON a.zid=b.zid and a.xporeqnum=b.xporeqnum ~
+	JOIN caitem c ON b.zid=c.zid and b.xitem=c.xitem WHERE left(a.xporeqnum,4)='PAY-'
+ end table 

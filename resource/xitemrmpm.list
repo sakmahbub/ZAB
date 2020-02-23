@@ -1,0 +1,11 @@
+     list xitemrmpm
+        caption "Items containing: "+zvalue
+        table caitem
+        order xitem
+        select "((xitem like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%') and xgitem<>'Finished Goods')"
+        rows 30
+        objects xitem attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdesc
+     end list
+
+

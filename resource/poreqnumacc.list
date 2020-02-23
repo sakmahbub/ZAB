@@ -1,0 +1,15 @@
+     list poreqnumacc
+        caption "Transfer Order List"</b>"
+        table poreqprview
+        order xtornum desc
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4) in ('SR--')) and xtype='Cash'"
+		searchselect "left(xtornum,4) in ('SR--') and xtype='Cash'"
+        rows 20
+        objects ~
+         xporeqnum attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+		 xtornum,xdate,xtype,xlong,xregi
+		 
+	header "SR No","PR No","SR Date","Purchase Type","Division","Car/Department"
+     end list
+
+

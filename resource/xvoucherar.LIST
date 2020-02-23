@@ -1,0 +1,15 @@
+     list xvoucherar
+        table arhedarc
+        order xvoucher
+        select "left(xvoucher,2)='MR' and xwh='"+#wh+"'"
+        navigators alpha
+        rows 10
+        objects xvoucher attrib(link "abc" embed onclick="return updateParent(this:'xvoucher')"), ~
+                xcus,xdate
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

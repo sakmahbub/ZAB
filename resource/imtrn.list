@@ -1,0 +1,14 @@
+list imtrn
+        caption "Search Results for Doc No : "+zvalue
+        table imtrn
+        order ximtrnnum
+        select "ximtrnnum like '%"+zvalue+"%' and left(ximtrnnum,2)='RE'"
+        searchselect "left(ximtrnnum,2)='RE'"
+		rows 15
+
+        objects  ximtrnnum attrib(link "abc" embed onclick="return updateParent(this:'');return false"),~
+                 xdate,xqty
+
+     end list
+
+

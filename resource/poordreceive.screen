@@ -1,0 +1,43 @@
+screen poordreceive
+     caption "Receiving Detail"
+     sections form one,jscript myscript
+
+     form one
+        caption "R<ACRONYM>eceiving</ACRONYM> D<ACRONYM>etail</ACRONYM>"
+	      table poordheader
+        fixed xpornum
+        order xpornum
+        //select
+        return "login"
+        layout 2
+        pstyle
+        objects Return,Clear,Update,"<p>" ,~
+          xdatedel,xmrrno,xdatemrr,xblno,xbldate,xvessel,xcontroller,xpackweightgross,xpackweightnet
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	      if (detail=="Return"){
+            form.screen.value = "poordheader"
+            form.searchbutton.value = "Find xpornum=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

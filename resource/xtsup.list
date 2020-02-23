@@ -1,0 +1,11 @@
+     list xtsup
+        table casup
+        order xsup
+        select "(xsup like '%"+zvalue+"%' or xorg like '%"+zvalue+"%')"
+        navigators alpha
+        rows 10
+        objects xsup attrib(link "abc" embed onclick="return updateParent(this:'xtsup')"), ~
+                xorg
+     end list
+
+

@@ -1,0 +1,23 @@
+
+
+
+product ZAB ERP
+
+table polistview
+  caption "PO List View"
+  columns zid,xpornum,xdate,xtype,xporeqnum,xtornum,xwh,xlong,xregi,xpreparer,xcus,xorg
+  primary zid,xpornum,xdate,xtype,xporeqnum,xtornum,xwh,xlong,xregi,xpreparer,xcus,xorg
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view polistview (zid,xpornum,xdate,xtype,xporeqnum,xtornum,xwh,xlong,xregi,xpreparer,xcus,xorg,xlcno,xname,xstatuspor,xstatus)~
+                  as select a.zid,a.xpornum,a.xdate,a.xtype,a.xporeqnum,c.xtornum,b.xtwh,~
+					d.xlong,b.xregi,c.zauserid,a.xcus,e.xorg,isnull(a.xlcno,''),p.xname,a.xstatuspor,a.xstatus from  poordheader a ~
+					left join poreqheader b on a.zid=b.zid and a.xporeqnum=b.xporeqnum ~
+					left join imtorheader c on b.zid=c.zid and b.xtornum=c.xtornum ~
+					left join branchview d on b.zid=d.zid and b.xtwh=d.xcode ~
+					left join cacus e on a.zid=e.zid and a.xcus=e.xcus ~
+					left join pdmst p on a.zid = p.zid and a.xpreparer =p.xstaff
+					//where a.xstatus='Approved'
+end table

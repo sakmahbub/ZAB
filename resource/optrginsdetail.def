@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table optrginsdetail
+  caption "Incentive Scheme Detail"
+  columns ztime,zutime,zauserid,zuuserid,zid,xinstrn,xrow,xfpercent,xtpercent,xpoint,xdesc
+          
+         
+          
+  primary key zid,xinstrn,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xinstrn references optrginsheader.zid,xinstrn
+  end foreign key
+end table

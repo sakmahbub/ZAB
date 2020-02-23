@@ -1,0 +1,19 @@
+product ZAB ERP
+
+table aprefallview
+  caption "IM Loan Header View"
+
+  primary key zid,xloannum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view aprefallview(zid,xinvnum,xvoucher,xcus,xorg,xlcno,xgrnnum,xpornum,xtornum,xporeqnum,xsrnum,xprnum) ~
+				as Select a.zid,a.xinvnum,a.xvoucher,a.xcus,c.xorg,a.xlcno,case when left(a.xgrnnum,2)='PO' then '' else a.xgrnnum end, ~
+				case when left(a.xpornum,3)='GRN' then '' else a.xpornum end,p.xtornum, ~
+				p.xporeqnum,po.xtornum,po.xporeqnum from aprefview a ~
+					left join pogrnheader p on a.zid=p.zid and a.xgrnnum=p.xgrnnum ~
+					left join cacus c on a.zid=c.zid and a.xcus=c.xcus ~
+					left join poordheader po on a.zid=po.zid and a.xpornum=po.xpornum
+end table

@@ -1,0 +1,13 @@
+//General Ledger Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Cash/Bank Book                 |#classPath+"/login?screen=*jspcrystal acledcashdailyex(xdiv=Division,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xyear=Year)"
+Date Wise Accounts Ledger      |#classPath+"/login?screen=*jspcrystal acleddailyex(xdiv=Division,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xyear=Year)"
+Date Wise Accounts Ledger (Export in Xls)     |#classPath+"/login?screen=*jspcrystal acleddailyexport(xdiv=Division,xdate=From Date,xdate=To Date,xacc=Account=,xsub=Subaccount,xyear=Year)"
+
+Monthly Account Ledger      |#classPath+"/login?screen=*jspcrystal acledmex(xdiv=Division,xyear=Year=,xper=Period=,xacc=Account=,xsub=Subaccount)"
+Annual Ledger       |#classPath+"/login?screen=*jspcrystal acledasubex(xdiv=Division,xyear=Year=,xper=Period=,xacc=Account=,xsub=Subaccount)"
+
+
+

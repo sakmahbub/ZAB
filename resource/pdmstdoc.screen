@@ -1,0 +1,179 @@
+screen pdmstdoc
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table pdmst
+        order xstaff,xname
+        select "xempcategory='Doctor'"
+        navigators alpha
+        rows 20
+        objects xstaff attrib(link "login?screen=pdmstdoc&command=Show&xstaff=?"),xname, xrank,~
+        xdeptname,xempcategory
+
+     end list
+
+     form one
+        caption "P<ACRONYM>ersonnel</ACRONYM> I<ACRONYM>nfo</ACRONYM>"
+        table pdmst
+        order xstaff//,xname,xrank
+        select "xempcategory='Doctor'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update, Delete, *next,Top, Previous, Next, Bottom,"<p>" ,~
+                xstaff,xname attrib(search),xmadd,xvisitinghour,xrank,xdeptname,~
+		            
+                
+                xjoinyearperdate display(hide),~
+                xendyearperdate display(hide),xempcategory display(hide),//,xtype
+
+        field xtype
+          pick "Doctor,Staff"
+        end field
+
+        field xrank
+          caption Status
+          display combo
+          pick select xcode from xcodes where xtype='Rank'
+        end field
+
+       field xempstatus
+      		caption Service Status
+		      default "Normal"
+      		pick "Normal,Closed,On Hold"
+       end field
+
+       field xempcategory
+    		caption Location
+       end field
+
+       field xmadd
+    		width 20
+    	end field
+
+        field xenddate
+          default "2030-12-31"
+        end field
+
+        field xgrade
+          display combo
+          pick select xgrade from pdgrade
+        end field
+
+        field Search
+          event before
+            class picase(PDSearch())
+          end event
+        end field
+
+        field xstaff
+          event after
+            set globals(xstaff)=xstaff
+          end event
+        end field
+
+        field add
+          event before
+            set xempcategory = "Doctor"
+            set jyear = #sub(xdatejoin,0,4)
+            set jper = #sub(xdatejoin,5,2)
+            set jday = #sub(xdatejoin,8,2)
+            set xjoinyearperdate = jyear+jper+jday
+
+            set eyear = #sub(xenddate,0,4)
+            set eper = #sub(xenddate,5,2)
+            set eday = #sub(xenddate,8,2)
+            set xendyearperdate = eyear+eper+eday
+          end event
+          event after
+            class pd(UpdateSubAccount{128001,134002,xstaff,xname})
+          end event
+        end field
+
+
+        field update
+          event before
+		        set jyear = #sub(xdatejoin,0,4)
+            set jper = #sub(xdatejoin,5,2)
+            set jday = #sub(xdatejoin,8,2)
+            set xjoinyearperdate = jyear+jper+jday
+
+            set eyear = #sub(xenddate,0,4)
+            set eper = #sub(xenddate,5,2)
+            set eday = #sub(xenddate,8,2)
+            set xendyearperdate = eyear+eper+eday
+          end event
+        end field
+
+
+
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail="clicked"
+        }
+        function service(b){
+          detail="service"
+        }
+        function education(b){
+          detail="education"
+        }
+        function training(b){
+          detail="training"
+        }
+        function payment(b){
+          detail="payment"
+        }
+        function submitit(form){
+
+	    if (detail=="payment"){
+            form.screen.value = "pdmstpay"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="training"){
+            form.screen.value = "pdtrain"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="education"){
+            form.screen.value = "pdedu"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+	    if (detail=="service"){
+            form.screen.value = "pdservice"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        function pickAccount(link,name,rank){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xstaff.value=link.innerText
+            document.one.xname.value=name.innerText
+            document.one.xrank.value=rank.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

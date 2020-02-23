@@ -1,0 +1,500 @@
+screen poadvadjheaderapp
+	
+     sidebars list reqlist,list one,list reqapp
+     sections form one, jscript myscript
+	 
+    list reqlist
+      caption "Adjustment List"
+         table poreqheader
+        order xporeqnum desc
+		select "(xsuperiorsp='"+#position+"' or xsuperior2='"+#position+"' or xsuperior3='"+#position+"') ~
+		and '"+#position+"'<>'' and xtype='Cash' and left(xporeqnum,4) in ('PADJ') and xstatusreq<>''"
+		rows 10
+        objects  xporeqnum attrib(link "login?screen=poadvadjheaderapp&command=Show&xporeqnum=?"), xdate,xadvnum,xprime
+               
+		  headers "Adjustment No","Date","PR No","Advance Amount"
+	end list
+	
+	  list reqapp
+        caption "Last 5 Approved Adjustment"
+        table poreqappview
+	    order xrow
+		select "xposition='"+#position+"' and left(xporeqnum,4) in ('PADJ')"//and xtype='Cash'
+		rows 5
+       objects xporeqnum attrib(link "abc" embed onclick="return pickItem(this)"),~
+	    xdate attrib(name xdate#),xdesc attrib(name xdesc#),xdateapp attrib(name xdateapp#),xrow attrib(name xrow#)
+       headers "PADJ No","Date","Division","Approved Date","Row"
+     end list
+	  
+ list one
+       caption "Adjustment Detail List."
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=poadvadjdetail&command=Show&xporeqnum=?&xrow=?"), ~
+                 xgrnnum,xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xlineamt
+
+		headers "Line No","GRN No","Item","Description","Line Amount"
+		totals "","Total","","",sum
+     end list
+
+
+     form one
+		caption "Cash Purchase Advance Adjustment Approval"
+        table poreqheader
+        order xporeqnum desc
+        select "left(xporeqnum,4)='PADJ'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects	Add,Update,Delete,*Next,*Next,*Next,Show,Clear,*Next,*Next,*Next,~
+				Top,Next,Previous,Bottom,*next,Approve,Reject,"<p>",~
+                xporeqnum,xdate display(const),xsup display(hide),xorg display(hide),~
+				xqotnum display(hide),xfwh display(const),xfbrname,xtwh display(hide),~
+				xtype display(hide),xstatusreq display(const),~
+				xadvnum display(const),xstaff,sname,tornum,xprime display(const),xnote display(const),~
+				xstatus display(hide),xstatusap display(hide),xstatusgl display(hide),xcus display(hide),~
+				xsuperiorsp display(hide),xsuperior2 display(hide),xsuperior3 display(hide),~
+				xnote1,xpkey display(hide) attrib(local),~
+				signatorysec display(const),,,~
+				xpreparer display(hide),preparer display(const),~		
+				xsignatory1 display(hide),signatory1  display(const),~
+				xsignatory2 display(hide),signatory2 display(const),~
+				xsignatory3 display(hide),signatory3 display(const),~
+				xsignatory4 display(hide),signatory4 display(const),~
+				xsignatory5 display(hide),signatory5 display(const),~
+				xsignreject display(hide),signreject display(const)
+				
+//----------------Declare Local Field--------------------
+		field xdate
+		attrib local
+		  event after
+		  set xdate=#sql("select xdate from poreqheader where xporeqnum='"+xporeqnum+"'")
+		  end event
+		end field
+
+		field xfwh
+		  attrib local
+		  event after
+		  set xfwh=poreqheader.xfwh("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xtype
+		  attrib local
+		  event after
+		  set xtype=poreqheader.xtype("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xnote
+		  attrib local
+		  event after
+		  set xnote=poreqheader.xnote("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xstatusreq
+		  attrib local
+		  event before
+		  set xstatusreq=poreqheader.xstatusreq("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xprime
+		  attrib local
+		   caption PR Advance Amount
+		  event after
+		  set xprime=poreqheader.xprime("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+
+		field xadvnum
+		  caption PR No
+		  attrib local
+		  event after
+		  set xadvnum=poreqheader.xadvnum("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field	
+
+		field xstaff
+		  display const
+		  caption Employee ID
+		  attrib local
+		  event after
+		  set xstaff=poreqheader.xstaff("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field		
+
+		field xpreparer
+		  attrib local
+		  event after
+		  set xpreparer=poreqheader.xpreparer("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xsignatory1
+		  attrib local
+		  event after
+		  set xsignatory1=poreqheader.xsignatory1("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xsignatory2
+		  attrib local
+		  event after
+		  set xsignatory2=poreqheader.xsignatory2("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xsignatory3
+		  attrib local
+		  event after
+		  set xsignatory3=poreqheader.xsignatory3("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xsignatory4
+		  attrib local
+		  event after
+		  set xsignatory4=poreqheader.xsignatory4("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xsignatory5
+		  attrib local
+		  event after
+		  set xsignatory5=poreqheader.xsignatory5("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xsignreject
+		  attrib local
+		  event after
+		  set xsignreject=poreqheader.xsignreject("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+		field xtwh
+		  attrib local
+		  event after
+		  set xtwh=poreqheader.xtwh("xporeqnum='"+xporeqnum+"'")
+		  end event
+        end field
+		
+//--------------End ------------------------
+  
+		  field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+		  
+		   field sname
+            attrib local
+            display const
+            caption Name
+            event after
+              set sname= pdmst.xname("xstaff= '"+xstaff+"'")
+            end event
+          end field
+		  
+		field signatorysec
+		attrib local
+		caption <span class=sheader style="	BACKGROUND:#0480ba;	PADDING-BOTTOM: 5px;PADDING-LEFT: 10px; PADDING-RIGHT: 50px; 	PADDING-TOP: 2px;">Signatories</span>
+		display const
+		//column 2
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field signatory1
+          caption pick,"select xsignatory1 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory1=pdmst.xname("xstaff='"+xsignatory1+"'")
+		  end event
+        end field
+		
+		field signatory2
+          caption pick,"select xsignatory2 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory2=pdmst.xname("xstaff='"+xsignatory2+"'")
+		  end event
+        end field
+		
+		
+		field signatory3
+          caption pick,"select xsignatory3 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory3=pdmst.xname("xstaff='"+xsignatory3+"'")
+		  end event
+        end field
+		
+		field signatory4
+          caption pick,"select xsignatory4 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory4=pdmst.xname("xstaff='"+xsignatory4+"'")
+		  end event
+        end field
+		
+		field signatory5
+          caption pick,"select xsignatory5 from pdsignatoryrpt where xtypetrn='PAF Approval'"
+		  attrib local
+		  event after
+		  set signatory5=pdmst.xname("xstaff='"+xsignatory5+"'")
+		  end event
+        end field
+		
+		field signreject
+          caption Reject Signatory
+		  attrib local
+		  event after
+		  set signreject=pdmst.xname("xstaff='"+xsignreject+"'")
+		  end event
+        end field
+		  
+		   field xdum
+            attrib local
+            caption
+          end field
+		  
+	    field pornum
+        attrib local
+		display const
+		caption PO / WO No
+        event after
+		set pornum=poordheader.xpornum("xporeqnum='"+xadvnum+"'")
+	    end event
+        end field
+		
+		field poreqnum
+        attrib local
+		display const
+		caption PR / JN No
+        event after
+		set poreqnum=pogrnheader.xporeqnum("xgrnnum='"+xgrnnum+"'")
+	    end event
+        end field
+		
+		field tornum
+        attrib local
+		display const
+		caption SR / WR No
+        event after
+		set tornum=poreqheader.xtornum("xporeqnum='"+xadvnum+"'")
+	    end event
+        end field
+		
+		   field xordernum
+            event before
+             //set xordernum=poreqheader.xordernum("xporeqnum='"+xadvnum+"'")
+			 set xcus=poreqheader.xcus("xordernum='"+xordernum+"'")
+			 // set xstaff=poreqheader.xstaff("xporeqnum='"+xadvnum+"'")
+            end event
+          end field
+			
+ 	   field xgrnnum
+		caption GRN / QC No
+		pick list xgrnnumcash
+	  end field
+		  
+ 
+	field xnote1
+      caption Reject Note
+		  width 50
+		  height 2
+		  column 1
+    end field
+		  
+		   field xregi
+           caption Car No. / Other
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+		  
+		field show
+		event after
+          set xpkey=xporeqnum
+		  end event
+        end field
+
+        field xporeqnum
+		caption Adjustment Number
+		pick list padjnum
+        	width 15
+          event after
+		  class careports(getReport{poadvadj;2;in,st;zid,poreqnum;xporeqnum;View Adjustment Form})
+            set globals(xporeqnum)=xporeqnum
+			 set globals(xgrnnum)=xgrnnum
+			 set globals(xstaff)=xstaff
+			 set globals(xsuperiorsp)=xsuperiorsp
+			  set globals(xstatusreq)=xstatusreq
+		    if poreqheader.xstatusreq("xporeqnum='"+xporeqnum+"'") .eq. "" .or. #position .eq. ""
+			   set #field(Update.attrib) = "disabled"
+			    set #field(Approve.display) = "hidden"
+				set #field(Reject.display) = "hidden"
+			end if  
+			
+		   if xsuperiorsp .ne. #position .and. xsuperior2 .ne. #position .and. xsuperior3 .ne. #position
+			   set #field(Update.attrib) = "disabled"
+			    set #field(Approve.display) = "hidden"
+				set #field(Reject.display) = "hidden"
+			end if
+			set #field(Add.attrib) = "disabled"
+			set #field(Delete.attrib) = "disabled"
+          end event
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Plant/Store Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Plant/Store Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	   	field Approve
+            event before
+			if poreqheader.xstatusreq("xporeqnum='"+xporeqnum+"'") .eq. "Approved"
+				error "Cannot Proceed-- Already Approved!"
+			else if xsuperiorsp .ne. #position .and. xsuperior2 .ne. #position .and. xsuperior3 .ne. #position
+				error "Superior doesn't match!"
+			else if  #position .eq. ""
+				error "Superior doesn't match!"
+			end if
+            end event
+            event after
+			set temp = #spsql(zabsp_apvprcs,#id,#user,#position,xporeqnum,0,xstatusreq,"Adjustment Approval")
+			 //set temp = #spsql(zabsp_sendmail,#id,#user,xporeqnum,"CPO","PADJ")
+	         action show
+            end event
+          end field
+		  
+		   field Reject
+            event before
+			set status=poreqheader.xstatusreq("xporeqnum='"+xporeqnum+"'")
+			if status .eq. "Open" .or. status .eq. "Approved"
+				error "Cash Advance Request can not be reject!"
+			else if poreqheader.xnote1("xporeqnum='"+xporeqnum+"'") .eq. ""
+				error "Please Write Reject Note!"
+			end if
+		   end event
+		   event after
+		   set temp =  #spsql(zabsp_Reject_Request,#id,#user,#position,0,xporeqnum,"Cash Adjustment")
+		   action show
+		   end event
+          end field
+		
+		
+		field update
+			event before
+			set advnum=#sql("select xadvnum from poreqheader where xadvnum='"+xadvnum+"'")
+			set prjnno=#sql("select xporeqnum from poreqheader where xporeqnum='"+xadvnum+"'")
+			if xpkey .ne. xporeqnum
+				error "Please press show first!"
+			else if xadvnum .eq. ""
+				error "Please Show first"
+			else if xadvnum .eq. ""
+				error "Please Select PR / JN No."
+			//else if xadvnum .eq. advnum 
+			//error "PR/JN already added as adjustment"
+			else if prjnno .ne. xadvnum 
+			error "Only PR/JN consider as adjustment"
+			else if poreqheader.xsuperiorsp("xporeqnum='"+xporeqnum+"'") .ne. #position .and. poreqheader.xsuperior2("xporeqnum='"+xporeqnum+"'") .ne. #position .and. poreqheader.xsuperior3("xporeqnum='"+xporeqnum+"'") .ne. #position
+				error "You do not have permission to update!" 
+			else if #position .eq. ""
+				error "You do not have permission to update!" 
+			end if
+			
+			set xprime=#sql("select sum(xlineamt) from poreqdetail WHERE xporeqnum='"+xadvnum+"'")
+			set xtwh=xfwh
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+		
+	 field Approve
+          embed onclick="clicked(this)"
+     end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poadvadjdetail"
+            form.searchbutton.value = "Top"
+          }
+		 if (button=="Approve"){
+           if(confirm('Are You Confirm ?')){
+			form.searchbutton.value = "Approve"
+			}else{
+			form.searchbutton.value = "Show"
+			}
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

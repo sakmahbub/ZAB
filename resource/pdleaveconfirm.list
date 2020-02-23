@@ -1,0 +1,14 @@
+     list pdleaveconfirm
+        table pdleaveheader
+        order xyearperdate desc
+        select "(xyearperdate like '%"+zvalue+"%' or xstaff like '%"+zvalue+"%') and xstatus='Confirmed'"
+        searchselect "xstatus='Confirmed'"
+ 		rows 20
+        objects xyearperdate attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xstaff,xtypeleave,xdatefrom,xdateto,xstatus
+				
+		headers "Application SL No","Eployee ID","Leave Type","From Data","To Date","Status"		
+	
+     end list
+
+

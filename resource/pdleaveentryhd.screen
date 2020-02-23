@@ -1,0 +1,164 @@
+screen pdleaveentryhd
+  caption "Leave Enter By HRD"
+  sidebar list trn, list trn1
+  sections form one,jscript myscript
+
+  list useleave
+    caption "Used & Available Leave"
+    table pdleaveasigne
+    order xstaff,xyear,xtypeleave
+    fixed xstaff,xyear	
+    rows 20
+    objects  xtypeleave,xavailable,xused,xbalance
+    header "Leave Type","Available Leave","Used Leave","Balance Leave"
+    totals "Total",sum,sum,sum
+  end list
+
+  list trn
+    caption "Availed Leave Detail"
+    table pdleaveheader
+    order xstaff,xyearperdate desc
+    fixed xstaff
+    //select "xstaff='"+xstaff+"' and xyear="+xyear
+    rows 100
+    objects  xyearperdate attrib(link "login?screen=pdleaveentrydt&command=Show&xstaff=?&xyearperdate=?"),~
+       xdate,xtypeleave,xdatefrom,xdateto,xday,xhour,xstatus
+
+    header "Auto ID","Apply Date","Type Of Leave","From Date","To Date","No Of Day","Hour","Status"
+    totals "","","Total","","",sum
+  end list
+
+  list trn1
+    caption "Leave Detail "+xstaff+" "+xyearperdate
+    table pdleavedetail
+    order xyearperdate,xstaff
+    fixed xstaff
+    //select "xstaff='"+xstaff+"'"
+    rows 20
+    objects xdate,xtypeleave
+    header "Date","Leave Type"
+  end list
+
+  form one
+    caption "Leave Application Entry Header"
+    table pdleaveheader
+    primarykey xyearperdate,xstaff
+    order xstaff
+    select "xstaff='"+xstaff+"' and xyear="+xyear
+    return "login"
+    layout 2
+    pstyle 3
+
+    objects Add,Show,Detail,Clear,Delete,~ //,*next,Top,Next,Previous,Bottom,*next,Confirm Leave,~,Show,Clear,Update,Delete
+    xstaff,xname,xdate,xyear display(const),xyesno display(const),xstatus display(const),~
+    xyearperdate attrib(row 0 1) display(hide),xdaydeduct display(hide),xhourdeduct display(hide)
+
+    field show
+      event before
+        set xstaff=xstaff
+      end event
+    end field
+
+    field xname
+      attrib local
+      display const
+      event after
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+      end event
+    end field
+
+    field xyesno
+      caption Include Holliday
+      default "Yes"
+    end field
+
+    field xstatus
+      default "Approved"
+      event after
+        if xstatus .ne. "Approved"
+          //set #field(add.display)="hidden"
+          set #field(update.display)="hidden"
+          set #field(delete.display)="hidden"
+          set #field(confirm.display)="hidden"
+        end if
+      end event
+    end field
+
+    field xdate
+      caption Application Date
+      event before
+        //int xslno
+        set year = #sub(xdate,0,4)
+        set per = #sub(xdate,5,2)
+        set day = #sub(xdate,8,2)
+        //set xyearperdate = year+per+day
+        set xyear=year
+      end event
+      event after
+        set globals(xyearperdate)=xyearperdate
+        set globals(xstaff)=xstaff
+        set globals(xyear)=xyear
+      end event
+    end field
+
+    field Confirm
+      event after
+        set temp = #sql("update pdleaveheader set xstatus = 'Confirmed' where xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'")
+        action show
+      end event
+    end field
+
+    field add
+      event before
+        set xstatus="Approved"
+        set xdaydeduct=1
+        set xhourdeduct=24
+        set temp=#sql("select xempstatus from pdmst where xstaff='"+xstaff+"' and xempstatus='Normal'")
+        if #result .ne. "true"
+          error "Cannot add this staff cause of resigned"
+        end if
+      end event
+    end field
+
+    field update
+      event before
+        int totday = 0	
+        int avleave = 0
+        set avleave = #sql("select xavailable from pdleaveusedview where xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"' and xyear="+xyear)
+        set totday = #sesql("select datediff(day,'"+xdatefrom+"','"+xdateto+"')")
+        set totday=totday+1
+        if totday > avleave
+          error "Cannot Proceed--Applied leave greater then available leave"
+        end if
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field Detail
+      embed onclick="clicked(this)"
+    end field
+  
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+      var detail
+
+      function clicked(b)
+      {
+        detail=b.value
+      }
+      function submitit(form)
+      {
+        if (detail=="Detail")
+        {
+          form.screen.value = "pdleaveentrydt"
+          form.searchbutton.value = "Find xyearperdate=?&xstaff=?"
+          //return false
+        }
+      }
+      </script>
+  end jscript
+
+end screen

@@ -1,0 +1,10 @@
+//logs.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Error Logs                       |#classPath+"/login?screen=zlogs"
+Audit trail Report             |#classPath+"/login?screen=*viewcrystal audittrail(6;in,dt,dt,st,st,st;zid,fdate,tdate,command,firstpar,user;xdate=From Date=#date,xdate=To Date=#date,xbutton=Button,xref=Topic,zemail=User ID,xviewtype=Report View)"
+//History Logs                     |#classPath+"/login?screen=zhistory"
+
+//-------------------------------------------------------------------
+

@@ -1,0 +1,19 @@
+
+product ERP on the Net
+
+table faglview
+  caption "FA To GL View"
+  columns zid,xvoucher,xaction,xcode,xcat,xyear,xper,xcur,xexch,xdiv,xsec,xproj,xprime
+  primary key zid,xgcus,xvoucher
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view faglview (zid,xvoucher,xaction,xcode,xcat,xyear,xper,xcur,xexch,xdiv,xsec,xproj,xprime)~
+                  as select zid,xvoucher,substring(fatrn.xvoucher,1,4),~
+                  xcode,(select famst.xcat from famst where famst.xcode=fatrn.xcode and famst.zid=fatrn.zid),~
+                  xyear,xper,xcur,xexch,(select famst.xdiv from famst where famst.xcode=fatrn.xcode and famst.zid=fatrn.zid),~
+                  (select famst.xsec from famst where famst.xcode=fatrn.xcode and famst.zid=fatrn.zid),(select famst.xproj from famst where famst.xcode=fatrn.xcode and famst.zid=fatrn.zid),~
+                  xprime from fatrn where fatrn.xdesc='Transactions'
+
+end table

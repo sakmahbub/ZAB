@@ -1,0 +1,11 @@
+     list xitemrbb
+        caption "Items containing: "+zvalue
+        table caitem
+        order xitem
+        select "((xitem like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%') and xcitem='RBB')"
+        rows 10
+        objects xitem attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdesc
+     end list
+
+

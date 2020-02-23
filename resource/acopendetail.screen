@@ -1,0 +1,175 @@
+screen acopendetail
+     sidebar list one,list two
+     sections form one,  jscript myscript
+
+
+     list one
+        caption "Detail List"
+        table acdetail
+        order xvoucher,xrow
+        fixed xvoucher
+        rows 20
+        objects  xrow attrib(link "login?screen=acopendetail&command=Show&xvoucher=?&xrow=?"), ~
+                xacc, xprime
+
+        totals "","Totals",sum
+
+     end list
+
+     list two
+        caption "Sub Code"
+        table acsub
+        order xacc,xsub
+    	  select "xacc='"+xacc+"'"
+        rows 20
+        objects  xsub attrib(link "abc" embed onclick="return pickSub(this:xdesc#)"), ~
+                xdesc attrib(name xdesc#)
+
+     end list
+
+     form one
+        caption "<ACRONYM>Details of "+xvoucher+"</ACRONYM>"
+        table acdetail
+        order xvoucher,xrow
+        fixed xvoucher
+        pstyle 3
+        return "login"
+        layout 2
+        objects Return,Clear,Add, Update, Delete,*next,Show, Top, Bottom,~
+               xrow attrib(row 0 10;search),xtempstr1 display(constant),xacc,~
+               xtempstr2 display(constant),~
+               xsub,xdesc,~
+               xprime,xlong,~
+
+               //hide
+               xdiv display(hide),xproj display(hide),xsec display(hide),xbase display(hide)
+
+
+
+        field xdesc
+          width 40
+          attrib local
+          caption Sub Code Description
+          display const
+          event after
+            set xdesc = acsub.xdesc("xacc='"+xacc+"' and xsub='"+xsub+"'")
+          end event
+        end field
+
+        field xtempstr1
+          width 40
+          attrib local
+          caption
+        end field
+
+        field xtempstr2
+          width 40
+          attrib local
+          caption Description
+          event after
+            set xtempstr2=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+        field xlong
+                width 70
+                columns 3
+        end field
+
+        field xbase
+          event after
+          end event
+        end field
+
+        field Add
+          event before
+		set xdiv=acheader.xdiv("xvoucher='"+xvoucher+"'")
+		set xproj=""
+		set xsec=""
+//            if acheader.xstatusjv .eq. "Posted"
+//              error " Voucher posted -- can not add"
+//            end if
+            set account = #sql("select xacc from acmst where xacc='"+xacc+"'")
+            if xacc .ne. account .or. xacc .eq. ""
+              error "Cannot Proceed,Check The Account"
+            end if
+          end event
+          event after
+            class gltrn(acValidateAfterDetail{xvoucher,xrow,xprime,xexch})
+          end event
+        end field
+
+        field Update
+          event before
+		set xdiv=""
+		set xproj=""
+		set xsec=""
+//            if acheader.xstatusjv .eq. "Posted"
+//              error " Voucher posted -- can not Update"
+//            end if
+            set account = #sql("select xacc from acmst where xacc='"+xacc+"'")
+            if xacc .ne. account .or. xacc .eq. ""
+              error "Cannot Proceed,Check The Account"
+            end if
+          end event
+          event after
+            class gltrn(acValidateAfterDetail{xvoucher,xrow,xprime,xexch})
+          end event
+        end field
+
+        field Delete
+          event before
+//            buffer acheader
+//            move acheader=acheader(xvoucher)
+//            if acheader.xstatusjv .eq. "Posted"
+//              error " Voucher posted -- can not Delete"
+//            end if
+          end event
+          event after
+            class gltrn(acValidateAfterDetail{xvoucher,xrow,xprime,xexch})
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "acopenheader"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+              but = ''
+              return result
+        }
+        function pickSub(link,desc){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xproj.value=link.innerText
+            document.one.xdesc.value=desc.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+

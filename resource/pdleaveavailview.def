@@ -1,0 +1,27 @@
+product ZAB ERP
+
+table pdleaveavailview
+  
+  caption "Leave Avail View"
+  columns zid,xstaff,xname,xposition,xdatejoin,xplan,xsid,xtypeleave,xday,xrate,xcurday,xdate,xavailm,xavail
+
+  //primary key zid,xstaff,xname,xposition,xdatejoin,xplan
+
+  foreign key
+    zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdleaveavailview (zid,xstaff,xname,xposition,xdatejoin,xplan,xsid,xtypeleave,xday,xrate,xcurday,xdate,xavailm,xavail)~
+                  as Select p.zid,p.xstaff,p.xname,p.xposition,p.xdatejoin,p.xplan,p.xsid,pl.xtypeleave,pl.xday,CAST(pl.xday as decimal(20,2))/12,MONTH(GETDATE()) ~
+,CASE WHEN YEAR(CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END)<YEAR(GETDATE()) ~ 
+THEN DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) ELSE (CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END) END ~ 
+,CASE WHEN (MONTH(CASE WHEN YEAR(CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END)<YEAR(GETDATE()) ~ 
+THEN DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) ELSE (CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END) END))=1 THEN MONTH(GETDATE()) ~ 
+ELSE MONTH(GETDATE())+1-(MONTH(CASE WHEN YEAR(CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END)<YEAR(GETDATE()) ~ 
+THEN DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) ELSE (CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END) END)) END ~ 
+,ROUND((CAST(pl.xday as decimal(20,2))/12)*(CASE WHEN (MONTH(CASE WHEN YEAR(CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END)<YEAR(GETDATE()) ~ 
+THEN DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) ELSE (CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END) END))=1 THEN MONTH(GETDATE()) ~ 
+ELSE MONTH(GETDATE())+1-(MONTH(CASE WHEN YEAR(CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END)<YEAR(GETDATE()) ~ 
+THEN DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) ELSE (CASE WHEN DAY(CASE WHEN Year(p.xdatejoin)=YEAR(GETDATE()) THEN p.xdatejoin ELSE DATEADD(yy, DATEDIFF(yy, 0, GETDATE()), 0) END) >15 THEN DATEADD(m,1,p.xdatejoin) ELSE p.xdatejoin END) END)) END),0) ~ 
+from pdmst p join pdlplanedt pl on p.zid=pl.zid and p.xplan=pl.xname
+end table

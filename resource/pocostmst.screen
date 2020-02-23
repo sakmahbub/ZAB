@@ -1,0 +1,82 @@
+screen pocostmst
+     caption "LC Cost Master"
+     sidebar list one
+     sections form one,  jscript myscript
+
+     list one
+        caption "Cost Detail List"
+        table pocostmst
+        order xcostcode
+        //select none
+        //navigators alpha
+        //,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 20
+        objects xcostcode attrib(link "login?screen=pocostmst&command=Show&xcostcode=?"), ~
+                xdesc,xpercent,xacc
+
+
+        headers "Code","Description","Percent","Account"
+     end list
+
+
+     form one
+        caption "LC C<ACRONYM>ost</ACRONYM> M<ACRONYM>aster</ACRONYM>"
+        table pocostmst
+        order xcostcode
+        //select
+        pstyle 3
+        return "login"
+        layout 3
+        objects Add, Update, Delete,Clear,Show, *next,Top, Previous, Next, Bottom,"<p>",~
+                xcostcode,xdesc,xpercent,xacc,xacccr
+
+        embed onsubmit="return submitit(this)"
+
+        field xacc
+          caption Prepaid Account
+        end field
+
+        field xacccr
+          caption Account
+          display text
+          pick list xacc
+        end field
+
+        field xlong
+          width 75
+          column 3
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "poordheader"
+            form.searchbutton.value = "Find xpornum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

@@ -1,0 +1,29 @@
+//MIS Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+------- Sales Reports ---------  | 
+Act. Sales Stmt By Customer Cat. |#classPath+"/login?screen=*ucrystal opactsalesbygcusalltypefm(xyear=Year,xtype=Type)"
+Customer Wise Product Sale       |#classPath+"/login?screen=*ucrystal opactsalesbycusproductalltypefm(xdate=From Date=#date,xdate=To Date=#date,xcus=Customer,xtype=Type)"
+Product Sale By Market           |#classPath+"/login?screen=*ucrystal opmrktvolsale2fm(xdate=From Date=#date,xdate=To Date=#date,xfmarket=From Market,xtmarket=To Market)"
+Sales By PPO (Summary)           |#classPath+"/login?screen=*ucrystal opsalesbyallsrtypefm(xdate=From Date=#date,xdate=To Date=#date,xrptsp=From PPO,xrptsp=To PPO,xtype=Type)"
+Sales By PPO (Detail)            |#classPath+"/login?screen=*ucrystal opsalesbysrdttypefm(xdate=From Date=#date,xdate=To Date=#date,xmiscus=From Customer,xmiscus=To Customer,xrptsp=PPO Code,xtype=Type)"
+Daily Sales Chart By PPO         |#classPath+"/login?screen=*ucrystal opsalqtybyppotypefm(xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+Territory Wise Actual Daily Sales|#classPath+"/login?screen=*ucrystal opfmwisetestnewtype(xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+RSM Wise Daily Sales             |#classPath+"/login?screen=*ucrystal opfmwiseaccsalestype(xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+RSM Wise Product Sale            |#classPath+"/login?screen=*ucrystal opfmwisesaletypefm(xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+Monthly Statement of Return      |#classPath+"/login?screen=*ucrystal opmsalesretstalltypefm(xdate=From Date=#date,xdate=To Date=#date,xreptype=Report Type,xtype=Type)"
+Monthly Stmt of Sales By Product |#classPath+"/login?screen=*ucrystal opsalesbyproducttypersm(xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+//Monthly Stmt of Return By PPO	   |#classPath+"/login?screen=*ucrystal opsrstmtbypporsm(xdate=From Date=#date,xdate=To Date=#date,xcus=From Customer=,xcus=To Customer=zzz,xsp=PPO)"
+Monthly Stmt of Ret. By Product|#classPath+"/login?screen=*ucrystal opreturnbyproducttypefm(xdate=From Date=#date,xdate=To Date=#date,xtype=Type)"
+PPO Wise Target By FM,RSM        |#classPath+"/login?screen=*spucrystal opfmppotrgfm(xyear=Year,xper=Period)"
+Target & Achivement By FM PPO        |#classPath+"/login?screen=*spucrystal optargetfmppo(xyear=Year,xper=Period)"
+Achievement Report               |#classPath+"/login?screen=*spucrystal optrgachvdatersm(xyear=Year,xper=Period,xdate=From Date=#date,xdate=To Date=#date)"
+Flag Wise Product Sale           |#classPath+"/login?screen=*ucrystal opflagbyproductfm(xdate=From Date=#date,xdate=To Date=#date,xproject=Project Flag,xitem=From Item,xitem=To Item=zzz)"
+Flag Wise Customer Qty & Val      |#classPath+"/login?screen=*ucrystal opcusbyprojectfm(xdate=From Date=#date,xdate=To Date=#date,xcus=From Customer=,xcus=To Customer=zzz,xproject=Project Flag)"
+//List of Hold Summary             |#classPath+"/login?screen=*wcrystal opHoldsummary(xdate=From Date=#date,xdate=To Date=#date)"
+//All Transit Product List         |#classPath+"/login?screen=*wcrystal opAlltransit(xdate=From Date=#date,xdate=To Date=#date,xsumnum=From Summary No.,xsumnum=To Summary No.)"
+//Sales by MIO	               |#classPath+"/login?screen=*wcrystal opSalesbyMIO(xdate=From Date=#date,xdate=To Date=#date)"
+
+//-------------------------------------------------------------------
+

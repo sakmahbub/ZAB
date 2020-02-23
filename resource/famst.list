@@ -1,0 +1,17 @@
+     list famst
+        table famst
+        order xcode
+        select "((xstatusfa<>'Disposal') and xcode like '%"+zvalue+"%' or xname like '%"+zvalue+"%')"
+        navigators alpha
+        rows 10
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xname
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

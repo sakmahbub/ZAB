@@ -1,0 +1,80 @@
+screen pdcalenderheader
+     caption "Leave Detail"
+     sidebar list trn
+	 sections form one,jscript myscript
+	
+	list trn
+        caption "Leave Detail"
+        table  pdcalenderdetail
+        order xshift,xyearperdate
+        fixed xyear,xshift
+		rows 365
+        objects xyearperdate attrib(link "login?screen=pdcalenderdetail&command=Show&xyearperdate=?"),xshift,~
+		xdate,xdesc,xnote
+        header "YPD","Shift","DATE","Day","Remarks"
+     end list
+
+     form one
+        caption "<ACRONYM>Weekend & Holyday Calendar</ACRONYM>"
+	  table pdcalenderheader
+        order xyear,xshift
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Detail,Top,Next,Previous,Bottom,Create Weekend,~
+          xyear,xshift,xlocation,xdayname
+
+        field xyear
+          event after
+            set globals(xyear)=xyear
+            set globals(xlocation)=xlocation
+			set globals(xshift)=xshift
+          end event
+        end field
+	  
+	  field xlocation
+	  display hide
+	  pick "Head Office"
+	  end field
+	  
+	  field xdayname
+	  caption Holiday(s)
+	  display text
+	  end field	  
+	  
+	  field create
+	   event after
+	     set temp = #spsql(zabsp_weekend,#id,#user,xshift,xlocation,xyear)
+	   end event
+	  end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdcalenderdetail"
+            form.searchbutton.value = "Find xyear=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

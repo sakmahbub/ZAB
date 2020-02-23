@@ -1,0 +1,14 @@
+LC.menu
+//-------------------------------------------------------------------
+option                           |action                                        |modules|models|width
+//-------------------------------------------------------------------
+LC Opening                      |#classPath+"/login?screen=poordheaderlc"         |       |      |120
+Invoice Receive                 |#classPath+"/login?screen=pogrnlcheader"       |       |      |120
+LTR Transaction                  |#classPath+"/login?screen=polcltr"            |       |      |120
+LC TO GL Transfer                |#classPath+"/login?screen=polctogltransfer"   |       |      |120
+LTR Adjustment                   |#classPath+"/login?screen=polcltrpayment"            |       |      |120
+//LTR Adjustment(Interest)         |#classPath+"/login?screen=apcasltrinterest"   |       |      |120
+Codes & Parameter               |#classPath+"/login?menu=polccodes"
+Reports                         |#classPath+"/login?menu=lcreports"             |       |      |120
+//-------------------------------------------------------------------
+

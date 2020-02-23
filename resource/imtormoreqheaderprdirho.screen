@@ -1,0 +1,258 @@
+screen imtormoreqheaderprdirho
+      caption "Transfer Order Entry Header"
+     	sidebar list imtor,list imtor2
+	sections form one,list one,jscript myscript
+     
+	 list imtor
+        caption "Product Requisition "
+        table imtorheader
+        order xtornum desc
+        select "xstatustor='Approved' and left(xtornum,4)='SR--' and xstatusreq ='Open' and xfwh not in ('02','27')"
+		rows 7
+        objects  xtornum  attrib(link "login?screen=imtormoreqheaderprdirho&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","To Branch"
+     end list
+	
+	
+	 list imtor2
+        caption "Purchase Requisition "
+        table imtorheader
+        order xtornum desc
+        select "xstatustor='Approved' and left(xtornum,4)='SR--' and (xstatusreq = 'Create PO' or xstatusreq = 'PR Created') and xfwh not in ('02','27')"
+		rows 7
+        objects  xtornum  attrib(link "login?screen=imtormoreqheaderprdirho&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","To Branch"
+     end list
+
+
+   list one
+        caption "Item List For SR No "+xtornum
+        table imtordetail
+        order xtornum,xrow desc
+        fixed xtornum
+		select "xqtyreq-xqtyalc>0"
+		rows 50
+        objects ~
+        xrow,~//attrib(link "login?screen=imtormoreqdetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xbrand,~
+        (xqtyreq-xqtyalc),xunit,xqtycom,xqtyord,xstype
+
+		totals "","","Total","",sum
+		
+        headers "Serial No","Item","Description","Brand","Qunatity Required","UOM","Available Quantity","Quantity Delivered","Stock Check Status"
+     end list
+
+     form one
+        caption "Direct PR from SR (Head Office)"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+       select "(xstatustor='Checked' OR xstatustor='Approved' OR xstatustor='Partial Issue') and left(xtornum,4)='SR--'"// and xstatusreq <> 'Create PO'"//" and left(zauserid,2)='"+#sub(#user,0,2)+"'"
+        return "login"
+        pstyle 3
+        layout 3
+        objects Show,Clear,Create PR,~//Cash PR,~
+        "<p>" ,~
+        xtornum ,xdate,xref,xdatecom display(hide),~
+        xfwh,xfbrname,xregi display(const),xtwh,xtbrname,xstatustor display(constant),~//xporeqnum display(constant),~
+		xdocrow display(hide),xstatusreq display(hide),xlong display(const),zauserid display(hide),preparer display(const),//xdum,
+				
+			
+       field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+		
+		field xregi
+		pick list xcardept
+			caption Car No/Department Name
+			event before
+			end event
+		end field
+		
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+		caption Requisition No.
+          event after
+			set globals(xtornum)=xtornum
+			set globals(xstatusreq)=xstatusreq
+           // class careports(getaspReport{imtranissueprint,1,xtornum,Print Transfer Challan})
+			if xstatusreq .ne. "Open"
+              set #field(Issue.display)="hidden"
+			  set #field(Create.display)="hidden"
+			  set #field(Receive.display)="hidden"
+			  set #field(Cash.display)="hidden"
+			end if
+           end event
+        end field
+
+		 field xporeqnum
+          caption Purchase Requisition No.
+        end field
+		
+        field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xposition='"+zauserid+"'")
+		  end event
+        end field
+
+		  field xdate
+          caption Transfer Date
+        end field
+
+        field xdatecom
+          caption Receive Date
+        end field
+		
+		 field xdum
+		 attrib local
+          display constant
+          caption
+        end field
+
+
+        field xlong
+		caption Note
+          height 3
+          width 70
+          column 2
+        end field
+
+
+        field Create
+          event before
+            if xstatustor .eq. "Confirmed"
+              error "Cannot Proceed -- Requisition Already Checked"
+			else if xstatusreq .ne. "Open"
+			error "Cannot Proceed -- PR Already Created"
+            end if
+          end event
+          event after
+           // set temp = #spsql(zabsp_IM_createPORequisition,#id,#user,xtornum,xdate,"")
+		  // set temp =  #sql("update imtorheader set xstatusreq='Create PO' where xtornum='"+xtornum+"'")
+		  // set temp =  #sql("update imtorheader set xdateso='"+#date+"' where xtornum='"+xtornum+"'")
+		   set temp = #spsql(zabsp_DATETIME_Update,#id,#user,xtornum,"imtorheader","xdateso","xsofficer","xstatusreq","xtornum","Create PO")
+            action Show
+          end event
+        end field
+		
+		 field Cash
+          event before
+            if xstatustor .eq. "Confirmed"
+              error "Cannot Proceed -- Requisition Already Checked"
+            end if
+          end event
+          event after
+            set temp = #spsql(zabsp_IM_createPORequisition,#id,#user,xtornum,xdate,"Cash")
+            action Show
+          end event
+        end field
+		
+        field Check
+          event before
+		   //if xstatustor .ne. "Approved"
+              //error "Cannot Proceed -- Requisition not Approved"
+            //else 
+			//if xstatustor .eq. "Checked"
+              //error "Cannot Proceed -- Requisition Already Checked"
+            //end if
+          end event
+          event after
+            set temp = #spsql(zabsp_IM_CheckMORequisition,#id,#user,xtornum,xdate,xfwh,xstatustor)
+              action show
+          end event
+        end field
+
+        field Issue
+          event before
+		    if xstatustor .ne. "Checked"
+             error "Cannot Proceed -- Please Check Store"
+           //else if xstatustor .eq. "Checked"
+           //   error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+		   set srinc=pdmst.xstaff("xposition='"+#user+"'")
+		   set temp =  #sql("update imtorheader set xsofficer='"+srinc+"' where xtornum='"+xtornum+"'")
+           set temp = #spsql(sp_Admin_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,6)
+		   // set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,"imtormoreqheader",6)
+			action Show
+          end event
+        end field
+		
+		 field Receive
+          event before
+		    if xstatustor .ne. "Checked"
+             error "Cannot Proceed -- Please Check Store"
+           //else if xstatustor .eq. "Checked"
+           //   error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+		   set srinc=pdmst.xstaff("xposition='"+#user+"'")
+		   set temp =  #sql("update imtorheader set xsofficer='"+srinc+"' where xtornum='"+xtornum+"'")
+           set temp = #spsql(sp_Admin_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,"Received",6)
+		   // set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,"imtormoreqheader",6)
+			action Show
+          end event
+        end field
+		
+		
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtormoreqdetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+          link.innerText
+            document.one.xtornum.value=link.innerText
+          }
+          return false
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

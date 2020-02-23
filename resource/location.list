@@ -1,0 +1,17 @@
+     list location
+        table xcodes
+        order xcode desc
+        //select none
+        //navigators alpha
+        select "(xcode like '%"+zvalue+"%' and xtype='Location' and zactive='1')"
+		searchselect "xtype='Location' and zactive='1'"
+		rows 10
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')")
+     
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

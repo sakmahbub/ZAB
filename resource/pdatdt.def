@@ -1,0 +1,16 @@
+product ZAB ERP
+
+table pdatdt
+  caption "PD Attendance Detail"
+
+  columns ztime,zutime,zauserid,zuuserid,zid,xyearperdate,xstaff,xrow,xdate,xtimein,xtimeout,xtype,xhh,xmin,xss,~
+  xempcategory,xaccess,xtimein1,xtimeout1
+
+  primary key zid,xyearperdate,xstaff,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xyearperdate,xstaff references pdathd.zid,xyearperdate,xstaff
+  end foreign key
+
+end table

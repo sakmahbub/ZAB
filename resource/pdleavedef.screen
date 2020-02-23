@@ -1,0 +1,64 @@
+screen pdleavedef
+
+     sidebar list one
+     sections form one
+	 
+	 list one
+        caption "Invoice Detail List"
+        table pdleavedef
+        order xtypeleave
+        rows 20
+        objects  xtypeleave attrib(link "login?screen=pdleavedef&command=Show&xtypeleave=?"), ~
+                 xtype,xminqty,xmaxqty,xmaxbalance,xmaxfs,xyesno,xleavecf,xleavecash,xrate
+				 
+        headers "Leave Type","Leave Calculation on","Min CF","Max CF","Max Bal","Max Encashment","Encashment / CF","Leave CF","Leave Encashment","Rate"
+     end list	 
+
+
+     form one
+        caption "Default Leave Setting"
+	    table pdleavedef
+        return "login"
+		order xtypeleave
+        layout 2
+        pstyle 3
+        objects Top,Clear,Add, Update, Delete,"<p>" ,~
+          xtypeleave,xtype,xminqty,xmaxqty,xmaxbalance,xmaxfs,xyesno,xleavecf,xleavecash,xrate
+
+          filed xtype
+            display combo
+            caption Leave Calculation on
+            pick "Gross,Basic"
+          end field
+		  
+          filed xyesno
+          caption Encashment/ CF Applicable ?
+          end field		
+
+          filed xminqty
+            caption Minimum CF Leave
+          end field	
+
+          filed xmaxqty
+            caption Maximum CF Leave
+          end field	
+
+          filed xmaxbalance
+            caption Maximum Leave Balance
+          end field		  
+		  
+          filed xrate
+            caption Encashment Rate
+          end field	
+
+		field update
+		  event before
+		  if  xtypeleave .eq. ""
+			error "Please Press First Button!"
+		  end if 
+		  end event  
+		  end field
+
+     end form
+
+end screen

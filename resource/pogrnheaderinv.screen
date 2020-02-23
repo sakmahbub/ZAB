@@ -1,0 +1,385 @@
+screen pogrnheaderinv
+
+     sidebar list grncost,list one
+     sections form one, jscript myscript
+	
+	 	list grncost
+        caption "Detail List"
+        table pogrndetail
+        order xgrnnum,xrow
+        fixed xgrnnum
+        rows 250
+        objects  xrow,~// attrib(link "login?screen=pogrndetailinv&command=Show&xgrnnum=?&xrow=?"), ~
+                xitem,desc equals((select xdesc from caitem where zid=pogrndetail.zid and  xitem=pogrndetail.xitem)),xserial,xqtygrn,~
+				xlineamt,xbase//xttamount,,xttbase,xbuyeramt,(xbase+xttbase)
+				
+        headers "Row","Item","Description","Part No","Qty","LC Amt","LC amt(BDT)"//,"Other Amt(USD)","Other Amt(BDT)","Invoice Amt","Total BDT"//,"TT Amt(BDT)","Total amt (BDT)"
+     total "","Total","","","",sum,sum
+	 end list	
+	 
+	 
+
+	 list one
+        caption "PO List"
+        table pogrnheader
+        order xpornum
+        fixed xgrnnum
+        rows 20
+        objects  xpornum attrib(link "login?screen=poordheadercash&command=Show&xpornum=?"), ~
+                 xdate
+
+
+//        headers "Row","Item","Description","Qty","Unit","Rate","GRN Qty"
+     end list
+	
+    form one
+        caption "Document Retirement"
+        table pogrnheader
+        order xgrnnum desc
+        return "login"
+		select "xtype in ('LC')"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Add,Update,Delete,Top,Previous,Next,Bottom,"<br/>",~
+                Detail,Confirm,~
+                xgrnnum,xdate,~
+				xlcno,xpaydate,xcus display(const),~
+				xorg,xwh,xwhdesc,xcur,xexch,xref,~
+                xfreightcost,xinvnum display(hide),xstatusap display(hide),xstatusgrn display(const),~
+				xvoucher display(hide),xpornum  display(hide),xtypeobj display(hide),~
+				xstatus display(const),xstatusjv display(hide),xtype display(const),xstatusimgl display(const),xnote,~
+				xstatusapgl display(hide),xstatusjvgl display(hide),xstatusinsp display(hide),xstatusdoc display(hide),xstatusclaim display(hide),xdatecom display(hide)
+				
+       field xwhdesc
+        attrib local
+        caption Store Name
+        display const
+        event after
+          set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+		 field xcur
+		  caption <br><FONT SIZE=2 COLOR=red>LC Currency*</font> 
+		 end field
+		 
+		 field xexch
+		 caption <br><FONT SIZE=2 COLOR=red>Exchange Rate in(Base)*</font> 
+		 end field
+		 
+		 field xcurbuyer
+		 caption <br><FONT SIZE=2 COLOR=red>Invoice Currency*</font>
+		 end field
+		 
+		 field xexchbuyer
+		 caption <br><FONT SIZE=2 COLOR=red>Exchange Rate(LC to Invoice)*</font> 
+		 end field
+		 
+		 
+		field xcus
+			caption Supplier ID
+		end field
+		
+		field xstatusimgl
+			caption Costing Status
+		end field
+		
+		field xtype
+			caption Purchase Type
+		end field
+		 		 
+		 field xttcur
+		 caption <br><FONT SIZE=2 COLOR=red>Other Currency*</font>
+		 end field
+		 
+		field xttexch
+		 caption <br><FONT SIZE=2 COLOR=red>Exchange Rate in(Base)*</font>
+		 end field
+		
+		field xacc
+			caption LC Payment Account
+		end field
+		
+		field xacccr
+			caption Margin Account
+		end field
+		
+		field xpercent
+			caption Margin Percentage
+		end field
+		
+	field acccr
+      attrib local
+      caption Description
+      display const
+      event after
+        set acccr=acmst.xdesc("xacc='"+xacccr+"'")
+      end event
+    end field
+		
+		field xlcno
+		caption LC No
+		pick list xlcttno
+		end field
+		
+	field xaccdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xaccdesc=acmst.xdesc("xacc='"+xacc+"'")
+      end event
+    end field
+	
+	field xsubdesc
+      attrib local
+      caption Sub code Description
+      display const
+      event after
+        set xsubdesc = acsubview.xorg("xacc='"+xacc+"' and xsub='"+xsub+"'")
+      end event
+    end field
+		
+		field xcurss
+		  	attrib local
+		  	dispaly const
+		  	caption LC Currency
+		  	event after
+		  		set xcur=lcinfo.xcur("xlcno='"+xlcno+"'")
+		  	end event
+		  end field
+		  	
+		  field xcurbuyer22
+		  	attrib local
+		  	caption Buyer Currency
+		  	event after
+		  		set xcurbuyer=lcinfo.xcurbuyer("xlcno='"+xlcno+"'")
+		  	end event
+		  end field
+
+		field xttcur22
+		  	attrib local
+		  	caption TT Currency
+		  	event after
+		  		set xttcur=lcinfo.xttcur("xlcno='"+xlcno+"'")
+		  	end event
+		  end field
+		  	
+		field xgrnnum
+		caption GRN/ Invoice No
+		event after
+		class careports(getReport{pogrnprint;2;in,st;zid,grnnum;xgrnnum;Print GRN})
+		//class careports(getReport{powisegrndetail;2;in,st;zid,xpornum;xpornum;View/Print GRN})
+		 class careports(getReport{lcreport;4;in,dt,dt,st;zid,fdate,tdate,lcno;"2017-01-01","2079-12-31",xlcno;View Document Retirement})
+		if pogrnheader.xstatus("xgrnnum='"+xgrnnum+"'") .ne. "Open" //.and. xstatusjv .eq. "Confirmed"
+         			set #field(delete.attrib)="disabled"
+					set #field(update.attrib)="disabled"
+					set #field(confirm.attrib)="hidden"
+					set #field(Detail.display)="hidden"
+       		  end if
+    		  if pogrnheader.xlcno("xgrnnum='"+xgrnnum+"'") .eq. "" 
+		         	set #field(Invoice.attrib)="disabled"
+       		  end if
+			   if xtype .eq. "TT" .or. xtype .eq. "T T" 
+		         	set #field(Duty.display)="hidden"
+					set #field(LC.display)="hidden"
+       		  end if 
+			if xstatusgrn.eq. "" 
+		         	set #field(Duty.display)="hidden"
+					set #field(LC.display)="hidden"
+					set #field(delete.attrib)="disabled"
+					set #field(update.attrib)="disabled"
+       		  end if 
+			if xstatusimgl .eq. "Confirmed"
+		         	//set #field(add.attrib)="disabled"	
+         			set #field(delete.attrib)="disabled"
+					set #field(update.attrib)="disabled"
+					set #field(Duty.display)="hidden"
+					set #field(Duty_Entry.display)="hidden"
+					set #field(confirm.attrib)="hidden"
+					set #field(Detail.display)="hidden"
+       		  end if  
+			if xstatusapgl .eq. "Confirmed" .and. xstatusjvgl .eq. "Confirmed"
+		         	//set #field(add.attrib)="disabled"	
+         			set #field(delete.attrib)="disabled"
+				//	set #field(update.attrib)="disabled"
+					set #field(Transfer.display)="hidden"
+       		  end if	  
+			  set globals(xlcno)=xlcno
+		end event
+        	width 18
+        end field
+		  
+		  field xref
+			caption Document No.
+		  end field
+		  
+		  field xwh
+			pick list xwh
+          end field
+		  
+		field xwhdesc
+			attrib local
+			display const
+			caption Store Name
+			event after
+				set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+        field xlcinfo
+          attrib local
+          display const
+          column 3
+          caption <br><FONT SIZE=4 COLOR=red>LC Info</font>
+        end field
+
+ 		field xorg
+			attrib local
+		  	display const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=cacus.xorg("xcus='"+xcus+"'")
+		  	end event
+		end field
+		
+
+        field xnote
+          width 80
+          column 2
+        end field
+
+        field xgrnnum
+           event after
+		    //class careports(getjspReport{pogrnprint,1,xgrnnum,Print GRN})
+				//class careports(getjspReport{acledlcm,2,xlcno,"PDF",LC Ledger})
+				//class careports(getjspReport{lccostsheet,2,xlcno,"PDF",LC Cost Sheet})
+               
+			  set globals(xgrnnum) = xgrnnum
+           end event
+        end field
+
+
+        field Add
+          event before
+            set lcno=lcinfo.xlcno("xlcno='"+xlcno+"'")
+			set statusord=lcinfo.xstatuspor("xlcno='"+xlcno+"'")
+			set status=lcinfo.xstatus("xlcno='"+xlcno+"'")
+			set xtypeobj=poordheader.xtypeobj("xpornum='"+xpornum+"'")
+			if xlcno .eq. ""
+				error "Please select LC No."
+			else if xlcno .ne. lcno
+				error "LC No invalid!"
+			else if status .eq. "Open"
+				error "LC Doesn't Confirmed!"
+			else if statusord .eq. "Confirmed" .or. statusord .eq. "GRN Created" .or. statusord .eq. "Full Received"
+				error "Invoice Already Created!"
+			else if xwh .eq. ""
+				error "Please Select Store No!"
+			else
+			set xcur=lcinfo.xcur("xlcno='"+xlcno+"'")
+			set xexch=lcinfo.xexch("xlcno='"+xlcno+"'")
+			set xttexch=lcinfo.xttexch("xlcno='"+xlcno+"'")
+			set xexchbuyer=lcinfo.xexchbuyer("xlcno='"+xlcno+"'")
+			set xstatusgrn = "Open"
+			set xstatusjv="Open"
+			set xstatusap="Open"
+			set xstatusapgl="Open"
+			set xstatusjvgl="Open"
+			set xstatusimgl="Open"
+			set xstatusinsp="Open"
+			set xstatus="Open"
+			set xstatusdoc="Open"
+			set xstatusclaim=""
+			set xdatecom=xdate
+			//set xwh = "01"
+			set xtype="LC"
+		    set xcus = lcinfo.xcus("xlcno='"+xlcno+"'")
+			//set xpornum = lcinfo.xpornum("xlcno='"+xlcno+"'")
+        	set xgrnnum = #trn("GRN Number","GRN-",10)
+			end if
+         end event
+		 
+		 event after
+				set temp = #sql("Update lcinfo set xstatuspor='GRN Created' where xlcno='"+xlcno+"'")
+		 end event
+        end field 
+		
+        field update
+			event before
+				set xtypeobj=poordheader.xtypeobj("xpornum='"+xpornum+"'")
+				if xcus .eq. ""
+					error "Cannot Proceed -- Please Select Supplier!"
+				else if xstatusapgl .eq. "Confirmed" .or. xstatusjvgl .eq. "Confirmed"
+					error "Cannot Proceed -- Payable already Created!"
+				else if pogrnheader.xstatus("xgrnnum='"+xgrnnum+"'").ne. "Open" 
+					error "Invoice Already Confirmed!"
+				else
+				set xdatecom=xdate
+				end if
+			end event
+          event after
+			set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xgrnnum,xlcno,0,0,"pogrndetailinv")
+            action show
+          end event
+        end field	
+
+		
+		field confirm
+            event before
+			set ref=#sql("select xref from pogrnheader WHERE xgrnnum='"+xgrnnum+"'")
+			double grnqty=#sql("select sum(xqtygrn) from pogrndetail WHERE xgrnnum='"+xgrnnum+"'")
+			if grnqty <0.01
+			error "Please add detail!"
+			else if pogrnheader.xstatus("xgrnnum='"+xgrnnum+"'") .ne. "Open"
+				error "Invoice Already Confirmed!"
+			else if ref .eq. ""
+				error "Please write Document No!"
+			end if
+            end event
+            event after
+			set temp = #sql ("update pogrnheader set xstatus='Applied' where  xgrnnum='"+xgrnnum+"'")
+			//will remove if lc cost entry start later
+			//set temp = #sql ("update pogrnheader set xstatusimgl='Confirmed' where  xgrnnum='"+xgrnnum+"'")
+			
+	        action show
+            end event
+          end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+		
+		 field Invoice Cost
+          embed onclick="clicked(this)"
+        end field
+	
+		field Duty_Entry
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "pogrndetailinv"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

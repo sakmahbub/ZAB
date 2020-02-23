@@ -1,0 +1,247 @@
+screen optoartrn
+
+     sidebar list detail,list one,list arci,list arcipar
+     sections form one, jscript myscript
+
+     list detail
+        caption "DO List"
+        table opdociforarview
+        order xinvnum,ztime
+		select "xstatusdor = 'Confirmed'"
+        fixed xinvnum
+        rows 100
+        objects  xdornum attrib(link "login?screen=optoartrndt&command=Show&xdornum=?"),~
+					xdate,xstatusdor,xlineamt,xordernum,piref equals((select xpiref from opordheader where zid=opdociforarview.zid and  xordernum=opdociforarview.xordernum)),xlcno,xvoucher
+
+        headers "DO No.","DO Date","DO Status","DO Amount","PI No.","PI Ref","LC No","Voucher"
+    	  total count,"Total:","",sum,"","",""
+     end list
+	 
+	 list arci
+        caption "CI List for Create Sales Revenue"
+        table arciviewdis
+        order xinvnum desc
+		select " xstatusjv ='Open'"
+		//select " xstatusjv in ('Open','Partial')"
+        rows 100
+        objects  xinvnum attrib(link "login?screen=optoartrn&command=Show&xinvnum=?"), ~
+                 xinvref,xdate,xcus,org equals((select xorg from cacus where zid=arciviewdis.zid and  xcus=arciviewdis.xcus)),lc equals((select xlcno from opinvheader where zid=arciviewdis.zid and  xinvnum=arciviewdis.xinvnum)),xstatusjv//,xdornum,xdeldate,,xstatusar 
+
+       headers "CI No","CI Ref","CI Date","CUS ID","Name","LC No.","GL Status"//,"DO No","Del Date",,"AR Status"
+     end list 
+	 
+	 
+	 
+	  list arcipar
+        caption "Partial GL Status CI List for Create Sales Revenue"
+        table arciviewdis
+        order xinvnum desc
+		select " xstatusjv ='Partial'"
+		//select " xstatusjv in ('Open','Partial')"
+        rows 100
+        objects  xinvnum attrib(link "login?screen=optoartrn&command=Show&xinvnum=?"), ~
+                 xinvref,xdate,xcus,org equals((select xorg from cacus where zid=arciviewdis.zid and  xcus=arciviewdis.xcus)),lc equals((select xlcno from opinvheader where zid=arciviewdis.zid and  xinvnum=arciviewdis.xinvnum)),xstatusjv//,xdornum,xdeldate,,xstatusar 
+
+       headers "CI No","CI Ref","CI Date","CUS ID","Name","LC No.","GL Status"//,"DO No","Del Date",,"AR Status"
+     end list 
+
+	 
+
+
+	form one				
+        caption "Sales Revenue Generate"
+        table opinvheader
+        order xinvnum 
+		//fixed xinvnum 
+        return "login"
+        layout 2
+        pstyle 3
+		objects ~
+                Show,Clear,~//DO Update,Transfer To A/R
+                xinvnum,xdatedo,xinvref,xstatusar,xstatusjv,~
+				xcus,xorg,~
+				xvoucher,xlcno display(const),~
+				Balance,xprimetotamt
+				
+	
+			
+        field xinvnum
+			width 30
+			pick list opcoinvopen
+			event after 
+				set globals(xinvnum) = xinvnum
+				set globals(xdornum)=xdornum
+				set statusjv =  opinvheader.xstatusjv("xinvnum='"+xinvnum+"'")
+
+				if xvoucher .ne. ""
+					class careports(getReport{acvoucher;2;in,st;zid,svoucher;xvoucher;Print Voucher})
+				end if
+				
+				if statusjv .eq. "Confirmed"
+					//set #field(update.attrib) = "disabled"
+					set #field(Transfer.display) = "hidden"
+					set #field(DO.display) = "hidden"
+				end if
+				if xinvnum .eq. ""
+					//set #field(update.attrib) = "disabled"
+					set #field(Transfer.display) = "hidden"
+					set #field(DO.display) = "hidden"
+				end if
+			end event
+		end field
+		
+		field xinvref
+			display const
+		end field
+
+		field xdatedo
+			caption Delivery Date
+		end field
+		
+        field xstatusjv
+		  	display const
+		  	caption GL Status
+			default Open
+		end field		
+
+        field xstatusar
+		  	display const
+		  	caption AR Status
+			default Open
+		end field
+
+        field xvoucher
+		  	display const
+		  	caption Voucher No
+			after event
+				set xvoucher =  opinvheader.xvoucher("xinvnum='"+xinvnum+"'")
+			end event
+		end field
+
+        field xcus
+		  	display const
+		  	caption CUS./SUP. ID.
+			default Open
+		end field
+
+        field xorg
+          attrib local
+          caption Name
+          display constant
+          event after
+            set xorg = cacus.xorg("xcus = '"+xcus+"'")
+          end event
+        end field
+
+		field xprimetotamt
+			event after	
+				set xprimetotamt = #sql("select sum(xlineamt) from opinvdetail where xinvnum = '"+xinvnum+"'")
+			end event
+		end field
+		
+        field Balance
+
+				attrib local
+				  caption Balance Status
+				 display constant
+
+          event after
+		  
+		  set xinvnum=#trim(xinvnum)
+		  double bal = 00.00
+			set bal = #sql("select sum(xlineamt) from opdociforarview where xinvnum = '"+xinvnum+"'")
+			set ciamt = #sql("select xlineamt from opdociforarview where xinvnum = '"+xinvnum+"'")
+			
+			double detailamt = 00.00		
+			set detailamt = #sql("select sum(xlineamt) from opinvdetail where xinvnum = '"+xinvnum+"'")
+			
+			if bal .eq. ""
+				set Balan = "N/A"
+				set Balance ="<font color=blue size=+1> "+Balan+" </font>"
+			else if bal == detailamt .and. xinvnum .ne. ""
+						//print "<font size=+2 color=blue> ===  BALANCED  ===</font>"
+						set Balan = "Balanced"
+						set Balance ="<font color=green size=+1> "+Balan+" </font>"
+            else if bal <> detailamt .and. xinvnum .ne. "" 	
+					//print "<font size=+2 color=red> ===  SUSPENDED  ===</font>"
+					set Balan = "Suspended"
+					set Balance ="<font color=red size=+1> "+Balan+" </font>"
+				
+					set #field(Transfer.display) = "hidden"
+					set #field(DO.display) = "hidden"
+			else
+					set Balan = "N/A"
+					set Balance ="<font color=blue size=+1> "+Balan+" </font>"
+			end if
+				if Balance .eq. "N/A"
+					set #field(Transfer.display) = "hidden"
+					set #field(DO.display) = "hidden"
+				end if	
+          end event
+        end field
+		
+        field Transfer To A/R
+			event before
+				double exch = 0.000
+				double amt = 0.000
+				set status =  opinvheader.xinvnum("xinvnum='"+xinvnum+"' and xstatusar='Confirmed' and xstatusjv='Confirmed'")
+				set exch =  opinvheader.xexch("xinvnum='"+xinvnum+"'")
+				set amt =  #sql("select sum(xlineamt) from opinvdetail where xinvnum='"+xinvnum+"'")
+				if exch  <= 0
+					error "Cannot Proceed -- Exchnage Rate is "+exch
+				else if amt <= 0	
+					error "Cannot Proceed -- Invoice Amount is "+amt
+				else if status .eq. xinvnum
+					error "Cannot Proceed -- Invoice Already Transferred"
+				else 	
+					set temp = #spsql(zabsp_OP_transferOPtoAR,#id,#user,xinvnum,xdatedo,"opinvheader")
+					set temp = #spsql(zabsp_OP_transferOPtoGL,#id,#user,xinvnum,xdatedo,"opinvheader")
+					set voucher = opinvheader.xvoucher("xinvnum='"+xinvnum+"'")
+					print "<font size=+1 color=red>Voucher No "+voucher+" Created</font>"
+				end if
+			end event
+          event after  
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field DO Update
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+		//============================= onload ===============================	//
+		window.onload = function() {
+				document.one.xinvnum.select();
+			//	document.getElementById("xdornum").placeholder = "System Gererated";
+	
+			//	document.getElementById("Balance").style.color = "blue";
+			//	document.getElementById("Balance").style.backgroundColor = "#f8fba7"	
+			//	document.getElementById("Balance").style.fontSize = "large";	
+		}
+		
+		
+        function submitit(form){
+          result = true
+          if (button=="DO Update"){
+            form.screen.value = "opdoheaderpicilcupdate"
+           //form.searchbutton.value = "Find xinvnum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

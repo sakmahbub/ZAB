@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table ardef
+  caption "AR Defaults"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xlength
+
+  primary key zid
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

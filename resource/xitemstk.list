@@ -1,0 +1,13 @@
+     list xitemstk
+        caption "Items containing: "+zvalue+" of "+#wh
+        table imstock
+        order xwh,xitem
+	//select "xwh='"+#wh+"'"
+        select "(xitem like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%') and xwh='"+#wh+"' and xgitem in ('Finished Goods','General')  and left(xitem,2)<>'GF' and zactive = 1"
+        rows 30
+		searchselect "xwh='"+#wh+"' and xgitem in ('Finished Goods','General')  and left(xitem,2)<>'GF' and zactive = 1"
+        objects xitem attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdesc,xavail
+     end list
+
+

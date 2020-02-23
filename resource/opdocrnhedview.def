@@ -1,0 +1,38 @@
+product ZAB ERP
+
+table opdocrnhedview
+  caption "OP DO CRN View"
+
+  columns zid,xdornum,xdate,xcus,xstatusord,xref,xnote,xwh,xdesc,xstatusar,xtotamt,~
+          xtotamt,xvatamt,xdiscamt,xfm,xsm,xrsm,xsp,xpp,~
+          xrow,xitem,xlong,xvatrate,xvatamt,~
+          xqtyord,xunit,xrate,xlineamt,xqtybonus,xdateinv,xsign,xyear,xper
+
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view opdocrnhedview(zid,xdornum,xcrnnum,xdate,xcus,xstatusord,xwh,xstatusar,xtotamt,~
+	          xvatamt,xdiscamt,xfm,xsm,xrsm,xsp,xpp,xdateinv,xterritory,xsign,xyear,xper,xfield,xregion,xmarket,xtype) ~
+
+                  as select a.zid,a.xdornum,'',a.xdate,a.xcus,a.xstatusord,a.xwh,a.xstatusar,a.xtotamt,~
+	          a.xvatamt,a.xdiscamt,a.xfm,a.xsm,a.xrsm,a.xsp,a.xpp,a.xdate,a.xterritory,1,a.xyear,a.xper, ~
+		  isnull(a.xfield,''),isnull(a.xregion,''),isnull(a.xmarket,''),a.xtype ~
+                  from opdoheader a ~
+
+		  union all ~
+
+                  select a.zid,a.xordernum,a.xcrnnum,a.xdate,a.xcus,a.xstatuscrn,a.xwh,a.xstatusar,a.xtotamt,~
+	          a.xvatamt,a.xdiscamt,a.xfm,a.xsm,a.xrsm,a.xsp,a.xpp,b.xdate,b.xterritory,-1,b.xyear,b.xper,~	
+		  '','','',b.xtype ~	
+                  from opcrnheader a ~
+		  join opdoheader b on a.xordernum=b.xdornum 
+
+			
+
+
+
+end table

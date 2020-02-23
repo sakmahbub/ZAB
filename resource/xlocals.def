@@ -1,0 +1,12 @@
+product ZAB
+
+table xlocals
+  caption "Local Settings"
+  columns ztime, zutime,zauserid,zuuserid, zid, xtypelocal, xname, xcaption, xlong, xtrns, ~
+          xcodes,xprops,zactive
+  primary key zid, xtypelocal, xname
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+  list xcaption, zactive
+end table

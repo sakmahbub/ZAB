@@ -1,0 +1,128 @@
+screen cacusbonus
+
+     caption "Customer Bonus"
+     sidebar list one
+     sections  form one, jscript myscript
+
+
+     list one
+        caption "Customer Bonus List : "+xcus
+        //+xitem+" "+caitem.xdesc("xitem='"+xitem+"'")
+        table cacusbonus
+        order xcus,xitem
+        fixed xcus
+        rows 20
+        objects  xitem attrib(link "login?screen=cacusbonus&command=Show&xitem=?&xqty=?"), ~
+                 xqty,xqtybonus
+
+     end list
+
+
+     form one
+        caption "Customer Bonus For <br>"+xcus 
+        //+xitem+" "+caitem.xdesc("xitem='"+xitem+"'")
+      	table cacusbonus
+        primarykey xcus,xitem
+        order xcus,xitem
+        fixed xcus
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Update,Clear,Delete,Show,*next,Return, Top,Previous,Next, Bottom,"<p>" ,~
+                xitem,xdesc,xwh display(hide),xdateeff,xdateexp,xqty,xqtybonus,~
+	 	            xqty1,xqtybonus1,xqty2,xqtybonus2,xqty3,xqtybonus3,xqty4,xqtybonus4
+
+        field xunitpur
+          attrib local
+          caption Unit Of Measurement
+          display const
+          event after
+            set xunitpur = caitem.xunitpur("xitem='"+xitem+"'")
+          end event
+        end field
+
+	  field xdesc
+	    atrrib local
+	    caption Name
+	    display const
+	    event after
+		    set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+	    end event
+	  end field
+
+        field xqty
+          caption Quantity Applicable L1
+        end field
+
+        field xqty1
+          caption Quantity Applicable L2
+        end field
+
+        field xqty2
+          caption Quantity Applicable L3
+        end field
+
+        field xqty3
+          caption Quantity Applicable L4
+        end field
+
+        field xqty4
+          caption Quantity Applicable L5
+        end field
+
+  field Add
+    event before
+		if rate <> 0 .or. disc <> 0
+          errror "Cannot Proceed -- Please Check Special Rate/Disc" 
+  		else if xitem .eq. ""
+			errror "Cannot Proceed -- Please Check Product Code"
+		end if
+		set rate = cacusprice.xrate("xcus='"+xcus+"' and xitem='"+xitem+"'")
+		set disc = cacusdisc.xdisc("xcus='"+xcus+"' and xitem='"+xitem+"'")
+		set xwh = #wh
+    end event
+  end field 
+
+  field Update
+    event before
+		if rate <> 0 .or. disc <> 0
+          errror "Cannot Proceed -- Please Check Special Rate/Disc" 
+  		else if xitem .eq. ""
+			errror "Cannot Proceed -- Please Check Product Code"
+		end if
+		set xwh = #wh
+    end event
+  end field
+
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	    if (detail=="Return"){
+            form.screen.value = "cacusdepo"
+            form.searchbutton.value = "Find xcus=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

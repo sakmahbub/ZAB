@@ -1,0 +1,14 @@
+//MIS Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Monthly Stock Balance            |#classPath+"/login?screen=*crystal opmstockbalanceall(xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group=zzz,xwh=Branch,xwh=Branch)"
+Stock Movement Detail            |#classPath+"/login?screen=*crystal imtrndetail(xwh=Branch,xgitem=Item Group,xgitem=Item Group,xitem=From Item=,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date)"
+Stock Movement Summary           |#classPath+"/login?screen=*crystal imledsum(xwh=Branch,xwh=Branch,xgitem=Item Group,xgitem=Item Group,xitem=From Item=,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date)"
+Stock Movement Summary By Type   |#classPath+"/login?screen=*crystal imledsumtype(xwh=Branch,xwh=Branch,xgitem=Item Group,xgitem=Item Group,xitem=From Item=,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xtype=Type)"
+Transferred Item List With Value |#classPath+"/login?screen=*crystal imtransfer(xfwh=From Warehouse,xtwh=To Warehouse,xdate=From Date=#date,xdate=To Date=#date,xitem=From Item,xitem=To Item=zzz)"
+Transaction Listing By Type      |#classPath+"/login?screen=*crystal imtrnlisttype2(xfwh=From Warehouse,xtwh=To Warehouse,xdate=From Date=,xdate=To Date=,xitem=From Item=,xitem=To Item=zzz,xgitem=Item Group,xgitem=Item Group,xtrn=Transaction Type)"
+Inventory Sum. Satement For COGS |#classPath+"/login?screen=*crystal imcostsumtype(xwh=Branch,xwh=Branch,xdate=From Date=,xdate=To Date=,xtype=Type)"
+Inventory Value By Branch        |#classPath+"/login?screen=*crystal imbrstock(xwh=Branch=,xitem=From Item,xitem=To Item=zzz)"
+//-------------------------------------------------------------------
+

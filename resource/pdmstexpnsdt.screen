@@ -1,0 +1,88 @@
+screen pdmstexpnsdt
+  sidebar list detail
+  sections form one, jscript myscript
+   
+  list detail
+    caption "Salary Details List"
+    table pdmstexpnsdt
+    order xstaff,xyear,xper,xrow
+    select "xyear="+xyear+" and xper="+xper
+    fixed xstaff,xyear,xper
+    rows 20
+    objects xrow attrib(link "login?screen=pdmstexpnsdt&command=Show&xstaff=?&xyear=?&xper=?&xrow=?"),xtype,xamount
+    //objects  xrow attrib(link "login?screen=pdsalarydetail&command=Show&xstaff=?&xrow=?"), ~
+    //         xtype,xamount,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdsalarydetail.xtype))
+
+    total "",sum
+    header "Line No","Componant Type","Amount"
+    
+  end list
+ 
+  form one
+    caption "Expenses for Staff ID: "+xstaff
+    table pdmstexpnsdt
+    fixed xstaff,xyear,xper
+    order xstaff,xyear,xper,xrow
+    return "login"
+    layout 3
+    pstyle 3
+    objects Show, Add, Update, Delete, Back to Header,"<p>",~
+            xrow attrib(row 0 1),xtype,xamount
+            
+    field xrow
+      caption Record No
+      display const
+    end field
+
+    field xtype
+      caption Componant Type
+      pick "select xcode from xcodes where xtype = 'PD Transaction Type'"//code PD Transaction Type
+    end field
+
+    field add
+      event before
+        if #len(xtype) .eq. 0
+          error "Cannot Proceed -- Componant Type field is mandatory"
+        end if 
+      end event
+    end field
+
+    field Back
+      embed onclick="clicked(this)"
+    end field
+
+    
+    embed onsubmit="submitit(this)"
+    
+  end form
+
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var detail
+      function clicked(b){
+        detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Back to Header"){
+          form.screen.value = "pdmstexpnshd"
+          form.searchbutton.value = "Find xstaff=?"
+          //return false
+        }
+      }
+      function pickAccount(link,name,rank){
+        if (navigator.appName.indexOf("Netscape") >= 0){
+          document.one.xinvnum.value=link.text
+          document.one.xbalance.value=primebal.text
+          document.one.xdate.value=date.text
+      }else{
+          document.one.xstaff.value=link.innerText
+          document.one.xname.value=name.innerText
+          document.one.xrank.value=rank.innerText
+        }
+        return false
+      }
+    </script>
+  end jscript
+
+end screen

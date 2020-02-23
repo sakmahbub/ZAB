@@ -1,0 +1,34 @@
+
+
+product ZABDB
+
+table potoacchkview
+  caption "Ac Bal View"
+  columns zid,xacc,xyear,xcur,xdiv,xsec,xproj,xprime,xbase,xacctype
+  primary key zid,xacc,xyear,xcur,xdiv,xsec,xproj
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view potoacchkview (zid,xgrnnum,xtype,xgitem,xgsup,xaccdr,xdescdr,xacccr,xdesccr,xaccvat,xdescvat,xaccait,xdescait,xlineamt)~
+                  as select a.zid,a.xgrnnum,b.xtype,itm.xgitem,cus.xgsup,isnull(api.xaccdr,'Debit Account Not Set'),isnull(acm.xdesc,''), ~
+				  isnull(cod.xacc,'Payable Account Not Set'),isnull(bpacm.xdesc,''), ~
+				  isnull(cod.xaccvat,'VAT Account Not Set'),isnull(vacm.xdesc,''), ~
+				  isnull(cod.xaccait,'AIT Account Not Set'),isnull(aacm.xdesc,''), ~
+				  sum(a.xlineamt) ~
+                  from pogrndetail a join pogrnheader b on a.zid=b.zid and a.xgrnnum=b.xgrnnum ~
+				  join cacus cus on b.zid=cus.zid and b.xcus=cus.xcus ~
+				  join caitem itm on a.zid=itm.zid and a.xitem=itm.xitem ~
+				  left join potoapi api on api.zid=a.zid  and api.xgitem=itm.xgitem and api.xgsup=cus.xgsup ~
+				  left join acmst acm on acm.zid=api.zid and acm.xacc=api.xaccdr ~
+				  join xcodes cod on cod.zid=cus.zid and cod.xtype='Supplier Group' and cod.xcode=cus.xgsup ~ 
+				  left join acmst bpacm on bpacm.zid=cod.zid and bpacm.xacc=cod.xacc ~
+				  left join acmst vacm on vacm.zid=cod.zid and vacm.xacc=cod.xaccvat ~
+				  left join acmst aacm on aacm.zid=cod.zid and aacm.xacc=cod.xaccait ~
+				  group by a.zid,a.xgrnnum,b.xtype,itm.xgitem,cus.xgsup,isnull(api.xaccdr,'Debit Account Not Set'),isnull(acm.xdesc,''), ~
+				  isnull(cod.xacc,'Payable Account Not Set'),isnull(bpacm.xdesc,''), ~
+				  isnull(cod.xaccvat,'VAT Account Not Set'),isnull(vacm.xdesc,''), ~
+ 				  isnull(cod.xaccait,'AIT Account Not Set'),isnull(aacm.xdesc,'')
+
+
+end table

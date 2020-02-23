@@ -1,0 +1,90 @@
+screen pdatdt
+     caption "Leave Detail"
+     sections form one,jscript myscript
+
+  	list trn
+        caption "Leave Detail"
+        table pdleaveview
+        order xpositino,xtypeleave
+        select "xstaff='"+xstaff+"' and xtypeleave='"+xtypeleave+"'"
+        rows 20
+        objects  xyear,xday
+//        header "Year","EMP ID","Name","Total Day","Leave Type","Paid/Unpaid"
+//        totals "","","",sum,"",""
+     end list
+
+     form one
+        caption "<ACRONYM>Attendance Header</ACRONYM>"
+	      table pdatdt
+        order xyearperdate,xposition
+        fixed xyearperdate
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Return,Top,Next,Previous,Bottom,~
+          xposition,xname,xtimein,xtimeout,xlncin,xlncout,~
+          xwrkhours,xothours,xtype,xstaff display(hide)
+
+
+          field xtype
+            pick "LWP,Absent,Present,Suspend"
+          end field
+
+          field xdum
+            attrib local
+            display constant
+            caption
+          end field
+
+          field xname
+            attrib local
+            display constant
+            caption Name
+            event after
+              set xname=pdmst.xname("xstaff='"+xstaff+"'")
+            end event
+          end field
+
+          field add
+            event before
+              set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+		        end event
+          end field
+
+          field update
+            event before
+              set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+		        end event
+          end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Return"){
+            form.screen.value = "pdathd"
+            form.searchbutton.value = "Find xyearperdate=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

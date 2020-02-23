@@ -1,0 +1,223 @@
+screen apadvadjustment
+
+     sidebar list invoice,list allocation
+     sections form one,jscript myscript
+			
+     list invoice
+        caption "<br><center><b>"Unallocated Voucher List"</b>"
+		table apallocationarcview
+        order xcus,xvoucher
+        fixed xcus
+        select "xprime> 0"
+        rows 10
+        objects ~
+        xvoucher,xprime,xdate
+
+        headers "Invoice Number","Balance","Date"
+     end list
+		
+     list allocation
+        caption "Allocated Voucher List"
+        table apalcarcview
+        order xvoucher,xinvnum
+        fixed xvoucher
+        rows 10
+        objects ~
+        xinvnum attrib(link "login?screen=aralc&command=Show&xinvnum=?"), ~
+        xdate,xbalance,xamount
+		header "Invoice No","Inv Date","Invoice Balance","Allocated Amt"
+        totals "","Totals","",sum
+     end list
+
+     form one
+        caption "Supplier Payment Entry"
+        table arhed
+		primarykey xvoucher
+        order xvoucher
+        select "left(xvoucher,4)='PM--'"
+        return "login"
+        pstyle 3
+        layout 2        
+        objects Add,Clear,Show,Update,Delete, *next,Top,Previous,Next,Bottom,Allocate,Transfer To GL,"<p>" ,~
+                xvoucher,xdate,xcus,xorg,xbank,xbankname,xwh display(hide),~
+                xprime,xbalprime display(hide),xpaymenttype,xref,xdateref,xvatamt,xaitamt,xdiscprime display(hide),~
+                xstatusjv display(hide),xnote,xdocnum display(hide),xtypetrn display(hide),~
+
+                //hide
+                xsign display(hidden),~
+                xchgsprime display(hide),xpaymentterm display(hide),xtype display(hide)
+	
+	
+		field xcus
+			caption Supplier Code
+			pick list casup
+		end field
+
+		field xdate
+			caption Payment Date
+		end field
+
+		field xpaymenttype
+			pick "Cheque"
+		end field
+		
+		field xprime
+			caption Total Paid Amount
+		end field
+
+        field xvatamt
+          caption VAT Deducted At Source
+          display text
+        end field
+
+        field xaitamt
+          caption AIT Deducted At Source
+          display text
+        end field
+
+        field xorg
+          attrib local
+          display constant
+          caption Supplier Name
+          event after
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+	 field xbank
+		width 30
+			pick list xacc
+	 end field
+
+        field xbankname
+          attrib local
+          display const
+          caption Bank Name
+          event after
+            set xbankname=acmst.xdesc("xacc='"+xbank+"'")
+          end event
+        end field
+
+        field xname
+          display constant
+          event after
+          end event
+        end field
+
+        field xnote
+		height 3
+          width 60
+		  column 2
+        end field
+
+
+        field xvoucher
+			width 15	
+         caption Payment Number
+		 display text
+		 pick list xvouchermr
+	   event after    
+		set globals(xvoucher)=xvoucher
+            set globals(xcus)=xcus
+	     	      if xstatusjv .eq. "Confirmed"
+		         	set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+            	end if
+				if xdate .lt. '"+#date+"'
+					set #field(update.display)="hidden"
+				end if
+		class careports(getjspReport{armrprint,1,xvoucher,Print Money Receipt})
+          end event
+        end field
+
+    field add
+		event before
+			set xstatusjv="Open"
+		    set xtypetrn = "Purchase"
+			set xtype="PM--"
+			set xsign = "1"
+			if xprime == 0
+				error "Cannot Proceed -- Amount is Blank"
+			else if xcus .eq. ""
+				error "Cannot Proceed -- Supplier Invalid"
+			else if xbank .eq. ""
+				error "Cannot Proceed -- Bank A/C Required"
+			else 
+				set trn = "PM--"
+				set xvoucher = #trn("AR Transactions",trn,10)
+			end if
+      end event
+      event after
+            set command = "add"
+            set temp = #spsql(zabsp_ArhedChk,#id,#user,xvoucher,xcus,command)
+			//set temp = #spsql(sp_validateAfterARcas,#id,#user,xvoucher,xcus,command)
+            action Show
+          end event
+        end field
+
+        field Update
+          event before
+            set temp = #sql("select xinvnum from aralc where xvoucher='"+xvoucher+"'")
+            if #result .eq. "false"
+              set xbalprime=xprime
+            end if
+          end event
+          event after
+            set command = "update"
+			set temp = #spsql(zabsp_ArhedChk,#id,#user,xvoucher,xcus,command)
+            //set temp = #spsql(sp_validateAfterARcas,#id,#user,xvoucher,xcus,command)
+            action Show
+          end event
+        end field
+
+        field Transfer
+			event before
+			if xbank .eq. ""
+				error "Cannot Proceed -- Bank A/C Required"
+			end if
+			end event
+          event after  
+            set temp = #spsql(zabsp_AP_transferAPtoGL,#id,#user,xvoucher)
+			action show
+			//set voucher = #sql("select xvoucher from acheader where xinvnum='"+xinvnum+"'")
+		    print "<font color=red size=+1>Voucher No "+xdocnum+" Created</font>"
+          end event
+        end field
+
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Allocate
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Details"){
+            form.screen.value = "apcas"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+          if (detail == "Allocate"){
+            form.screen.value = "apalc"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+        }
+        </script>
+     end jscript
+
+
+
+end screen

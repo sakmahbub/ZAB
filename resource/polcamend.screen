@@ -1,0 +1,65 @@
+screen polcamend
+     caption "LC Ammendment"
+     sidebar list one
+     sections form one,jscript myscript
+
+     list one
+        caption "<br><center><b>"Ammendment List For LC No ""+xmlcno+"</b>"
+        table polcamend
+        fixed xpornum
+        order xpornum,xamendno
+        navigators alpha //group xsub "select xsub from acdetail where (xprime<xarap)"
+        rows 10
+        objects ~
+         xamendno attrib(link "login?screen=polcamend&command=Show&xamendno=?"), ~
+         xdate,xnote
+//         headers Invoice List
+     end list
+
+     form one
+        caption "LC Ammendment"
+	      table polcamend
+        fixed xpornum,xmlcno
+        order xpornum,xamendno
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Return,Show,Clear,Add,Update,Delete,*Next,Next,Previous,Top,Bottom,"<p>" ,~
+                xamendno attrib(row 0 10;search),xdate,xapprover,xnote
+
+
+        field xnote
+         width 120
+          column 3
+          height 20
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	      if (detail=="Return"){
+            form.screen.value = "poordheader"
+            form.searchbutton.value = "Find xpornum=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

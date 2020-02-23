@@ -1,0 +1,12 @@
+     list xponum
+        caption "Items containing: "+zvalue
+        table poordheader
+        order xpornum
+        select "(xpornum like '%"+zvalue+"%' or xdate like '%"+zvalue+"%') and left(xpornum,2)='PO'"
+        searchselect "left(xpornum,2)='PO'"
+		rows 20
+        objects xpornum attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdate
+     end list
+
+

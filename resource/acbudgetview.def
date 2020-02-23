@@ -1,0 +1,22 @@
+product ZAB ERP
+
+table acbudgetview
+  caption "Account Budget view"
+  columns   zid, xwh, xacc,xyear, xper, xbudgetamt
+
+  primary key  zid, xwh, xacc,xyear, xper
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql CREATE VIEW acbudgetview AS ~
+	with acbudgetCTE as ~
+	(select b1.zid, b1.xwh, b1.xacc, b1.xyear, b1.xper, b1.xbudgetamt, b1.xbudgetamt as CalBudget, 1 as value from acbudget as b1 where b1.xper=0 ~
+	UNION ALL ~
+	select b2.zid, b2.xwh,  b2.xacc, b2.xyear, b2.xper+1, convert(decimal(20, 2),b2.CalBudget/12), b2.CalBudget, (value+1) as value from acbudgetCTE as b2 ~
+	where b2.value<=12) ~
+	select zid, xwh, xacc,xyear, xper, xbudgetamt from acbudgetCTE ~
+	UNION ALL ~
+	select b3.zid, b3.xwh, b3.xacc, b3.xyear, b3.xper,b3.xbudgetamt from acbudget as b3 where b3.xper<>0 	
+end table

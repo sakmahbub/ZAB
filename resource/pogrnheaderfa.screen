@@ -1,0 +1,114 @@
+screen pogrnheaderfa
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        caption "PO List"
+        table poordheader
+        order xpornum
+        fixed xpornum
+        rows 20
+        objects  xpornum attrib(link "login?screen=poordheaderfa&command=Show&xpornum=?"), ~
+                 xdate
+
+
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+     form one
+        caption "<ACRONYM>GRN Header(Fixed Asset)</ACRONYM>"
+        table pogrnheader
+        order xgrnnum desc
+        select "xtype='FA'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Delete,Update,~
+                *next,Detail,Top, Previous, Next, Bottom,Confirm,"<p>" ,~
+                xgrnnum attrib(search) display(trn GRN Number),xinvnum,~
+                xdate,xwh,xsup,xdum,xcur display(hide),xexch display(hide),~
+                xprimetotamt,xbasetotamt display(const),~
+                xtype display(hide),~
+                xstatusgrn display(const),xstatusjv display(hide),xref,xpornum display(hide),xnote
+
+        field xdum
+          attrib local
+          caption Name
+          diplay constant
+          event after
+            set xdum = casup.xorg("xsup = '"+xsup+"'")
+          end event
+        end field
+
+
+        field update
+          event before
+            set xstatusgrn = "Open"
+          end event
+        end field
+
+        field xnote
+          width 50
+          column 4
+        end field
+
+        field xgrnnum
+           event after
+              set globals(xgrnnum) = xgrnnum
+           end event
+        end field
+
+        field Confirm
+           event before
+            if xstatusgrn .eq. "Confirmed"
+              error "Already Confirmed"
+            end if
+           end event
+           event after
+              class pomedical(ConfirmGRNSingle{xgrnnum,xdate,xwh,Single})
+           end event
+        end field
+
+        field Post
+          event after
+            if xstatusap .ne. "Confirmed"
+              class pomedical(TransferToAPSingle{pogrnheader,xgrnnum,-1})
+            end if
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+        field Amendment
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Detail"){
+            form.screen.value = "pogrndetailfa"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

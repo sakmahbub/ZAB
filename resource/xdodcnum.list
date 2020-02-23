@@ -1,0 +1,12 @@
+     list xdodcnum
+        caption "Items containing: "+zvalue
+        table opdoheader
+        order xdornum desc
+        select "(xdornum like '%"+zvalue+"%' or xdate like '%"+zvalue+"%') and left(xdornum,2)='DC'"
+        searchselect "left(xdornum,2)='DC'"
+		rows 20
+        objects xdornum attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdate,xcus
+     end list
+
+

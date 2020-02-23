@@ -1,0 +1,25 @@
+product ZAB ERP
+
+table poorddetailview
+  caption "PO Detail View"
+  columns zid,xcrnnum,xdate,xcus,xstatuscrn,xref,xwh,xdesc,xstatusar,xtotamt,~
+          xdisc,xdiscf,xait,xamount,xsp,xtotvat,xaitamt,xdiscamt,xfm,xsm,xrsm,~
+          xrow,xitem,xlong,xvatrate,xvatamt,~
+          xqtyord,xqtybonus,xunit,xrate,xlineamt,xordernum,xgitem
+
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view poorddetailview(zid,xlcno,xpornum,xrow,xitem,xdesc,xqtypur,xunitpur,xrate,xlineamt,xbase,xrategrn,xnote,xserial,xqtygrn,xporef,xqtyprn) ~
+            as select a.zid,b.xlcno,a.xpornum,a.xrow,a.xitem,c.xdesc,a.xqtypur,a.xunitpur,a.xrate,a.xlineamt, ~
+			a.xbase,a.xrategrn,a.xnote,isnull(c.xtheircode,''),a.xqtygrn,a.xpornum,isnull(a.xqtyprn,0) ~
+			from poorddetail a join poordheader b on a.zid=b.zid and a.xpornum=b.xpornum ~
+			join caitem c on a.zid=c.zid and a.xitem=c.xitem ~
+			union all ~
+			select zid,xlcno,xpornum,999,'','Freight Cost',1,'Job',xtransport,xtransport,isnull(xbasetransport,0),0,xnote,'',0,'',0 ~
+			from poordheader where xtransport>0
+end table

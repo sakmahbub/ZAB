@@ -1,0 +1,31 @@
+//Inventory Reports.menu
+//-------------------------------------------------------------------
+option                                |action
+//-------------------------------------------------------------------
+///Item Ledger Detail            |#classPath+"/login?screen=*viewcrystal imtrndetailstore(9;in,st,st,st,st,st,st,dt,dt;zid,wh,gitem,catitem,itemtype,pnature,item,fdate,tdate;xwh=Store=,xgitem=Item Group,xcatitem=Item Category,xtitem=Item Type,xtypeitemrep=Product Nature,xitem=Item,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+//
+Not Confirmed DO List  |#classPath+"/login?screen=*viewcrystal opdonotconfirmed(1;in;zid;xviewtype=Report View)"
+Outstanding Delivery Order         |#classPath+"/login?screen=*viewcrystal opsalesordercustore(3;in,st,dt;zid,cus,fdate;xcus=Customer ID,xdate=Date,xviewtype=Report View)"
+Delivery Report(Datewise)         |#classPath+"/login?screen=*viewcrystal opdodelrpt(5;in,st,st,dt,dt;zid,cus,count,fdate,tdate;xcus=Customer ID,xcount=Count,xdate=From Date,xdate=To Date,xviewtype=Report View)"
+////Delivery Report(Datewise)         |#classPath+"/login?screen=*viewcrystal opdodelrpt(5;in,st,st,dt,dt;zid,cus,fdate,tdate;xcus=Customer ID,xcount=Count,xdate=From Date,xdate=To Date,xviewtype=Report View)"
+Item Ledger Detail            |#classPath+"/login?screen=*viewcrystal imtrndetailstore(9;in,st,st,st,st,st,st,dt,dt;zid,wh,gitem,catitem,item,ordernumso,colorcode,fdate,tdate;xwh=Store=,xgitem=Item Group,xcatitem=Item Category,xitem=Item,xordernumso=So No,xcolorcode=ColorCode,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+//Item Ledger Summary           |#classPath+"/login?screen=*viewcrystal imledsumstore(10;in,st,st,st,st,st,st,dt,dt,st;zid,xwh,itemtype,fgitem,tgitem,fitem,titem,fdate,tdate,pnature;xwh=Store=,xtitem=Item Type,xgitem=Item Group,xgitem=Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xtypeitemrep=Product Nature,xviewtype=Report View)"
+////Item Ledger Summary           |#classPath+"/login?screen=*viewcrystal imledsumstore(8;in,st,st,st,st,st,dt,dt;zid,xwh,fgitem,tgitem,fitem,titem,fdate,tdate;xwh=Store=,xgitem= From Item Group,xgitem= To Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xviewtype=Report View)"
+Item Ledger Summary           |#classPath+"/login?screen=*viewcrystal imledsumstorenew(9;in,st,st,st,st,st,dt,dt,st;zid,xwh,fgitem,tgitem,fitem,titem,fdate,tdate,count;xwh=Store=,xgitem=From Item Group,xgitem= To Item Group,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xcount=Count,xviewtype=Report View)"
+Finish Goods Enrty(Datewise) |#classPath+"/login?screen=*viewcrystal datewfinishgentry(3;in,dt,dt;zid,fdate,tdate;xdate=From Date,xdate=To Date,xviewtype=Report View)"
+///Plant & machinery Summary     |#classPath+"/login?screen=*viewcrystal imledsumstorepnm(8;in,st,st,st,st,dt,dt,st;zid,xwh,pnature,fitem,titem,fdate,tdate,reptype;xwh=Store=,xtypeitemrep=Product Nature,xitem=From Item=0=text,xitem=To Item=zzz,xdate=From date=#date,xdate=To Date=#date,xreptype=Report Type,xviewtype=Report View)"
+
+LC Confirmation Report		  |#classPath+"/login?screen=*viewcrystal lcreport(4;in,dt,dt,st;zid,fdate,tdate,lcno;xdate=From Date=,xdate=To Date=,xlcno=LC No,xviewtype=Report View)"
+Date Wise Receive           		  |#classPath+"/login?screen=*viewcrystal imreceived(6;in,dt,dt,st,st,st;zid,fdate,tdate,gitem,item,wh;xdate=From date=#date,xdate=To Date=#date,xgitem=Item Group,xitem=Item,xwh=Store=,xviewtype=Report View)"
+Date Wise Issue          		  	  |#classPath+"/login?screen=*viewcrystal imconsumption(8;in,dt,dt,st,st,st,st,st;zid,fdate,tdate,acdiv,wh,gitem,type,status;xdate=From date=#date,xdate=To Date=#date,xdiv =Plant /Office,xwh=Store=,xgitem=Item Group,ximistype = Issue Type,xstatusrep=Status,xviewtype=Report View)"
+
+Product List                     |#classPath+"/login?screen=*viewcrystal caitem(3;in,st,st;zid,gitem,catitem;xgitem=Item Group,xcatitem=Item Category,xviewtype=Report View)"
+Group Wise Product List   		 |#classPath+"/login?screen=*viewcrystal caitemgroup(3;in,st,st;zid,gitem,catitem;xgitem=Item Group,xcatitem=Item Category,xviewtype=Report View)"
+
+/////Duplicate Product Listing	  |#classPath+"/login?screen=*viewcrystal caitemjustification(3;in,st,st;zid,firstpar,secpar;xdegree=1st Param,xdegree=2nd Param,xviewtype=Report View)"
+Store                         |#classPath+"/login?menu=misreportsstore"
+/////Inventory Notifications Query |#classPath+"/login?screen=imnotificquery"
+
+
+//-------------------------------------------------------------------
+

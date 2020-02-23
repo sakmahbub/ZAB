@@ -1,0 +1,210 @@
+screen opcnfbilldetailapp
+
+     sidebars list one
+     sections form one,list reqlist,jscript myscript
+	
+	
+	 list one
+        caption "C&F Bill Detail List."
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=opcnfbilldetailapp&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = opdodetail.zid and xitem=opdodetail.xitem)),xlineamt,xcomm
+
+		headers "Line No","Item","Description","Amount","Commission %"
+		totals "","Total","",sum,""
+     end list
+	 
+	  list reqlist
+    	caption "Advance Amount List for : "+xordernum
+        table pocnfadjview
+        order xordernum
+        fixed xordernum
+        rows 40
+        objects ~//xitem attrib(link "abc" embed onclick="return pickItem(this)"),~
+        xitem attrib(name xitem#), xdesc attrib(name xdesc#), xlineamt attrib(name xlineamt#)
+        
+       totals "","Total",sum
+	   header "Code Code","Cost Name","Amount"
+     end list
+
+
+
+     form one
+        caption "C&F Bill Approval Detail For : "+xdornum
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+               Add,Update,Delete,Show,Clear,*next, Return,Top, Previous, Next, Bottom,~
+                xrow attrib(row 0 1),xunit display(hide),xdum,~
+                xitem,xdesc,xgcost,xrate display(hide),xqtyord display(hide),xlineamt,xlong,xdocrow,xrem,xcomm,zactive//,xqtypor display(hide)//xep display(hide)
+
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+		
+		 field xlineamt
+          caption Amount
+        end field
+		
+		 field xqtyord
+         default 1
+        end field
+		
+	 field xitem
+		 caption Cost Code
+       pick list costitem
+        end field
+		
+		 field zactive
+         caption Paid by Customer
+		 default 0
+        end field
+		
+		 field xunit
+		  caption Unit
+		  pick
+        end field
+		
+		 field xdocrow
+        attrib readonly
+        end field
+		
+		 field xdum
+		 attrib local
+		display const
+          caption
+        end field
+		
+		 field xrate
+          caption Amount
+        end field
+		
+		 field xrowss
+        event after
+		if xstatusreq .ne. ""
+		set #field(Update.display)="hidden"
+		set #field(Add.display)="hidden"
+		set #field(Delete.display)="hidden"
+		end event
+        end field
+		
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		field xrem
+        display text
+            width 80
+        caption Agency Commission Note
+          end field
+
+        field add
+          event before
+		  if xitem .eq. ""
+		  set xitem="CC--0016"
+		  end if
+            set xunit = caitem.xunitpur("xitem='"+xitem+"'")
+			ser xrate=1
+		//	set xlineamt=xqtyord*xrate
+		//	set xlineamt=xrate
+			set xunit=#trim(xunit)
+          end event
+          event after
+		 //  set temp=#sql("Update oporddetail set xdoamount='"+xlineamt+"' where xordernum='"+xordernum+"' and xorderrow='"+xdocrow+"'")
+			 set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xdornum,xordernum,xdocrow,xrow,"opcnfbilldetail")
+		 end event
+        end field
+
+        field update
+          event before
+			set xunit=#trim(xunit)
+		//  set xlineamt=xqtyord*xrate
+		//	set xlineamt=xrate
+          end event
+          event after
+		// set temp =  #sql("update poreqheader set xep='"+ep+"' where xporeqnum='"+xporeqnum+"'")
+		 set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xdornum,xordernum,xdocrow,xrow,"opcnfbilldetail")
+          end event
+        end field
+		
+		field delete
+          event before
+		  set dornum=xdornum
+		set ordernum=xordernum
+		set docrow=xdocrow
+		set row=xrow
+          end event
+          event after
+		//  set temp=#sql("Update oporddetail set xdoamount=0 where xordernum='"+ordernum+"' and xorderrow='"+docrow+"'")
+		    set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,dornum,ordernum,docrow,row,"opcnfbilldetail")
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+		
+        embed onsubmit="return submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+
+  jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Return"){
+            form.screen.value = "opcnfbillheaderapp"
+            form.searchbutton.value = "Find xdornum=?"
+          }
+          return result
+        }
+		
+	  function pickItem(link,amt,orderrow){//unit,
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xitem.value=link.text
+            document.one.xlineamt.value=amt.text
+           // document.one.xunit.value=unit.text
+            document.one.xdocrow.value=orderrow.text
+          }else{
+            document.one.xitem.value=link.innerText
+            document.one.xlineamt.value=amt.innerText
+       //     document.one.xunit.value=unit.innerText
+            document.one.xdocrow.value=orderrow.innerText
+          }
+          return false
+        }
+		
+		
+        </script>
+     end jscript
+	 
+ end screen

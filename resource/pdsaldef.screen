@@ -1,0 +1,67 @@
+screen pdsaldef
+     caption "PD Salary Defaults"
+	sidebar list one
+	sections form one
+	
+	   list one
+        caption "Salary Grade Interface"
+        table pdsaldef
+        order xgrade
+		//fixed xgrade
+        rows 20
+        objects xgrade attrib(link "login?screen=pdsaldef&command=Show&xgrade=?"), ~
+                xbasic,xhrent,xmedical,xmedicalf,xcomm,xlfa,xentertainment,xothers,xconveyance,xmobilebill
+
+
+        headers "Salary Grade","Basic Rate (%)","House Rent Rate(%)","Medical Rate(%)","Medical Fixed","Conveyance %","LFA %","Entertainment %","Others Rate(%)","Conveyance","Mobile Bill"
+     end list
+
+	form one
+		caption "Salary Defaults"
+		table pdsaldef
+		//primary key xgrade
+		order xgrade
+		//fixed xgrade
+		return "login"
+		layout 2
+		pstyle 3
+		objects Show,Clear,Add,Update, Delete,*next,Top,Bottom,"<p>" ,~
+						xgrade,xbasic,xhrent,xmedical,xmedicalf,xothers,xconveyance,xmobilebill,xlfa,xcomm,xentertainment
+
+	
+	field xgrade	
+	//display combo
+	//pick "A,B,C,D"
+	end field
+						
+	field xbasic
+	   caption Basic Rate
+	end field
+	
+	field xhrent
+	   caption House Rent Rate
+	end field
+	
+	field xmedical
+	   caption Medical Rate
+	end field
+	
+	field xothers
+	   caption Others Rate
+	end field
+	
+	field xcomm
+	   caption Conveyance %
+	end field
+	
+	field xconveyance 
+	   caption Conveyance Fixed
+	end field
+
+	
+	field xmobilebill
+	   caption Mobile Bill Fixed
+	end field
+end form
+
+end screen

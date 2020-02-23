@@ -1,0 +1,278 @@
+screen acheaderadmin
+
+  sidebar list detail
+  sections form one,jscript myscript
+
+  list detail
+    caption "Detail List"
+    table acdetail
+    order xvoucher,xrow
+    fixed xvoucher
+    rows 50
+    objects  xrow,~// attrib(link "login?screen=acdetailg&command=Show&xvoucher=?&xrow=?"), ~
+             xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)),~
+			 xsub,subdesc equals((select xorg from acsubview where zid=acdetail.zid and xsub=acdetail.xsub and xacc=acdetail.xacc)),xdebit,xcredit
+
+    totals "","","","","Total",sum,sum
+
+    headers "Line No","Acc Code","Description","Sub Code","Description","Debit","Credit"//,"Amt"
+  end list
+
+
+  form one
+    caption "Voucher Update By Admin"
+    table acheader
+    primarykey xvoucher
+    order xvoucher
+    //select "xstatusjv='Balanced' and xstatus='Open' and xper>0"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Show,Update,Delete,Clear,*next,Top,Previous,Next,Bottom,Post,Unpost,Detail,~
+            xtrn,xvoucher,xdate,xref,xwh,xwhdesc,xsub display(h),xyear display(const),xper display(const),~
+            xstatusjv,xoldvoucher display(const),xtype display(hide),xlcno display(h),~
+			xpreparer display(hide),xsuperiorgl,superiorgl,xsuperior2,superior2,xstatus,xtypeobj,xlong
+
+	field xtrn
+		display combo
+		pick "select xtrn from xtrn where xtypetrn='GL Voucher'"
+	end field
+	
+		field xtypeobj
+			caption Requisition Type
+			pick code Requisition Type
+			display combo
+		end field		
+	
+	field xstatus
+		display combo
+		pick "Open,Applied,Recommended,Approved"
+	end field
+
+    field xwh
+      //display const
+	  caption Division Code
+      default "01"
+    end field
+
+    field xwhdesc
+      attrib local
+      caption Division Name
+      display const
+      event after
+        set xwhdesc=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+      end event
+    end field
+	
+	field superiorgl
+      attrib local
+      caption Approval Superior 1
+      display const
+      event after
+        set superiorgl=pdmst.xname("xposition='"+xsuperiorgl+"'")
+      end event
+    end field
+	
+	 field superior2
+	 attrib local
+	 display const
+	 caption Approval Superior 2
+	 event after
+	 set superior2=pdmst.xname("xposition='"+xsuperior2+"'")
+	 end event
+	 end field	
+
+    field xorg
+      attrib local
+      caption Customer Name
+      display const
+      event after
+        set xorg=cacus.xorg("xcus='"+xsub+"'")
+      end event
+    end field
+
+    field xlong
+      caption Header Description
+      width 80
+      height 3
+      column 2
+    end field
+
+        field xdate
+          event before
+           set xyear=#year(xdate,acdef)
+           set xper=#per(xdate,acdef)
+          end event
+        end field
+
+    field xstatusjv
+      display constant
+    end field
+
+    field xvoucher
+	//pick xvoucherother
+      event after
+		class careports(getReport{acvoucher;2;in,st;zid,svoucher;xvoucher;Print Voucher})
+        set globals(xvoucher)=xvoucher
+		 set globals(xstatusjv)=xstatusjv
+		set globals(xwh)=xwh
+		
+        if xstatusjv .eq. "Posted"
+          set #field(Delete.display) = "hidden"
+          set #field(Update.display) = "hidden"
+        end if
+		if xstatus .ne. "Open"
+		 set #field(Checked.display) = "hidden"
+		end if
+      end event
+    end field	
+	
+		field Post
+        event before
+		int xday=#sql(int,"select xday from acdef")
+		set preventry=#sql("select xpreventry from acdef")
+		int mon=#per(#date,acdef)
+		int yyy=#year(#date,acdef)
+		int daycon=#sub(#date,8,2)	
+		if yyy>xyear+1 .and. preventry .eq. "No"
+		error "Can not Proceed-- Previous Year voucher doesnot allow."
+		
+		else if yyy>xyear .and. xper .ne. 12 .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous Year voucher doesnot allow."
+		
+		else if yyy>xyear .and. xper .eq. 12 .and. daycon >xday .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous Year voucher doesnot allow."
+		
+		else if mon >xper .and.  daycon >xday .and. preventry .eq. "No"
+		error "Can not Proceed <--> Previous month voucher doesnot allow."
+		
+		else if mon>xper+1 .and. preventry .eq. "No"
+		error "Can not Proceed <-> Previous month voucher doesnot allow."
+		
+		else if acheader.xstatusjv("xvoucher='"+xvoucher+"'") .eq. "Posted" .or. xstatusjv .eq. ""
+				error "Voucher Already Post or Voucher is not selected"
+		end if
+        end event
+        event after
+			set temp = #spsql(sp_acPost,#id,#user,xyear,xper,xvoucher,xvoucher)
+	        action show
+		end event
+        end field
+		  
+		  
+		  field Unpost
+            event before
+			int xday=#sql(int,"select xday from acdef")
+		set preventry=#sql("select xpreventry from acdef")
+		int mon=#per(#date,acdef)
+		int yyy=#year(#date,acdef)
+		int daycon=#sub(#date,8,2)
+		
+		if yyy>xyear+1 .and. preventry .eq. "No"
+		error "Can not Proceed-- Previous Year voucher doesnot allow."
+		
+		else if yyy>xyear .and. xper .ne. 12 .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous Year voucher doesnot allow."
+		
+		else if yyy>xyear .and. xper .eq. 12 .and. daycon >xday .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous Year voucher doesnot allow."
+		
+		else if mon >xper .and.  daycon >xday .and. preventry .eq. "No"
+		error "Can not Proceed <--> Previous month voucher doesnot allow."
+		
+		else if mon>xper+1 .and. preventry .eq. "No"
+		error "Can not Proceed <-> Previous month voucher doesnot allow."
+
+		else if acheader.xstatusjv("xvoucher='"+xvoucher+"'") .ne. "Posted" .or. xstatusjv .eq. ""
+				error "Voucher is not Posted"
+			end if
+            end event
+            event after
+			  set temp = #spsql(sp_acUnPost,#id,#user,xyear,xper,xvoucher,xvoucher)
+	        action show
+		   end event
+          end field
+
+    field Add
+      event before
+	    set xwh="01"
+		set xtype = ""
+		set xlcno = ""
+		set xsub = ""
+		set xoldvoucher = ""
+        set xstatusjv="Balanced"
+		//set xpreparer=pdmst.xname("xposition='"+#user+"'")
+		set xstatus="Open"
+  		set xvoucher = #trn("GL Voucher",xtrn,12)
+        class gltrn(acValidateBeforeHeader{xyear,xper})
+      end event
+    end field
+	
+	
+	field Update
+      event before
+		int xday=#sql(int,"select xday from acdef")
+		set preventry=#sql("select xpreventry from acdef")
+		int mon=#per(#date,acdef)
+		int yyy=#year(#date,acdef)
+		int daycon=#sub(#date,8,2)
+		
+		if xstatusjv .eq. ""
+		 error "Please Show First."
+		
+		else if yyy>xyear+1 .and. preventry .eq. "No"
+		error "Can not Proceed-- Previous Year voucher doesnot allow."
+		
+		else if yyy>xyear .and. xper .ne. 12 .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous Year voucher doesnot allow."
+		
+		else if yyy>xyear .and. xper .eq. 12 .and. daycon >xday .and. preventry .eq. "No"
+		error "Can not Proceed------ Previous Year voucher doesnot allow."
+		
+		else if mon >xper .and.  daycon >xday .and. preventry .eq. "No"
+		error "Can not Proceed <--> Previous month voucher doesnot allow."
+		
+		else if mon>xper+1 .and. preventry .eq. "No"
+		error "Can not Proceed <-> Previous month voucher doesnot allow."
+		
+		else if xtrn .eq. ""
+			error "Cannot Proceed -- Please Select Transaction Code"
+		end if
+      end event
+    end field
+	
+
+    embed onsubmit="submitit(this)"
+
+    field Detail
+      embed onclick="clicked(this)"
+    end field
+
+    field Inventory
+      embed onclick="clicked(this)"
+    end field
+
+    field AR
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+    function clicked(b){
+      detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Detail"){
+          form.screen.value = "acdetailadmin"
+          form.searchbutton.value = "Find xvoucher=?"
+          //return false
+        }
+      }
+
+      </script>
+  end jscript
+
+end screen

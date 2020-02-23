@@ -1,0 +1,16 @@
+     list bmeassetcode
+        table xcodes
+        order xcode
+        select "((xcode like '%"+zvalue+"%' or xlong like '%"+zvalue+"%') and xtype='Asset Category')"
+        rows 20
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'xfacat')"), ~
+                xlong
+
+	  searchselect "xtype='Asset Category'"	
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

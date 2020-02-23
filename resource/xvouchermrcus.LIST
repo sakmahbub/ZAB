@@ -1,0 +1,16 @@
+     list xvouchermrcus
+        table arhed
+        order xvoucher
+		linkobjects xcus
+        select "(xvoucher like '%"+zvalue+"%') and left(xvoucher,2)='MR'"
+		searchselect "left(xvoucher,2)='MR'"
+        rows 10
+        objects xvoucher attrib(link "abc" embed onclick="return updateParent(this:'xdocnum')"), ~
+                xcus,xdate,xprime
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

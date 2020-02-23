@@ -1,0 +1,207 @@
+screen impackhdr
+     caption "Transfer Order Entry Header"
+    sidebar list tolist,list one,list two
+	sections form one, jscript myscript
+
+    list tolist
+        caption "<br><center><b>"Packing Entry Header List"</b>"
+        table imtorheader
+        order xtornum
+		select "xstatustor<>'Confirmed' and left(xtornum,4)='TO--'"// and isnull(xbatch,'')=''"
+        rows 10
+        objects ~
+        xtornum attrib(link "login?screen=impackhdr&command=Show&xtornum=?"),xdate,xordernum,xpiref,~
+		pidate equals((select xpidate from opordheader where zid=imtorheader.zid and xordernum=imtorheader.xordernum))
+        
+        headers "Chalan No","Chalan Date","Order No","PI No","PI Date"
+    end list
+
+    list one
+        caption "<br><center><b>"RM Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+		select "xgitem='Finished Goods'"
+        rows 10
+        objects ~
+        xrow, ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyord
+
+        headers "Serial No","Item","Description","Qunatity Ordered"//,"Quantity Delivered"
+     end list
+
+    list two
+        caption "<br><center><b>"FG Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+		select "xgitem='Finished Goods (Packing)'"
+        rows 10
+        objects ~
+        xrow, ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),~
+        xqtyord
+
+        headers "Serial No","Item","Description","Qunatity Ordered"//,"Quantity Delivered"
+     end list
+
+     form one
+        caption "Packing Entry Header"
+        table imtorheader
+        primarykey xtornum
+        order xtornum desc
+        select "left(xtornum,4)='TO--'"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Add,Update,Delete,Clear,Show,RM Entry,FG Entry,Top,Next, "<p>" ,~
+        xtornum ,xdate,xref,xstatustor display(constant),~
+        xfwh,xfbrname,xtwh,xtbrname,xlong,~
+		xdocrow display(hide),xdatecom display(hide)
+					
+	    field xfwh
+    		caption From Store
+			display text
+			pick list xwh
+	    end field
+	    
+	    field xtwh
+    		caption To Store
+			display text
+			pick list xwh
+	    end field
+			
+       field xfbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+		
+        field xtornum
+          event after
+			set global(xtornum)=xtornum
+            class careports(getjspReport{impack,1,xtornum,Print Packing Report})
+			if xstatustor .eq. "Confirmed"
+              set #field(Check.display)="hidden"
+              set #field(Confirm.display)="hidden"
+			end if
+           end event
+        end field
+
+        field add
+          event before
+			//set xordernum = opdoheader.xordernum("xdornum='"+xdornum+"'")
+			if xfwh .eq. ""
+				error "Cannot Proceed -- Please Select From Branch"
+			else if xtwh .eq. ""
+				error "Cannot Proceed -- Please Select To Branch"
+			//else if xdate .lt. #date
+			//	error "Cannot Proceed -- Transfer On Previous Date Not Allowed"
+			else
+	          	set trn = "TO--"
+		        set xstatustor="Open"
+				//set xbatch = moheader.xbatch("xordernum='"+xordernum+"'")
+				//set xpiref = opordheader.xpiref("xordernum='"+xordernum+"'")
+	       	    set xtornum = #trn("Transfer Transaction",trn,10)
+			end if
+          end event
+        end field
+		
+
+        field xdate
+          caption Transfer Date
+        end field
+
+        field Confirm
+          event before
+            if xstatustor .ne. "Open"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,"imtorheader",6)
+            action Show
+          end event
+        end field
+
+        field Transfer
+          event before
+            if xstatustor .ne. "Open"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,6)
+           // action Show
+          end event
+        end field
+
+        field Receive
+          event before
+            if imtorheader.xstatustor("xtornum='"+xtornum+"'") .ne. "Transfered"
+              error "Cannot Proceed -- TO Already Confirmed"
+            end if
+          end event
+          event after
+            set temp = #spsql(sp_confirmTO,#id,#user,xtornum,xdate,xfwh,xtwh,xstatustor,8)
+           // action Show
+          end event
+        end field
+
+       embed onsubmit="submitit(this)"
+        
+
+        field RM
+          embed onclick="clicked(this)"
+        end field
+
+        field FG
+          embed onclick="clicked(this)"
+        end field
+        
+        field Production
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="RM Entry"){
+            form.screen.value = "impackrm"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="FG Entry"){
+            form.screen.value = "impackfg"
+            form.searchbutton.value = "Top"
+          }
+
+
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

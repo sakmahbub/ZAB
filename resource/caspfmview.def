@@ -1,0 +1,18 @@
+
+product ZAB ERP
+
+table caspfmview
+  caption "Credit Limit View"
+  columns zid,xsp,xname,xwh
+  primary key zid,xsp
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view caspfmview (zid,xsp,xname,xwh)~
+                  as select zid,xsp,xname,xwh ~
+                  from casp where left(xsp,4)='FM--'
+
+
+end table

@@ -1,0 +1,24 @@
+
+     list ximtorprint
+        table imtorheader 
+        order xtornum
+    	select "xtornum like '%"+zvalue+"%'"     
+        rows 10
+        objects xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+	xfwh,xtwh,xdate
+
+     end list
+
+        //select "xwh='"+#wh+"' and xtornum like '%"+zvalue+"%'"
+//list cacus
+  //table cacus
+  //order xcus
+  //select "((xcus like '%"+zvalue+"%' or xorg like '%"+zvalue+"%') and left(xcus,2)='"+#wh+"' and xstatuscus='Open')"
+  //rows 10
+  //searchselect "left(xcus,2)='"+#wh+"' and xstatuscus='Open'"
+  //objects xcus attrib(link "abc" embed onclick="return updateParent(this:'xcus')"), ~
+          //xorg,xmadd,xroute //,name equals((select xname from cappo where zid=cacus.zid and xsp=cacus.xsp))
+
+  //header "Customer Code","Customer Name","Address","PPO Code","PPO Name"
+        
+//end list

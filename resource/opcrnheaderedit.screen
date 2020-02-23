@@ -1,0 +1,213 @@
+screen opcrnheaderedit
+
+     sidebar list one, list inv
+     sections form one, jscript myscript
+
+     list one
+	      caption "List For Sales Return Adjustment No "+xcrnnum
+        table opcrndetail
+        order xcrnnum,xrow
+        fixed xcrnnum
+        rows 20
+        objects xrow, ~
+                xitem,desc equals((select xdesc from caitem where caitem.zid=opcrndetail.zid and caitem.xitem=opcrndetail.xitem)),~
+                xqtyord,xrate,xlineamt
+
+        totals count,"","Totals",sum,"",sum
+        header "Line No","Item Code","Description","Qty Ordered","Rate","Line Amount"
+     end list
+
+     list inv
+        caption "Return Amount"
+        table opcrnheader
+        order xcrnnum
+        fixed xcrnnum
+        rows 10
+        objects  xcrnnum,xtotamt,xvatamt,xdiscamt,(xtotamt+xvatamt-xdiscamt)
+
+        header "Return No","Trade Price","VAT","Discount","Net Amount"
+     end list
+
+
+     form one
+        caption "Sales Return Entry Header"
+        table opcrnheader
+        primarykey xcrnnum
+        order xcrnnum desc
+        select "xwh='"+#wh+"'"
+        return "login"
+        layout 3
+        pstyle 3
+        objects ~
+                Details,Show,Clear,Add,Delete, Update,*next,Top,Previous,Next,Bottom,Confirm,"<p>" ,~
+                xcrnnum ,xordernum,xdate,xref,xcus display(const),xorg display(const),~
+                xstatuscrn display(text),xstatusar display(text),xdum, ~
+                xtotamt display(hide),~
+                xait display(hide),xvatamt display(hide),xdisc display(hide),xdiscamt display(hide),xdiscf display(hide),~
+                xaitamt display(hide),~
+
+                //hide
+                xwh display(const),xbrname,xsp display(const),xcur display(hide),xexch display(hide),~
+                xfm display(hide),xsm display(hide),xrsm display(hide),xamount display(const),xnetamt
+
+     field xnetamt
+      attrib local
+      display const
+      caption <font size=+1 color=blue>Receivable Amount </font>
+      event after
+        set xnetamt = xamount-xtotamt+xdiscamt-xvatamt
+      end event
+     end field
+
+     field xamount
+      caption <font size=+1 color=red>Invoice Amount</font>
+     end field
+
+       field xdum
+        attrib local
+        caption 
+        display const
+       end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+        field xorg
+          event after
+          set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+        field xordernum
+          pick list opordcrn
+        end field
+
+        field xcrnnum
+          event after
+           class careports(getReport{opreturnbill,1,xcrnnum,Print Return})
+            set globals(xordernum)=xordernum
+            set globals(xcrnnum)=xcrnnum
+          end event
+        end field
+
+        field add
+          event before
+		set status = opdoheader.xstatusord("xdornum='"+xordernum+"'")
+		if status .eq. "Open"
+			error "Cannot Proceed -- Invoice Not Confirmed"
+		else
+            set xstatuscrn = "Open"
+            set xstatusar = "Open"
+
+            //*********** GETTING INFO FROM CACUS ****************
+
+//            set xcus = opdoheader.xcus("xdornum='"+xordernum+"'")
+//            set xsp = opdoheader.xsp("xdornum='"+xordernum+"'")
+//            set xait = opdoheader.xait("xdornum='"+xordernum+"'")
+//            set xvatrate=opdoheader.xvatrate("xdornum='"+xordernum+"'")
+//            set xdisc=opdoheader.xdisc("xdornum='"+xordernum+"'")
+//            set xdiscf=opdoheader.xdiscf("xdornum='"+xordernum+"'")
+
+            //*********** GETTING TRN NO ****************
+
+            set xwh = opdoheader.xwh("xdornum='"+xordernum+"'")
+            set year = #sub(xdate,2,2)
+            set trn = xtrn.xtrn("xtypetrn='CRN Number' and xwh='"+xwh+"'")
+            set xcrnnum = #trn("CRN Number",trn,10)
+            set xcrnnum = #sub(xcrnnum,0,4)+year+#sub(xcrnnum,4,10)
+		end if
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterHeaderCRN,#id,#user,xcrnnum,xordernum)
+//            action Show
+          end event
+        end field
+
+        field update
+          event before
+		set temp = #sql("select xrow from opcrndetail where xcrnnum='"+xcrnnum+"'")
+		if #result .eq. "true"
+	//		error "Cannot Update -- Detail Exists"
+		end if	
+            set xwh = opdoheader.xwh("xdornum='"+xordernum+"'")
+//            set xsp = opdoheader.xsp("xdornum='"+xordernum+"'")
+//            set xcus = opdoheader.xcus("xdornum='"+xordernum+"'")
+//            set xait = opdoheader.xait("xdornum='"+xordernum+"'")
+//            set xvatrate=opdoheader.xvatrate("xdornum='"+xordernum+"'")
+//            set xdisc=opdoheader.xdisc("xdornum='"+xordernum+"'")
+//            set xdiscf=opdoheader.xdiscf("xdornum='"+xordernum+"'")
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterHeaderCRN,#id,#user,xcrnnum,xordernum)
+          end event
+        end field
+
+        field Confirm
+          event before
+            set temp = #sql("select xrow from opcrndetail where xcrnnum='"+xcrnnum+"'")
+            if #result .eq. "false"
+              error "Cannot Proceed -- Detail Not Exists"
+            end if
+          end event
+          event after
+              set temp = #spsql(sp_CRNProcess,#id,#user,#wh,xdate,xdate,xcrnnum,xcrnnum)
+//            set temp = #spsql(sp_confirmCRN,#id,#user,xcrnnum,xdate,xwh,8)
+//            set temp = #spsql(sp_transferOPtoARReturn,#id,#user,xcrnnum,xordernum,xdate,xwh,xsp,xcus,xtotamt,xait,xdisc,xdiscf)
+//            action Show
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+       field Print_Return
+         embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+//        function changeit(f){
+//          document.one.xexch.style.visibility="hidden"
+//          document.one.xexch.value = "2"
+//        }
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opcrndetailedit"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+          if (button=="Print_Return"){
+           var link =  "login?screen=*crystal+opreturnbill(xcrnnum=Return No)&option=Print+Return&menu=*none*"//&xdornum="+form.xdornum.value+""
+              var width = 240
+              var left = 760
+              if (screen){
+                left = screen.width-width
+             }
+              var param = "toolbar=no,location=yes,directories=0,status=0,menubar=0,scrollbars=1,center=0,alwaysRaised=yes,resizable=yes,height=200,width="+width+",top=0,left="+left
+              window.open(link,"StockStatus",param)
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

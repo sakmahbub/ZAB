@@ -1,0 +1,130 @@
+screen arwriteoffcr
+
+    sections form one,jscript myscript
+
+     form one
+        caption "AR Write Off Credit"
+        table arhed
+        primarykey xvoucher
+        order xvoucher
+        select "left(xvoucher,2)='WC' and xwh='"+#wh+"'"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Add,Update,Delete,Clear,Show,Allocate,*next, Top,Previous,Next, Bottom,"<p>" ,~
+                xvoucher display(trn AR Transactions),xdate,xcus,xorg,xwh display(const),xbrname,xtype,xref,xstatusjv,~
+                xprime,xbalprime attrib(readonly),xvatrate,xait,~
+                xsign display(hidden),xnote,xdocnum display(const),xsp
+
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+        field xorg
+          attrib local
+          display constant
+          caption Name
+          event after
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+        field xnote
+          width 30
+		height 3
+          //column 2
+        end field
+
+        field xlong
+          caption Header Description
+          width 50
+        end field
+
+        field xstatusjv
+           display constant
+        end field
+
+
+        field xvoucher
+         event after
+          set globals(xvoucher)=xvoucher
+         end event
+        end field
+
+        field Add
+          event before
+            set xwh=#wh
+            set xstatusjv="Open"
+		set xbalprime = xprime
+            set xsp = cacus.xsp("xcus='"+xcus+"'")
+		        set trntype = left(xvoucher,1)
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterARhed,#id,#user,xvoucher)
+          end event
+        end field
+
+        field Update
+          event before
+            set xsp = cacus.xsp("xcus='"+xcus+"'")
+            set temp = #sql("select xinvnum from aralc where xinvnum = '"+xvoucher+"'")
+            if #result .eq. "true"
+              error "Cannot Proceed Already Allocated"
+            end if
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Allocate
+          embed onclick="clicked(this)"
+        end field
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "artrn"
+            form.searchbutton.value = "Find xvoucher=?"
+            //return false
+          }
+          if (detail == "Allocate"){
+            form.screen.value = "arwriteoffalc"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+        }
+
+        function pickCur(link, exch){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+            document.one.xcur.value=link.innerText
+            document.one.xexch.value=exch.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

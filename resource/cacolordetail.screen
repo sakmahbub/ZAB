@@ -1,0 +1,79 @@
+screen cacolordetail
+
+     sidebar  list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Detail List for "+xcolorcode
+        table cacolordetail
+        order xcolorcode,xbcolor
+        fixed xcolorcode
+        rows 100
+        objects  xbcolor attrib(link "login?screen=cacolordetail&command=Show&xcolorcode=?&xbcolor=?"), ~
+                 xnote
+
+        //header "Row No","Passing Year","Exam Name","Name of Institute","Major Subject","Result"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Previous Qualification Detail For "+xcolorcode+"</ACRONYM>"
+	  table cacolordetail
+        order xcolorcode,xbcolor
+        fixed xcolorcode
+        return "login"
+        layout 1
+        pstyle 3
+        objects Add, Update, Delete,Return,Clear,*next,Top,Next,Previous,Bottom, "<p>" ,~
+          xbcolor,xnote
+
+
+
+		field xbcolor
+			display text
+		end field
+		
+		field Add
+			event before
+				set xcolorcode=#trim(xcolorcode)
+				set xbcolor=#trim(xbcolor)
+			   set bcolor = #sql("select xbcolor from cacolordetail where xcolorcode='"+xcolorcode+"' and xbcolor='"+xbcolor+"'")
+				if bcolor .eq. xbcolor
+				 // error "This Buyer Color Already Added"
+				end if
+			end event
+		end field
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "cacolor"
+            form.searchbutton.value = "Find xcolorcode=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

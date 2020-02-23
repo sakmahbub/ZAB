@@ -1,0 +1,49 @@
+
+product ZAB ERP
+
+table pditassview
+  caption "IT Assessment View"
+  columns zid,xstaff,xposition,xname,xdesignation,xtin,xempcategory,xtaxyear,xtaxper,xrow,xtype,xamount,xdesc,xtaxslab,xtaxrate,xyear,xper
+
+  primary key zid,xyear,xper,xstaff
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pditassview (zid,xstaff,xposition,xname,xdesignation,xtin,xempcategory,xtaxyear,xtaxper,xrow,xtype,xamount,xdesc,xtaxslab,xtaxrate,xyear,xper) ~
+
+                  // pdbal
+                  as select a.zid,a.xstaff,a.xposition,b.xname,b.xdesignation,isnull(b.xtin,''),b.xempcategory,~
+                  a.xtaxyear,a.xtaxper,0,a.xtype,(a.xamount+a.xarrear-a.xadjustment),'pdbal',0,0,a.xyear,a.xper ~
+                  from pdbal a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff  where a.xsign>0 ~
+                  union all ~
+                  // pdbal
+                  select a.zid,a.xstaff,a.xposition,b.xname,b.xdesignation,isnull(b.xtin,''),b.xempcategory,~
+                  a.xtaxyear,a.xtaxper,0,a.xtype,(a.xamount+a.xarrear-a.xadjustment),'pdbal',0,0,a.xyear,a.xper ~
+                  from pdbal a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff  where a.xtype='Provident Fund' ~
+                  union all ~
+                  // pdbal
+                  select a.zid,a.xstaff,a.xposition,b.xname,b.xdesignation,isnull(b.xtin,''),b.xempcategory,~
+                  a.xtaxyear,a.xtaxper,0,a.xtype,(a.xamount-a.xarrear+a.xadjustment),'pdbal',0,0,a.xyear,a.xper ~
+                  from pdbal a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff  where a.xtype='IT' ~
+                  union all ~
+
+                  // pdbonusbal
+                  select a.zid,a.xstaff,a.xposition,b.xname,b.xdesignation,isnull(b.xtin,''),b.xempcategory,~
+                  a.xtaxyear,a.xtaxper,0,a.xtype,(a.xamount),'pdbal',0,0,a.xyear,a.xper ~
+                  from pdbonusbal a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff ~
+                  union all ~
+
+                  // pdinvdetail
+                  select a.zid,a.xstaff,b.xposition,b.xname,b.xdesignation,isnull(b.xtin,''),b.xempcategory,~
+                  (select xyear from pddef where pddef.zid=a.zid),0,a.xrow,a.xtype,(a.xamount),'pdinvdetail',0,0,0,0 ~
+                  from pdinvdetail a join pdmst b on a.zid=b.zid and a.xstaff=b.xstaff ~
+                  union all ~
+
+                  // pdtaxslab
+                  select a.zid,'','','','','','',~
+                  a.xyear,0,a.xrow,'',b.xlmin,'pdtaxslab',a.xtaxslab,a.xtaxrate,0,0 ~
+                  from pdtaxdetail a join pdtaxheader b on a.zid=b.zid and a.xyear=b.xyear
+
+end table

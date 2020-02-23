@@ -1,0 +1,170 @@
+screen caitemprice
+
+     sidebar list one
+     sections form one,  jscript myscript
+
+     list one
+        caption "Price List For <br>"+xitem+" "+caitem.xdesc("xitem='"+xitem+"'")
+        table caitemprice
+        order xitem,xrow desc
+        fixed xitem
+        rows 20
+        objects  xrow attrib(link "login?screen=caitemprice&command=Show&xitem=?&xrow=?"),xdate,xdateeff, ~
+                 xrate,zactive  //,xdealerp,xmrp,xvatamt
+
+     end list
+
+
+     form one
+        caption "Price List For <br>"+xitem+" "+caitem.xdesc("xitem='"+xitem+"'")
+        table caitemprice
+        primarykey xrow,xitem
+        order xitem,xrow desc
+        fixed xitem
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add,Show,Clear, Update,Delete,*next,Return,Top,Previous,Next,Bottom,"<p>",~
+                xrow attrib(row 0 1),xcolortype,xdate display(hide),xdateeff display(hide),xrate,~
+                xyearperdate display(hide),xdealerp display(hide),xmrp display(hide),xvatrate display(hide),xvatamt display(hide),xpacking,~
+				xpackqty,xcartoon,zactive,xpricerow display(hide)
+        embed onsubmit="return submitit(this)"
+
+	  field xcost
+		caption Old Cost
+	  end field	
+	  
+	  field xcolortype
+		display combo
+		pick "select xcode from xcodes where xtype='Color Type' and zactive='1'"
+	  end field
+	  
+	  field zactive
+		default "1"
+	  end field	  
+
+	  field xvatrate
+		caption Vat Rate
+		default 15
+	  end field	
+	  
+	// field xdate
+		//default #date
+	 // end field	
+
+        field xqtydel
+          attrib local
+          display const
+          caption Qty Used
+          event after
+            set xqtydel=caitempriceqtyview.xqtydel("xitem='"+xitem+"' and xrow="+xrow)
+          end event
+        end field
+
+        field xbalance
+          attrib local
+          display const
+          caption Qty Used
+          event after
+            set xbalance=xqty-xqtydel
+          end event
+        end field
+
+        field xdate
+          event before
+           set xyear=#sub(xdate,0,4)
+           set year=#sub(xdate,0,4)
+           set per=#sub(xdate,5,2)
+           set day=#sub(xdate,8,2)
+           set xper=#sub(xdate,5,2)
+           set xyearperdate = year+per+day
+          end event
+        end field
+
+        field add
+			event before
+				set xdate=#date
+				double vatamt=xrate*xvatrate
+				double vatamt=vatamt/100
+				set xvatamt=vatamt
+				set zactive="1"
+				set xpricerow=1
+			end event
+		
+	      event after
+			set temp=#sql("update caitemprice set zactive='0' where xitem='"+xitem+"' and xrow<>'"+xrow+"'")
+            set temp=#spsql(zabsp_CA_changeItemPrice,#id,#user,xitem,xrow,"Update")
+			// set temp = #sql("update caitem set xrate="+xrate+" where xitem='"+xitem+"'")
+            // set temp = #sql("update caitem set xvatamt="+vatamt+" where xitem='"+xitem+"'")
+			// set temp = #sql("update caitem set xdealerp="+xdealerp+" where xitem='"+xitem+"'")
+            //set temp = #sql("update caitem set xpacking='"+xpacking+"' where xitem='"+xitem+"'")
+            //set temp = #sql("update caitem set xmrp="+xmrp+" where xitem='"+xitem+"'")
+            //set temp = #sql("update caitem set xcartoon="+xcartoon +" where xitem='"+xitem+"'")
+			//set temp = #sql("update caitem set xpackqty="+xpackqty+" where xitem='"+xitem+"'")
+			//set temp = #sql("update caitem set xvatrate="+xvatrate+" where xitem='"+xitem+"'")
+          end event
+        end field
+		
+		field Update
+			event before
+				set xdate=#date
+				double vatamt=xrate*xvatrate
+				double vatamt=vatamt/100
+				set xvatamt=vatamt
+				set zactive="1"
+				set xpricerow=1
+			end event
+          event after
+			set temp=#sql("update caitemprice set zactive='0' where xitem='"+xitem+"' and xrow<>'"+xrow+"'")
+			set temp=#spsql(zabsp_CA_changeItemPrice,#id,#user,xitem,xrow,"Update")
+            // set temp = #sql("update caitem set xrate="+xrate+" where xitem='"+xitem+"'")
+            // set temp = #sql("update caitem set xvatamt="+vatamt+" where xitem='"+xitem+"'")
+			// set temp = #sql("update caitem set xdealerp="+xdealerp+" where xitem='"+xitem+"'")
+            //set temp = #sql("update caitem set xpacking='"+xpacking+"' where xitem='"+xitem+"'")
+            //set temp = #sql("update caitem set xmrp="+xmrp+" where xitem='"+xitem+"'")
+            //set temp = #sql("update caitem set xcartoon="+xcartoon +" where xitem='"+xitem+"'")
+			//set temp = #sql("update caitem set xpackqty="+xpackqty+" where xitem='"+xitem+"'")
+			//set temp = #sql("update caitem set xvatrate="+xvatrate+" where xitem='"+xitem+"'")
+          end event
+        end field
+		
+		field delete
+			event before
+			set row=xrow
+			set item=xitem
+			end event
+          event after
+			set temp=#spsql(zabsp_CA_changeItemPrice,#id,#user,item,row,"Update")
+          end event
+        end field		
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          if (but == "Return"){
+            form.screen.value = "caitem"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

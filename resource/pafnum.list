@@ -1,0 +1,12 @@
+ list pafnum
+        table appaymentreqh
+        order xpafnum
+        select "xpafnum like '%"+zvalue+"%' and (left(xpafnum,4)='PAF-')"
+		searchselect "left(xpafnum,4)='PAF-'"
+        rows 20
+        objects xpafnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xdate,xcus,xpornum,xtornum
+
+     end list
+
+

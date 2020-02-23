@@ -1,0 +1,90 @@
+screen cacuspjdetail
+
+  sidebar list one //,list two
+  sections form one,  jscript myscript
+
+
+  list one
+    caption "Project List"
+    table cacuspjdetail
+    order xcus,xrow
+    fixed xcus
+    rows 20
+    objects  xrow attrib(link "login?screen=cacuspjdetail&command=Show&xcus=?&xrow=?"), ~
+             xproject,xprjname equals((select xlong from xcodes where xtype='Project Flag'and xcodes.xcode=cacuspjdetail.xproject and xcodes.zid=cacuspjdetail.zid)),xdateeff,xdateexp
+
+ 	headers "Line No","Project","Project Name","Effectivity Date","Expiration Date "	
+  end list
+
+  form one
+    caption "<ACRONYM>Project Detail For "+xcus+"</ACRONYM>"
+    table cacuspjdetail
+    primary key xcus,xrow
+    order xcus,xrow
+    fixed xcus
+    pstyle 3
+    return "login"
+    layout 2
+    objects Add, Update, Delete,Clear,Show, *next,Return,Top,Previous,Next,Bottom,~
+            xrow attrib(row 0 1),xdum,xproject,xprjname,xdateeff,xdateexp
+
+
+
+
+	
+	    field xprjname
+		attrib local
+		caption Project Name
+		display const
+		event after
+		set xprjname = xcodes.xlong("xtype='Project Flag' and xcode='"+xproject+"'")
+		end event
+	    end field
+
+	
+    field xdum
+      attrib local
+      caption
+      display const
+    end field
+
+
+
+    embed onsubmit="return submitit(this)"
+
+    field Return
+      embed onclick="clicked(this)"
+    end field
+
+
+
+
+
+  end form
+
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var but
+      var result
+
+      function clicked(b){
+        but = b.value
+      }
+      function submitit(form){
+        result = true
+        if (but == "Return"){
+          form.screen.value = "cacusdepo"
+          form.searchbutton.value = "Find xcus=?"
+        }
+        but = ''
+        return result
+      }
+      </script>
+  end jscript
+
+end screen
+
+
+
+

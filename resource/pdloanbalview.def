@@ -1,0 +1,25 @@
+ 
+product ZAB DB
+
+xvoucher,xdate,xstaff,xname,xtype,xloanamt,xinterest,xtotamt,xinstallment,xinsamt,xlastinsamt,~
+                xdateeff,xyear,xper,xstatus display(const),xdateeff,xtype
+
+table pdloanbalview
+  caption "Loan Balance View"
+
+  columns zid,xvoucher,xstaff,xdate,xinsamt,xinstallment,xbalance
+
+  primary key zid,xvoucher
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdloanbalview (zid,xvoucher,xstaff,xdate,xinsamt,xinstallment,xbalance,xdateeff,xtype) ~
+                  as select zid,xvoucher,xstaff,xdate,xinsamt,~
+                  xinstallment-isnull((select count(xstaff) from pdbal where pdbal.xvoucher=pdloantrn.xvoucher and pdbal.zid=pdloantrn.zid),0),~
+                  xtotamt -isnull((select sum(xamount) from pdbal where pdbal.xvoucher=pdloantrn.xvoucher and pdbal.zid=pdloantrn.zid),0),~
+                  xdateeff,xtype ~
+                  from pdloantrn where xstatus='Open'
+
+end table

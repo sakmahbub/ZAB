@@ -1,0 +1,39 @@
+
+//Accounts.menu
+//-------------------------------------------------------------------
+option                           			|action
+//-------------------------------------------------------------------
+
+BOM / Recipe Setting        		 |#classPath+"/login?screen=bmbomheader"
+///Work Order               					|#classPath+"/login?screen=opordlcheaderlocal" 
+///Sample Order               					|#classPath+"/login?screen=opordsamheader"
+///Planning Approval               			|#classPath+"/login?screen=mopiapproval" 
+Batch Entry  	             			|#classPath+"/login?screen=moheader"
+///Recipe Setting	             				|#classPath+"/login?screen=moheaderrecipe"
+//Store Requisition (Batch)					|#classPath+"/login?screen=mostorereqheader"
+//Store Requisition (Bulk)					|#classPath+"/login?screen=moreqheaderprod"
+Finished Goods Entry              |#classPath+"/login?screen=imtorheaderfg"
+Finish Goods Stock cheeck          		 |#classPath+"/login?screen=finishstockcheeck"
+
+///Issue For  Production						|#classPath+"/login?screen=mostoreisheader"
+///Production Process							|#classPath+"/login?screen=mostartprocessheader"
+//Finished Goods Issue						|#classPath+"/login?screen=mofingoodsissueheader"
+///Inspection Finished Goods					|#classPath+"/login?screen=imtorheaderinsp"
+Reports										|#classPath+"/login?menu=moreports"
+Codes & Parameter							|#classPath+"/login?menu=mocodes"
+
+
+
+//Prcs Weighted Avg Costing (Raw Material)  |#classPath+"/login?screen=imaveragecost"
+//Production Planning            			|#classPath+"/login?screen=mopiheader"
+//Local Entry                         		|#classPath+"/login?menu=molocal" 
+//Work Order               					|#classPath+"/login?screen=opordlcheadercf"  
+//Asiatic PI                          		|#classPath+"/login?screen=opordlcheaderasiatic" 
+//Start Process								|#classPath+"/login?screen=mostartprocessheader"
+//Daily Production Transaction				|#classPath+"/login?screen=modailyprdtrnheader"
+//Wastage Issue								|#classPath+"/login?screen=mowastageissueheader"
+//Store Requisition For  Production			|#classPath+"/login?screen=mostorereqheader"
+//Store Requisition For  Production			|#classPath+"/login?screen=moreqheader"
+//Transaction								|#classPath+"/login?screen=motrn"
+//-------------------------------------------------------------------
+

@@ -1,0 +1,19 @@
+//op.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Transactions                     |#classPath+"/login?screen=xtrn(xtypetrn=FA Transactions)"
+Transfer Transactions            |#classPath+"/login?screen=xtrn(xtypetrn=FA Transfer Trn)"
+Estimeted Life Change Trn        |#classPath+"/login?screen=xtrn(xtypetrn=Estimated Life Trn)"
+Category                         |#classPath+"/login?screen=xcodes(xtype=Category)"
+Asste Type                       |#classPath+"/login?screen=xcodes(xtype=Asset Type)"
+Depreciation Method              |#classPath+"/login?screen=xcodes(xtype=Depreciation Method)"
+Division                         |#classPath+"/login?screen=xcodes(xtype=Division)"
+Section                          |#classPath+"/login?screen=xcodes(xtype=Section)"
+Project                          |#classPath+"/login?screen=xcodes(xtype=Project)"
+-House Keeping
+Depreciation Log                 |#classPath+"/login?screen=fadeplog"
+FA To GL Interface               |#classPath+"/login?screen=fagli"
+Related Codes                    |#classPath+"/login?screen=xtrnp(xtypetrn=FA Transactions)"
+//-------------------------------------------------------------------
+

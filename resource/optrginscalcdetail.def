@@ -1,0 +1,12 @@
+product ZAB
+
+table optrginscalcdetail
+  caption "Incentive Calculation Header"
+  columns ztime,zutime,zid,zauserid,zuuserid,xyear,xper,xsp,xrow,xdesc,xqty,xpoint,xamount,xinstrn
+
+  primary key zid, xyear,xper,xsp,xrow
+  foreign key
+        zid references zbusiness.zid
+		zid,xyear,xper,xsp references optrginscalcheader.zid,xyear,xper,xsp
+  end foreign key
+end table

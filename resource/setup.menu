@@ -1,0 +1,17 @@
+//Setup.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Codes                            |#classPath+"/login?menu=codes"
+//Users                            |#classPath+"/login?menu=users"
+Logs                               |#classPath+"/login?menu=logs"
+//Entry Review                     |#classPath+"/login?screen=*aspcrystal adminreviewpass(xstart=Issue No,xpassword=Password)"
+//User and Date wise Entry Review  |#classPath+"/login?screen=*aspcrystal admindatewisereview(zemail=User,xdate=Fromdate=#date,xdate=To Date=#date,xpassword=Password)"
+//Screen Entry                     |#classPath+"/login?screen=zscreenheader"
+Query - System Admin               |#classPath+"/login?screen=query"  
+Print Voucher  					   |#classPath+"/login?screen=*viewcrystal acvoucher(2;in,st;zid,svoucher;xvoucher=Voucher No.,xviewtype=Report View)"
+//Modules                          |#classPath+"/login?screen=*modules"
+//Models                           |#classPath+"/login?screen=*models"
+//Lists                            |#classPath+"/login?menu=lists"
+
+//-------------------------------------------------------------------

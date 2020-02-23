@@ -1,0 +1,37 @@
+screen zlogs
+     caption "Error Logs"
+     sidebar list one//,list two, text three
+     //sections list one, form one
+     sections form one
+     list one
+        table zlogs
+        primarykey zerrorid
+        order zerrorid DESC
+        //select none
+        //navigators alpha
+        rows 20
+        objects  zerrorid attrib(link "login?screen=zlogs&command=Show&zerrorid=?"), ~
+                ztime,zscreen,zemail,zerrornum
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+     form one
+        caption "Error Logs"
+        table zlogs
+        order zerrorid DESC
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show, Top, Bottom,Delete,~
+                zerrorid display(text) attrib(attach;search),ztime,zscreen attrib(search),~
+                zemail attrib(search),zerrornum attrib(search), zstatement columns(3),zmessage columns(3)
+
+     end form
+
+end screen

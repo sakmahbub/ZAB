@@ -1,0 +1,170 @@
+screen oppiheader
+
+     sidebar list detail
+     sections form one, jscript myscript
+
+     list detail
+        caption "Order Detail List For PI No: "+xpiref
+        table oporddetail
+        order xordernum,xorderrow
+        fixed xordernum
+        rows 20
+        objects  xorderrow,xitem,desc equals((select xdesc from caitem where caitem.zid=oporddetail.zid and caitem.xitem=oporddetail.xitem)),xprcstype,xstyle,~
+                //xconstruction  equals((select xconstruction from caitem where caitem.zid=oporddetail.zid and caitem.xitem=oporddetail.xitem)),~
+				//xcolor equals((select xfabriccolor from caitem where caitem.zid=oporddetail.zid and caitem.xitem=oporddetail.xitem)),~
+				xqtyord
+
+        headers "Line No","Item","Description","Process Type","Style","Qty"
+	    total "","","","Total","",sum
+     end list
+
+    list terms
+        caption "PI Terms & Condition For: "+xpiref
+        table oppiterms
+        order xordernum,xrow
+        fixed xordernum
+        rows 20
+        objects  xrow , xcode,xnote 
+
+
+//        headers "Line No","Item","Description","Qty","Rate","Disc %","Disc Fixed","Line Amount"
+//	  total "Total","","","","",sum	
+     end list
+	 
+     form one
+        caption "Estimated Cost Entry Header For Order No: "+xordernum+"<br> PI No: "+xpiref
+		table opordheader
+        order xordernum desc
+        return "login"
+        select "xtype in ('LC','Sample')"
+        layout 4
+        pstyle 3
+        objects Show,Clear,Estimated Cost,*next,"<p>",~
+          xordernum,xpiref,xpirefr,xpidate,xcus,xorg,~
+		  xtype display(hide)
+		
+		field xordernum
+			event after
+				set globals(xordernum)=xordernum
+			end event
+		end field
+		
+		field xorg
+			attrib local
+			caption Customer Name
+			display const
+			event after
+				set xorg=cacus.xorg("xcus='"+xcus+"'")
+			end event
+		end field
+		
+        field xpiref
+		 caption PI Reference / Job Order No	
+		width 30
+         event after
+            set globals(xpiref)=xpiref
+          end event
+        end field
+
+
+        field Add1
+          event before
+				set xstatuspi="Open"
+				if xtrn .ne. "PI--"
+					set xpiref = #trn("Job Order No",xtrn,8)
+				end if
+//					set xpiref = #sub(xbatch,0,4)+mon+year+#sub(xbatch,4,4)
+//				set xbatch = #trn("Batch No",xtrn,8)
+//				set xbatch = #sub(xbatch,0,4)+mon+year+#sub(xbatch,4,4)
+//				set xqtymor = xqtyprd/1.09361
+			end if
+          end event
+        end field
+
+		
+        embed onsubmit="submitit(this)"
+        
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+        field Recipe
+          embed onclick="clicked(this)"
+        end field
+        
+        field Terms
+          embed onclick="clicked(this)"
+        end field
+
+	
+        field Required
+          embed onclick="clicked(this)"
+        end field
+
+		field Estimated
+          embed onclick="clicked(this)"
+        end field
+	
+	field Finished
+          embed onclick="clicked(this)"
+        end field
+	
+	
+
+        
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "mopidetail"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Terms & Condition"){
+            form.screen.value = "mopiterms"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Estimated Cost"){
+            form.screen.value = "oppiestcostheader"
+            form.searchbutton.value = "Top"
+          }
+
+	if (detail=="Required Tests & Parameters"){
+            form.screen.value = "mopitestandparam"
+            form.searchbutton.value = "Top"
+          }
+
+	
+	if (detail=="Count"){
+            form.screen.value = "mocount"
+            form.searchbutton.value = "Top"
+          }	
+
+	
+          if (detail=="Production Process"){
+            form.screen.value = "moprocess"
+            form.searchbutton.value = "Top"
+          }
+	
+	 if (detail=="Finished Goods Issue"){
+            form.screen.value = "mofgissue"
+            form.searchbutton.value = "Top"
+          }		
+	
+
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table opratedefh
+  caption "Sales Rate Defaults"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xgrade,xrate
+
+  primary key zid,xgrade
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

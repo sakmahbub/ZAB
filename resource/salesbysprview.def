@@ -1,0 +1,16 @@
+product ZAB ERP
+
+table salesbysprview
+caption "Sales by Sales Representative"
+
+  sql create view salesbysprview(zid,zorg,xsp,xname,xdornum,xcrnnum,xwh,xtotinv,xdate,xamount,xdiscamt,xamtafdisc,xvat,xreturnamt,xnetsale,xtype) ~
+    AS SELECT ophd.zid, z.zorg, ophd.xsp,sp.xname,ophd.xdornum,c.xcrnnum,ophd.xwh, COUNT(ophd.xdornum)AS xtotinv, ophd.xdate, SUM(ISNULL(ophd.xtotamt,0)) AS xamount,~ 
+    SUM(ISNULL(ophd.xdiscamt,0)) AS xdiscamt, SUM((ISNULL(ophd.xtotamt,0)-ISNULL(ophd.xdiscamt,0)))AS xamtafdisc, SUM(ISNULL(ophd.xvatamt,0)) AS xvat, ~
+    ISNULL(c.xtotamt,0) AS xreturnamt, SUM(((ISNULL(ophd.xtotamt,0)-ISNULL(ophd.xdiscamt,0))+ISNULL(ophd.xvatamt,0))-(ISNULL(c.xtotamt,0))) AS xnetsale,ophd.xtype ~
+    FROM opdoheader ophd ~
+    INNER JOIN zbusiness z ON ophd.zid=z.zid ~
+    INNER JOIN cappo sp ON sp.zid=ophd.zid AND sp.xsp=ophd.xsp ~
+    LEFT JOIN opcrnheader c ON c.zid=ophd.zid AND c.xordernum=ophd.xdornum ~
+    GROUP BY ophd.zid,z.zorg,ophd.xsp,sp.xname,ophd.xdornum,c.xcrnnum,ophd.xwh,ophd.xdate, c.xtotamt,ophd.xtype  
+
+end table

@@ -1,0 +1,453 @@
+screen opdoheaderadmin
+
+     sidebar list one //,list inv //,list do
+     sections form one, jscript myscript
+
+     list one
+      caption "Detail List"
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=opdodetailadmin&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=opdodetail.zid and xitem=opdodetail.xitem)),~
+                 xqtyord,xqtybonus,xrate,xsprate,xdiscdet,xdiscdetamt,xvatamt,xlineamt,xnetamt //(xlineamt+xvatamt-xdiscdetamt)
+
+        header "Line No","Product <br>Code","Product <br>Name","Qty","Bonus <br>Qty","Rate","Special <br>Rate","Disc %","Disc <br>Amt","Vat <br>Amt","TP","Net Amt"
+        totals "","Totals","","","","","","",sum,sum,sum,sum
+     end list
+
+     list inv
+        caption "Invoice Amount"
+        table opdoheader
+        order xdornum
+        fixed xdornum
+        rows 2
+        objects  xdornum,(xtotamt+xvatamt-xdiscamt),xdiscamt,xvatamt,xtotamt
+
+        header "Invoice No","<font size=+1 color=red>Net Amount</font>","Discount","VAT","Trade Price"
+     end list
+
+     list do
+      caption "DO List"
+        table opdoheader
+        order xdornum
+        rows 2
+        objects  xdornum attrib(link "login?screen=opdoheader&command=Show&xdornum=?"), ~
+                 xdate,xcus,xsp,xpp
+
+//        header "Line No","Item Code","Description","Qty","Rate","Disc Amt","Vat Rate","Vat Amt","Line Amt"
+//        totals "","Totals","","","",sum,sum,sum,sum
+     end list
+
+
+     form one
+     
+      caption "INVOICE HEADER (Admin)"
+      table opdoheader
+      primarykey xdornum
+      order xdornum desc
+      select "xwh='"+#wh+"' and left(xdornum,2)='DO'"
+      return "login"
+      layout 3
+      pstyle 3
+      objects   Add,Show,Clear,Update,Delete,*next,~
+                Details,Top,Previous,Next,Bottom,"<p>",~
+                xdornum,xdate,xdatedel,xcrlimit,xcus,xorg display(const),~
+                xdeltime,xsp display(const),xname,~
+                xpaymentterm,xroute display(const),xsumnum display(const),xpornum,xdatepo,xcrnnum,xexpamt,xnetamt display(hide),xexptotal,xstatusar display(hide),~
+                xdatedue display(hide),xref display(hide),~
+                xpp display(hide),xalias,xaitamt display(hide),~   //xdum1,~
+              
+      // hide
+      xprime display(hide),xamount display(hide),xavlperc display(hide),xvatrate display(hide),xwh display(hide),~  
+      xdatecom display(hide),xdisc display(hide),xdiscf display(hide),xait display(hide),xproject display(hide),~
+      xyear display(hide),xper display(hide),xtype display(hide),xstatus display(hide),xtotamt display(hide),~
+     xvatamt display(hide),xdiscamt display(hide),xstatusord display(hide)  
+      //xnetamt,~//xtotamt display(hide),~
+
+  field xcrnnum
+    caption Exp. Adjustment No
+    pick list opdocrnexp
+    attib readonly
+    
+  end field
+
+
+  field xcrlimit
+        attrib local
+        display const
+        caption Credit Available
+        event after
+          if xpaymentterm .eq. "Credit"
+              set xcrlimit = cacreditview.xbalance("xcus='"+xcus+"'")
+            else 
+              set xcrlimit = 0
+            end if
+          //if xcrlimit<0
+          //  set xcrlimit=0
+          //end if
+        end event
+      end field
+
+  field xexpamt
+              display const
+        caption Exp Adjustment Amt
+        
+      end field
+
+  
+  field xexptotal
+        attrib local
+        display const
+        caption Net Amt After Adjustment
+        event after
+              set xexptotal = xtotamt+xvatamt-xdiscamt-xexpamt //opcrnchheader.xtotamt("xcrnnum='"+xcrnnum+"'")
+              //  if xnetamt <= 0
+              //    set xnetamt = 0
+       end if
+            action show
+      end event
+
+  end field
+
+
+field xpornum
+  caption Order No
+end field
+
+field xdatepo
+  caption Order Date
+  default "2999-01-01"
+end field
+
+field xdisc
+  caption Additional Discount
+end field
+
+field xdate
+  caption Invoice Date
+end field
+
+field xdeltime
+  caption Delivary Shift
+  default "Any Time"
+end field
+
+field xdornum
+  pick list opordcrn
+end field
+field xitem
+  pick list xitemnpl
+end field
+
+    field xdatedue
+    default "2999-01-01"
+  end field
+
+
+      field xwh
+        display hide
+        default #wh
+      end field
+
+      field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+      end field
+
+      field xdum
+        attrib local
+        caption
+        display const
+      end field
+
+
+      field xdum
+        attrib local
+        display const
+        caption
+      end field
+
+      field xdum1
+        attrib local
+        display const
+        caption
+      end field
+
+      field xorg
+        attrib local
+        display const
+        caption Customer Name
+        event after
+          set xorg=cacus.xorg("xcus='"+xcus+"'")
+//          set xorg=<font size=+2 color=red>cacus.xorg("xcus='"+xcus+"'")</font>
+        end event
+      end field
+
+      field xname
+        attrib local
+        display const
+        caption MIO Name
+        event after
+          set xname=cappo.xname("xsp='"+xsp+"'")
+        end event
+      end field
+
+      field xalias
+        attrib local
+        display hide
+        caption Name Of Delivery Man
+        event after
+          set xalias=cappo.xname("xsp='"+xpp+"'")
+        end event
+      end field
+
+      field xamount
+        caption Advance
+      end field
+
+      field xdatecom
+        caption Ledger Date
+      end field
+
+      field xpaymentterm
+        display const
+      end field
+
+
+      field xstatusar
+        caption Post To Ledger
+      end field
+
+      field xnote
+        width 40
+        height 3
+      end field
+
+      field xcus
+         event after
+           class careports(getReport{opbill-2,1,xdornum,Print Single Invoice})
+            //class careports(getboReport{1762,1,xdornum,Print Single Invoice}) 
+            //class careports(getReport{opchalan,1,xdornum,Print Single Challan})
+          class careports(getReport{opbill-3,2,xsumnum,xroute,Print Multiple Invoice})
+            //class careports(getboReport{1763,2,xsumnum,xroute,Print Multiple Invoice})
+
+            //class careports(getReport{opchalan-2,2,xdate,xsumnum,Print Multiple Challan})
+            set globals(xdornum)=xdornum
+            set globals(xcus)=xcus
+            if xstatusord .eq. "Confirmed" .and. xstatusar .eq. "Confirmed"
+              set #field(add.display)="hidden"
+              set #field(update.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(Confirm.display)="hidden"
+              end if
+            if xsumnum .ne. ""
+              set #field(add.display)="hidden"
+              //set #field(update.display)="hidden"
+              set #field(delete.display)="hidden"
+              set #field(Confirm.display)="hidden"
+              end if
+          end event
+        end field
+
+  field add
+          event before
+                //  set cyear = #sub(#date,0,4)
+               //   set cper = #sub(#date,5,2)
+        
+        //*********** Checking Territory ****************
+
+            set terri = cacus.xterritory("xcus='"+xcus+"'")
+            set territory = #sql("select xterritory from cappo where xterritory = '"+terri+"' and zactive=1")
+            set custype = cacus.xpaymentterm("xcus='"+xcus+"'") 
+            set datefrom = #sql("select xdateeff from cacus where xcus='"+xcus+"'")
+            set dateto = #sql("select xdateexp from cacus where xcus='"+xcus+"'")
+      if custype .eq. "Credit"
+              if xdate .lt. #sub(datefrom,0,10) .or. xdate .gt. #sub(dateto,0,10) 
+                 error "Cannot Proceed -- Credit Time Expired"
+              else if cacus.xallowcrinv("xcus='"+xcus+"'") .eq. "No"
+                  set invtoinv = cacus.xinvtoinvcr("xcus='"+xcus+"'")
+                if invtoinv .eq. "Yes"
+                    double bal = 0.00
+//                    set used = cacreditview.xcrused("xcus='"+xcus+"'")
+//                    set paid = cacreditview.xpaid("xcus='"+xcus+"'")
+    						    set bal = cacreditview.xbalance("xcus='"+xcus+"'") //used-paid
+                    if bal > 0
+                     error "Cannot Proceed -- Invoice To Invoice Credit Limit Exceeds  "+bal 
+                    end if
+                end if
+              end if
+          end if
+
+       if xcus .eq. ""
+                      error "Cannot Proceed -- Please Choose Customer"
+           //else if xdate .lt. #date
+            //    error "Cannot Proceed -- Invoice On Previous Date Not Allowed"
+           //else if xdatedel .lt. #date
+            //    error "Cannot Proceed -- Delivery on Previous Date Not Allowed"
+           else if xdeltime .eq. ""
+                error "Cannot Proceed -- Please Select Delivery Time"
+           else if xsp .ne. cappo.xsp("xsp='"+xsp+"' and xwh='"+#wh+"'")
+                error "Cannot Proceed -- MIO Belongs To Different Depot"
+                 // else if cper .ne. #sub(xdatedel,5,2)
+                //        error "Cannot Proceed -- Current Month Allowed"
+               // else if cyear .ne. #sub(xdatedel,0,4)
+              //          error "Cannot Proceed -- Current Year Allowed"
+           else if terri .ne. cappo.xterritory("xterritory = '"+terri+"' and zactive=1")
+              error "Cannot Proceed -- Territory Inactive"
+            else if xcus .ne. cacus.xcus("xcus='"+xcus+'"")
+              error "Cannot Proceed -- Customer Invalid"
+            else
+              set xtotamt = 0
+              set xvatamt = 0
+              set xaitamt = 0
+              set xdisc = 0
+              set xdiscamt = 0
+              set xexpamt = 0
+              set xprime = 0
+              set xsumnum =""
+              set xcrnnum =""
+              set xpp=""
+              set xyear = #sub(xdate,0,4)
+              set xper = #sub(xdate,5,2)
+              set xtype = "NPL"
+               //*********** GETTING INFO FROM CACUS ****************
+        
+                set xwh=cacus.xwh("xcus='"+xcus+"'")
+                set xstatusord = "Open"
+                set xstatusar = "Open"
+                set xstatus = "Open"
+
+
+              //*********** GETTING TRN NO ****************  if #result .eq. "true"
+              //set customer = cacus.xcus("xcus='"+xcus+"'")
+               
+                set year = #sub(xdate,2,2)
+                set trn = "DO"+#wh
+                set xdornum = #trn("DO Number",trn,10)
+                set xdornum = #sub(xdornum,0,4)+year+#sub(xdornum,4,10)
+      end if
+    end event
+          event after
+            set com = "add"
+              //set temp = #spsql(sp_validateAfterHeaderDOPj,#id,#user,xdornum,xdate,xcus,com)
+                  set temp = #spsql(zabsp_AfterInsertHeaderDO,#id,xcus,xdornum,xtype)
+            action Show
+          end event
+  end field
+
+
+    field update
+            event before
+                double totamt
+                double exptotamt
+                double expamt
+                double discamt
+                double vatmat
+                //double xexpmt
+                  set custype = cacus.xpaymentterm("xcus='"+xcus+"'") 
+                  //set xexpamt = opcrnchheader.xtotamt("xcrnnum='"+xcrnnum+"'")
+                  //set xexpmt = #sql(double,"select xtotamt from opcrnchheader where xcrnnum = '"+xcrnnum+"'")
+                  set totamt = #sql(double,"select xtotamt from opdoheader where xdornum='"+xdornum+"'")
+                  set vatamt = #sql(double,"select xvatamt from opdoheader where xdornum='"+xdornum+"'")
+                  set discamt = #sql(double,"select xdiscamt from opdoheader where xdornum='"+xdornum+"'")
+                  set expamt = #sql(double,"select xtotamt from opcrnchheader where xcrnnum='"+xcrnnum+"'")
+                  set totamt = totamt+vatamt-discamt
+                  set exptotamt = totamt - expamt
+
+                  set xexpamt = expamt
+                  
+                  if custype .eq. "Cash"
+                    set xprime = exptotamt
+                  else
+                    set xprime = 0
+                  end if
+
+                  if xdate .lt. #date .and. xsumnum .ne. "" 
+                    error "Cannot Proceed -- Invoice On Previous Date Not Allowed"
+                  else if xsp .ne. cappo.xsp("xsp='"+xsp+"' and xwh='"+#wh+"'")
+                    error "Cannot Proceed -- MIO Belongs To Different Depot"
+                  else if expamt > totamt
+                        //print "<font size=+2 color=red>Cannot Update-- Exp.Adj. Limit"
+                    error "<font size=+2 color=red>Cannot Proceed -- Exp. Adj. Not Allowed"
+                        //else if xdeltime .eq. ""
+                        //  error "Cannot Proceed -- Please Select Delivery Time"
+                        //else if xpp .eq. ""
+                        //  error "Cannot Proceed -- Please Select Delivery Person"
+                  end if
+
+                  //set terri = #sql("select xterritory from cacus where xcus='"+xcus+"'")
+
+                  //if terri .eq. ""  
+                  //error "Cannot Proceed -- Territory not assigned for this Customer"
+                  //end if
+
+                  set xwh=cacus.xwh("xcus='"+xcus+"'")
+                  set xyear = #sub(xdate,0,4)
+                  set xper = #sub(xdate,5,2)
+             end event
+              
+             event after
+                        set com = "update"
+    			set temp = #sql("update opcrnchheader set xstatusar='Confirmed' where xcrnnum='"+xcrnnum+"'")
+                        //set temp = #spsql(sp_validateAfterHeaderDOPj,#id,#user,xdornum,xdate,xcus,com)
+       			//set temp = #spsql(zabsp_AfterInsertHeaderDO,#id,xcus,xdornum,xtype)
+    		action Show
+            end event
+
+       end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field New
+          embed onclick="clicked(this)"
+        end field
+
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opdodetailadmin"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="New Customer"){
+            form.screen.value = "cacusnew"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+
+        function pickDetail(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text;
+            document.one.xbalance.value=primebal.text;
+            document.one.xdate.value=date.text;
+          }else{
+              document.one.xamount.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

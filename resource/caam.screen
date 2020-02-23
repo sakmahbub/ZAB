@@ -1,0 +1,95 @@
+screen caam
+
+  sections form one, jscript myscript
+
+  form one
+    caption "Area Manager Entry"
+    table cafm
+    primarykey xfm
+    order xfm
+    select "left(xfm,4)='AM--'"
+    return "login"
+    layout 2
+    pstyle 3
+    objects Add,Update,Show,Clear,Delete,*next,Top,Previous,Next,Bottom,"<p>",~
+            xfm,xname,xrsm,xsm,xwh,xfield,zactive
+            //xwh,xbrname,xterritory,xregion,xarea//xfm,xfmname
+
+
+    field xfield
+      caption Fields
+      display combo
+      pick "select xcode from xcodes where xtype='Fields' and zactive=1"
+    end field
+
+    field xsm
+      caption Sales Manager
+      display const
+      event before
+        set xsm=#sql("select xsm from carsm where xrsm='"+xrsm+"'")
+      end event
+    end field
+
+    field xrsm
+      caption Regional Sales Manager
+      display combo
+      pick "select xrsm from carsm"
+    end field
+
+    field xfm
+      default "AM--"
+      caption
+      display trn Sales Representative
+      event after
+        set globals(xsm)=xsm
+        set globals(xrsm)=xrsm
+        set globals(xfm)=xfm
+      end event
+    end field
+
+    field add
+      event before
+        if xfm_ONE .ne. "AM--"
+          error "Cannot Proceed -- You Chose Wrong Code. You have to chose AM--"
+        end if
+      end event
+    end field
+
+    embed onsubmit="submitit(this)"
+
+    field RSM
+      embed onclick="clicked(this)"
+    end field
+
+    field PPO
+      embed onclick="clicked(this)"
+    end field
+
+  end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var ret
+    var toppo
+    function clicked(b){
+      ret=b.value
+      toppo=b.value
+      }
+      function submitit(form){
+        if (ret=="RSM"){
+          form.screen.value = "carsm"
+          form.searchbutton.value = "Find xsm=?"
+          form.searchbutton.value = "Find xrsm=?"
+          //return false
+        }
+        if (toppo=="PPO"){
+          form.screen.value = "cappo"
+          form.searchbutton.value = "Find xsm=?"
+          form.searchbutton.value = "Find xrsm=?"
+          form.searchbutton.value = "Find xfm=?"
+        }
+      }
+      </script>
+  end jscript
+
+end screen

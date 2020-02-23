@@ -1,0 +1,226 @@
+screen poordheaderlc
+
+     sidebar list detail,list cost,list inv,list ltr
+     sections form one,jscript myscript
+
+     list detail
+        caption "LC Detail For :"+xlcno
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow attrib(link "login?screen=poorddetail&command=Show&xpornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where xitem=poorddetail.xitem)),xqtypur,xunitpur,xqtygrn
+
+
+        headers "Row","Item","Description","Qty","Unit","GRN Qty"
+     end list
+
+     list cost
+        caption "Cost Detail For LC No :"+xlcno
+        table poordcost
+        order xpornum,xrow
+        fixed xpornum
+        rows 20
+        objects  xrow attrib(link "login?screen=poordcost&command=Show&xpornum=?&xrow=?"), ~
+                xcostcode,xsup,name equals((select xorg from casup where xsup=poordcost.xsup)),xcost
+
+
+        headers "Row","Cost Type","Insurance Company Code","Name","Cost"
+	  total "","Total",sum,""
+     end list
+
+     list inv
+        caption "Invoice(s) For LC No :"+xlcno
+        table pogrnheader
+        order xpornum,xgrnnum
+        fixed xpornum
+        select "xsign<0"
+        rows 20
+        objects  xgrnnum attrib(link "login?screen=pogrnlcheader&command=Show&xpornum=?&xgrnnum=?"),xinvnum,xpornum, ~
+                 xdate
+
+
+        headers "GRN Number","Invoice Num","PO Number","Invoice Date"
+     end list
+
+     list ltr
+        caption "LTR :"+xlcno
+        table pogrnheader
+        order xpornum,xgrnnum
+        fixed xpornum
+        select "xsign<0"
+        rows 20
+                 
+        objects  xgrnnum attrib(link "login?screen=polcltr&command=Show&xpornum=?&xgrnnum=?"),xinvnum,xdate,xexpirydate,xpornum
+
+
+        headers "GRN Number","Invoice Num","LTR Date","Expiry Date","PO Number"
+     end list
+
+
+
+     form one
+        caption "LC Header"
+	      table poordheader
+	  primarykey xlcno desc
+        order xlcno desc
+        select "xtype='LC'"
+        return "login"
+        layout 3
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,*next,Top,Previous,Next,Bottom,*Next,Detail,Ammendment,Create Invoice,Costs,*next,"<p>" ,~
+          xlcno attrib(search),xdate,xpsirfi,xadvicebank,xopenbank,xobname,~
+          xsup,xorg,xcur,xexch,xprime,xbase attrib(readonly),xshipdate,xexpirydate,xportship,xlcstatus,~
+          xshipmode,xpaymentterm,xstatuspor display(const),~
+          
+          xwh display(const),xyear display(hide),xper display(hide),~
+          xtype display(hide),xpornum,xporeqnum display(const),xstatusjv display(hide),xsign display(hide)
+
+		  
+		  field xorg
+		  	attrib local
+		  	dispaly const
+		  	caption Supplier Name
+		  	event after
+		  		set xorg=casup.xorg("xsup='"+xsup+"'")
+		  	end event
+		  end field
+		  	
+		  field xobname
+		  	attrib local
+		  	dispaly const
+		  	caption Open Bank Name
+		  	event after
+		  		set xobname=acmst.xdesc("xacc='"+xopenbank+"'")
+		  	end event
+		  end field
+		  	
+          field xopenbank
+            pick list poopenbank
+          end field
+
+          field xprime
+            caption Amount In Foreign Currency
+          end field
+
+          field xbase
+            caption Amount In Tk (Base Currency)
+          end field
+
+          field xlcno
+            event after
+              set globals(xpornum)=xpornum
+              set globals(xlcno)=xlcno
+            end event
+          end field
+
+          field xstatusord
+            caption <font color=red size=3>Order Status</font>
+          end field
+
+          field xdate
+            caption LC Issue Date
+          end field
+
+          field xagentname
+            attrib local
+            caption Name
+            display const
+            event after
+              set xagentname = casup.xorg("xsup='"+xsup+"'")
+            end event
+          end field
+
+          field xexportdate
+            caption  Export / Contact Date
+          end field
+
+          field xlcissuedate
+            caption LC Open Date
+          end field
+
+          field xlcstatus
+            default "LC Opened"
+          end field
+
+          field add
+            event before
+              set xtype="LC"
+		  set xsign = 1
+              set xstatusjv = "Open"
+              set xbase = xprime*xexch
+              set xyear = #sub(xdate,0,4)
+              set xper = #sub(xdate,5,2)
+		      set year = #sub(xdate,2,2)
+              set xpornum = #trn("PO Number","PO--",12)
+		      set xpornum = #sub(xpornum,0,4)+year+#sub(xpornum,4,12)
+            end event
+            event after
+	            //set temp = #spsql(zabsp_PO_validateAfterHeaderPO,#id,#user,"LC",xpornum,xdate)
+    	        //action show
+            end event
+          end field
+
+          field update
+            event before
+              set xbase = xprime*xexch
+            end event
+          end field
+
+          field Create
+          	event before
+          		if xstatuspor .eq. "GRN Created"
+          			error "Cannot Proceed -- GRN Already Created"
+          		end if
+          	end event
+            event after
+              set temp = #spsql(zabsp_PO_createGRN,#id,#user,"LC",xlcno,xpornum,0,0,xdate,xwh,xsup,12)
+              action show
+            end event
+          end field
+
+          field Detail
+            embed onclick="clicked(this)"
+          end field
+
+          field Ammendment
+            embed onclick="clicked(this)"
+          end field
+
+          field Costs
+            embed onclick="clicked(this)"
+          end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+  	      if (detail=="Detail"){
+            form.screen.value = "poorddetaillc"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Ammendment"){
+            form.screen.value = "polcamend"
+            form.searchbutton.value = "Top"
+          }
+	        if (detail=="Costs"){
+            form.screen.value = "poordcost"
+            form.searchbutton.value = "Top"
+          }
+            return false
+        }
+        </script>
+     end jscript
+
+ end screen

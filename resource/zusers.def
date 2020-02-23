@@ -1,0 +1,9 @@
+product ZAB ERP
+
+table zusers
+  caption "Users"
+  columns ztime, zutime, zemail, xpassword, xsalute, xfirst, xmiddle, ~
+          xlast, xtitle, xorg, xadd1, xadd2, xcity, ~
+          xstate, xzip, xcountry, xphone, xfax, xurl, zactive, zref, xemailc
+  primary key zemail
+end table

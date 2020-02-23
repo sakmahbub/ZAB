@@ -1,0 +1,14 @@
+product ZABDB 
+
+table opcattermsheader
+  caption "Category Wise Terms Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xcatitem,xwh,xlong
+          
+  primary key zid,xwh,xcatitem
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key 
+
+end table

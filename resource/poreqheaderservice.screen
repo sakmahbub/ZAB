@@ -1,0 +1,226 @@
+screen poreqheaderservice
+	
+     sidebars list reqlist,list one
+     sections form one, jscript myscript
+	 
+    list reqlist
+      caption "Document List"
+         table poreqheader
+        order xporeqnum desc
+	   select "left(xporeqnum,4)='DOC-' and zauserid='"+#user+"'"
+		rows 10
+        objects  xporeqnum attrib(link "login?screen=poreqheaderservice&command=Show&xporeqnum=?"), xdate,xregi,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Car No","Division Code","Name"
+	end list
+	  
+	 list one
+        caption "Document Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=poreqdetailservice&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and  xitem=poreqdetail.xitem)),xqtyreq,xqtyapv,xunitpur,xrate,xlineamt
+
+		totals "","","Totals","","","","",sum
+        headers "Line No","Item","Description","Qty Req","Qty Apv","UOM","Rate","Amount"
+     end list
+
+
+     form one
+		caption "Document Requisition Header"
+        table poreqheader
+        order xporeqnum desc
+        select "left(xporeqnum,4) ='DOC-' and zauserid='"+#user+"'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Add,Show,Clear,Update,Delete,*Next,Details,Top, Previous, Next, Bottom,Confirm,"<p>",~
+                xporeqnum,xdate,xsup display(hide),xorg display(hide),xqotnum display(hide),xstatusreq display(const),xregi,xfwh,xfbrname,xtwh,xtbrname,~
+				xtype display(hide),xnote,xsuperiorsp display(hide),xpreparer display(hide),xstatus display(hide),xstatusap display(hide),xstype display(hide)
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+          
+		  	field xtype
+			//display combo
+			caption Service Type
+			pick "Cash,Agreement"
+			//default "Other"
+			end field
+		  
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xregi
+           caption Car No. / Other
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+			pick list poreqdocnum
+			caption DOC No
+        	width 15
+          event after
+		  //class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+		  //class careports(getjspReport{prletter,1,xporeqnum,View Advance Letter})
+            set globals(xporeqnum)=xporeqnum
+			 set globals(xstatusreq)=xstatusreq
+			  if xstatusreq .ne. ""
+		         	//set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Confirm.display)="hidden"
+       	      end if
+          end event
+        end field
+		
+		field xtwh
+		default #wh
+		event before
+		 //
+		end event
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	   	field confirm
+            event before
+			double prepqty=#sql("select sum(xqtyreq) from poreqdetail where xporeqnum='"+xporeqnum+"'")
+			if prepqty <1
+			error "Please add detail"
+			else if xstatustor .ne. ""
+				error "SR Already Confirm"
+			//else if xtype .eq. ""
+			//	error "Please Select Purchase Type"
+			end if
+            end event
+            event after
+			 set temp =  #sql("update poreqheader set xstatusreq='Open' where xporeqnum='"+xporeqnum+"'")
+			 set temp = #spsql(zabsp_sendmail,#id,#user,xporeqnum,"Department2","")
+	         action show
+            end event
+          end field
+		
+		  field add
+			event before
+				set xsuperiorsp=pdmst.xsuperiorsp("xposition='"+#user+"'")
+				//set cardept=cacardept.xregi("xregi='"+xregi+"'")
+				set trn = "DOC-"
+				set xstatusreq=""
+				//set xtype="Cash"
+				set xstatusrec="Open"
+				set xstatus="Open"
+				set xstatusap="Open"
+				set xstype="Documentation"
+				set xpreparer=pdmst.xstaff("xposition='"+#user+"'")
+				//if xregi .ne. "" .and.  xregi .ne. cardept
+				//if xregi .eq. ""
+				//error "Please select car No."
+				//else 
+				if xstype .eq. "Documentation"
+					set xtype="Cash"
+				end if
+				if xfwh .eq. ""
+				error "Please select Branch/Store for Requisition Product"
+				else
+				//set xregi =pdmst.xdeptname("xposition='"+#user+"'")
+				set xporeqnum = #trn("DOC Requisition",trn,10)
+				end if
+			end event
+        end field
+		
+		field update
+			event before
+
+			//if xstatusreq .eq. ""
+			//error "Please Show first"
+			//end if
+			set xsuperiorsp=pdmst.xsuperiorsp("xposition='"+#user+"'")
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poreqdetailservice"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

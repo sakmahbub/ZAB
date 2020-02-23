@@ -1,0 +1,14 @@
+     list todamnum
+        caption "Transfer Order List"</b>"
+        table imtorheader
+        order xtornum
+        select "(xtornum like '%"+zvalue+"%' and left(xtornum,4) in ('TO--','DAM-'))"
+		searchselect "left(xtornum,4) in ('TO--','DAM-')"
+        rows 10
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xordernum
+		 
+		headers "TO/DAM Number","Date" ,"Ref"
+     end list
+
+

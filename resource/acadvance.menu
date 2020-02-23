@@ -1,0 +1,12 @@
+//General Accounts.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Advance for Purchase			|#classPath+"/login?screen=poreqheadercashacc"
+Purchase Advance Adjustment      |#classPath+"/login?screen=pogrnheaderadvadj"
+
+
+//Advance for Purchase (CO) 			|#classPath+"/login?screen=poreqheadercashaccco"
+//Advance for C&F 			|#classPath+"/login?screen=poreqheadercashcnf"
+//C&F Advance Adjustment                  |#classPath+"/login?screen=opcashadvheaderadj"
+//-------------------------------------------------------------------

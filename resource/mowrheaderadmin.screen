@@ -1,0 +1,202 @@
+screen mowrheaderadmin
+
+  sidebar list imtor,list one//,
+	sections form one, jscript myscript
+
+	 list imtor
+        caption "WR List"
+        table imtorheader
+        order xtornum desc
+		select "zauserid='"+#user+"' and left(xtornum,2)='WR'"
+        rows 5
+        objects  xtornum  attrib(link "login?screen=mowrheaderadmin&command=Show&xtornum=?"),~// ,xdate,xbatch,~
+                 xdate
+				 
+        headers "Requisition No","Date"
+    end list
+              
+    list one
+        caption "<br><center><b>"Requisition Detail List"</b>"
+        table imtordetail
+        order xtornum,xrow
+        fixed xtornum
+        select "left(xtornum,2)='WR'"
+		rows 30
+        objects ~
+        xrow,~// attrib(link "login?screen=moreqdetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xbrand,~
+        xprepqty,xunit
+
+        headers "Serial No","Item","Description","Brand","Quantity Required","Unit"
+     end list
+
+
+
+     form one
+        caption "Work Requisition Header Admin"
+        table imtorheader
+        primarykey xtornum
+        order xtornum
+		select "left(xtornum,2)='WR'"
+        return "login"
+        pstyle 3
+        layout 3
+        objects Show,Update,Clear,Delete,Detail,~
+        xtornum ,~
+        xdate,xref,~
+        xfwh,xfbrname,xregi,xtwh,xtbrname,xstatustor,~//xdum,
+		xstatusreq display(const),xpreparer display(hide),~
+		xstatusrec display(hide),xidsup,xsuperipr  display(const),xlong,zauserid
+				
+		field xdocrow
+			caption Recipe Row
+		end field
+		
+		field zauserid
+		caption Preparer ID
+		pick list xidsup
+		end field
+		
+		field xstatustor
+		caption WR Status
+		display text
+		end field
+		
+		field xstatusreq
+		caption JN Status
+		display const
+		end field
+		
+		field xdum
+			display const
+			attrib local
+			caption
+		end field
+		
+		field xregi
+		pick list xcardept
+			caption Car No/Other
+			event before
+			end event
+		end field
+		
+		field xsuperipr
+          caption Superior
+		  attrib local
+		  event after
+		  set xsuperipr=pdmst.xname("xposition='"+xidsup+"'")
+		  end event
+        end field
+		
+		field director
+          caption ED / DF
+		  attrib local
+		  event after
+		  set director=pdmst.xname("xstaff='"+xdirector+"'")
+		  end event
+        end field
+		
+		field xtwh
+		default #wh
+		event before
+		 //
+		end event
+        end field
+		
+		  field appname
+        attrib local
+        caption Approved Person
+        display const
+        event after
+          set appname=pdmst.xname("xposition='"+xidsup+"'")
+        end event
+       end field
+		
+       field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+		caption Requisition No.
+		pick list xwrnum
+          event after
+			set global(xtornum)=xtornum
+			set global(xdocrow)=xdocrow
+			//class careports(getjspReport{imreqstatus,1,xtornum,View WR Status})
+            //class careports(getjspReport{imtranissueprint,1,xtornum,Print Transfer Challan})
+			//if xstatustor .eq. "Confirmed" .or. xstatustor .eq. "Approved"
+			if xtornum .eq. ""
+              set #field(Update.display)="hidden"
+			  set #field(Detail.display)="hidden"
+			end if
+           end event
+        end field
+
+        field xlong
+          height 3
+          width 70
+          column 2
+        end field
+		
+		
+        field update
+
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+        
+		field Select
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+
+        function clicked(b){
+          but=b.value
+        }
+
+        function submitit(form){
+          if (but=="Detail"){
+            form.screen.value = "mowrdetailadmin"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickRecipe(link,row){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xmoprcs.value=link.text
+            document.one.xdocrow.value=row.text
+          }else{
+            document.one.xmoprcs.value=link.innerText
+            document.one.xdocrow.value=row.innerText
+          }
+          return false
+        }
+		
+        </script>
+     end jscript
+
+
+
+end screen

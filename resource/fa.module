@@ -1,0 +1,10 @@
+//fa.module
+module FA
+     caption "Fixed Assets"
+     description "You need to manage your fixed assets, account for their wear ~
+                  and tear, procurement, disposals and replacements."
+
+     transactions FA Transactions, Estimated Life Trn, FA Transfer Trn
+     codes Category, Asset Type, Depreciation Method, Division, Section, Project
+end module
+

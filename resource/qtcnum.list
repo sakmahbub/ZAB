@@ -1,0 +1,12 @@
+     list qtcnum
+        caption "SQC No: "+zvalue
+        table pogrnheader
+        order xgrnnum
+        select "(xgrnnum like '%"+zvalue+"%' or xdate like '%"+zvalue+"%') and left(xgrnnum,4)='SQC-'"
+		searchselect "left(xgrnnum,4)='SQC-'"
+        rows 20
+        objects xgrnnum attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdate
+     end list
+
+

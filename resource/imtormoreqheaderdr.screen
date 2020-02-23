@@ -1,0 +1,203 @@
+screen imtormoreqheaderdr
+  caption "Transfer Order Entry Header"
+     	sidebar list imtor,list one,list imtorapp
+	sections form one, jscript myscript
+     
+	 list imtor
+        caption "Product Requisition "
+        table imtorheader
+        order xtornum desc
+		select "(xstatustor='Approved_DPH' or xidsup='"+#user+"') and left(xtornum,4)='SR--' and xfwh='02'"// OR xstatustor='Checked' OR xstatustor='Approved')
+        rows 6
+        objects  xtornum  attrib(link "login?screen=imtormoreqheaderdr&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","To Branch"
+     end list
+	
+	
+	 list imtorapp
+        caption "Last 5 Approved Requisition"
+        table imtorheader
+        order xtornum desc
+		select "(xstatustor='Approved' or xstatustor='Checked' or xstatustor='Confirmed') and left(xtornum,4)='SR--' and xfwh='02'"// OR xstatustor='Checked' OR xstatustor='Approved')
+        rows 5
+        objects  xtornum  attrib(link "login?screen=imtormoreqheaderdr&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","To Branch"
+     end list
+
+
+   list one
+        caption "Requisition List For Requisition No "+xtornum
+        table imtordetail
+        order xtornum,xrow desc
+        fixed xtornum
+        rows 30
+        objects ~
+        xrow,~// attrib(link "login?screen=imtormoreqdetail&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xbrand,~
+        xqtyreq,xunit
+
+		totals "","","Totals",sum
+		
+        headers "Serial No","Item","Description","Brand","Quantity Required","UOM"
+     end list
+
+     form one
+        caption "Requisition Approved By DF"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+       select "(xstatustor='Approved' or xstatustor='Checked' or xstatustor='Confirmed' or xstatustor='Approved_DPH' or xstatustor='Open') and left(xtornum,4)='SR--'"
+        return "login"
+        pstyle 3
+        layout 3
+        objects Update,Show,Clear,~//Create Purchase Requisition,Check Stock in Hand,
+        Approved,Reject,"<p>" ,~
+        xtornum ,xdate,xdatecom,~
+        xfwh display(const),xfbrname,xref,xtwh display(const),xtbrname,xstatustor display(hide),xporeqnum display(hide),~
+		xdocrow display(hide),xstatusreq display(hide),xregi display(const),~
+		zauserid display(hide),preparer display(const),xdphead display(hide),dphead display(const),xdum,xlong
+			
+       field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+		
+		field xregi
+		pick list xcardept
+			caption Car No/Department Name
+			event before
+			end event
+		end field
+		
+		  field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xposition='"+zauserid+"'")
+		  end event
+        end field
+		
+		field dphead
+          caption Department Head
+		  attrib local
+		  event after
+		  set dphead=pdmst.xname("xstaff='"+xdphead+"'")
+		  end event
+        end field
+		
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+		caption Requisition No.
+          event after
+			set globals(xtornum)=xtornum
+			set globals(xstatustor)=xstatustor
+            class careports(getjspReport{poreqprint,1,xtornum,View Requisition})
+			if xstatustor .ne. "Approved_DPH"
+            set #field(Check.display)="hidden"
+            set #field(Approved.display)="hidden"
+			set #field(Reject.display)="hidden"
+			set #field(Update.display)="hidden"
+			end if
+           end event
+        end field
+
+
+        field xdate
+          caption Transfer Date
+        end field
+		
+		  field xdum
+        	attrib local
+        	display const
+        	caption 
+        end field
+
+        field xdatecom
+          display constant
+          caption Receive Date
+        end field
+
+
+        field xlong
+		caption Note
+          height 3
+          width 70
+          column 3
+        end field
+		  
+		   field Approved
+            event before
+			 set xsuperior=pdmst.xidsup("xposition='"+#user+"'")
+            end event
+            event after
+			 set temp =  #sql("update imtorheader set xidsup='"+xsuperior+"' where xtornum='"+xtornum+"'")
+			 set temp = #spsql(zabsp_DATETIME_Update,#id,#user,xtornum,"imtorheader","xdateed","xdirector","xstatustor","xtornum","Approved")
+	         action show
+            end event
+        end field
+		  
+		   field Reject
+            event before
+            end event
+            event after
+	        set temp = #spsql(zabsp_DATETIME_Update,#id,#user,xtornum,"imtorheader","xdateed","xdirector","xstatustor","xtornum","Rejected")
+	        action show
+            end event
+          end field
+		
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtormoreqdetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+          link.innerText
+            document.one.xtornum.value=link.innerText
+          }
+          return false
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

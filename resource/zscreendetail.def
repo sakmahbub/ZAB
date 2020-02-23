@@ -1,0 +1,12 @@
+product ZAB ERP
+
+table zscreendetail
+  caption "User Roles"
+  columns ztime, zutime, zid,zauserid,zuuserid, zemail,zscreen,xfields,xcaption,xoption,xrow,xtype,zactive
+
+  primary key zid,zscreen,xrow
+  foreign key
+        zid references zbusiness.zid
+		zid,zscreen references zscreenheader.zid,zscreen
+  end foreign key
+end table

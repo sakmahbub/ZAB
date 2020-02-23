@@ -1,0 +1,9 @@
+     list xtrnimtogl
+        table xtrn
+        order xtypetrn,xtrn
+        select "(xtrn like '%"+zvalue+"%' and xtypetrn='Inventory Transaction')"
+        rows 30
+        objects xtrn attrib(link "abc" embed onclick="return updateParent(this:'')")
+     end list
+
+

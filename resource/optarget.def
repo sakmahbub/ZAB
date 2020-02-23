@@ -1,0 +1,36 @@
+product ZAB ERP
+
+table optarget
+  caption "Target & Sales"
+  columns zid,xyear,xper,xwh,xsp,xitem,xqtyalc,xqtyord,xqtycrn,xqty
+  primary key zid,xyear,xper,xwh,xsp,xitem
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view optarget (zid,xyear,xper,xwh,xsp,xitem,xqtyalc,xqtyord,xqtycrn,xqty) ~
+            as SELECT optargetdetail.zid,optargetdetail.xyear,optargetdetail.xper,optargetdetail.xwh,optargetdetail.xsp,optargetdetail.xitem,sum(optargetdetail.xqtyalc),~
+            isnull((select sum(xqtyord) from opdodetail where opdodetail.xitem=optargetdetail.xitem and opdodetail.zid=optargetdetail.zid and ~
+            (select year(opdoheader.xdate) from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid) = optargetdetail.xyear and ~
+            (select month(opdoheader.xdate) from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)= optargetdetail.xper and ~
+            (select opdoheader.xsp from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)=optargetdetail.xsp and ~
+            (select opdoheader.xwh from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)=optargetdetail.xwh),0),~
+            isnull((select sum(xqtyord) from opcrndetail where opcrndetail.xitem=optargetdetail.xitem and opcrndetail.zid=optargetdetail.zid and ~
+            (select year(opcrnheader.xdate) from opcrnheader where opcrnheader.xcrnnum=opcrndetail.xcrnnum and opcrnheader.zid=opcrndetail.zid) = optargetdetail.xyear and ~
+            (select month(opcrnheader.xdate) from opcrnheader where opcrnheader.xcrnnum=opcrndetail.xcrnnum and opcrnheader.zid=opcrndetail.zid)= optargetdetail.xper and ~
+            (select opcrnheader.xsp from opcrnheader where opcrnheader.xcrnnum=opcrndetail.xcrnnum and opcrnheader.zid=opcrndetail.zid)=optargetdetail.xsp and ~
+            (select opcrnheader.xwh from opcrnheader where opcrnheader.xcrnnum=opcrndetail.xcrnnum and opcrnheader.zid=opcrndetail.zid)=optargetdetail.xwh),0),~
+            isnull((select sum(xqtyord) from opdodetail where opdodetail.xitem=optargetdetail.xitem and opdodetail.zid=optargetdetail.zid and ~
+            (select year(opdoheader.xdate) from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid) = optargetdetail.xyear and ~
+            (select month(opdoheader.xdate) from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)= optargetdetail.xper and ~
+            (select opdoheader.xsp from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)=optargetdetail.xsp and ~
+            (select opdoheader.xwh from opdoheader where opdoheader.xdornum=opdodetail.xdornum and opdoheader.zid=opdodetail.zid)=optargetdetail.xwh),0)-~
+            isnull((select sum(xqtyord) from opcrndetail where opcrndetail.xitem=optargetdetail.xitem and opcrndetail.zid=optargetdetail.zid and ~
+            (select year(opcrnheader.xdate) from opcrnheader where opcrnheader.xcrnnum=opcrndetail.xcrnnum and opcrnheader.zid=opcrndetail.zid) = optargetdetail.xyear and ~
+            (select month(opcrnheader.xdate) from opcrnheader where opcrnheader.xcrnnum=opcrndetail.xcrnnum and opcrnheader.zid=opcrndetail.zid)= optargetdetail.xper and ~
+            (select opcrnheader.xsp from opcrnheader where opcrnheader.xcrnnum=opcrndetail.xcrnnum and opcrnheader.zid=opcrndetail.zid)=optargetdetail.xsp and ~
+            (select opcrnheader.xwh from opcrnheader where opcrnheader.xcrnnum=opcrndetail.xcrnnum and opcrnheader.zid=opcrndetail.zid)=optargetdetail.xwh),0) ~
+            FROM optargetdetail group by zid,xyear,xper,xwh,xsp,xitem
+  end table
+

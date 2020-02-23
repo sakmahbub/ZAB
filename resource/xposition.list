@@ -1,0 +1,17 @@
+     list xposition
+        table pdmst
+        order xposition desc
+		
+        select "(xposition like '%"+zvalue+"%' or xname like '%"+zvalue+"%')"
+        rows 20
+        objects xposition attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xstaff,xname,xdesignation,xdeptname
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

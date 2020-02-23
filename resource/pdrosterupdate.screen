@@ -1,0 +1,84 @@
+screen pdrosterupdate
+
+     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Roster For : "+pdmst.xname("xstaff='"+xstaff+"'")
+        table pdrosterdetailview
+        order xstaff,xyearperdate asc
+        fixed xstaff
+		select "xdate>='"+#date+"'"
+		//select "DATEPART(day,xdate)>=DATEPART(day,'"+#date+"')"
+        rows 60
+        objects xdate,xdayname,xshift,xshiftimin,xshiftimout,xnote ,xyearperdate display(hide)      
+        header "Date","Day Name","Shift","In Time","Out Time","Note"
+     end list
+
+
+     form one
+        caption "Roster Update By Employee"
+		table pdrosterdetail
+        primarykey xroster,xrow
+		order xstaff
+		select "xdate>='"+#date+"'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,*next,Detail,"<p>" ,~  //Add,Top,Next,Previous,Bottom,
+          xstaff,xname
+
+		field xstaff
+		pick list xstaffcat
+			event after
+				set globals(xstaff)=xstaff
+			end event
+		end field
+		
+        field xname
+          attrib local
+          display const
+          caption Name
+          event after
+            set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+        end field
+		
+		field show
+			event before
+				set empcat=pdmst.xempcategory("xstaff='"+xstaff+"'")
+				if empcat .ne. #empcat .and. #empcat .ne. ""
+				set xstaff=""
+				end if
+			end event
+		end field		
+        
+		
+		embed onsubmit="submitit(this)"
+
+    field Detail
+      embed onclick="clicked(this)"
+    end field
+
+     end form
+
+  jscript myscript
+    <script language="javascript" type="text/javascript">
+    var detail
+    function clicked(b){
+      detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Detail"){
+          form.screen.value = "pdrosterupdatemp"
+          form.searchbutton.value = "Bottom"
+          //return false
+        }
+      }
+
+      </script>
+  end jscript
+
+
+
+end screen

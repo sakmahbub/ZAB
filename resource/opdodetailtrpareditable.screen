@@ -1,0 +1,168 @@
+screen opdodetailtrpareditable
+
+     sidebar list one ,list price
+     sections form one,  jscript myscript
+
+     list one
+      caption "Detail List"
+        table opdodetail
+        order xdornum,xrow
+        fixed xdornum
+        rows 20
+        objects  xrow attrib(link "login?screen=opdodetailtrpareditable&command=Show&xdornum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid=opdodetail.zid and xitem=opdodetail.xitem)),~
+                 xqtyord,xqtybonus,xrate,xsprate,xdiscdet,xdiscdetamt,xvatamt,xlineamt,xnetamt //(xlineamt+xvatamt-xdiscdetamt)
+
+        header "Line No","Product <br>Code","Product <br>Name","Qty","Bonus <br>Qty","Rate","Special <br>Rate","Disc %","Disc <br>Amt","Vat <br>Amt","TP","Net Amt"
+        totals "","Totals","","","","","","",sum,sum,sum,sum
+     end list
+
+     form one
+      caption "Part Return For: "+xdornum
+      table opdodetail
+      primarykey xdornum
+      order xdornum,xrow
+      fixed xdornum
+      return "login"
+      layout 2
+      pstyle 3
+      objects Add,Update,Show,Clear,Delete,*next,Back, Top,Previous,Next, Bottom,"<p>",~
+              xrow attrib(row 0 1;search),xunit display(const), xitem, xdesc,zauserid display(constant),xqtycrn,xqtyord,~
+              xrate display(hide),xdiscdet display(hide),xqtytr,xdiscdetamt,~
+              xvatrate  display(hide),xdiscdetamttr,xqtybonus display(const),xqtybntr,xvatamt,xvatamttr,xnetamt,xnetamttr,xlineamt,~
+              xchallanitem display(hide),xeta display(hide),xcost display(hide)
+
+
+      embed onsubmit="return submitit(this)"
+
+	  field xdiscdetamttr
+		caption Discount TR
+	  end field
+	  
+	  field xqtybntr
+		caption Bonus TR
+	  end field
+
+	  field xnetamttr
+		caption Amount TR
+	  end field
+	  
+	  field xvatamttr
+		caption VAT TR
+	  end field
+
+	  field xqtytr
+		caption Order TR
+	  end field	  
+
+      field xdoctype
+		//default ""
+	end field
+
+	field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+          		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+      end field
+
+      field xeta
+        attrib local
+        caption
+        default "0"
+      end field
+
+  
+      field xlong
+//        width 70
+//        column 2
+      end field
+
+
+      field update
+        event before
+	  		if xqtycrn > xqtytr
+			//	error "Cannot Proceed -- Retrun Qty Cannot Be Greate Than Transit Qty"
+	  		else if opdoheader.xref("xdornum='"+xdornum+"'") .eq. ""
+			//	error "Cannot Proceed -- Please Specify Reason For Return"
+			else 
+				set xqtyord=xqtytr-xqtycrn
+				if xqtyord == 0
+					set xqtybonus = 0
+				end if
+	  		end if		
+					set xqtybonus = 0
+        	//set lineamt = xqtyord*xrate
+        end event
+
+        event after
+	      set date=#sql("select xdate from opdoheader where xdornum='"+xdornum+"'")
+         set temp = #spsql(zab_sp_giftitem,#id,xdornum,xitem,date,xqtyord,#user,#wh,"Update")
+          //set temp = #spsql(zab_sp_packageitem,#id,xdornum,xitem,date,xqtyord,#user,#wh,"Update")
+          set temp = #spsql(zabsp_DoBoQty,#id,#user,#wh,xdornum,xrow,xitem)
+          set temp = #spsql(zabsp_ValidedAfterDetailDO,#id,#user,xrow,xdornum,"update")
+
+	    double totqtyord = #sql(double,"select sum(xqtyord) from opdodetail where xdornum='"+xdornum+"'")	
+	    double totqtytr = #sql(double,"select sum(xqtytr) from opdodetail where xdornum='"+xdornum+"'")	
+	    if totqtyord<>totqtytr
+		set temp = #sql("update opdoheader set xstatus='Partial' where xdornum='"+xdornum+"'")
+	    end if		
+	    if totqtyord==totqtytr
+		set temp = #sql("update opdoheader set xstatus='' where xdornum='"+xdornum+"'")
+	    end if		
+
+		set temp = #spsql(zsp_Chk_DO_values,#id,#user,xitem,xdornum)
+//          	set temp = #spsql(zab_sp_giftitem,#id,xdornum,xitem,date,xqtyord,#user,#wh,"Update")
+//          	set temp = #spsql(zabsp_DoBoQty,#id,#user,#wh,xdornum,xrow,xitem)
+//          	set temp = #spsql(zabsp_ValidedAfterDetailDO,#id,#user,xrow,xdornum,"update")
+
+          action show
+	  end event
+      end field
+	
+      field Back
+        embed onclick="clicked(this)"
+      end field
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Back"){
+            form.screen.value = "opsumprocdetaileditable"
+            form.searchbutton.value = "Find xdornum=?"
+          }
+          return result
+        }
+        function pickPrice(link,vatamt,cost){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xrate.value=link.innerText
+            document.one.xvatrate.value=vatamt.innerText
+            document.one.xcost.value=cost.innerText
+            document.one.xeta.value="1"
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

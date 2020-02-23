@@ -1,0 +1,13 @@
+ list pdincnum
+        table pdsalincheader
+        order xvoucher desc
+        //select "xporeqnum like '%"+zvalue+"%' and left(xporeqnum,4) in ('APN-')"
+		//searchselect "left(xporeqnum,4) in ('APN-')"
+        rows 20
+        objects xvoucher attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xdate,xyear,xempcategory,xcomm
+
+     headers "INC Number","Date","Year","Division","Increment Rate"
+	 end list
+
+

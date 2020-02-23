@@ -1,0 +1,13 @@
+
+     list menulist
+        table xpermits 
+        order xmenu
+        select "xmenu like '%"+zvalue+"%'"
+        rows 20
+	//searchselect "xwh='"+#wh+"'"
+        objects xmenu attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xoption,xalist,zactive
+
+     end list
+
+

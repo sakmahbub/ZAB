@@ -1,0 +1,138 @@
+screen arhedac
+
+    sections form one,jscript myscript
+
+     form one
+        caption "AR Header"
+        table arhedacview
+        order xvoucher
+        fixed xvoucher
+        //select "xdocnum='"+xvoucher+"'"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Clear,Show,Add, Update, Delete,*next,Return, Top, Previous, Next, Bottom,"<p>" ,~
+                xvoucher display(trn AR Transactions),xdate,xcus,xorg,xref,xstatusjv,~
+                xprime,xbalprime attrib(readonly),xvatrate,xait,~
+                xsign display(hidden),xnote,~
+
+                //hide
+                xcur display(hide),xexch  display(hide),~
+                xbalbase display(hide),xbase display(hide)
+
+        field xorg
+          attrib local
+          display constant
+          caption Name
+          event after
+//          print xdocnum
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+        field xcur
+          default "BDT"
+          width 3
+        end field
+
+        field xexch
+          default "1"
+          width 3
+        end field
+
+        field xnote
+          width 80
+          column 2
+        end field
+
+        field xlong
+          caption Header Description
+          width 50
+        end field
+
+        field xstatusjv
+           display constant
+        end field
+
+
+        field xvoucher
+         event after
+          set globals(xvoucher)=xvoucher
+         end event
+        end field
+
+        field Add
+          event before
+            set temp = #sql("select xinvnum from aralc where xinvnum = '"+xvoucher+"'")
+            if #result .eq. "true"
+              error "Cannot Proceed Already Allocated"
+            end if
+            class ar(arValidateBeforeHead{xvoucher})
+          end event
+          event after
+            class ar(arValidateAfterHead{xvoucher})
+          end event
+        end field
+
+        field Update
+          event before
+            class ar(arValidateBeforeHead{xvoucher})
+            set temp = #sql("select xinvnum from aralc where xinvnum = '"+xvoucher+"'")
+            if #result .eq. "true"
+              error "Cannot Proceed Already Allocated"
+            end if
+          end event
+          event after
+            class ar(arValidateAfterHead{xvoucher})
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Details"){
+            form.screen.value = "artrn"
+            form.searchbutton.value = "Find xvoucher=?"
+            //return false
+          }
+          if (detail=="Return"){
+            form.screen.value = "acheader"
+            form.searchbutton.value = "Find xvoucher=?"
+            //return false
+          }
+        }
+
+        function pickCur(link, exch){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+            document.one.xcur.value=link.innerText
+            document.one.xexch.value=exch.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

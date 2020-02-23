@@ -1,0 +1,13 @@
+      list summary
+      	caption "Summary List"
+        table opdosumallview
+        order xsumnum,xroute
+	select "(xwh='"+#wh+"') and (xroute like '%"+zvalue+"%' or xsumnum like '%"+zvalue+"%')"	
+        rows 20
+	searchselect "xwh='"+#wh+"'"
+	//searchobject xsumnum,xroute,xpaymentterm
+        objects  xsumnum  attrib(link "abc" embed onclick="return updateParent(this:'')"),xroute,xdatedel,xpaymentterm
+                 
+
+     end list
+

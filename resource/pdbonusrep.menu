@@ -1,0 +1,8 @@
+//pdbalrep.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Bank Statement of Bonus                   |#classPath+"/login?screen=*crystal pdbankstmtbonus(xyear=Year,xper=Period,xbank=Bank=,xbank=Bank=,xempcategory=Employee Category,xempcategory=Employee Category)"
+Statment of Bonus   	   |#classPath+"/login?screen=*crystal pdbonus(xyear=Year,xper=Period,xempcategory=Employee Category,xempcategory=Employee Category)"
+//-------------------------------------------------------------------
+

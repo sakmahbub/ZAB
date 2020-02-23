@@ -1,0 +1,107 @@
+screen pdtrnheadernr
+
+     //sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "Detail List"
+        table pdtrndetail
+        order xvoucher,xrow
+        fixed xvoucher
+        rows 20
+        objects  xrow attrib(link "login?screen=pdtrndetail&command=Show&xvoucher=?&xrow=?"), ~
+                xtype,xamount
+        header "Line No","Transaction Type","Amount"
+
+     end list
+
+
+     form one
+        caption "<ACRONYM>Transaction Header (NR) </ACRONYM>"
+	      table pdtrnheader
+        order xvoucher desc
+        select "xempcategory='Contract & Services'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Clear,Add, Show,Update, Delete,*next,Detail,Top,Next,Previous,Bottom,"<p>" ,~
+                xvoucher,xdate,xposition display(hide),xyear,xper,~
+                xstaff display(hide),xempcategory display(hide)
+
+
+        field xposition
+          pick list xpositioncnt
+        end field
+
+        field xempcategory
+          default "Contract & Services"
+        end field
+
+        field xname
+          attrib local
+          display const
+          caption Name
+          event after
+            set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+        end field
+
+
+          field xvoucher
+            display trn PD Transaction No
+            width 12
+            event after
+              set globals(xvoucher)=xvoucher
+            end event
+          end field
+
+          field add
+            event before
+              set xyear=#sub(xdate,0,4)
+              set xper=#sub(xdate,5,2)
+              set xstaff=""
+             // set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+              set  xempcategory = "Contract & Services"
+            end event
+          end field
+
+          field update
+            event before
+              set xyear=#sub(xdate,0,4)
+              set xper=#sub(xdate,5,2)
+              set xstaff=""
+              set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+              set  xempcategory = "Contract & Services"
+            end event
+          end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdtrndetailnr"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,12 @@
+product ZAB ERP
+
+table acbudget
+  caption "Account Budget"
+  columns  ztime,zutime,zauserid,zuuserid, zid,xyear,xper,xwh,xacc,xbudgetamt//,xauditedamt
+
+  primary key zid,xyear,xper,xwh,xacc
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

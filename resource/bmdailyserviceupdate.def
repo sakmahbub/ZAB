@@ -1,0 +1,15 @@
+product ZAB ERP
+
+table bmdailyserviceupdate
+  caption "Service Log"
+  columns ztime,zutime,zid,zauserid,zuuserid,xvoucher,xrow,xdate,xtimein,xnote
+ 
+  primary key zid, xvoucher,xrow
+  
+  foreign key
+        zid references zbusiness.zid
+	zid,xvoucher references bmtrn.zid,xvoucher
+  end foreign key
+
+
+end table

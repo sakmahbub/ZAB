@@ -1,0 +1,28 @@
+//OP Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Letter of Credit (LC)                        |#classPath+"/login?menu=commercialreplc"
+///Sales Contract (SC)                        |#classPath+"/login?menu=commercialrepsc"
+///Date Wise PI List Detail    	|#classPath+"/login?screen=*viewcrystal oppilist(5;in,dt,dt,st,st;zid,fdate,tdate,ptype,status;xpidate=From Date=,xpidate=To Date=,xprodtype=Product Type,xstatusdor=Delivery Status,xviewtype=Report View)"
+///Date Wise PI List           	|#classPath+"/login?screen=*viewcrystal oppilisting(5;in,dt,dt,st,st;zid,fdate,tdate,ptype,status;xpidate=From Date=,xpidate=To Date=,xprodtype=Product Type,xstatusdor=Delivery Status,xviewtype=Report View)"
+//Customer Wise PI List Detail    |#classPath+"/login?screen=*viewcrystal oppilistcus(5;in,dt,dt,st,st;zid,fdate,tdate,xcus,ptype;xpidate=From Date=,xpidate=To Date=,xcus=Customer,xprodtype=Product Type,xviewtype=Report View)"
+
+Commercial Reports Partial       |#classPath+"/login?screen=opinvheaderpartial"
+Print Bill of Exchange         	|#classPath+"/login?screen=*viewcrystal opinvbillofexch(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+//Print Bill of Exchange_2         	|#classPath+"/login?screen=*jspcrystal opinvbillofexch_2(xinvnum=Commercial Invoice No=)"
+Print Beneficiary Certificate   |#classPath+"/login?screen=*viewcrystal opinvbencer(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Certificate of Origin	|#classPath+"/login?screen=*viewcrystal opinvceroforigin(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Commercial Invoice        |#classPath+"/login?screen=*viewcrystal opinvcominv(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Delivery Chalan           |#classPath+"/login?screen=*viewcrystal opinvdelcha(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Packing List             |#classPath+"/login?screen=*viewcrystal opinvplist(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Print Consumsion             |#classPath+"/login?screen=*viewcrystal opinvconstmlist(2;in,st;zid,invno;xinvnum=Commercial Invoice No=,xviewtype=Preview Type)"
+Commercial Invoice List               	|#classPath+"/login?screen=*viewcrystal opcomlisting(3;in,dt,dt;zid,fdate,tdate;xdate=From Date=,xdate=To Date,xviewtype=Report View)"
+Date wise Export LC	   	   			|#classPath+"/login?screen=*viewcrystal lcinfoexp(4;in,st,dt,dt;zid,lcno,fdate,tdate;xlcno=LC No.,xdate=From Date,xdate=To Date,xviewtype=Report View)"
+CI Untag DO List               	|#classPath+"/login?screen=*viewcrystal opuntagci(2;in,st;zid,cus;xcus=Customer ID,xviewtype=Report View)"
+
+
+
+
+//-------------------------------------------------------------------
+

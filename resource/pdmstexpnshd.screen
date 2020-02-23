@@ -1,0 +1,174 @@
+screen pdmstexpnshd
+  sidebar list detail,list emlist
+  sections form one, jscript myscript
+   
+  list detail
+    caption "Salary Details List"
+    table pdmstexpnsdt
+    order xstaff
+    select "xyear="+xyear+" and xper="+xper
+    fixed xstaff
+    rows 20
+    objects xtype,xamount
+    //objects  xrow attrib(link "login?screen=pdsalarydetail&command=Show&xstaff=?&xrow=?"), ~
+    //         xtype,xamount,typetrn equals((select xprops from xcodes where xtype='PD Transaction Type' and xcode=pdsalarydetail.xtype))
+
+    total "",sum
+    header "Componant Type","Amount"
+    
+  end list
+  
+  list emlist
+    caption "Employee List"
+    table pdmstexpnshd
+    order xstaff
+    select "xyear="+xyear" and xper="+xper
+    //fixed xstaff
+    rows 20
+    objects xtype,xamount
+    objects  xstaff attrib(link "login?screen=pdmstexpnshd&command=Show&xstaff=?"), ~
+             dname equals((select xname from pdmst where xstaff=pdmstexpnshd.xstaff))
+
+    header "Employee ID","Name"
+    
+  end list
+  
+
+  form one
+    caption "Expenses"
+    table pdmstexpnshd
+    order xstaff
+    return "login"
+    layout 3
+    pstyle 3
+    objects Show, Add, Update, Delete, Expenses,Clear,*next,Top,Previous,Next,Bottom,"<p>",~
+            xstaff,xname attrib(local) display(const),xdeptname attrib(local) display(const),~
+            xdesignation attrib(local) display(const),xdatejoin attrib(local) display(const),xbank,xacc,xdesc attrib(local),~
+            xstatus attrib(local),xyear,xper,xempcategory
+
+    field xempcategory
+      caption Expense Category
+      pick "Manager Expense,Field Expense"
+    end field
+
+    field xyear
+      //attrib local
+      default #sub(#date,0,4)
+    end field
+
+    field xper
+      //attrib local
+      default #sub(#date,5,2)
+    end field
+    
+    field xdesc
+      //attrib local
+      display const
+      caption Bank/Branch Name
+      event after
+        if xdesc .eq. " "
+          set xdesc=xcodes.xlong("xcode='"+xbank+"'")
+        end if
+      end event
+    end field
+    
+    field xacc
+      caption Bank Account No
+      pick
+    end field
+
+    field xstaff
+      event after
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+        set xdeptname=pdmst.xdeptname("xstaff='"+xstaff+"'")
+        set xdesignation=pdmst.xdesignation("xstaff='"+xstaff+"'")
+        set xdatejoin=pdmst.xdatejoin("xstaff='"+xstaff+"'")
+        set xstatus=pdmst.xstatus("xstaff='"+xstaff+"'")
+        set globals(xstaff)=xstaff
+        set globals(xyear)=xyear
+        set globals(xper)=xper
+      end event
+    end field
+
+    field xbank
+      display combo
+      pick "select xcode from xcodes where xtype='Bank'"
+    end field
+    
+    field xrow
+      caption Record No
+      display const
+    end field
+    
+    field xdateeff
+      caption Resign Effected Date
+    end field
+    
+    field xempstatus
+      caption Employee Status
+      display combo
+      pick "Resigned,Tarminate"
+    end field
+
+    field add
+      event before
+        set xbank=pdmst.xbank("xstaff='"+xstaff+"'")
+	set xacc=pdmst.xacc("xstaff='"+xstaff+"'")
+	if #len(xempcategory) .eq. 0
+	  error "Cannot Proceed -- Expense Category field mandatory"
+	else if #len(xstaff) .eq. 0
+	  error "Cannot Proceed -- Employee ID is mandatory"
+	end if
+      end event
+    end field
+
+    field update
+      event before
+        set xbank=pdmst.xbank("xstaff='"+xstaff+"'")
+	set xacc=pdmst.xacc("xstaff='"+xstaff+"'")
+	if #len(xempcategory) .eq. 0
+	  error "Cannot Proceed -- Expense Category field mandatory"
+	else if #len(xstaff) .eq. 0
+	  error "Cannot Proceed -- Employee ID is mandatory"
+	end if
+      end event
+    end field
+
+    field Expenses
+      embed onclick="clicked(this)"
+    end field
+    
+    embed onsubmit="submitit(this)"
+    
+  end form
+
+  jscript myscript
+
+    <script language="javascript" type="text/javascript">
+      var detail
+      function clicked(b){
+        detail=b.value
+      }
+      function submitit(form){
+        if (detail=="Expenses"){
+          form.screen.value = "pdmstexpnsdt"
+          form.searchbutton.value = "Find xstaff=?"
+          //return false
+        }
+      }
+      function pickAccount(link,name,rank){
+        if (navigator.appName.indexOf("Netscape") >= 0){
+          document.one.xinvnum.value=link.text
+          document.one.xbalance.value=primebal.text
+          document.one.xdate.value=date.text
+      }else{
+          document.one.xstaff.value=link.innerText
+          document.one.xname.value=name.innerText
+          document.one.xrank.value=rank.innerText
+        }
+        return false
+      }
+    </script>
+  end jscript
+
+end screen

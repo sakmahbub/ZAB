@@ -1,0 +1,179 @@
+screen pdleaveassignm
+     
+	 caption "Leave Detail"
+     sidebar list asigneplan
+	 sections form one,jscript myscript
+	 
+  list asigneplan
+    caption "Assigned Leave to "+pdmst.xname("xstaff='"+xstaff+"'")+"<br> for the year : "+xyear
+    table pdleaveasigne
+    order xstaff,xyear,xtypeleave
+    fixed xstaff,xyear
+    select "xtypeleave<>'Unpaid Leave'"	
+    rows 20
+    objects  xtypeleave attrib(link "login?screen=pdleaveassignm&command=Show&xstaff=?&xyear=?&xtypeleave=?"),xavailable,xmleave,xused,xbalance
+	//objects  xtypeleave attrib(link "abc" embed onclick="return picltype(this)")	
+    //header "Leave Type","Available Leave","Monthly","Used Leave","Balance Leave"
+    totals "Total",sum,sum,sum,sum
+  end list	 
+
+    form one
+        caption "Leave Assign (Manually) "
+	    table pdleaveasigne
+		primary key xyear,xstaff,xtypeleave
+        order xyear,xstaff,xtypeleave
+        return "login"
+		Select "xyear = DATEPART(year,'"+#date+"')"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,*next,Top,Next,Previous,Bottom,~
+          xyear display(hide),xstaff,xname,xtypeleave,~
+		  xavailable,xused attrib(local),xbalance attrib(local),~
+		  xstatus display(const),xcashleave display(const),xcashleaveconf display(const),xpkey attrib(local) display(hide)
+
+	field xstaff
+		event before
+		set xyear=#sub(#date,0,4)
+		end event
+		event after
+			set globals(xyear)=xyear
+			set globals(xstaff)=xstaff
+			set globals(xtypeleave)=xtypeleave]
+		end event
+	end field 	
+	
+	field xused
+	display const
+	event after
+		set xused=pdleaveasigne.xused("xstaff='"+xstaff+"' and xyear='"+xyear+"' and xtypeleave='"+xtypeleave+"'")
+	end event
+	end field	
+	
+	field xbalance
+	display const
+	event after
+		set xbalance=pdleaveasigne.xbalance("xstaff='"+xstaff+"' and xyear='"+xyear+"' and xtypeleave='"+xtypeleave+"'")
+	end event
+	end field		
+	
+	field xtypeleave
+	end field
+
+        field show
+		event after
+		set xpkey=xstaff
+		end event
+        end field	
+		
+        field Next
+		event after
+		set xpkey=xstaff
+		end event
+        end field	
+
+        field previous
+		event after
+		set xpkey=xstaff
+		end event
+        end field		
+	
+    field xname
+      attrib local
+      display const
+      event after
+        set xname=pdmst.xname("xstaff='"+xstaff+"'")
+      end event
+    end field	
+	
+	field Add
+	event before
+	  if xstaff .eq. ""
+			error "Please Press Show First!"
+	  else if xtypeleave .eq. ""
+		error "Please select Leave Type"
+	  else if xavailable < 1
+			error "Please enter Available Leave !"
+	  else if xavailable < usedl
+			error "Available Leave not less than Used Leave!"
+	  else 
+		set xcashleave=0
+		set xcashleaveconf =0 
+	  end if 
+	end event
+		event after
+		set temp=#sql("update pdleaveasigne set xused = 0 where xstaff='"+xstaff+"' and xyear='"+xyear+"' and xtypeleave='"+xtypeleave+"' ")
+		set temp=#sql("update pdleaveasigne set xbalance = '"+xavailable+"' where xstaff='"+xstaff+"' and xyear='"+xyear+"' and xtypeleave='"+xtypeleave+"'")
+		end event
+	end field	
+
+	field update
+	event before
+	  double usedl = #sesql("select xused from pdleaveasigne where xstaff='"+xstaff+"' and xyear='"+xyear+"' and xtypeleave='"+xtypeleave+"'")
+	  double cashleaveconf = #sesql("select xcashleaveconf from pdleaveasigne where xstaff='"+xstaff+"' and xyear='"+xyear+"' and xtypeleave='"+xtypeleave+"'")
+	  double cashleave = #sesql("select xcashleave from pdleaveasigne where xstaff='"+xstaff+"' and xyear='"+xyear+"' and xtypeleave='"+xtypeleave+"'")
+	  
+	  if xstaff .ne. xpkey
+		error "Please Press Show First!"
+	  else if xstaff .eq. ""
+			error "Please Press Show First!"
+	  else if xtypeleave .eq. ""
+			error "Please select Leave Type"
+	  else if xavailable < 1
+			error "Please enter Available Leave !"
+	  else if xavailable < usedl + cashleave
+			error "Available Leave not less than Used Leave!"
+	  end if 
+	end event  
+		event after
+		double balancel = xavailable - usedl
+		set temp=#sql("update pdleaveasigne set xbalance = '"+balancel+"' where xstaff='"+xstaff+"' and xyear='"+xyear+"' and xtypeleave='"+xtypeleave+"'")
+		end event	
+	end field
+
+	field delete
+	  event before
+			double usedl = #sesql("select xused from pdleaveasigne where xstaff='"+xstaff+"' and xyear='"+xyear+"' and xtypeleave='"+xtypeleave+"'")
+			if xstaff .ne. xpkey
+				error "Please Press Show First!"
+			else if xstaff .eq. ""
+					error "Please Press Show First!"
+			else if xtypeleave .eq. ""
+				error "Please select Leave Type"
+			else if usedl > 0
+					error "Leave Already used !"
+			end if 
+		end event  
+		event after
+		end event	
+	end field	
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdatdt"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,42 @@
+screen xtrnsp
+
+     sidebar list one
+     sections  form one
+
+     list one
+        caption "Detail List"
+      	table xtrn
+        order xtrn
+        select "xtypetrn = 'Sales Representative'"
+        rows 20
+        objects  xtrn attrib(link "login?screen=xtrnsp&command=Show&xtrn=?"), ~
+                 xdesc,zactive
+     end list
+
+     form one
+        caption "Sales Representative"
+      	table xtrn
+        order xtrn
+        select "xtypetrn = 'Sales Representative'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next,Top,Bottom,"<p>" ,~
+                xtrn, xdesc,xnum, xinc display(hide),xtypetrn display(hide), zactive
+
+       field add
+        event before
+          set xtypetrn="Sales Representative"
+        end event
+       end field
+
+       field xinc
+    		def "1"
+	     end  field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+end screen
+

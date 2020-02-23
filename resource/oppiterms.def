@@ -1,0 +1,15 @@
+product ZABDB 
+
+table oppiterms
+  caption "OP PI Terms"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xordernum,xrow,xcode,xnote
+          
+  primary key zid,xordernum,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xordernum references opordheader.zid,xordernum
+  end foreign key
+
+end table

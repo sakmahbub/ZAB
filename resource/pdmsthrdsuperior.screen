@@ -1,0 +1,201 @@
+screen pdmsthrdsuperior
+     //sidebar list detail,list inv
+     sections form one, jscript myscript
+
+
+     form one
+        caption "<ACRONYM>Approval Superior</ACRONYM>"
+        table pdmst
+        order xstaff
+		fixed xstaff
+	    //select "xempcategory='"+#wh+"' and xempstatus='Normal'"
+        return "login"
+        layout 4
+        pstyle 3
+        objects Show,Update,Return,"<p>" , *next,~//Show,Clear,
+			xidsup,supname,~
+			xsuperiorsp,supnamesp,xsuperiorpo,supnamepo,xsuperiorgl,superiorgl,xsuperiorcs,~
+			superiorcs,xsuperiorcnf,superiorcnf,xsuperioradj,superioradj,xsuperiorapn,superiorapn,~
+			xsuperiorcnfbl,superiorcnfbl,xsuperioradv,superioradv,xsuperiorpaf,superiorpaf,~
+			xsuperioreadj,superioreadj,xsuperiorerq,superiorerq,xsuperiorcash,superiorcash
+			
+
+	
+	
+	field supname
+	 attrib local
+	 display const
+	 caption SR / WR Approval Superior
+	 event after
+	 set supname=pdmst.xname("xposition='"+xidsup+"'")
+	 end event
+	 end field
+	 
+	 field supnamesp
+	 attrib local
+	 display const
+	 caption Documentation Approval Superior
+	 event after
+	 set supnamesp=pdmst.xname("xposition='"+xsuperiorsp+"'")
+	 end event
+	 end field
+	 
+	 field supnamepo
+	 attrib local
+	 display const
+	 caption PO Approval Superior
+	 event after
+	 set supnamepo=pdmst.xname("xposition='"+xsuperiorpo+"'")
+	 end event
+	 end field
+	 
+	 field superiorgl
+	 attrib local
+	 display const
+	 caption GL Approval Superior
+	 event after
+	 set superiorgl=pdmst.xname("xposition='"+xsuperiorgl+"'")
+	 end event
+	 end field
+	 
+	 field superiorcs
+	 attrib local
+	 display const
+	 caption CS Approval Superior
+	 event after
+	 set superiorcs=pdmst.xname("xposition='"+xsuperiorcs+"'")
+	 end event
+	 end field
+	 
+	  field superiorcnf
+	 attrib local
+	 display const
+	 caption C&F Approval Superior
+	 event after
+	 set superiorcnf=pdmst.xname("xposition='"+xsuperiorcnf+"'")
+	 end event
+	 end field
+	 
+	   field superiorcnfbl
+	 attrib local
+	 display const
+	 caption C&F Approval Superior
+	 event after
+	 set superiorcnfbl=pdmst.xname("xposition='"+xsuperiorcnfbl+"'")
+	 end event
+	 end field
+	 
+	  field superioradj
+	 attrib local
+	 display const
+	 caption C&F Adjustment Approval Superior
+	 event after
+	 set superioradj=pdmst.xname("xposition='"+xsuperioradj+"'")
+	 end event
+	 end field
+	 
+	  field superiorapn
+	 attrib local
+	 display const
+	 caption Approval Notes Superior
+	 event after
+	 set superiorapn=pdmst.xname("xposition='"+xsuperiorapn+"'")
+	 end event
+	 end field
+	 
+	   field superiorpaf
+	 attrib local
+	 display const
+	 caption PAF Approval Superior
+	 event after
+	 set superiorpaf=pdmst.xname("xposition='"+xsuperiorpaf+"'")
+	 end event
+	 end field
+	 
+	field superioreadj
+	 attrib local
+	 display const
+	 caption Expense Claim Superior
+	 event after
+	 set superioreadj=pdmst.xname("xposition='"+xsuperioreadj+"'")
+	 end event
+	 end field
+	 
+	field superioradv
+	 attrib local
+	 display const
+	 caption Employee Advance Superior
+	 event after
+	 set superioradv=pdmst.xname("xposition='"+xsuperioradv+"'")
+	 end event
+	 end field
+	 
+	 field superiorerq
+	 attrib local
+	 display const
+	 caption Employee Requisition Superior
+	 event after
+	 set superiorerq=pdmst.xname("xposition='"+xsuperiorerq+"'")
+	 end event
+	 end field
+	 
+	 field superiorcash
+	 attrib local
+	 display const
+	 caption Cash Approval Superior
+	 event after
+	 set superiorcash=pdmst.xname("xposition='"+xsuperiorcash+"'")
+	 end event
+	 end field
+
+        field update
+        event before	
+		
+          end event
+        end field
+   
+   field Return
+          embed onclick="clicked(this)"
+        end field
+        
+		embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	        if (detail=="Salary Detail"){
+            form.screen.value = "pdsalarydetail"
+            form.searchbutton.value = "Top"
+          }
+		   if (detail == "Return"){
+            form.screen.value = "pdsuperior"
+            form.searchbutton.value = "Find xstaff=?"
+          }
+  	      
+        }
+
+        function pickAccount(link,name,rank){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xstaff.value=link.innerText
+            document.one.xname.value=name.innerText
+            document.one.xrank.value=rank.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,181 @@
+screen cabothparty
+     
+     sections  form one,jscript myscript
+     sidebar list one 
+
+  list one
+    caption "Discount List:"
+    table cacusdisc
+    order xcus,xitem
+    fixed xcus
+    rows 20
+    objects  xitem attrib(link "login?screen=cacusdisc&command=Show&xcus=?&xitem=?"), ~
+             desc equals((select xdesc from caitem where zid=cacusdisc.zid and xitem=cacusdisc.xitem)),xdisc
+  headers "Item","Description","Discount"
+  end list
+  
+  form one
+     form one
+        caption "Both Party"
+        table cacus
+        primarykey xcus
+        order xcus
+        select "xtype<>'Buyer'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Update,Clear,*next,Top,Previous,Next,Bottom,"<p>" ,~//Delete,
+                xcus,xorg,xmadd,xcontact,xgcus,xgsup,~
+                xphone,~//xvatregno,
+                xinvtoinvcr display(hide),xcrterms display(hide),xcrlimit display(hide),~
+                xref display(hide),~
+                xallowcrinv display(hide),xallbndisc display(hide),xdisc display(hide),~
+                xstatuscus display(hide),xfax display(hide),xemail display(hide),xwh display(hide),xtype 
+
+
+  field xtype
+	caption Type
+	pick "Customer,Supplier,Both"
+  end field
+  
+  
+  field xstatuscus
+    default "Open"
+  end field
+  
+    field xgcus
+          caption Customer Group*
+		  pick code Customer Group
+	end field
+
+       field xcus
+	   caption Both Party
+	   pick list cassup
+    event after
+              if xpaymentterm .eq. "Cash"
+                set #field(Credit.display)="hidden"
+              end if
+      set globals(xcus)=xcus
+    end event
+      end field
+  
+      field xnote
+    weight 90
+    height 2
+    column 2
+      end field
+
+  //    field xterritory
+  //      caption Territory*
+  //      pick "select xcode from xcodes where xtype = 'Territory' and zactive = '1' and xwh='"+#wh+"'" 
+  //    end field
+  
+  
+
+      field xdum
+    attrib local
+    caption 
+    display const
+      end field
+
+
+    field xwh
+            default #wh
+     end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+        set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+    field update
+      event before
+        if xtype .eq. "Both" .and. xgsup .eq. ""
+          error "Cannot Proceed -- Please Choose Supplier Group"
+        else if xtype .eq. "Both" .and. xgcus .eq. ""
+          error "Cannot Proceed -- Please Choose Customer Group"
+		
+        //*********** GETTING TRN NO ****************
+        else
+			set xstatuscus="Open" 
+			set xallowcrinv="No"
+			set xallbndisc="No"
+        end if
+      end event
+    end field
+
+    field xcrused1
+      attrib local
+      display hide
+      caption Credit Given
+      event after
+    set xcrused=cacreditview.xcrused("xcus='"+xcus+"'")
+      end event
+    end field
+
+
+    field xorg
+      caption Customer Name*
+    end field
+
+    field Special_Discount
+        embed onclick="clicked(this)"
+    end field
+
+  
+    field Special_Rate
+        embed onclick="clicked(this)"
+    end field
+
+    field Project
+        embed onclick="clicked(this)"
+    end field
+
+    field Credit
+        embed onclick="clicked(this)"
+    end field
+
+        embed onsubmit="submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Special_Discount"){
+            form.screen.value = "cacusdisc"
+            form.searchbutton.value = "Find xcus=?"
+          }
+
+          if (but == "Special_Rate"){
+            form.screen.value = "cacusprice"
+            form.searchbutton.value = "Top"
+          }
+
+  if (but=="Project Flag"){
+            form.screen.value = "cacuspjdetail"
+            form.searchbutton.value = "Find xcus=?"
+          } 
+          if (but == "Credit Info"){
+            form.screen.value = "cacuscredit"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

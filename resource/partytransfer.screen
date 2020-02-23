@@ -1,0 +1,99 @@
+screen partytransfer
+
+     sections form one,jscript myscript
+
+     form one
+        caption "Party Transfer Process"
+        order
+        return "login"
+        layout 2
+        pstyle 3
+        objects Transfer,"<p>",~
+                xcode,xempcategory,xsup,xman
+
+		  field xcode
+          caption From Business
+		  display combo
+		  pick "select xlong from xcodes where xtype='Concern Name'"
+		  end field
+		  
+		  field xempcategory
+          caption To Business
+		  display combo
+		  pick "select xlong from xcodes where xtype='Concern Name'"
+		  end field
+        	
+		field xsup	
+          caption From Party
+        end field
+		
+		 field xman
+          caption To Party
+		  pick list casup
+        end field
+		
+
+		field Transfer
+		 event before
+		if xcode .eq. ""
+		    error "Please Select From Business"
+		else if xempcategory .eq. ""
+		    error "Please Select To Business"
+		else if xsup .eq. ""
+		    error "Please Select From Party"
+		else if xman .eq. ""
+		    error "Please Select To Party"
+		 end if
+		 print "Item Transferred"
+		end event
+          event after
+            set temp = #spsql(zabsp_Master_Data_Transfer,#id,#user,xcode,xempcategory,xsup,xman,"Party Transfer")
+          end event
+        end field
+
+
+        field Delete_Upload
+          event after
+            set temp = #spsql(sp_deleteUpload,#id,#user,xtype,#wh)
+          end event
+        end field
+
+
+
+        embed onsubmit="return submitit(this)"
+
+
+     end form
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Bonus"){
+            form.screen.value = "caitembonus"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Cost Price"){
+            form.screen.value = "caitemcostprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+          if (detail=="Sell Price"){
+            form.screen.value = "caitemprice"
+            form.searchbutton.value = "Find xitem=?"
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+
+end screen

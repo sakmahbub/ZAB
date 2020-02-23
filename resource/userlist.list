@@ -1,0 +1,13 @@
+
+     list userlist
+        table pdmst
+        order xstaff 
+        select "(xstaff like '%"+zvalue+"%' or xname like '%"+zvalue+"%')"
+	//fixed zeamil
+        rows 20
+	//searchselect "zemail like '%"+zvalue+"%'"
+        objects xstaff attrib(link "abc" embed onclick="return updateParent(this:'xstaff')"),~
+                xname//,name equals((select xname from pdmst where zid=xusers.zid and xstaff=xusers.zemail))
+
+	  header "ID","User Name"//,"Access"
+     end list

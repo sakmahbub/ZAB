@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table pdleavedef
+  caption "Leave Default"
+  columns ztime,zutime,zauserid,zuuserid,zid,xtypeleave,xtype,~
+  xminqty,xmaxqty,xmaxbalance,xmaxfs,xyesno,xrate,xleavecf,xleavecash
+
+  primary key zid,xtypeleave
+
+  foreign key
+      zid references zbusiness.zid
+  end foreign key
+
+end table

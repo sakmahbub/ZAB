@@ -1,0 +1,13 @@
+product ZAB
+
+table cafm
+  caption "FM Information Table"
+  columns ztime,zutime,zauserid,zuuserid,zid,xfm,xsm,xrsm,xname,xwh,xfield,zactive,xcode,xregion,xphone
+
+  primary key zid,xfm
+
+  foreign key
+        zid references zbusiness.zid
+        //zid,xsm,xrsm references carsm.zid,xsm,xrsm
+  end foreign key
+end table

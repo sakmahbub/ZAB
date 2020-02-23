@@ -1,0 +1,103 @@
+screen arcastrn
+
+     sidebar list one
+     sections form one,jscript myscript
+
+
+     list one
+        caption "Detail List"
+        table artrn
+        order xvoucher,xrow
+        fixed xvoucher
+        rows 20
+        objects  xrow attrib(link "login?screen=arcastrn&command=Show&xvoucher=?&xrow=?"), ~
+                xacc,desc equals((select xdesc from acmst where acmst.zid=artrn.zid and acmst.xacc=artrn.xacc)),xprime
+
+        totals "Totals","","",sum
+        header "Line No","Account Code","Description","Amount"
+     end list
+
+     form one
+        caption "Details of "+xvoucher
+        table artrn
+        primarykey xvoucher,xrow
+        order xvoucher,xrow
+        fixed xvoucher
+        return "login"
+        layout 2
+        pstyle 3
+        objects Return,Clear,Show,Add, Update, Delete,~
+               xrow attrib(row 0 10;search),xdum,xacc,xdesc,xdeptname,xdeptdesc,~
+               xprime,xnote width(50)
+
+        field xdeptdesc
+          attrib local
+          caption Department Name
+          display const
+          event after
+            set xdeptdesc = xcodes.xlong("xtype='Department Name' and xcode='"+xdeptname+"'")
+          end event
+        end field
+
+        field xdum
+          attrib local
+          caption
+          display const
+        end field
+
+        field xdesc
+          attrib local
+          caption Description
+          display const
+          event after
+            set xdesc=acmst.xdesc("xacc='"+xacc+"'")
+          end event
+        end field
+
+
+        field Add
+          event before
+          end event
+          event after
+            set temp = #spsql(sp_validateAfterARtrn,#id,#user,xvoucher)
+          end event
+        end field
+
+        field Update
+          event after
+            set temp = #spsql(sp_validateAfterARtrn,#id,#user,xvoucher)
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "arcas"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen
+
+
+
+

@@ -1,0 +1,15 @@
+     list xcolor
+        table xcodes
+        order xcode
+        select "(xcode like '%"+zvalue+"%' and xtype='Fabric Color')"
+		//searchselect "xtype='abc'"
+        rows 30
+
+		objects xcode attrib(link "abc" embed onclick="return updateParent(this:'$')")
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

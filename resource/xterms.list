@@ -1,0 +1,10 @@
+     list xterms
+        table potermview
+        order xcode
+        select "((xcode like '%"+zvalue+"%' or xlong like '%"+zvalue+"%') )"
+        rows 20
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"),xlong
+                
+     end list
+
+

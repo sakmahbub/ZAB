@@ -1,0 +1,101 @@
+screen achrc1
+     caption "GL Level 1"
+ //    sidebar list one,list two
+ //    sections form one,  jscript myscript
+     sidebar list two
+     sections form one, list one, jscript myscript
+	list one
+        caption "Primary Accounts Group"
+        table achrc1
+        order xhrc1
+        rows 30
+        objects  xhrc1 attrib(link "login?screen=achrc1&command=Show&xhrc1=?"),xdesc,xacctype
+	end list
+
+	list two
+        caption "Level 2 Accounts Group"
+        table achrc2
+        order xhrc1,xhrc2
+		fixed xhrc1
+        rows 40
+        objects xhrc1 attrib(link "login?screen=achrc2&command=Show&xhrc1=?&xhrc2=?"),xhrc2,xdesc
+	end list
+
+    form one
+		caption "Primary Accounts Group"
+        table achrc1
+        primarykey xhrc1
+        order xhrc1
+        return "LogIn"
+        layout 2
+	      pstyle 3
+
+        objects Level 2, ~
+               Show,Clear,Add, Update, Delete,*next, Top,Previous,Next, Bottom,"" ,~
+               xhrc1 width(10),xdesc width(40),xacctype,xnum display(const),xrow attrib(row 0 1)
+	
+	field xacctype
+		display combo
+		pick "Asset,Liability,Income,Expenditure"
+	end field
+
+        field xrow
+			caption Position in Report
+        end field
+
+        field xhrc1
+          event after
+            set globals(xhrc1)=xhrc1
+          end event
+        end field
+		
+		field add
+			event before
+				set temp = acgroup.xgroup("xgroup='"+xhrc1+"'")
+				if #result .eq. "true"
+					error "Cannot Proceed -- Duplicate Code"
+				end if
+			end event
+			event after
+				set temp=#spsql(zabsp_AC_validateAfterAchrc,#id,#user,xhrc1,xdesc,xhrc1,"","","","","")
+			end event
+		end field
+		
+		field update
+			event before
+				set temp = #sql("update acgroup set xdesc='"+xdesc+"' where xgroup='"+xhrc1+"'")
+				set temp = #sql("update acgroup set xacctype='"+xacctype+"' where xgroup='"+xhrc1+"'")
+				//set temp=#spsql(zabsp_AC_validateAfterAchrc,#id,#user,xhrc1,xdesc,xhrc1,"","","","")
+			end event
+		end field
+
+		field delete
+			event before
+				set temp = #sql("delete from acgroup where xgroup='"+xhrc1+"'")
+			end event
+		end field
+		
+        embed onsubmit="submitit(this)"
+        field Level
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but = ""
+        function clicked(b){
+          but = "clicked"
+        }
+        function submitit(form){
+          if (but == "clicked"){
+            form.screen.value = "achrc2"
+            form.searchbutton.value = "Find xhrc1=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

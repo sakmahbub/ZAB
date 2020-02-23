@@ -1,0 +1,17 @@
+     list arhedvoucher
+        table arhed
+        order xvoucher
+        //select none
+        navigators alpha
+        rows 10
+        objects xvoucher attrib(link "abc" embed onclick="return updateParent(this:'xvoucher')"), ~
+                xdate
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

@@ -1,0 +1,117 @@
+screen acpostdate
+
+     caption "Voucher Posting By Date"
+	 sidebar list appvoucher,list detail
+     sections form one,  jscript myscript
+
+     list appvoucher
+    caption "Approved Voucher List for Post "
+    table acheader
+    order xvoucher desc
+	 select "xstatusjv in ('Balanced') and xstatus ='Approved'"
+    rows 200
+    objects  xvoucher attrib(link "login?screen=acpostdate&command=Show&xvoucher=?"), ~
+             xdate,xpreparer,name equals((select xname from pdmst where pdmst.zid=acheader.zid and pdmst.xstaff=acheader.xpreparer)),~
+			 xlong,xstatus
+
+    headers "Voucher No","Date","Preparer","Name","Note","Voucher Status"
+  end list
+  
+  list detail
+    caption "Detail for :"+xvoucher
+    table acdetail
+    order xvoucher,xrow
+    fixed xvoucher
+	select "xvoucher <> ''"
+    rows 450
+    objects  xrow,~// attrib(link "login?screen=acdetail&command=Show&xvoucher=?&xrow=?"), ~
+			 descxwh equals((select xlong from branchview where zid=acdetail.zid and branchview.xcode=acdetail.xwh)),~
+			 descprj equals((select xlong from projectallview where zid=acdetail.zid and projectallview.xcode=acdetail.xwh)),~
+             xacc,desc equals((select xdesc from acmst where acmst.zid=acdetail.zid and acmst.xacc=acdetail.xacc)),~
+			 xsub,subdesc equals((select xorg from acsubview where zid=acdetail.zid and xsub=acdetail.xsub and xacc=acdetail.xacc)),xdebit,xcredit
+
+    totals "","","","","","","Total",sum,sum
+
+    headers "Line No","Store/ Plant","Project","Acc Code","Description","Sub Code","Description","Debit","Credit"//,"Amt"
+  end list  
+
+     form one
+        caption "Voucher Posting By Date"
+		return "login"
+        layout 2
+    	  pstyle 3
+
+        objects Post,Clear,Show,"<p>" ,~
+                 xvoucher display(hide),xfdate,xtdate
+
+       field xdatecom
+		caption To Date
+	   end field
+	   
+       field xfdate
+		attrib local
+	   end field
+
+       field xtdate
+		attrib local
+	   end field	   
+	   
+	   field post
+         event after
+            set temp = #spsql(sp_acPostdate,#id,#user,xfdate,xtdate)
+         end event
+       end field
+
+       field dummy
+         caption
+         display constant
+       end field
+	   
+    field xvoucher
+      event after
+		class careports(getReport{acvoucher;2;in,st;zid,svoucher;xvoucher;Print Voucher})
+        set globals(xvoucher)=xvoucher
+       end event
+    end field	   
+
+       field fper
+         caption Period
+         display text
+       end field
+
+       field tper
+         caption To Period
+         display text
+       end field
+
+       field xdate
+         caption From Date
+       end field
+
+       field xdateref
+         caption To Date
+       end field
+
+       field ftrn
+         caption From Trn.
+         display text
+	   pick list ftrn	
+       end field
+
+       field ttrn
+         caption To Trn.
+         display text
+         default "z"
+	   pick list ttrn	
+       end field
+        //embed onsubmit="return submitit(this)"
+        embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+     end jscript
+
+
+
+end screen

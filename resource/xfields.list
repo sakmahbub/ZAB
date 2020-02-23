@@ -1,0 +1,13 @@
+     list xfields
+        table xcodes
+        order xtype,xcode
+        select "(xtype='fields' and xcode like '%"+zvalue+"%')"
+        rows 30
+	searchselect "xregion<>'"null"' and xtype='fields'"
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'xcode')"), ~
+                xtrcode,xregion,xarea
+
+     	header "Fields Name","F_Code","Region","Zone"
+	end list
+
+

@@ -1,0 +1,28 @@
+product ZAB ERP
+
+table imloanheaderview
+  caption "IM Loan Header View"
+
+  primary key zid,xloannum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view imloanheaderview(zid,zorg,xloannum,zbid,xtornum,xdate,xfwh,xtypestore,xtwh,xlong,xdesc,xref,xstatustor,xidsup,xpreparer,preparer, ~
+									xsignatory1,signatory1,xsigndate1, ~
+									xsignatory2,signatory2,xsigndate2,xsignatory3,signatory3,xsigndate3,xnote,xstatusloan,xtype) ~
+					as select a.xacc,c.xorg,a.xloannum,a.zid,a.xtornum,a.xdate,a.xfwh,b.xtypestore,a.xtwh,b.xlong,d.xlong,a.xref,a.xstatustor,a.xidsup, ~
+					a.xpreparer,p1.xname,a.xsignatory1,p2.xname,a.xsigndate1, ~
+					a.xsignatory2,p3.xname,a.xsigndate2,a.xsignatory3,p4.xname,a.xsigndate3,a.xnote,a.xstatusloan,a.xtype from imtorheader a ~
+					left join branchview b on a.zid=b.zid and a.xfwh=b.xcode ~
+					left join branchviewloan d on a.xacc=d.zid and a.xtwh=d.xcode ~
+					left join pdmst p1 on a.zid=p1.zid and a.xpreparer=p1.xstaff ~
+					left join pdmst p2 on a.zid=p2.zid and a.xsignatory1=p2.xstaff ~
+					left join pdmst p3 on a.zid=p3.zid and a.xsignatory2=p3.xstaff ~
+					left join pdmst p4 on a.zid=p4.zid and a.xsignatory3=p4.xstaff ~
+					left join cacusview c on a.zid=c.zid and a.xacc=c.xcus ~
+					WHERE left(a.xtornum,1)='L' 
+
+
+end table

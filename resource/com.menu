@@ -1,0 +1,13 @@
+//Administration.menu
+//---------------------------------------------------------------------------------------
+option                  	|action                                          
+//---------------------------------------------------------------------------------------
+Master Setup            	|#classPath+"/login?menu=cacodes"               
+System Admin			    |#classPath+"/login?menu=Setup" 
+User Management   			|#classPath+"/login?menu=users"
+T&C Management 			    |#classPath+"/login?menu=lccodes"                 
+Database Management   		|#classPath+"/login?menu=zdbmgt"  
+Approval Setup           		 |#classPath+"/login?menu=apvsetup"
+Business Profile        	|#classPath+"/login?screen=zbusiness"
+//-------------------------------------------------------------------arprobissue
+

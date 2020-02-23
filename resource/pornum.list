@@ -1,0 +1,13 @@
+
+     list pornum
+        table poordheader
+        order xpornum
+        select "xpornum like '%"+zvalue+"%' "
+        navigators alpha
+        rows 10
+        objects xpornum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xsup,xwh,xdate
+
+     end list
+
+

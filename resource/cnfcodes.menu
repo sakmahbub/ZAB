@@ -1,0 +1,19 @@
+//Order Codes.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+Cost Master                 |#classPath+"/login?screen=caitemcost"
+Cost group                 |#classPath+"/login?screen=xcodes(xtype=Cost Group)"
+Agency Commission Note     |#classPath+"/login?screen=xcodes(xtype=Agency Commission)"
+Customers Master                 |#classPath+"/login?menu=cacus"
+JOB Number 			     |#classPath+"/login?screen=xtrn(xtypetrn=JOB Number)"
+C&F Advance Number 			     |#classPath+"/login?screen=xtrn(xtypetrn=Advance Number)"
+Pay Order Number 			     |#classPath+"/login?screen=xtrn(xtypetrn=Pay Order Number)"
+C&F Bill Number 			     |#classPath+"/login?screen=xtrn(xtypetrn=Bill Number)"
+C&F Adjustment Number 			     |#classPath+"/login?screen=xtrn(xtypetrn=Adjustment Number)"
+C&F Advance Related Transaction Codes   |#classPath+"/login?screen=xtrnp(xtypetrn=Advance Number)"
+C&F Pay Order Related Transaction Codes   |#classPath+"/login?screen=xtrnp(xtypetrn=Pay Order Number)"
+C&F Related Transaction Codes   |#classPath+"/login?screen=xtrnp(xtypetrn=Adjustment Number)"
+PO To GL Advance              |#classPath+"/login?screen=podef"
+//-------------------------------------------------------------------
+

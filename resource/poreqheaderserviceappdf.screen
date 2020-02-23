@@ -1,0 +1,255 @@
+screen poreqheaderserviceappdf
+	
+     sidebars list reqlist,list req,list one
+     sections form one, jscript myscript
+	 
+    list reqlist
+      caption "Work Requisition List"
+         table poreqheader
+        order xporeqnum desc
+	   select "left(xporeqnum,4)='DOC-' and xsuperiorsp='"+#user+"'"//" and xstatusreq in ('Open','Approved_DPH','Approved_CMP')"
+		rows 10
+        objects  xporeqnum attrib(link "login?screen=poreqheaderserviceappdf&command=Show&xporeqnum=?"), xdate,xregi,xtwh, ~
+				 desc equals((select xlong from branchview where zid = poreqheader.zid and  xcode=poreqheader.xtwh))
+               
+		  headers "Requisition No","Date","Car No","Division Code","Name"
+	end list
+	  
+	list req
+        caption "Last 5 Approved Requisition"
+        table poreqappview
+        order xdateapp desc
+		select "xposition='"+#user+"' and left(xporeqnum,4)='DOC-'"
+		rows 5
+       objects xporeqnum attrib(link "abc" embed onclick="return pickItem(this)"),~
+	   xdate attrib(name xdate#),xdateapp attrib(name xdateapp#)
+       headers "Requisition No","Date","Approved Date"
+     end list
+
+	list one
+        caption "Work Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow,~// attrib(link "login?screen=poreqdetailservice&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and  xitem=poreqdetail.xitem)),xqtyreq,xqtyapv,xunitpur,xrate,xlineamt
+
+		totals "","","Totals","","","","",sum
+        headers "Line No","Item","Description","Qty Req","Qty Apv","UOM","Rate","Amount"
+     end list
+
+
+     form one
+		caption "Work Requisition Approved By DF"
+        table poreqheader
+        order xporeqnum desc
+		select "left(xporeqnum,4)='DOC-'"
+	//	select "left(xporeqnum,4)='DOC-' and xsuperiorsp='"+#user+"'"//" and (xstatusreq='Open' or xstatusreq='Approved_DPH')"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Show,Clear,Update,Approved,"<p>",~//Add,Details,*Next,Top, Previous, Next, Bottom,
+                xporeqnum,xdate,xsup display(hide),xorg display(hide),xqotnum display(hide),~
+				xstatusreq display(hide),xdum,xregi display(const),xfwh display(const),xfbrname,xtwh display(const),xtbrname,xpreparer display(hide),preparer display(const),~
+				xdphead display(hide),dphead display(const),xgmdf display(hide),gmdf display(const),~
+				xnote,xtype display(hide),xsuperiorsp display(hide),xstype display(hide)
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+          
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+		pick list poreqdocnum
+		caption DOC No
+        	width 15
+          event after
+		  //class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+		  //class careports(getjspReport{prletter,1,xporeqnum,View Advance Letter})
+			class careports(getjspReport{prletter,1,xporeqnum,View Advance Letter})
+		   set globals(xporeqnum)=xporeqnum
+			 set globals(xstatusreq)=xstatusreq
+			 set globals(xsuperiorsp)=xsuperiorsp
+			  if xsuperiorsp .ne. #user
+		         	//set #field(add.display)="hidden"
+         			set #field(update.display)="hidden"
+         			set #field(delete.display)="hidden"
+         			set #field(Approved.display)="hidden"
+       	      end if
+          end event
+        end field
+		
+		field xtwh
+		default #wh
+		event before
+		 //
+		end event
+        end field
+		
+		field xdum
+		caption
+		attrib local
+		display const
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	    field preparer
+        attrib local
+        caption Preparer
+        display const
+        event after
+          set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+        end event
+       end field
+	   
+	     field dphead
+        attrib local
+        caption Department Head
+        display const
+        event after
+          set dphead=pdmst.xname("xstaff='"+xdphead+"'")
+        end event
+       end field
+	   
+	      field gmdf
+        attrib local
+        caption Director of Finance
+        display const
+        event after
+          set gmdf=pdmst.xname("xstaff='"+xgmdf+"'")
+        end event
+       end field
+	   
+		 field Approved
+            event before
+			set xsuperior=pdmst.xsuperiorsp("xposition='"+#user+"'")
+			if xstatusreq .eq. "Approved"
+			error "Can not Proceed -- Already approved."
+			end if
+            end event
+            event after
+			set temp = #spsql(zabsp_apvprcs,#id,#user,xporeqnum,0,xstatusreq,"Cash Approval")
+			set temp = #spsql(zabsp_sendmail,#id,#user,xporeqnum,"Cash Advance",xfwh)
+			//if xfwh .ne. "02" .and. 
+	        action show
+           end if
+		   end event
+          end field	   
+
+
+	   field Approvedss
+            event before
+			set xsuperior=pdmst.xsuperiorsp("xposition='"+#user+"'")
+		   end event
+            event after
+			set type=poreqheader.xtype("xporeqnum='"+xporeqnum+"'")
+		if xstatusreq .eq. "Approved_DPH" .and. xstype .eq. "Service"
+			set temp =  #sql("update poreqheader set xsuperiorsp='"+xsuperior+"' where xporeqnum='"+xporeqnum+"'")
+			set temp = #spsql(zabsp_DATETIME_Update,#id,#user,xporeqnum,"poreqheader","xdatedirector","xdirector","xstatusreq","xporeqnum","Approved_ED")
+			//set temp =  #sql("update poreqheader set xwh='GMDF' where xporeqnum='"+xporeqnum+"'")
+			//set temp = #spsql(zabsp_sendmail,#id,#user,xporeqnum,"GM",xtwh)
+			 
+		else if xstatusreq .eq. "Approved_DPH" .and. xstype .eq. "Documentation"
+			set temp =  #sql("update poreqheader set xsuperiorsp='"+xsuperior+"' where xporeqnum='"+xporeqnum+"'")
+			set temp = #spsql(zabsp_DATETIME_Update,#id,#user,xporeqnum,"poreqheader","xdatedirector","xdirector","xstatusreq","xporeqnum","Approved")
+			// set temp =  #sql("update poreqheader set xwh='GMDF' where xporeqnum='"+xporeqnum+"'")
+			// set temp = #spsql(zabsp_sendmail,#id,#user,xporeqnum,"GM",xtwh)
+		end if
+	         action show
+            end event
+          end field
+		
+		field update
+			event before
+			if xstatusreq .eq. ""
+			error "Please Show first"
+			end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poreqdetailservice"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

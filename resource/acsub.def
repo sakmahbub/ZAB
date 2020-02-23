@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table acsub
+  caption "AC Sub Code"
+  columns  ztime,zutime,zauserid,zuuserid,zid,xacc,xsub,xdesc,xtypeobj
+
+  primary key zid, xacc, xsub
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xacc references acmst.zid,xacc
+  end foreign key
+end table

@@ -1,0 +1,60 @@
+screen xcodesleave
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xtype,xcode
+        select "xtype='Leave Type'"
+        rows 50
+        objects  xcode attrib(link "login?screen=xcodesleave&command=Show&xtype=?&xcode=?"),~
+                xprops,xtypeobj,xincholiday,zactive
+
+        headers "Leave Type","Apply Earned Only?","Apply Over Balance?","Include Holiday?","Active"
+     end list
+
+     form one
+
+     caption "Leave Type"
+        table xcodes
+        order xcode
+        select "xtype='Leave Type'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update,*next,~
+                Top,Previous,Next, Bottom,"<p>" ,~
+                xtype display(hide),~
+                xcode width(20),~//xlong,
+				xprops,xtypeobj,xincholiday,zactive
+
+		field xcode
+		caption Leave Type
+		end field
+		
+	field xprops
+		caption Apply Earned Only?
+		display combo
+		pick "Yes,No"
+		default "No"
+	end field		
+		
+		field xtypeobj
+		caption Apply Over Balance?
+		display combo
+		pick "Yes,No"
+		default "No"
+        end field
+
+        field add
+          event before
+           set xtype="Leave Type"
+         end event
+        end field
+
+
+     end form
+
+
+end screen

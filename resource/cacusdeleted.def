@@ -1,0 +1,21 @@
+product ZAB ERP
+
+table cacusdeleted
+  caption "Deleted Customer Master"
+  columns ztime,zutime,zauserid,zuuserid,zid,xcus,xorg,xmadd,~
+          xemail, xphone, xfax, xurl,~
+          xcrlimit,xgcus,xgsup,xstatuscus,xwh,xdistrict,xthana,~
+	      xterritory,xmarket,xsp,xcrtermtype,xcrterms,xpaymentterm,xproject,xdateeff,xdateexp,~
+	      xso,xroute,xlastcrdate,xinvtoinvcr,xallowcrinv,~
+	      xallbndisc,xcode,xref,xcontact,xdisc,xoldcus,xtype,xsupcat,xmobile,~
+		  xcomm,xcomm1,xcomm2,xcomm3,xassessval1,xassessval2,xassessval3,xsamtjar,~
+		  xsamtdispat,xpaymenttype,xcusold,xvatregno,xvatdef,zactive,xcity,xcountry,xtin,xlicense,xpostcode,xcontactphn,~
+		  xpadd,xname,xoccupation,xregion,xdiscdet,xdiscdetamt,xdisctype,~
+		  xporamt,xbonuspoints,xreqbonuspoints,xearnedbonusamt,xexpday,xblockday,xprdcounte
+          
+  primary key zid, xcus
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

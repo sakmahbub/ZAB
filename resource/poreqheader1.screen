@@ -1,0 +1,180 @@
+screen poreqheader
+	
+     sidebar list one//,list po
+     sections form one, jscript myscript
+
+	 list one
+        caption "Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=poreqdetail&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xunitpur,xqtyreq
+
+
+        headers "Line No","Item","Description","Unit","Qty Req"
+     end list
+
+
+     list po
+        caption "PO For : "+xreqnum
+        table poordheader
+        order xpornum desc
+        fixed xporeqnum
+        rows 10
+        objects  xpornum attrib(link "login?screen=poordheader&command=Show&xpornum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+     form one
+     caption "Requisition Header"
+        table poreqheader
+		primarykey xporeqnum desc
+        order xporeqnum desc
+         select "xstatusreq='Open'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Add, Update, Delete, Show,Clear,*Next,Top, Previous, Next, Bottom,Send,"<p>" ,~
+                xporeqnum,xdate,xdeptname,xstatusreq display(const),xwh display(hide),xnote,xsup display(hide)// display(hide)
+
+           
+           field xorg
+          	attrib local
+          	display const
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+          
+          field xnote
+            caption SMS
+			column 2
+            width 80
+            height 2
+          end field
+
+          field xwh
+            defualt #wh
+          end field
+		  
+		   field xdeptname
+            display text
+			caption Phone No
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+            width 12
+          event after
+            set globals(xporeqnum)=xporeqnum
+              class careports(getjspReport{poreqprint,1,xporeqnum,Print Requisition})       
+                  //pick poreq
+          end event
+        end field
+
+        field add
+          event before
+ //         	if xdeptname .eq. ""
+ //         		error "Cannot Proceed -- Please Select Department"
+//		else if xwh .eq. ""
+//			error "Cannot Proceed -- Please Choose Store"
+ //         	else
+              set xwh = #wh
+          		set xstatusreq="Open"
+	          	set year = #sub(xdate,2,2)
+    	       set xporeqnum = #trn("Requisition Number","RQ--",10)
+		       // set xporeqnum = #sub(poreqnum,0,4)+year+#sub(poreqnum,4,6)
+          //	end if
+          end event
+        end field
+
+		field update
+			event before
+			end event
+		end field
+		
+		field Send
+          embed onclick="clicked(this)"
+        end field
+
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+       var detail
+        function clicked(b){
+          detail=b.value
+        }	 
+		 function budgeted(b){
+          detail="budgeted"
+        }
+		 function submitit(form){
+			if (detail=="Send"){
+				//var isBusy = true
+				  var number = document.one.xdeptname.value
+				  var note = document.one.xnote.value
+				  var date=document.one.xdate.value
+				var url = '';
+				url = "http://api.bulksms.icombd.com/api/v3/sendsms/plain?user=zaberp&password=l0g1n@zab&sender=ZAB&SMSText="+date+" - "+note+"&GSM="+number+""
+				
+				if (window.ActiveXObject)
+				{
+					httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				else if (window.XMLHttpRequest)
+				{
+					httpRequest = new XMLHttpRequest();
+				}
+
+				httpRequest.open("GET", url, false);
+				httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				//alert(url)
+				httpRequest.onreadystatechange = null;//function() {getSMS(); } ; 
+				httpRequest.send(null);
+				//httpRequest.setRequestHeader("Cache-Control", "no-cache")
+				
+				//httpRequest.timeout = 100
+				//httpRequest.abort();
+				//httpRequest = null;
+
+				function getSMS(){
+					////alert(httpRequest.readyState)
+					//if(httpRequest.readyState < =4){
+						httpRequest.onreadystatechange = null; 
+					//	httpRequest.abort();
+					//}
+				}
+			}	
+			if (detail=="budgeted"){
+				form.screen.value = "glbud"
+				form.searchbutton.value = "Top"
+				//return false
+			  }
+		}
+		
+        </script>
+     end jscript
+
+end screen

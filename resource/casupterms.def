@@ -1,0 +1,15 @@
+product ZABDB 
+
+table casupterms
+  caption "Suplier Terms"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xsup,xrow,xcode,xnote
+          
+  primary key zid,xsup,xrow
+
+  foreign key
+        zid references zbusiness.zid
+       zid,xsup references casup.zid,xsup
+  end foreign key
+
+end table

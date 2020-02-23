@@ -1,0 +1,9 @@
+  list pilinkso
+        caption "Items containing: "+zvalue
+        table opordheader
+        order xordernum desc
+        select "(xordernum like '%"+zvalue+"%' or xpiref like '%"+zvalue+"%')"
+        rows 20
+        objects xordernum attrib(link "abc" embed onclick="return updateParent(this:'')"),xpiref,xpidate,xcus
+
+     end list

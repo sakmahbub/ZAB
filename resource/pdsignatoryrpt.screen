@@ -1,0 +1,165 @@
+screen pdsignatoryrpt
+     sidebar list rptsignatory
+     sections form one, jscript myscript
+  
+  list rptsignatory
+    caption "Reports Signatory"
+    table pdsignatoryrpt
+    order xtypetrn
+    rows 30
+    objects  xtypetrn attrib(link "login?screen=pdsignatoryrpt&command=Show&xtypetrn=?"),~
+	xnofsignatory,xsignatory1,xsignatory2,xsignatory3,xsignatory4,xsignatory5,xsignatory6,xsignatory7,xsignatory8,xsignatory9
+    header "Process","No of Signatory","1","2","3","4","5","6","7","8","9"
+  end list
+
+     form one
+        caption "Reports Signatory"
+        table pdsignatoryrpt
+        order xtypetrn
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Update,Clear,Delete,Next,Previous,Report Copy,"<p>" , *next,~
+			xtypetrn,xnofsignatory,xsignatory1 display(text),xsignatory2 display(text),xsignatory3 display(text),~
+			xsignatory4 display(text),xsignatory5 display(text),xsignatory6 display(text),~
+			xsignatory7 display(text),xsignatory8 display(text),xsignatory9 display(text),xlong
+			
+        field xlong
+		caption Mail Message
+		column 2
+		width 70
+		end field
+		
+		
+		field xtypetrn
+        	pick code Process Name
+			event after
+			set globals(xtypetrn)=xtypetrn
+			if pdsignatoryrpt.xnofsignatory("xtypetrn='"+xtypetrn+"'")<1
+			set #field(xsignatory1.attrib)="hidden"
+			set #field(xsignatory2.attrib)="hidden"
+			set #field(xsignatory3.attrib)="hidden"
+			set #field(xsignatory4.attrib)="hidden"
+			set #field(xsignatory5.attrib)="hidden"
+			set #field(xsignatory6.attrib)="hidden"
+			set #field(xsignatory7.attrib)="hidden"
+			set #field(xsignatory8.attrib)="hidden"
+			set #field(xsignatory9.attrib)="hidden"
+			end if
+			
+			if pdsignatoryrpt.xnofsignatory("xtypetrn='"+xtypetrn+"'")<2
+			set #field(xsignatory2.attrib)="hidden"
+			set #field(xsignatory3.attrib)="hidden"
+			set #field(xsignatory4.attrib)="hidden"
+			set #field(xsignatory5.attrib)="hidden"
+			set #field(xsignatory6.attrib)="hidden"
+			set #field(xsignatory7.attrib)="hidden"
+			set #field(xsignatory8.attrib)="hidden"
+			set #field(xsignatory9.attrib)="hidden"
+			end if
+			
+			if pdsignatoryrpt.xnofsignatory("xtypetrn='"+xtypetrn+"'")<3
+			set #field(xsignatory3.attrib)="hidden"
+			set #field(xsignatory4.attrib)="hidden"
+			set #field(xsignatory5.attrib)="hidden"
+			set #field(xsignatory6.attrib)="hidden"
+			set #field(xsignatory7.attrib)="hidden"
+			end if
+			
+			if pdsignatoryrpt.xnofsignatory("xtypetrn='"+xtypetrn+"'")<4
+			set #field(xsignatory4.attrib)="hidden"
+			set #field(xsignatory5.attrib)="hidden"
+			set #field(xsignatory6.attrib)="hidden"
+			set #field(xsignatory7.attrib)="hidden"
+			set #field(xsignatory8.attrib)="hidden"
+			set #field(xsignatory9.attrib)="hidden"
+			end if
+			
+			if pdsignatoryrpt.xnofsignatory("xtypetrn='"+xtypetrn+"'")<5
+			set #field(xsignatory5.attrib)="hidden"
+			set #field(xsignatory6.attrib)="hidden"
+			set #field(xsignatory7.attrib)="hidden"
+			set #field(xsignatory8.attrib)="hidden"
+			set #field(xsignatory9.attrib)="hidden"
+			end if
+			
+			if pdsignatoryrpt.xnofsignatory("xtypetrn='"+xtypetrn+"'")<6
+			set #field(xsignatory6.attrib)="hidden"
+			set #field(xsignatory7.attrib)="hidden"
+			set #field(xsignatory8.attrib)="hidden"
+			set #field(xsignatory9.attrib)="hidden"
+			end if
+			
+			if pdsignatoryrpt.xnofsignatory("xtypetrn='"+xtypetrn+"'")<7
+			set #field(xsignatory7.attrib)="hidden"
+			set #field(xsignatory8.attrib)="hidden"
+			set #field(xsignatory9.attrib)="hidden"
+			end if
+			
+			if pdsignatoryrpt.xnofsignatory("xtypetrn='"+xtypetrn+"'")<8
+			set #field(xsignatory8.attrib)="hidden"
+			set #field(xsignatory9.attrib)="hidden"
+			end if
+			
+			if pdsignatoryrpt.xnofsignatory("xtypetrn='"+xtypetrn+"'")<9
+			set #field(xsignatory9.attrib)="hidden"
+			end if			
+			
+			end event
+		 end field
+
+        field update
+        event before	
+		
+          end event
+        end field
+   
+   field Return
+          embed onclick="clicked(this)"
+        end field
+        
+   field Report Copy
+          embed onclick="clicked(this)"
+        end field
+		
+		embed onsubmit="submitit(this)"
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+
+	        if (detail=="Report Copy"){
+            form.screen.value = "rptcopy"
+            form.searchbutton.value = "Top"
+          }
+		   if (detail == "Return"){
+            form.screen.value = "pdsuperior"
+            form.searchbutton.value = "Find xstaff=?"
+          }
+  	      
+        }
+
+        function pickAccount(link,name,rank){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text
+            document.one.xbalance.value=primebal.text
+            document.one.xdate.value=date.text
+          }else{
+            document.one.xstaff.value=link.innerText
+            document.one.xname.value=name.innerText
+            document.one.xrank.value=rank.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,159 @@
+screen poreqheaderapproval
+	
+     sidebar list req,list one//,list po
+     sections form one, jscript myscript
+
+     list req
+        caption "Requisition List"
+        table poreqheader
+        order xporeqnum
+		//select "xstatusreq='Approved-ED'"
+		select "(xstatusreq='Approved_req' OR xstatusreq='Open') and xwh='"+#wh+"'"
+        rows 20
+        objects  xporeqnum attrib(link "login?screen=poreqheaderapproval&command=Show&xporeqnum=?"), ~
+                xdate
+        //headers "Line No","Item","Description","Unit","Qty Req"
+     end list
+	 
+	 list one
+        caption "Requisition Detail List"
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=poreqdetailapproval&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xunitpur,xprepqty,xqtyapv
+
+
+        headers "Line No","Item","Description","Unit","Qty Req","Qty Approved"
+     end list
+
+
+     list po
+        caption "PO For : "+xreqnum
+        table poordheader
+        order xpornum desc
+        fixed xporeqnum
+        rows 10
+        objects  xpornum attrib(link "login?screen=poordheader&command=Show&xpornum=?"),~
+                 xdate
+//        headers "Row","Item","Description","Qty","Unit","Rate","MRR Qty"
+     end list
+
+
+     form one
+     caption "Requisition Header"
+        table poreqheader
+		primarykey xporeqnum desc
+        order xporeqnum desc
+       // select "xstatusreq='Approved-ED'"
+		select "(xstatusreq='Approved_req' OR xstatusreq='Open') and xwh='"+#wh+"'"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Show,Clear,*Next,Details,Top, Previous, Next, Bottom,Approval,"<p>" ,~//Add, Update, Delete, 
+                xporeqnum,xdate,xdeptname display(hide),xstatusreq display(const),xwh display(hide),xnote,xsup display(hide)
+
+           
+           field xorg
+          	attrib local
+          	display const
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+          
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+
+          field xwh
+            //defualt #wh
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+            width 12
+          event after
+            set globals(xporeqnum)=xporeqnum
+              class careports(getjspReport{poreqprint,1,xporeqnum,Print Requisition})       
+                  //pick poreq
+          end event
+        end field
+		
+		 field Approval
+            event before
+           // if xstatuspi .ne. "Open"
+            //	error "Cannot Proceed -- Order is not authorised for approval"
+            //end if
+            end event
+            event after
+			set temp = #spsql(zabsp_PO_Reqn_Approved,#id,#user,#wh,xporeqnum)
+			action show
+	         //   set temp = #sql("update poreqheader set xstatusreq='Approved' where xporeqnum='"+xporeqnum+"'")
+			//	set temp =  #sql("update poreqheader set xdmddc='"+#user+"' where xporeqnum='"+xporeqnum+"'")
+	            action show
+            end event
+          end field
+		
+        field add
+          event before
+ //         	if xdeptname .eq. ""
+ //         		error "Cannot Proceed -- Please Select Department"
+//		else if xwh .eq. ""
+//			error "Cannot Proceed -- Please Choose Store"
+ //         	else
+              set xwh = #wh
+          		set xstatusreq="Open"
+	          	set year = #sub(xdate,2,2)
+    	       set xporeqnum = #trn("Requisition Number","RQ--",10)
+		       // set xporeqnum = #sub(poreqnum,0,4)+year+#sub(poreqnum,4,6)
+          //	end if
+          end event
+        end field
+
+		field update
+			event before
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "poreqdetailapproval"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

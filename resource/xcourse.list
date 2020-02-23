@@ -1,0 +1,16 @@
+     list xcourse
+        table xcodes
+        order xcode
+        select "xtype = 'Courses'"
+        navigators alpha //,group xrank "select xcode from xcodes where xtype = 'Rank'"
+        rows 10
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'xcourse')")
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+

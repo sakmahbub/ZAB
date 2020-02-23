@@ -1,0 +1,14 @@
+product ZAB ERP
+
+table poquotheader
+  caption "Quotation Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,xporeqnum,xqotnum,~
+          xdate,xnote,xcus,xstatusep,xstatusquot,~
+		  xwh,xpdfimage,ximage,xrow,xquotrec,xcur,xdiscf,xvatrate
+
+  primary key zid,xporeqnum,xqotnum
+  foreign key
+        zid references zbusiness.zid
+		zid,xporeqnum references poreqheader.zid,xporeqnum
+  end foreign key
+end table

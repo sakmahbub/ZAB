@@ -1,0 +1,265 @@
+screen opinvdetaildupex
+
+     sidebar list order,list one
+     sections form one,  jscript myscript
+ 
+     list order
+        caption "Commercial Invoice Detail List of "+xinvref
+        table opinvdetaildupview
+        order xinvnum,xitem
+        fixed xinvnum
+		select "(xqtyinv-xqtyinvdup)<>0"
+        rows 500
+		objects  xitem,xtheircode,desc equals((select xdesc from caitem where zid=opinvdetaildupview.zid and xitem=opinvdetaildupview.xitem)),~
+		(xqtyinv-xqtyinvdup),~
+		xinvnum,xinvref
+		totals "Totals","","",sum,"",""
+		headers "Item","Old Code","Description","Qty","CI Number","CI Ref"
+		end list
+	 
+	 
+     list one
+        caption "Detail List for Duplicate CI- "+ xinvnumdup
+        table opinvdetaildup
+        order xinvnumdup,xinvrow
+        fixed xinvnumdup
+        rows 500
+        objects  xinvrow attrib(link "login?screen=opinvdetaildupex&command=Show&xinvnumdup=?&xinvrow=?"),xitem,~
+				 descc equals((select xtheircode from caitem where zid=opinvdetaildup.zid and xitem=opinvdetaildup.xitem)),~
+				 desc equals((select xdesc from caitem where zid=opinvdetaildup.zid and xitem=opinvdetaildup.xitem)), ~
+                 xqtyinv,xrate,xlineamt 
+
+        totals "","Totals","","",sum,"",sum
+
+        headers "Invoice row","Item","Old Code","Description","Qty","Rate","Line Amount" 
+     end list
+
+     form one
+        caption "Commercial Invoice(Duplicate) Detail For "+xinvnumdup
+        table opinvdetaildup
+        order xinvnumdup,xinvrow
+        fixed xinvnumdup
+        pstyle 3
+        return "login"
+        layout 2
+        objects Add, Update,Delete,*next,*next,*next,Show,Clear,*next,*next,*next,Top,Previous,Next,Bottom,Return,*next,"<p>",~//Add_Default_Detail
+                xinvrow attrib(row 0 1),xunit display(const), xitem ,xdesc,xcolorcode display(hide),xbcolor display(hide),~
+				xordernum  display(hide),xpidate display(hide),xpiref display(hide),xqtyinv ,xrate ,~
+				xgrossweight,xnetweight,xlineamt display(const),~
+                xnoofrolls display(hide),xnote display(hide),xcomposition display(hide),xstyle display(hide),~
+				xfabrictype display(hide),xwidth display(hide),~
+				xfabriccolor display(hide),xgsm display(hide),xprcstype display(hide),~
+				xorderrow display (hide),xprodtype display(hide),xordernumso display(hide),xinvnum display(const)
+
+
+        embed onsubmit="return submitit(this)"
+	
+		field xnote
+			width 30
+		end field
+				
+				
+		field xinvrow
+			caption Invoice Row
+		end field
+		
+		       
+		field xwidth1
+			attrib readonly
+			display text
+			pick
+		end field
+        
+		field xgsm1
+			attrib readonly
+			display text
+			pick
+		end field
+		
+        field xitem
+		pick list xitemfg
+		end field
+		
+
+        field xdesc
+          attrib local
+          display const
+		  caption Description
+          event after
+            set xdesc = caitem.xdesc("xitem = '"+xitem+"'")
+          end event
+        end field
+		
+		field xcolorname
+		 attrib local
+			caption Color Name
+			event after
+            set xcolorname = cacolor.xcolor("xcolorcode ='"+xcolorcode+"'")
+          end event
+		end field
+
+        field xunit
+          attrib local
+          display const
+		  caption Unit
+          event after
+            set xunit = caitem.xunitsel("xitem = '"+xitem+"'")
+          end event
+        end field
+
+        field xlong
+          width 85
+          column 3
+        end field
+
+        field add
+          event before
+		  	double rate
+			double weight
+			double checkqty
+			set xinvnumdup=#trim(xinvnumdup)
+			set xcolorcode=#trim(xcolorcode)
+			set xitem=#trim(xitem)
+			set xpiref = #trim(xpiref)
+			set xinvnum=opinvheaderdup.xinvnum("xinvnumdup = '"+xinvnumdup+"'")
+			set xprcstype=caitem.xprodtype ("xitem = '"+xitem+"'")
+			set itemchk =#sql("select xitem from opinvdetaildup where xinvnumdup='"+xinvnumdup+"' and xinvnum='"+xinvnum+"' and xitem='"+xitem+"'")		
+			set checkqty =#sql("select (xqtyinv-xqtyinvdup) from opinvdetaildupview where xinvnum='"+xinvnum+"' and xitem='"+xitem+"'")
+			
+			if xitem .eq. itemchk
+			 //error "Item Already Added"
+			else if xqtyinv <=0
+				error " Please Give Qty"
+			else if xrate <=0
+				error " Please Give Rate"
+			else if xqtyinv > checkqty
+				error "You Are exceed Qty. Your Remain Qty of This Item is "+checkqty
+			else
+			
+			double qtyinv
+			double lineamt
+			set qtyinv = xqtyinv
+			set rate = xrate
+			set xlineamt = qtyinv * rate
+			
+			end if
+          end event
+          event after
+        
+		  
+		  
+			//set temp = #spsql(zabsp_OP_validateAfterINVDetail_dup,#id,#user,xinvnumdup,xinvnum,xinvrow,xitem,xordernum,xorderrow,"Add")	
+           // set temp=#spsql(sp_piupdateSOPO,#id,#user,xinvnumdup,"opinvdetaildup")
+			set temp = #spsql(sp_weightupdate,#id,"opinvdetaildup",xinvnumdup,xitem,xqtyinv,xinvrow) 	
+			set xinvrow=0
+			action Show
+		  end event
+        end field
+
+        field update
+		  event before
+			 set xprcstype=caitem.xprodtype ("xitem = '"+xitem+"'")
+			 
+			double qtyinv
+			double lineamt
+			set qtyinv = xqtyinv
+			set rate = xrate
+			set xlineamt = qtyinv * rate
+			
+
+		  end event	
+          event after
+		  //set temp = #spsql(zabsp_OP_validateAfterINVDetail_dup,#id,#user,xinvnumdup,xinvnum,xinvrow,xitem,xordernum,xorderrow,"Update")
+           // set temp=#spsql(sp_piupdateSOPO,#id,#user,xinvnumdup,"opinvdetaildup")
+			set temp = #spsql(sp_weightupdate,#id,"opinvdetaildup",xinvnumdup,xitem,xqtyinv,xinvrow) 	
+			action show
+		  end event
+        end field
+
+        field delete
+			event before
+			    set invnumdup=xinvnumdup
+				set invnum=xinvnum
+				set invrow=xinvrow
+				set ordernum=xordernum
+				set orderrow=xorderrow
+				set item=xitem
+			end event
+          event after
+		  //set temp = #spsql(zabsp_OP_validateAfterINVDetail_dup,#id,#user,invnumdup,invnum,invrow,item,ordernum,orderrow,"Delete")
+			 //set temp=#spsql(sp_piupdateSOPO,#id,#user,invnumdup,"opinvdetaildup")
+		  end event
+        end field
+		
+		
+		field Add_Default_Detail
+		  event after
+            set temp = #spsql(zabsp_OP_addCIDetail,#id,#user,xinvnum)
+		  end event
+        end field
+		
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "opinvheaderdup"
+            form.searchbutton.value = "Find xinvnum=?"
+          }
+          return result
+        }//xitem:xcolorcode#:xbcolor#:xprcstype#:xpiref#:xpidate#:xordernum#:xqtyinv#:xinvrow#:xordernumso#:xrate#:xinvnum#
+		function pickItem(link,colorcode,bcolor,prcs,piref,pidate,ordernum,qty,item,sono,rate,invnum){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+				document.one.xorderrow.value=link.text
+				document.one.xcolorcode.value=colorcode.text
+				document.one.xbcolor.value=bcolor.text
+				document.one.xprcstype.value=prcs.text
+				document.one.xpiref.value=piref.text
+				document.one.xpidate.value=pidate.text				
+				document.one.xordernum.value=ordernum.text
+				document.one.xqtyinv.value=qty.text
+				document.one.xitem.value=item.text
+				document.one.xordernumso.value=sono.text
+				document.one.xrate.value=rate.text
+				document.one.xinvnum.value=invnum.text
+          }else{
+				
+				document.one.xorderrow.value=link.innerText
+				document.one.xcolorcode.value=colorcode.innerText
+				document.one.xbcolor.value=bcolor.innerText
+				document.one.xprcstype.value=prcs.innerText
+				document.one.xpiref.value=piref.innerText
+				document.one.xpidate.value=pidate.innerText				
+				document.one.xordernum.value=ordernum.innerText
+				document.one.xqtyinv.value=qty.innerText
+				document.one.xitem.value=item.innerText
+				document.one.xordernumso.value=sono.innerText
+				document.one.xrate.value=rate.innerText
+				document.one.xinvnum.value=invnum.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

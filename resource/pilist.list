@@ -1,0 +1,13 @@
+     list pilist
+        table arprobissue
+        order xvoucher desc
+        //select "xwh='"+#wh+"' and xdornum like '%"+zvalue+"%' and xtype='NPL' and xstatusord='Confirmed'"
+	select "xwh='"+#wh+"' and xvoucher like '%"+zvalue+"%'"
+        rows 20
+	searchselect "xwh='"+#wh+"' and left(xvoucher,2)='PI'"
+        objects xvoucher attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xstaff,xdate
+
+     end list
+
+

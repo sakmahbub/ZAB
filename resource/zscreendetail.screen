@@ -1,0 +1,83 @@
+screen zscreendetail
+
+     sidebar list one
+     sections form one, jscript myscript
+
+
+     list one
+        caption "<ACRONYM>Screen Detail</ACRONYM>"
+        table zscreendetail
+        order zscreen,xrow
+        fixed zscreen
+        rows 20
+       objects  xrow attrib(link "login?screen=zscreendetail&command=Show&zscreen=?&xrow=?"), ~
+                 xfields,xcaption,xtype,zactive
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+     form one
+        caption "Screen Detail Entry: "+zscreen
+        table zscreendetail
+    //    primarykey zscreen
+        order zscreen,xrow
+        fixed zscreen
+        return "login"
+        pstyle 3
+        layout 2	
+        objects Show, Add, Update, Delete,*next,return, Top,Bottom,Clear,"<p>" ,~
+                xrow attrib(row 0 1),xtype,xfields,xcaption,xoption,zactive
+				
+        embed onsubmit="return submitit(this)"
+
+        field xoption
+          display combo
+          pick "hidden,constant"
+        end field
+		
+		field xfields
+				
+				//caption Access Priority
+				//display combo
+				//pick "Add,Delete,Update,Confirm,Tranfer,Top,Bottom,Next,Previous,Detail,Amendment,Terms & Condition"
+		end field
+        
+		field xtype
+          display combo
+          pick "button,field"
+        end field
+
+        field return
+          embed onclick="clicked(this)"
+        end field
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "return"){
+            form.screen.value = "zscreenheader"
+            form.searchbutton.value = "Find zscreen=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+end screen

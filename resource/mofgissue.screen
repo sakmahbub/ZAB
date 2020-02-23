@@ -1,0 +1,375 @@
+screen mofgissue
+
+     sidebar list prdlist,list item,list fin
+     sections form one,  jscript myscript
+    
+     list prdlist
+        caption "Select Process For Complete Production "
+        table modailyprdtrn
+        order xbatch,xrow
+		select "(xqtymor-xqtycom)>0 and xtype in ('Start Process','First Process')"
+		fixed xbatch
+        rows 20
+
+				objects  xrow attrib(name xrow#),xtmoprcs attrib(link "abc" embed onclick="return pickPrdList(this:xrow#:xqty#:xfabcolor#:xdocrow#:xnewprcsrow#)"),~
+		        xfabriccolor attrib(name xfabcolor#),xqtymor-xqtycom attrib(name xqty#),xunit,xqty,xdocrow attrib(name xdocrow#),~
+				 xnewprcsrow attrib(name xnewprcsrow#)
+
+        headers "Row No","Process Name","Fabric Color","Balance Qty","Unit","Qty In Meter","MO Prcs Row","New MO Row"
+				
+     end list
+
+	list prdlist1
+        caption "Select From Process"
+        table moprocess
+        order xbatch,xrow
+		select "(xqty-xbalance)>0"
+        fixed xbatch
+        rows 20
+        objects xrow attrib(name xrow#),xmoprcs attrib(link "abc" embed onclick="return pickPrdList(this:xrow#:xqty#)"), ~
+                xfabriccolor,(xqty-xbalance) attrib(name xqty#)
+				
+        headers "Row No","Process Name","Fabric Color","Qty"
+     end list
+  
+     list prdlist1
+        caption "Select Process For Transfer <br>For Batch: "+xbatch
+        table moprocess
+        order xbatch,xrow
+		//select "(xqty-xbalance)>0"
+        fixed xbatch
+        rows 20//
+        objects  xrow attrib(name xrow#),xmoprcs attrib(link "abc" embed onclick="return pickPrdList(this:xrow#:xmodate#:xqty#)"), ~
+                 xfabriccolor,xmodate attrib(name xmodate#),xmotime,xbalance attrib(name xqty#)
+
+        headers "Row No","Process Name","Fabric Color","Start Date","Start Time","Qty"
+     end list
+              
+	list item
+        caption "Select Finished Goods For Issue "
+       // table oporddetail
+	   table oporddetail
+	    order xordernum,xorderrow
+        fixed xordernum
+		//select "xqtymor-xqtyprd>0"
+        rows 20
+        objects  xitem attrib(link "abc" embed onclick="return pickItem(this:xorderrow#:xfabrictype#:xfabriccolor#:xwidth#:xgsm#:xprcstype#)"), ~
+                 xorderrow attrib(name xorderrow#),desc equals((select xdesc from caitem where zid=oporddetail.zid and xitem=oporddetail.xitem)),~
+				 xfabrictype attrib(name xfabrictype#),xfabriccolor attrib(name xfabriccolor#),xwidth attrib(name xwidth#),~
+				 xgsm attrib(name xgsm#),xprcstype attrib(name xprcstype#),xqtyord,xunitsel,(xqtymor-xqtyprd)
+
+        headers "Item","Row","Construction","Fabric Type","Fabric Color","Width","GSM","Process Type","Order Qty","Unit","Balance"
+     end list
+
+     list fin
+        caption "Finished Goods Production List For <br>Batch "+xbatch
+        table modailyprdtrn
+        order xbatch,xrow
+		fixed xbatch
+		select "xtype='Finished Goods'"
+        rows 10
+        objects ~
+        xrow attrib(link "login?screen=mofgissue&command=Show&xbatch=?&xrow=?"), ~
+        xdate,xtmoprcs,xfabrictype,xfabriccolor,xwidth,xprcstype,xgsm,xqty,xqtyover
+//         headers Invoice List
+        headers         "Row","Date","Process","Fabric Type","Color","Width","Color Process","GSM","Qty in Yard","Access Qty"
+	Total "","","","","","","Total","",sum,sum
+     end list
+
+     form one
+        caption "Finished Goods Issue:"+xbatch
+        table modailyprdtrn
+        order xbatch,xrow
+		fixed xbatch
+		select "xtype='Finished Goods'"
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add, Show,Clear,Delete,Top,Previous,Next,Bottom,Complete,"<p>",~
+                xdate display(h),xstartdate display(h),xenddate,xfmoprcs,xqtymor,xunit,xqtyovermor,xovercause,xitem,xdesc,xwh,xwhname,xtype display(hide),~
+				xfabrictype,xfabriccolor,xwidth,xgsm,xprcstype,xrow attrib(row 0 1),xdorrow attrib(readonly),xqty,xqtyover,~
+				xsign display(hide),xtmoprcs display(h),xitemraw display(hide),xdocrow attrib(readonly),xsprcsrow attrib(readonly),xnewprcsrow attrib(readonly)
+				
+		field xdorrow
+			caption Finished Row
+		end field
+			
+		field xqty
+				caption QTY in Yard
+				display hide
+				event before
+				if xunit .eq. "Meter"
+					set xqty = #round(xqtymor*1.09361,0)
+				else if xunit .eq. "Kg"
+					set xqty = #round(xqtymor,0)
+				else 
+					set xqty = #round(xqtymor,0)
+				end if					
+					//set xqty = #round(xqtymor*1.09361,0)
+				end event
+		end field
+		
+		field xenddate
+			caption Production Date
+		end field
+
+		field xqtyover
+				caption Excess Qty in Yard
+				display hide
+				event before
+				if xunit .eq. "Meter"
+					set xqtyover = #round(xqtyovermor*1.09361,0)
+				else if xunit .eq. "Kg"
+					set xqtyover = #round(xqtyovermor,0) 
+				else 
+					set xqtyover = #round(xqtyovermor,0) 
+				end if					
+					//set xqtyover = #round(xqtyovermor*1.09361,0)
+				end event
+			end field
+
+		
+		field xfabrictype
+			display text
+			attrib readonly
+			pick
+		end field
+		
+		field xfabriccolor
+			display text
+			attrib readonly
+			pick
+		end field
+		
+		field xwidth
+			display text
+			attrib readonly
+			pick
+		end field
+		
+		field xgsm
+			display text
+			attrib readonly
+			pick
+		end field
+		
+		field xprcstype
+			display text
+			attrib readonly
+			pick
+		end field
+		
+		field xdocrow
+			display text
+			attrib readonly
+			caption MO Process Row
+		end field
+		
+		
+		field xfmoprcs
+			display text
+			attrib readonly
+		end field
+		
+		field xitem
+			caption Finished Goods Item Code
+			pick list xitemfin
+		end field
+		
+		field xwh
+			//default "05"
+			//caption Finished Goods Store
+			display text
+			pick list xwh
+			//default modef.xfwh("zid='"+#id+"'")
+		end field
+
+		field xdesc
+			attrib local
+			dispaly const
+			caption Description
+			event after
+				set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+			end event
+		end field
+		
+		field xwhname
+			attrib local
+			dispaly const
+			caption Store Name
+			event after
+				set xwhname=xcodes.xlong("xtype='Store' and xcode='"+xwh+"'")
+			end event
+		end field
+		
+		
+		field xunit
+			//attrib readonly
+			display combo
+			//set xunit= 
+			pick "Meter,Yard,Kg"
+		end field
+		
+
+        field add
+         event before
+			set xsign = -1
+			set xtype="Finished Goods"
+			set xtmoprcs=xfmoprcs
+			set xdate=xenddate
+			set xfabriccolor=#trim(xfabriccolor)
+			set xitemraw = moheader.xitemraw("xbatch='"+xbatch+"'")
+        	double qty = #sql(double,"select sum(xqty-xbalance) from moprocess where xbatch='"+xbatch+"' and xrow="+xnewprcsrow)
+				if xunit .eq. "Meter"
+					double qty = #round(qty*1.09361,0)
+					double qtymor = #round(xqtymor*1.09361,0)
+				else if xunit .eq. "Kg"
+					double qty = #round(qty,0)
+					double qtymor = #round(xqtymor,0)
+				else 
+					double qty = #round(qty,0)
+					double qtymor = #round(xqtymor,0)
+				end if	
+			set reciperow = moprocess.xreciperow("xbatch='"+xbatch+"' and xrow="+xnewprcsrow)
+			double qtyalc = #sql(double,"select sum(xqtyalc) from mohrecipesettingdetail where xbatch='"+xbatch+"' and xrow="+reciperow)
+			
+			if xwh .eq. ""
+				error "Cannot Proceed -- Please Choose Store For Issue"
+        	//else if qtymor>qty
+        		//error "Cannot Proceed -- Qty Exceeds "+qty
+			//else if qtyalc == 0
+				//error "Cannot Proceed -- Issue Chemical To Production First"
+			else if xqtyovermor >0 .and. xovercause .eq. ""
+				error "Cannot Proceed -- Please Select Cause for Addition"
+			else if xunit .eq. ""
+				error "Cannot Proceed--Unit is Blank"	
+			else if xitem .eq. ""
+				error "Cannot Proceed -- Please Select Item Code From Side List"
+			end if
+          end event 	 
+          event after
+			double totqty = 0.00
+			set totqty = xqty+xqtyover
+            set temp = #spsql(zabsp_MO_issueFinishedGoods,#id,#user,xbatch,xrow,xdorrow,xnewprcsrow,xwh,totqty,xdate,xitem,xdocrow,xfabrictype,xfabriccolor,xwidth,xgsm)
+			set temp = #spsql(zabsp_MO_dailyProduction,#id,#user,xbatch,xrow,xfmoprcs,xtmoprcs,xqtymor,xdate,xdocrow,xsprcsrow,xnewprcsrow,xfabriccolor,xdorrow,"mofg",xqtyovermor)
+           // action Show
+          end event
+        end field
+
+		field delete
+			event before
+				set batch=#trim(xbatch)
+				set row= xrow
+				set fmoprcs = xfmoprcs
+				set qtymor = xqtymor
+				set date = xdate
+				set docrow = xdocrow
+				set sprcsrow = xsprcsrow
+				set newprcsrow = xnewprcsrow
+				set dorrow = xdorrow
+				set fabcolor = #trim(xfabriccolor)
+			end event
+			event after
+			set temp = #sesql("delete from imtrn where xdocnum='"+batch+"' and xdocrow="+row+" and left(ximtrnnum,4)='PRRE'")
+			set temp = #spsql(zabsp_MO_issueFinishedGoods,#id,#user,xbatch,xrow,xdorrow,xnewprcsrow,xwh,totqty,xdate,xitem,xdocrow,xfabrictype,xfabriccolor,xwidth,xgsm)
+			set temp = #spsql(zabsp_MO_dailyProduction,#id,#user,batch,row,fmoprcs,"",qtymor,date,docrow,sprcsrow,newprcsrow,fabcolor,dorrow,"deletefin",0)
+			action Show
+			end event
+        end field
+ 		
+ 		
+        embed onsubmit="submitit(this)"
+        
+
+        field Complete
+          embed onclick="clicked(this)"
+        end field
+
+        field Recipe
+          embed onclick="clicked(this)"
+        end field
+        
+        field Production
+          embed onclick="clicked(this)"
+        end field
+
+	
+	
+
+        
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Complete"){
+            form.screen.value = "mofingoodsissueheader"
+            form.searchbutton.value = "Find xbatch=?"
+          }
+		}
+
+
+        function pickItem(link,row,ftype,fcolor,width,gsm,prcs){
+			if (navigator.appName.indexOf("Netscape") >= 0){
+				document.one.xitem.value=link.text
+				document.one.xdorrow.value=row.text
+				document.one.xfabrictype.value=ftype.text
+				document.one.xfabriccolor.value=fcolor.text
+				document.one.xwidth.value=width.text
+				document.one.xgsm.value=gsm.text
+				document.one.xprcstype.value=prcs.text
+			}else{
+				document.one.xitem.value=link.innerText
+				document.one.xdorrow.value=row.innerText
+				document.one.xfabrictype.value=ftype.innerText
+				document.one.xfabriccolor.value=fcolor.innerText
+				document.one.xwidth.value=width.innerText
+				document.one.xgsm.value=gsm.innerText
+				document.one.xprcstype.value=prcs.innerText
+			} 	
+          return false
+        }
+        function pickPrdListold(link,row,qty){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xfmoprcs.value=link.text
+            document.one.xdocrow.value=row.text
+            document.one.xqtymor.value=qty.text
+			}else{
+            document.one.xfmoprcs.value=link.innerText
+            document.one.xdocrow.value=row.innerText
+            document.one.xqtymor.value=qty.innerText
+			}
+          return false
+        }
+		
+        function pickPrdList(link,row,qty,fcolor,docrow,nprcsrow){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xfmoprcs.value=link.text
+            document.one.xsprcsrow.value=row.text
+            document.one.xdocrow.value=docrow.text
+            document.one.xqtymor.value=qty.text
+            document.one.xfabriccolor.value=fcolor.text
+            document.one.xnewprcsrow.value=nprcsrow.text
+          }else{
+            document.one.xfmoprcs.value=link.innerText
+            document.one.xdocrow.value=docrow.innerText
+            document.one.xsprcsrow.value=row.innerText
+            document.one.xqtymor.value=qty.innerText
+            document.one.xfabriccolor.value=fcolor.innerText
+            document.one.xnewprcsrow.value=nprcsrow.innerText
+          }
+          return false
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

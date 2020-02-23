@@ -1,0 +1,43 @@
+screen pdfacprocs
+  caption "Payment Processing"
+  sections form one
+
+  form one
+    caption "<ACRONYM>Salary Process</ACRONYM>"
+    return "login"
+    layout 2
+    pstyle 3
+
+    objects Process, xfstaff,xtstaff,xyear,xper,xempcatefac
+
+    field xdum
+      attrib local
+      display const
+      caption
+    end field
+
+    field xtstaff
+      default "z"
+    end field
+
+    field xyear
+      attrib local
+      default #sub(#date,0,4)
+    end field
+
+    field xper
+      attrib local
+      default #sub(#date,5,2)
+    end field
+
+
+    field Process
+      event before
+		//set xempcategory="Factory"
+        set temp = #spsql(sp_salprocfactory, #id,#user,xfstaff,xtstaff,xyear,xper,xempcatefac) //#id,#user,xyear,xper,xempcategory
+      end event
+    end field
+
+  end form
+
+end screen

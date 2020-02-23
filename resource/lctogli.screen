@@ -1,0 +1,88 @@
+screen lctogli
+
+     sidebar list one
+	 sections  form one, jscript myscript
+
+
+     list one
+        caption "LC To GL Interface"
+        table lctogli
+        order xtype,xgitem,xgsup
+        rows 20
+        objects xtype attrib(link "login?screen=lctogli&command=Show&xtype=?&xgitem=?&xgsup=?"),~
+                xgitem,xgsup,xaccdr,desc equals((select xdesc from acmst where zid=lctogli.zid and xacc=lctogli.xaccdr))
+				//xacccr,salesdesc equals((select xdesc from acmst where zid=lctogli.zid and xacc=lctogli.xacccr))
+				
+		header "Transacton Type","Item Group","Supplier Group","Debit Account No","Description"//,"Credit Account No","Description"
+    end list
+
+
+
+    form one
+        caption "LC To GL Interface"
+        table lctogli
+        order xtype,xgitem,xgsup
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update,Delete,~
+                Top,Next,Previous,Bottom,"<p>" ,~
+                xtype,xgitem,xgsup,,xaccdr,xaccdrdesc,xacccr,xacccrdesc
+        
+		field xacc
+			caption Account Receivable
+		end field
+		
+		field xtype
+          caption Transacton Type
+          display combo
+          pick "LC Opening,LC Payment"
+        end field
+
+	field xaccdrdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xaccdrdesc=acmst.xdesc("xacc='"+xaccdr+"'")
+      end event
+    end field
+	
+	field xacccrdesc
+      attrib local
+      caption Description
+      display const
+      event after
+        set xacccrdesc=acmst.xdesc("xacc='"+xacccr+"'")
+      end event
+    end field
+	
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          b.value = "Top"
+          detail="clicked"
+        }
+        function submitit(form){
+
+	    if (detail=="clicked"){
+            form.screen.value = "caexch"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

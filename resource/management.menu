@@ -1,0 +1,16 @@
+//Accounts.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+//Order Status                   |#classPath+"/login?screen=oppiapproval"  
+Accounts Reports                 |#classPath+"/login?menu=acreports"
+Anatytical Reports               |#classPath+"/login?menu=misanalytical"
+Product Analysis                 |#classPath+"/login?menu=misprodanalysis"
+Procurement                      |#classPath+"/login?menu=misreportspo"
+////Store                            |#classPath+"/login?menu=misreportsstore"
+Inventory Reports                |#classPath+"/login?menu=imacreports"
+//////Query                            |#classPath+"/login?menu=misquery"
+//Dash Board Procurement & Inventory  |#classPath+"/login?screen=podashboard"			 |im  	 |		|inventory.png|180 //|fa-home|180
+//Management Dash Board   		|#classPath+"/login?screen=mgndashboard"			 |ac     |      |sales.png|180
+//-------------------------------------------------------------------
+

@@ -1,0 +1,49 @@
+screen branch
+     caption "Branch Master"
+     sections form detail,jscript myscript
+
+     form detail
+        caption "Branch Master"
+        table xcodes
+        primarykey xcode
+        order xcode
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add,Update, Delete,*next,Top, Bottom,"</b></font><p>" ,~
+                 xcode,xlong,xmadd,xphone,xfax,xemail
+
+
+              //  xitem,~// width(50), ~
+               // xdesc width(50),~
+               // xcatitem,xcatname,xtitem,xgitem,xunit,xpacking,xvatamt,xstype, ~
+               // xcost display(const),xrate display(const),~
+                //xvatcode,
+                //xlong
+
+
+
+
+      //  field xcode
+        // display trn Item Code
+        //  event after
+          //  set globals(xcode)=xcode
+         // end event
+       // end field
+
+      
+
+       // field xdesc
+      // pick list xitemdesc
+        //end field
+
+        
+
+      //  field xitem
+        //  display trn Item Code
+        //end field
+
+     end form
+
+end screen

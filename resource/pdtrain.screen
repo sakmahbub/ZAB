@@ -1,0 +1,54 @@
+screen pdtrain
+     caption "Training & courses"
+     //sidebar list one
+     sections  form one,list one, jscript myscript
+
+	list one
+        caption "Training & Courses"
+        table pdtrain
+        order xstaff,xrow
+        fixed xstaff
+        rows 20
+        objects  xrow attrib(link "login?screen=pdtrain&command=Show&xstaff=?&xrow=?"), ~
+                xcourse,xinst,xyear,xgrade,xrem
+     end list
+
+
+
+     form one
+        caption "Training & Courses"
+        table pdtrain
+        order xstaff,xrow
+        fixed xstaff
+        //select
+        return "login"
+        layout 2
+        pstyle 3
+        objects Return, ~
+               Show,Clear,Add, Update, Delete,*next, Top, Previous, Next, Bottom,"" ,~
+               xrow attrib(row 0 10;search),xcourse,xinst,xyear,xgrade,xrem
+
+        embed onsubmit="submitit(this)"
+        field Return
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but = ""
+        function clicked(b){
+          but = "clicked"
+        }
+        function submitit(form){
+          if (but == "clicked"){
+            form.screen.value = "pdmst"
+            form.searchbutton.value = "Find xstaff=?"
+          }
+        }
+
+        </script>
+     end jscript
+
+end screen

@@ -1,0 +1,287 @@
+screen poreq
+     caption "PO Requisition"
+     //sidebar list cur
+     sections  list rev,form one,list one, jscript myscript
+    list rev
+        table porfq
+        order xporeqnum
+        fixed xporeqnum
+        rows 20
+        objects xrev  attrib(link "login?screen=porfq&command=Show&xrev=?"),xporeqnum,xsup,xdate
+     end list
+     list one
+        table poreq
+        order  xporeqnum DESC
+        //fixed xsup
+        //select none
+        navigators alpha
+        rows 10
+        objects  xporeqnum attrib(link "login?screen=poreq&command=Show&xsup=?&xporeqnum=?"), ~
+                xdate,xsupref,xdatesupref,xstatusreq
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+
+    list cur
+        table xcur
+        order xcur
+        rows 20
+        objects xcur attrib(link "abc" embed onclick="return pickCur(this:xexch#)"), ~
+                xexch attrib(name xexch#),xname
+     end list
+
+     form one
+        caption "Requisition Entry"
+        table poreq
+        order xporeqnum DESC
+        //fixed xsup
+        //select
+        return "login"
+        layout 2
+        objects Supplier,Depot,Details,RFQ,Create Purchase Order,"<BR>",Show, Add, Update, Delete, Top, Previous, Next, Bottom,Clear,"<p>" ,~
+                xporeqnum attrib(search)  display(trn Requisition),xdate attrib(attach),xrev,xsupref,xdatesupref,~
+                xsup,xorg display(constant),xhmsg,xfmsg,xcur,xexch,xdiv,xsec,xproj,xstatusreq display(constant),~
+                xporef display(constant), xref ,xsp
+
+
+        field xcur
+          default xlocals.xname("xtypelocal='Base Currency'")
+          event after
+            set globals(xcur)=xcur
+            set globals(xexch)=xexch
+          end event
+        end field
+
+        field xsup
+          pick list xsup
+        end field
+
+        field update
+          event before
+            set xorg=casup.xorg("xsup='"+xsup+"'")
+            set temp=#sql(int,"delete from poreqsup where xporeqnum='"+xporeqnum+"'")
+          end event
+          event after
+            set temp=#sql(string,"update poodt set xcur = '"+xcur+"' , xexch = '"+xexch+"' where xporeqnum='"+xporeqnum+"'")
+            buffer poreqsup
+            move poreqsup=casup(xsup)
+            set poreqsup.xporeqnum=xporeqnum
+            insert poreqsup
+          end event
+        end field
+
+
+        field Create
+          event before
+            set checkrow=#sql(string,"select xrow from pordt where xporeqnum='"+xporeqnum+"' and substring(xinclude, 1, 1) = '0'")
+            if #result .eq. "false"
+              error "Cannot Proceed With Blank Detail"
+            else
+              set ponumber=xtrnp.xrel("xtypetrn='Requisition' and xtrn='"+xporeqnum_ONE+"' and xtyperel='Purchase Order'")
+              set xpornum=#trn("Purchase Order",ponumber)
+              buffer poord
+              set poord.xpornum=xpornum
+              move poord=poreq(xporeqnum)
+//              set poord.xsupref="Created From "+ xporeqnum
+              insert poord
+
+              buffer poordsup
+              set poordsup.xpornum=xpornum
+              move poordsup=poreqsup(xporeqnum)
+              insert poordsup
+
+              buffer poorddep
+              set poorddep.xpornum=xpornum
+              move poorddep=poreqdep(xporeqnum)
+              insert poorddep
+              print "Purchase Order No <a href=login?screen=poordq&command=Show&xpornum="+xpornum+">" +xpornum+ "</a> Created"
+
+
+              set temp=#sql(string,"update poreq set xstatusreq='"+#status("xstatusreq",7)+"' , xporef='"+xpornum+"' where xporeqnum='"+xporeqnum+"'")
+              set xstatusreq=#status("xstatusreq",7)
+              int i=0
+              set xrow=#sql(string,"select xrow from pordt where xporeqnum='"+xporeqnum+"' and xrow>'"+i+"' and substring(xinclude, 1, 1) = '0'")
+              while #result .eq. "true"
+                buffer poodt
+                set poodt.xpornum=xpornum
+                set poodt.xrow=xrow
+                move poodt=pordt(xporeqnum,xrow)
+                set poodt.xstatuspdt=pordt.xstatusrdt("xporeqnum='"+xporeqnum+"' and xrow='"+xrow+"'")
+                insert poodt
+                set xrow=#sql(string,"select xrow from pordt where xporeqnum='"+xporeqnum+"' and xrow>'"+xrow+"' and substring(xinclude, 1, 1) = '0'")
+              end while
+            end if
+          end event
+        end field
+
+        field Add
+          event before
+            set xorg=casup.xorg("xsup='"+xsup+"'")
+            set xstatusreq=xstatussup
+            set xappamt = 0.00
+            //set xexch = #sql(double,"select xexch from xcur where xcur = '"+xcur+"'")
+            double rate=0.00+caexch.xexch("xcur='"+xcur+"' and xdate <= '"+xdate+"'  Order by xdate DESC")
+            if rate <= 0.00
+              double rate=0.00+xcur.xexch("xcur='"+xcur+"'")
+            end if
+            if rate <= 0.00
+              set xexch="1"
+            else
+              set xexch=rate
+            end if
+          end event
+          event after
+            buffer poreqsup
+            move poreqsup=casup(xsup)
+            set poreqsup.xporeqnum=xporeqnum
+            insert poreqsup
+            buffer poreqdep
+            set xrow=cadep.xrow("xrow>0")
+            move poreqdep=cadep(xrow)
+            set poreqdep.xporeqnum=xporeqnum
+            insert poreqdep
+          end event
+        end field
+
+        field Delete
+
+          event before
+            buffer poreqsup
+            buffer poreqdep
+            set poreqsup.xporeqnum=xporeqnum
+            set poreqdep.xporeqnum=xporeqnum
+            delete poreqsup(xporeqnum)
+            delete poreqdep(xporeqnum)
+          end event
+        end field
+
+        field xporeqnum
+         event after
+          set globals(xporeqnum)=xporeqnum
+         end event
+        end field
+
+        field RFQ
+          event before
+            set checkrow=#sql(string,"select xrow from pordt where xporeqnum='"+xporeqnum+"' and substring(xinclude, 2, 1) = '0'")
+            if #result .eq. "false" .or. xsup .eq. ""
+              error "Cannot Proceed With Blank Detail/Supplier"
+            else
+              int line= 0+xrev+1
+              buffer porfq
+              move porfq=poreq(xporeqnum)
+              set porfq.xrev=""+xporeqnum+"-"+line
+              set porfq.xsup=xsup
+              set porfq.xorg=casup.xorg("xsup='"+xsup+"'")
+              set xrev=line
+              insert porfq
+
+              if xsup .ne. ""
+                buffer porfqsup
+                move porfqsup=casup(xsup)
+                set porfqsup.xrev=porfq.xrev
+                insert porfqsup
+                buffer porfqdep
+                set xrow=cadep.xrow("xrow>0")
+                move porfqdep=cadep(xrow)
+                set porfqdep.xrev=porfq.xrev
+                insert porfqdep
+               end if
+
+
+              print "Request for Quotation  No " +line+ "</a> Created"
+              set temp=#sql(int,"update poreq set xrev='"+line+"' where xporeqnum='"+xporeqnum+"'")
+              int i=0
+              set xrow=#sql(string,"select xrow from pordt where xporeqnum='"+xporeqnum+"' and xrow>'"+i+"' and substring(xinclude, 2, 1) = '0'")
+              while #result .eq. "true"
+                buffer porfqd
+                move porfqd=pordt(xporeqnum,xrow)
+                set porfqd.xrev=porfq.xrev
+                insert porfqd
+                set xrow=#sql(string,"select xrow from pordt where xporeqnum='"+xporeqnum+"' and xrow>'"+xrow+"' and substring(xinclude, 2, 1) = '0'")
+              end while
+            end if
+          end event
+        end field
+
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Supplier
+          embed onclick="clicked(this)"
+        end field
+
+        field Depot
+          embed onclick="clicked(this)"
+        end field
+        field BrandSearch
+          embed onclick="clicked(this)"
+        end field
+        field ProductSearch
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        var result
+        function clicked(b){
+          detail = b.value
+        }
+        function submitit(form){
+          result = true
+          if (detail=="Details"){
+            form.screen.value = "pordt"
+            form.searchbutton.value = "Top"
+          }
+          if (detail=="Supplier"){
+            form.screen.value = "poreqsup"
+            form.searchbutton.value = "Find xporeqnum=?"
+          }
+          if (detail=="Depot"){
+            form.screen.value = "poreqdep"
+            form.searchbutton.value = "Find xporeqnum=?"
+          }
+          if (detail=="BrandSearch"){
+              var link =  "login?screen=casupbrandq&menu=*none*&zvalue="+form.xhmsg.value
+
+              var width = 700
+              var left = 600
+              if (screen){
+                left = screen.width-width
+              }
+              var param = "toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,center=0,alwaysRaised=yes,resizable=yes,width="+width+",top=0,left="+left
+              window.open(link,"Search",param)
+              result = false
+          }
+          if (detail=="ProductSearch"){
+              var link =  "login?screen=casupprodq&menu=*none*&zvalue="+form.xhmsg.value
+
+              var width = 700
+              var left = 600
+              if (screen){
+                left = screen.width-width
+              }
+              var param = "toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,center=0,alwaysRaised=yes,resizable=yes,width="+width+",top=0,left="+left
+              window.open(link,"Search",param)
+              result = false
+          }
+
+          detail = ''
+          return result
+        }
+        </script>
+     end jscript
+
+//            set xcur = #sql(string,"select xcur from casup where xsup= '"+xsup+"'")
+
+end screen

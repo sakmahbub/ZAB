@@ -1,0 +1,17 @@
+
+product ZAB ERP
+
+table pdleaveview
+  caption "Leave View"
+  columns zid,xyear,xstaff,xtypeleave,xday
+
+  primary key zid,xyear,xstaff,xtypeleave
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view pdleaveview (zid,xyear,xstaff,xtypeleave,xday) ~
+                  as select zid,xyear,xstaff,xtypeleave,count(*) ~
+                  from pdleavedetail group by zid,xyear,xstaff,xtypeleave
+end table

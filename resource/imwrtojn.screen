@@ -1,0 +1,231 @@
+screen imwrtojn
+     	sidebar list imtor,list one,list reqlist
+	sections form one, jscript myscript
+     
+	 list imtor
+        caption "Work Requisition "
+        table imtorheader
+        order xtornum desc
+       select "xstatustor='Approved' and left(xtornum,4)='WR--' and xstatusreq = 'Create PO'"
+		rows 10
+        objects  xtornum  attrib(link "login?screen=imwrtojn&command=Show&xtornum=?"),~
+                 xdate,twhdesc equals((select xlong from branchview where zid=imtorheader.zid and xcode=imtorheader.xtwh))
+				 
+        headers "Requisition No","Date","To Branch"
+     end list
+
+   list one
+        caption "Detail List For Work Requisition No "+xtornum
+        table imtordetail
+        order xtornum,xrow desc
+        fixed xtornum
+		select "((xqtyreq-xqtyalc)-xqtycom)-xqtypor>0 and xtornum<>''"
+		rows 20
+        objects ~
+        xrow,~// attrib(link "login?screen=imwrtojn&command=Show&xtornum=?&xrow=?"), ~
+        xitem,desc equals((select xdesc from caitem where zid=imtordetail.zid and xitem=imtordetail.xitem)),xbrand,~
+        (((xqtyreq-xqtyalc)-xqtycom)-xqtypor),xunit
+
+		totals "","","Total","",sum
+		
+        headers "Serial No","Item","Description","Brand","Qunatity Required","UOM"
+     end list
+	 
+    list reqlist
+      caption "Requisition List"
+         table poreqheader
+        order xporeqnum desc
+		fixed xtornum
+		select "left(xporeqnum,2)='JN'"
+		rows 10
+        objects  xporeqnum attrib(link "login?screen=poreqhedjn&command=Show&xporeqnum=?"), xdate,xtype
+               
+		  headers "Requisition No","Date","Purchase Type"
+	end list
+
+
+     form one
+        caption "Create JN"
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+        return "login"
+        select "left(xtornum,4)='WR--' and xstatustor='Approved'"
+		pstyle 3
+        layout 2
+        objects Show,Clear,Create JN,~
+        "<p>" ,~
+        xtornum ,xdate,~
+        xfwh  display(const),xfbrname,xtwh display(const),xtbrname,xref,xstatustor display(constant),~
+		xdocrow display(hide),xstatusreq display(hide),xregi display(const),~
+		xdatesol display(const),~
+		//xdum,~
+		xpreparer display(hide),preparer display(const),~
+		//xdirector display(hide),xdir  display(const),
+		//xappdate display(const),~
+		xlong display(const)		
+			
+       field xfbrname
+        attrib local
+        caption From Store Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+		
+		field xregi
+			caption Department Name
+			event before
+			end event
+		end field
+		
+		field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xstaff='"+xpreparer+"'")
+		  end event
+        end field
+		
+		field xappdate
+          caption Approved Date & Time
+		  attrib local
+		  event after
+		  set xappdate=#sql(varchar,"select convert(VARCHAR, xdateed, 100) from imtorheader where xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+		field xdatesol
+          caption Send From Store
+		  attrib local
+		  event after
+		  set xdatesol=#sql(varchar,"select convert(VARCHAR, xdateso, 100) from imtorheader where xtornum='"+xtornum+"'")
+		  end event
+        end field
+		
+			field xdir
+          caption ED / DF
+		  attrib local
+		  event after
+		  set xdir=pdmst.xname("xstaff='"+xdirector+"'")
+		  end event
+        end field
+		
+       field xtbrname
+        attrib local
+        caption To Store Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+
+        field xtornum
+		caption Work Requisition No.
+		pick list xwrnum
+		//pick list xtornum
+          event after
+			set globals(xtornum)=xtornum
+			set globals(xstatusreq)=xstatusreq
+			 class careports(getjspReport{poreqprint,1,xtornum,View Product history })
+            class careports(getjspReport{imtranissueprint,1,xtornum,View Requisition})
+			class careports(getjspReport{imreqstatus,1,xtornum,View WR Status})
+			end if
+           end event
+        end field
+
+		 field xporeqnum
+          caption Purchase Requisition No.
+        end field
+		
+        field preparer
+          caption Preparer
+		  attrib local
+		  event after
+		  set preparer=pdmst.xname("xposition='"+zauserid+"'")
+		  end event
+        end field
+
+		  field xdate
+          caption WR Date
+        end field
+		
+		 field xstatustor
+          caption WR Status
+        end field
+
+        field xdatecom
+          display constant
+          caption Receive Date
+        end field
+		
+		 field xdum
+		 attrib local
+          display constant
+          caption
+        end field
+
+
+        field xlong
+		caption Note
+          height 3
+          width 110
+          column 2
+        end field
+
+
+        field Create
+          event before
+		  if xtornum .eq. ""
+		  error "Cannot Proceed -- Please Select SR No"
+           else if xstatusreq .eq. "PR Created"
+              error "Cannot Proceed -- PR Already Created"
+            end if
+          end event
+          event after
+           set temp = #spsql(zabsp_IM_createPORequisition,#id,#user,xtornum,#date)
+            action Show
+          end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "imtormoreqdetail"
+            form.searchbutton.value = "Find xtornum=?"
+          }
+        }
+		function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xcur.value=link.text
+            document.one.xexch.value=exch.text
+          }else{
+          link.innerText
+            document.one.xtornum.value=link.innerText
+          }
+          return false
+        }
+
+
+        </script>
+     end jscript
+
+
+
+end screen

@@ -1,0 +1,102 @@
+screen pdusernotification
+
+  caption "User Notifications"
+    
+ 	sidebar list leaveapp,list absent
+	sections form one,list late,list early,jscript myscript	//list late2,list early2,
+	
+	list leaveapp
+    caption "Applied Leave & Tour Info Detail"
+    table pdleavehdview
+    order xstaff,xdaymonth desc//xyear,xtypeleave,xyearperdate desc
+    select "xposition='"+#position+"' and DATEPART(year,xdate)=DATEPART(year,'"+#date+"') and (DATEPART(month,xdate)>=datepart(month,'"+#date+"') or DATEPART(month,xdate)>=datepart(month,'"+#date+"')-1)"
+    rows 50
+    objects  ~//xyearperdate,~//attrib(link "login?screen=pdleaveapplystaff&command=Show&xstaff=?&xyearperdate=?"),~
+       xdate,xtypeleave,xdatefrom,xdateto,xappday,xday,xstatus,~
+	   xidsupdesc equals((select xname from pdmst where zid=pdleavehdview.zid and xposition=pdleavehdview.xsid)),~
+	   //xidsupdesc2 equals((select xname from pdmst where zid=pdleaveheader.zid and xposition=pdleaveheader.xsuperior2)),~
+	    xidsupdesc2 equals((select xname from pdmst where zid=pdleavehdview.zid and xstaff=pdleavehdview.xsignatory2)),xsigndate2,xdaymonth display(hide)
+
+    header "Apply Date","Type Of Application","From Date","To Date","Applied Day(s)","Approved Day(s)","Status","Approver","Approved By","Approved Date"
+    totals "","Total","","",sum,sum
+	end list
+	 
+	list late
+        caption "Late Info Detail"
+        table pdattview
+        order xposition,xyearperdate desc
+		select " xposition='"+#position+"' and xposition<>'' and '"+#position+"'<>''and xemplate='1' and xpaystatus<>'Closed' and xstatustask<>'Closed'"  // and DATEPART(MM,xdate)=DATEPART(MM,'"+#date+"')"
+        rows 25
+        objects ~
+                 xdate,xdayname,xtimein1,xtimeout1,xworktime,xstatus,xstatuslate,~//name equals((select xname from pdmst where zid=pdathd.zid and xstaff=pdathd.xstaff)),
+				 xstaff display(hide),xyearperdate display(hide)
+        headers "Date","Day","In","Out","Working Hours","Status","Approval Status"
+     end list
+
+	list early
+        caption "Early Info Detail"
+        table pdattview
+        order xposition,xyearperdate desc
+		select " xposition='"+#position+"' and xempearly='1' and xposition<>'' and '"+#position+"'<>''  and xpaystatus<>'Closed'  and xstatustask<>'Closed'" // and DATEPART(MM,xdate)=DATEPART(MM,'"+#date+"')"
+        rows 25
+        objects ~
+                 xdate,xdayname,xtimein1,xtimeout1,xworktime,xstatus,xstatusel,~ //name equals((select xname from pdmst where zid=pdathd.zid and xstaff=pdathd.xstaff)),
+				 xstaff display(hide),xyearperdate display(hide)		 
+        headers "Date","Day","In","Out","Working Hours","Status","Approval Status"
+     end list	
+	 
+	list absent
+        caption "Absent Info Detail for : "+pdmst.xname("xposition='"+#position+"'")+", "+pdmst.xdesignation("xposition='"+#position+"'")+", "+pdmst.xdeptname("xposition='"+#position+"'")
+        table pdempat
+        order xposition,xyearperdate desc
+		select " xposition='"+#position+"' and xstatus='Absent'"
+        rows 25
+        objects xposition attrib(link "login?screen=pdabsentapplication&command=Show&xposition=?&xyearperdate=?"),~
+                 xdate,xdayname,xshift,xtimein,xtimeout,xstatus,~
+				 xstaff display(hide),xyearperdate display(hide)
+        headers "Employee ID","Date","Day","Shift","In","Out","Status"
+     end list	 
+
+     form one
+        table imtorheader
+        primarykey xtornum
+        order xtornum 
+        return "login"
+        pstyle 1
+        layout 2
+        objects  xposition attrib(local) display(hide)
+		
+		
+		field xposition
+            event after
+			set globals(xposition)=#position
+			set temp =  #spsql(zabsp_emp_attendance,#id,#user,#position)
+            end event
+        end field
+        
+		embed onsubmit="submitit(this)"
+
+      end form
+
+      jscript myscript
+
+        <script language="javascript" type="text/javascript">
+     var time = new Date().getTime();
+     $(document.body).bind("mousemove keypress", function(e) {
+         time = new Date().getTime();
+     });
+
+     function refresh() {
+         if(new Date().getTime() - time >= 3000) 
+             window.location.reload(true);
+         else 
+             setTimeout(refresh, 3000000);
+     }
+
+     setTimeout(refresh, 3000000);
+        </script>
+     end jscript
+
+
+
+end screen

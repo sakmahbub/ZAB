@@ -1,0 +1,77 @@
+screen pdprocsbuy
+     caption "Payment Processing"
+     sections form one
+
+     form one
+        caption "Process Pay"
+        return "login"
+        layout 2
+        pstyle 1
+
+        objects Process,xyear,xper,fdate,tdate,fstaff,tstaff,fyearperdate,tyearperdate
+
+        field Process
+          event before
+            set jyear = #sub(fdate,4,4)
+            set jper = #sub(fdate,2,2)
+            set jday = #sub(fdate,0,2)
+            set fyearperdate = jyear+jper+jday
+
+            set eyear = #sub(tdate,4,4)
+            set eper = #sub(tdate,2,2)
+            set eday = #sub(tdate,0,2)
+            set tyearperdate = eyear+eper+eday
+
+            class pd(buyerprocess{xyear,xper,fdate,tdate,fstaff,tstaff,fyearperdate,tyearperdate})
+          end event
+        end field
+
+        field xyear
+          attrib local
+        end field
+
+        field xper
+          attrib local
+        end field
+
+        field fdate
+          caption From Date
+          attrib local
+          display text
+          default #date
+        end field
+
+        field tdate
+          caption To Date
+          attrib local
+          display text
+          default #date
+        end field
+
+        field fstaff
+          caption From Staff
+          attrib local
+          display text
+        end field
+
+        field tstaff
+          caption To Staff
+          attrib local
+          display text
+        end field
+
+        field fyearperdate
+          caption dummy
+          attrib local
+          display text
+        end field
+
+        field tyearperdate
+          caption dummy
+          attrib local
+          display text
+        end field
+
+     end form
+
+end screen

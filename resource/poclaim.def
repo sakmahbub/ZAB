@@ -1,0 +1,14 @@
+product ZAB
+
+table poclaim
+  caption "Claim Header"
+  columns ztime,zutime,zid,zemail,~
+          xclaimnum,xdateclaim,xpornum,xmlcno,xref,xyear,xper,xyearperdate,~
+          xclaimstatus,xnote
+
+  primary key zid,xclaimnum
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+end table

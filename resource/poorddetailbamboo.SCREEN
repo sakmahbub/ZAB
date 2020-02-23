@@ -1,0 +1,170 @@
+screen poorddetailbamboo
+
+
+     sidebar list one
+     sections form one,  jscript myscript
+
+     list one
+        caption "PO Detail List For "+xpornum
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        //select none
+        rows 20
+        objects  xrow attrib(link "login?screen=poorddetailcash&command=Show&xpornum=?&xrow=?"),~
+                xitem,desc equals((select xdesc from caitem where zid=poorddetail.zid and  xitem=poorddetail.xitem)),~
+				xqtypur,xunitpur,xcfpur,unitiss equals((select xunitiss from caitem where zid=poorddetail.zid and xitem=poorddetail.xitem)),~
+				xrate,xlineamt
+
+
+        headers "Row","Item","Description","Qty","Purchase Unit","Qty Per Unit","Issue Unit","Rate","Line Amount"
+	  total "Total","","","","","","",sum,sum	
+     end list
+
+
+     form one
+        caption "PO Detail (Bamboo):"+xpornum
+        table poorddetail
+        order xpornum,xrow
+        fixed xpornum
+        //select
+        layout 2
+        pstyle 3
+        return "login"
+        objects Add,Show,Clear,Update, Delete,*next,Complete,Top, Previous, Next, Bottom,"<p>",~
+                xrow attrib(row 0 1),xunitpur display(const), xitem, xdesc display(const),xhscode display(const),xdum,xqtypur,xrate,~
+                xqtygrn display(hide),xlineamt display(const),xnote,~
+                xcfpur display(const)
+
+        embed onsubmit="return submitit(this)"
+
+		field xrow
+		  event after
+		  set status= #sql("select xstatuspor from poordheader where zid='"+#id+"' and xpornum='"+xpornum+"'")
+		  // print status
+		     if status .eq. "GRN Created"
+					set #field(Add.display)="hidden"
+         			set #field(Update.display)="hidden"
+					set #field(Delete.display)="hidden"
+       		   end if
+				set globals(xpornum)=xpornum
+		   end event
+		end field
+		
+		
+	field xmenufacture
+		caption Manuf. ID.
+		pick list caman
+	end field
+
+	field xdum
+		caption.
+		attrib local
+		display const
+	end field
+
+
+	field xorg
+		attrib local
+        	display const
+        	caption Manuf. Description
+        	event after
+        		set xorg=caman.xorg("xman='"+xmenufacture+"'")
+        	end event
+	end field
+
+        field xdesc
+        	attrib local
+        	display const
+        	caption Description
+        	event after
+        		set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        	end event
+        end field
+        
+	field xitem
+		//pick list xitempo
+	end field
+
+	field xrate
+            caption Unit Price
+    end field
+	
+        field xnote
+          width 30
+//          column 3
+        end field
+
+        field xqtydel
+//          display constant
+        end field
+
+        field Add
+          event before
+            set xunitpur = caitem.xunitpur("xitem='"+xitem+"'")
+            set xcfpur = caitem.xcfpur("xitem='"+xitem+"'")
+            set xspecification = caitem.xspecification("xitem='"+xitem+"'")
+			set xhscode = caitem.xhscode("xitem='"+xitem+"'")
+
+		//   set xrate = caitem.xrate("xitem='"+xitem+"'")
+         //   set xcfpur = caitem.xcafpur("xitem='"+xitem+"'")
+            set xqtygrn = 0.00
+			set xdisc=0
+			set xdiscf=0
+          end event
+          event after
+//            class pomedical(UpdatePoDetailAfter{xpornum,xrow,add})
+           set temp = #spsql(zabsp_PO_validateAfterDetailPO,#id,#user,xpornum,xdate,xrow,xitem,xqtypur,xrate,xdisc,xdiscf)
+            action show
+          end event
+        end field
+
+        field update
+          event before
+            set xunitpur = caitem.xunitpur("xitem='"+xitem+"'")
+            set xcfpur = caitem.xcfpur("xitem='"+xitem+"'")
+			set xspecification = caitem.xspecification("xitem='"+xitem+"'")
+			set xhscode = caitem.xhscode("xitem='"+xitem+"'")
+			set xdisc=0
+			set xdiscf=0
+			//  set xcfpur = caitem.xcfpur("xitem='"+xitem+"'")
+          end event
+          event after
+            set temp = #spsql(zabsp_PO_validateAfterDetailPO,#id,#user,xpornum,xdate,xrow,xitem,xqtypur,xrate,xdisc,xdiscf)
+            action show
+          end event
+        end field
+
+         field Complete
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Complete"){
+            form.screen.value = "poordheaderbamboo"
+            form.searchbutton.value = "Find xpornum=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

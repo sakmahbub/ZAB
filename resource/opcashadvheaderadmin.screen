@@ -1,0 +1,190 @@
+screen opcashadvheaderadmin
+	
+     sidebars list one//list reqlist,
+     sections form one, jscript myscript
+	 
+	  
+	 list one
+        caption "Advance Against JOB Detail List."
+        table poreqdetail
+        order xporeqnum,xrow
+        fixed xporeqnum
+        rows 20
+        objects  xrow attrib(link "login?screen=opcashadvdetail&command=Show&xporeqnum=?&xrow=?"), ~
+                 xitem,desc equals((select xdesc from caitem where zid = poreqdetail.zid and xitem=poreqdetail.xitem)),xlineamt
+
+		headers "Line No","Item","Description","Amount"
+		totals "","Total","",sum
+     end list
+
+
+     form one
+		caption "Advance & Adjustment Header admin"
+        table poreqheader
+        order xporeqnum desc
+        select "left(xporeqnum,4) in ('AD--','ADJ-','PAY-')"
+		return "login"
+        layout 2
+        pstyle 3 
+        objects ~
+                Show,Clear,Update,Delete,*Next,Details,Top, Previous, Next, Bottom,"<p>",~//Upload_One,Upload_Two,
+                xporeqnum,xdate,xsup display(hide),xorg display(hide),xqotnum display(hide),xfwh,xfbrname,xtwh display(hide),~
+				xtype display(hide),xstatusreq display(const),xordernum,xstaff,sname,xsuperiorsp,xsuperior display(const),xnote,~
+				xep display(hide),xstatus display(hide),xstatusap display(hide),~
+				xstatusgl display(hide),xcus display(hide)//,xfile
+
+           field xqotnum
+		   pick list qotnum
+		   end field
+		   field xorg
+          	attrib local
+          	caption Supplier Name
+          	event after
+          		set xorg = casup.xorg("xsup='"+xsup+"'")
+          	end event
+          end field
+
+        field xdeptname
+           // attrib local
+           // display const
+            caption Depot Name
+            event after
+              set xdeptname = xcodes.xlong("xcode='"+#wh+"' and xtype = 'Branch'")
+            end event
+          end field
+		  
+		  field xstaff
+		  pick list xstaffcnf
+		  caption Paid to
+		  end field
+		  
+		   field sname
+            attrib local
+            display const
+            caption Name
+            event after
+              set sname= pdmst.xname("xstaff= '"+xstaff+"'")
+            end event
+          end field
+		  
+		   field xsuperior
+            attrib local
+            display const
+            caption Name
+            event after
+              set xsuperior= pdmst.xname("xposition= '"+xsuperiorsp+"'")
+            end event
+          end field
+          
+          
+		  	field xtype
+			caption Service Type
+			pick "Cash,Agreement"
+			//default "Other"
+			end field
+		  
+          field xnote
+            column 2
+            width 80
+            height 2
+          end field
+		  
+		   field xregi
+           caption Car No. / Other
+          end field
+
+          field xstatusord
+            caption <font color=red size=2>Requisition Status</font>
+          end field
+
+        field xporeqnum
+        	width 15
+			pick list advancenum
+          event after
+		  //class careports(getjspReport{poreqprint,1,xporeqnum,View Requisition})
+		  class careports(getjspReport{cnfadvletter,1,xporeqnum,View Advance Letter})
+		  class careports(getjspReport{cnfadvletterpdf,1,xporeqnum,Print Advance Letter})
+            set globals(xporeqnum)=xporeqnum
+			 set globals(xordernum)=xordernum
+			 set globals(xstatusreq)=xstatusreq
+          end event
+        end field
+		
+		field xfwh
+		default #wh
+		event before
+		 //
+		end event
+        end field
+		
+		field xfbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xfbrname=xcodes.xlong("xtype='Branch' and xcode='"+xfwh+"'")
+        end event
+       end field
+	
+       field xtbrname
+        attrib local
+        caption Division Name
+        display const
+        event after
+          set xtbrname=xcodes.xlong("xtype='Branch' and xcode='"+xtwh+"'")
+        end event
+       end field
+	   
+	  
+		field update
+			event before
+			if xstatusreq .eq. ""
+			error "Please Show first"
+			else
+			set xtwh=xfwh
+			end if
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+        //embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Print
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "opcashadvdetailadmin"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+		
+		   function pickItem(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xporeqnum.value=link.text
+          }else{
+            document.one.xporeqnum.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen

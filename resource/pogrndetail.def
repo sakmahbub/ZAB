@@ -1,0 +1,20 @@
+product ZABERP
+
+table pogrndetail
+  caption "GRN Detail"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xgrnnum,xrow, xitem,xdesc, ~
+          xqtygrn,xunitpur,xrate,xlong,xlineamt,xbatch,xdateexp,xdisc,xdiscf,xdocrow,~
+		  xcfpur,xqtybonus,xpornum,xtype,xrategrn,xvatamt,~
+		  xlot,xcottontype,xserial,xttamount,xbase,xttbase,xbuyeramt,~
+		  xprimebuyer,xttbuyer,xqtycom,xstatusimgl,xmodel,xprodyear,xengineno,xqtyinsp,xvalpo,xqtyprn,xqtyrec,xqtyclaim,xbinref
+          
+  primary key zid,xgrnnum,xrow
+
+  foreign key
+        zid references zbusiness.zid
+        zid,xgrnnum references pogrnheader.zid,xgrnnum
+        zid,xitem references caitem.zid,xitem
+  end foreign key
+
+end table

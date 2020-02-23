@@ -1,0 +1,83 @@
+screen pogrndetailcost
+     caption "Cost Detail"
+     sidebar list one
+     sections form one,  jscript myscript
+
+     list one
+        caption "Cost Detail List"
+        table pogrndetailcost
+        order xgrnnum,xrow,xcostrow
+        fixed xgrnnum,xrow
+        //select none
+        //navigators alpha
+        //,group xacc "select xacc from glmst" // where xtype = 'Country'"
+        rows 20
+        objects  xcostrow attrib(link "login?screen=pogrndetailcost&command=Show&xgrnnum=?&xrow=?&xcostrow=?"), ~
+                xcostcode,xcost
+
+
+        headers "Row","Code","Cost"
+     end list
+
+
+     form one
+        caption "Cost Detail"
+        table pogrndetailcost
+        order xgrnnum,xrow,xcostrow
+        fixed xgrnnum,xrow
+        //select
+        pstyle 1
+        return "login"
+        layout 3
+        objects Return,Clear,Add, Update, Delete,*next,Show, Top, Previous, Next, Bottom,"<p>",~
+                xcostrow attrib(row 0 10;search), xcostcode,xcost,xlong
+
+        embed onsubmit="return submitit(this)"
+
+
+        field xlong
+          width 75
+          column 3
+        end field
+
+        field xcostcode
+          display combo
+          pick code
+        end field
+
+        field update
+        end field
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+
+
+end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var but
+        var result
+
+        function clicked(b){
+          but = b.value
+        }
+        function submitit(form){
+          result = true
+          if (but == "Return"){
+            form.screen.value = "pogrndetail"
+            form.searchbutton.value = "Find xgrnnum=?&xrow=?"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen
+
+
+
+

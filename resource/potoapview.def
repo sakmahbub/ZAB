@@ -1,0 +1,19 @@
+product ZAB ERP
+
+table potoapview
+  caption "PO TO AP View"
+  columns zid,xgrnnum,xgitem,xdate,xprime
+
+  primary key zid,xgrnnum
+
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+
+  sql create view potoapview (zid,xgrnnum,xgitem,xdate,xprime) ~
+                  as select zid,xgrnnum,~
+                  (select xgitem from caitem where pogrndetail.xitem=caitem.xitem and pogrndetail.zid=caitem.zid),~
+                  (select xdate from pogrnheader where pogrnheader.xgrnnum=pogrndetail.xgrnnum and pogrnheader.zid=pogrndetail.zid),~
+                  xprime from pogrndetail
+
+end table

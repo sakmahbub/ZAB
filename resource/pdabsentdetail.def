@@ -1,0 +1,19 @@
+product ZAB ERP
+
+table pdabsentdetail
+  caption "Absent Transaction"
+  columns ztime,zutime,zauserid,zuuserid,zid,xstaff,~
+          xdate,xyear,xper,xday,xpaidleave,xyearperdate,xposition,xtypeleave
+
+  primary key zid,xyearperdate,xstaff
+
+  foreign key
+      zid,xyearperdate references pdabsent.zid,xyearperdate
+      zid references zbusiness.zid
+      zid,xstaff references pdmst.zid,xstaff
+  end foreign key
+
+  field xday
+    caption Adsent Days
+  end field
+end table

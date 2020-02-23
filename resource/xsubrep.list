@@ -1,0 +1,14 @@
+     list xsubrep
+        table acsubview
+        order xacc,xsub
+		//linkobjects xacc
+		//fixed xacc
+        select "(xsub like '%"+zvalue+"%' or xorg like '%"+zvalue+"%')"
+        rows 20
+		//searchselect "xtype='Expenditure'"
+        objects xsub attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xorg,xacc
+
+     end list
+
+

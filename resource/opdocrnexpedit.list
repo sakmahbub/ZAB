@@ -1,0 +1,13 @@
+
+     list opdocrnexpedit
+        table opcrnchheader
+        order xcrnnum 
+        select "xcrnnum like '%"+zvalue+"%' and xstatuscrn='Confirmed'"// and xstatusar='Open'"
+	fixed xcus
+        rows 20
+	searchselect "xcus='"+#cus+"' and xstatuscrn='Confirmed' and xstatusar='Open'"
+        objects xcrnnum attrib(link "abc" embed onclick="return updateParent(this:'')"),~
+                xcus,xdate,xtotamt
+
+     end list
+

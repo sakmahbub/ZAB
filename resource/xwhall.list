@@ -1,0 +1,13 @@
+     list xwhall
+		caption "Store"
+        table xcodes
+        order xcode
+        select "((xwh like '%"+zvalue+"%' or xlong like '%"+zvalue+"%') and xtype='Branch')"
+        rows 20
+		searchselect "xtype='Branch'"
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xlong,zactive
+
+     end list
+
+

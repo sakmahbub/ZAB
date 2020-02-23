@@ -1,0 +1,19 @@
+//pdhrd.menu
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+option                  		|action                                          	|modules	|models	|width
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Attendance File Upload     		|#classPath+"/login?screen=pdfileupload"               	|ca        	|   		|100
+Attendance info Update     		|#classPath+"/login?screen=pdatheader"               	|ca        	|   		|100
+Late Approval     				|#classPath+"/login?screen=pdatlateapp"               	|ca        	|   		|100
+Early Leave Approval     		|#classPath+"/login?screen=pdatelapp"               	|ca        	|   		|100
+Absence Approval     		    |#classPath+"/login?screen=pdabsentapp"               	|ca        	|   		|100
+Attendance Data Pull   			|#classPath+"/login?screen=pdatdatapull"               	|ca        	|   		|100
+Attendance Process    			|#classPath+"/login?screen=pdatprcs"               		|ca        	|   		|100
+Roster Entry              		|#classPath+"/login?screen=pdrosterheader"              |ca        	|   		|100
+Roster Update              		|#classPath+"/login?screen=pdrosterupdate"              |ca        	|   		|100
+
+Reports                   		|#classPath+"/login?menu=pdatrep"                   	|ca        	|   		|100
+//Attendance Entry          	|#classPath+"/login?screen=pdathd"               		|ca        	|   		|100
+//-------------------------------------------------------------------
+

@@ -1,0 +1,15 @@
+     list xitemsales
+        caption "Items containing: "+zvalue
+        table caitem
+        order xitem
+		linksql select xdesc from caitem
+        select "((xitem like '%"+zvalue+"%' or xdesc like '%"+zvalue+"%') and xgitem ='FABRIC')"
+        searchselect "xgitem ='FABRIC'"
+		rows 30
+        objects xitem attrib(link "abc" embed onclick="return updateParent(this:'$')"), ~
+                xdesc,xtheircode,xcatitem,xgitem//,xitemdept,xitemsubdept//,xshelf
+     end list
+
+     
+
+

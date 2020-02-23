@@ -1,0 +1,47 @@
+screen pdtaxinfo
+
+     sections form one,jscript myscript
+
+
+     form one
+        caption "<ACRONYM>Tax Information</ACRONYM>"
+	      table pdtaxheader
+        order xyear
+        fixed xyear
+        return "login"
+        layout 2
+        pstyle 3
+        objects Return,Clear, Update,Top,"<p>" ,~
+          xconveyancelimit,xinvrebaterate,xinvlimitper,xinvlimitmax,~
+          xhrentper,xhrentmax,xtransportadd,xmedicalper,xmedicalmax,xmedexemption
+
+        embed onsubmit="submitit(this)"
+
+        field Return
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail="clicked"
+        }
+        function submitit(form){
+          if (detail=="clicked"){
+            form.screen.value = "pdtaxheader"
+            form.searchbutton.value = "Find xyear=?"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

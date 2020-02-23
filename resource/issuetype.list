@@ -1,0 +1,16 @@
+list issuetype
+        caption "Items containing: "+zvalue
+        table xcodes
+        order xtype
+        select "xtype='Issue Type'"
+        rows 20
+		searchselect "xtype='Issue Type'"
+        objects xcode attrib(link "abc" embed onclick="return updateParent(this:'$')")
+
+
+
+        //totals "","Totals","","","","",sum,sum
+
+        //headers none
+     end list
+

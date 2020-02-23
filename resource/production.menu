@@ -1,0 +1,10 @@
+Production.menu
+//-------------------------------------------------------------------
+option                           |action                                         |modules|models|width
+//-------------------------------------------------------------------
+Ingot Production        |#classPath+"/login?screen=imingotprd"                   |       |      |120
+Rod Production          |#classPath+"/login?screen=imrodprd"                     |       |      |120
+Reports                 |#classPath+"/login?menu=imprdreports"                   |       |      |120
+//Codes & Parameter       |#classPath+"/login?menu=imprdcodes"                   |       |      |120
+//-------------------------------------------------------------------
+

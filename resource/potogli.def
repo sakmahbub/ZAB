@@ -1,0 +1,13 @@
+product ZAB ERP
+
+table potogli
+  caption "PO To GL Interface"
+  columns  ztime,zutime,zauserid,zuuserid, zid,~
+           xgsup,xacc
+
+  primary key zid,xgsup
+  
+  foreign key
+        zid references zbusiness.zid
+  end foreign key
+end table

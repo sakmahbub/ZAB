@@ -1,0 +1,9 @@
+ list xfileref
+        table acfilerefview
+        order xfileref
+        select "xfileref like '%"+zvalue+"%'"
+        rows 20
+        objects xfileref attrib(link "abc" embed onclick="return updateParent(this:'')")
+     end list
+
+

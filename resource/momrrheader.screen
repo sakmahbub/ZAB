@@ -1,0 +1,157 @@
+screen momrrheader
+
+      sidebar list mrr
+      sections form momrrheader,jscript myscript
+	  
+     list mrr
+		caption "MRR Header List"
+        table momrrheader
+        order xmrrnum
+        //fixed xmrrnum
+        select "xstatus='Open'"
+        rows 20
+        objects  xmrrnum attrib(link "login?screen=momrrheader&command=Show&xmrrnum=?")
+        //header "Issue No.","Code","Name","Batch","Date"
+		//totals "","Totals",sum,"",sum
+     end list
+
+form momrrheader
+  caption "MRR Header"
+  table momrrheader
+  primarykey xmrrnum
+  order xmrrnum desc
+  select "left(xmrrnum,4)='MRR-'"
+  return "login"
+  layout 3
+  pstyle 3
+  objects Add,Clear,Show,Update,Delete,*next,Details,Top,Previous,Next,Bottom,Confirm,~
+          xmrrnum,xdate,xbatch,xwh display(hide),xnote,xstatus,xdateexp display(hide)
+
+field xmrrnum
+	pick list mrrnum
+	//def "MRR-"
+	event after
+	set globals(xmrrnum)=xmrrnum
+    	//if xstatu .eq. "Confirmed"
+    	//set #field(add.display)="hidden"
+      	//set #field(update.display)="hidden"
+      	//set #field(delete.display)="hidden"
+	end if
+	end event
+end field
+  
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+  field xissueto
+    //caption Issue To (Store)
+  end field
+
+  field xnote
+    width 80
+    height 3
+    column 2
+  end field
+
+  
+    field xbatch
+    event after
+     // set globals(xitem)=xitem
+    end event
+  end field
+  
+	field Confirm
+          event after
+            set temp = #spsql(zabsp_MRR_confirm,#id,#user,xmrrnum,xdate,#wh)
+           action Show
+          end event
+        end field
+
+
+
+	field xdateexp
+		default "2999-01-01"
+	end field
+
+   	field add
+        	event before
+            		if xdateexp .eq. ""
+				set xdateexp="2999-01-01"
+			end if	
+			set xwh=#wh
+
+	
+            		set year = #sub(xdate,2,2)
+		            set trn = "MRR-"
+            		set xmrrnum = #trn("MRR Number",trn,10)
+		            set xmrrnum = #sub(xmrrnum,0,4)+year+#sub(xmrrnum,4,10)
+				set xstatus="Open"
+		end event
+   	end field
+  
+ 	field Update
+		event before
+			if xwh .eq. ""
+				set xwh=#wh
+			end if
+			end event
+			event after
+				action show
+			end event
+		end field
+		
+        embed onsubmit="return submitit(this)"
+
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field New
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Details"){
+            form.screen.value = "momrrdetail"
+            form.searchbutton.value = "Top"
+          }
+          if (button=="New Customer"){
+            form.screen.value = "cacusnew"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+
+        function pickDetail(link){
+          if (navigator.appName.indexOf("Netscape") >= 0){
+            document.one.xinvnum.value=link.text;
+            document.one.xbalance.value=primebal.text;
+            document.one.xdate.value=date.text;
+          }else{
+              document.one.xamount.value=link.innerText
+          }
+          return false
+        }
+        </script>
+     end jscript
+
+end screen
+

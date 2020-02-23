@@ -1,0 +1,141 @@
+screen optargetrsm
+
+     sidebar list prdtrg,list fm
+     sections form one, jscript myscript
+
+    list prdtrg
+      caption "National Target For<br> "caitem.xdesc("xitem='"+xitem+"'")
+        table opproducttarget 
+        order xyear,xper,xitem
+        fixed xyear,xper,xitem
+        rows 20
+        objects  xitem,xqty,xqtydel,xstatus
+
+        header "Item Code","Target Qty","Allocated Qty","Status"
+//        totals "Total",sum,sum
+     end list
+
+    list fm
+      caption "FM Wise Target And Allocation For "+xrsm
+        table optargetfm
+        order xyear,xper,xitem,xrsm,xfm
+        fixed xyear,xper,xitem,xrsm
+        rows 20
+        objects  xyear,xper,xitem,xrsm,xfm attrib(link "login?screen=optargetfm&command=Show&xyear=?&xper=?&xitem=?&xrsm=?&xfm=?"), ~
+                 xqty,xqtydel,xstatus
+
+        header "Year","Month","Item","RSM","FM","Target Qty","PPO Wise Allocated Qty","Status"
+        totals "","","","","Total",sum,sum
+     end list
+
+     form one
+        caption "RSM Wise Target For <br> "+caitem.xdesc("xitem='"+xitem+"'")
+        table optargetrsm
+        primarykey xyear,xper,xitem,xrsm
+        order xyear,xper,xitem,xrsm
+        fixed xyear,xper,xitem
+        return "login"
+        layout 2
+        pstyle 3
+        objects ~
+                Show,Clear,Update,*next, Top,Previous,Next, Bottom,*next,Auto Allocate,~
+                *next,Back To National Target,FM Wise Target,~
+                *next,"<p>" ,~
+                xrsm,xrsmname,xqty,xrate display(hide),xval,xqtydel,xbalance,xstatus
+
+      field xrsm
+        event after
+          set globals(xyear)=xyear
+          set globals(xper)=xper
+          set globals(xrsm)=xrsm
+          set globals(xitem)=xitem
+        end event
+      end field
+
+      field xqtydel
+        display const
+        caption Qty Allocated To FM
+      end field
+
+      field xbalance
+	  attrib local	
+        display const
+	  caption Balance
+	  event after
+		set xbalance=xqty-xqtydel
+	  end event	
+      end field
+
+      field xdesc
+        attrib local
+        display const
+        caption Description
+        event after
+          set xdesc=caitem.xdesc("xitem='"+xitem+"'")
+        end event
+      end field
+
+      field xrsmname
+        attrib local
+        display const
+        caption RSM Name
+        event after
+          set xrsmname=carsm.xname("xrsm='"+xrsm+"'")
+        end event
+      end field
+
+      field Update
+       	event before
+      		set xval=xrate*xqty
+      	end event
+        event after
+          set temp = #spsql(zabsp_OPTRG_updateTargetRSM,#id,#user,xyear,xper,xitem,"","","RSM")
+ //         set temp = #spsql(zabsp_OPTRG_targetAllocationRSM,#id,#user,xyear,xper,xitem,xrsm,xqty)
+          action show
+        end event
+      end field
+
+        field Auto
+          event after
+	          set temp = #spsql(zabsp_OPTRG_targetAllocationRSMBT,#id,#user,xyear,xper,xitem,xrsm,xqty,xrate)
+          end event
+        end field
+
+
+      field FM
+        embed onclick="clicked(this)"
+      end field
+
+
+      field Back
+        embed onclick="clicked(this)"
+      end field
+
+        embed onsubmit="return submitit(this)"
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var button
+        var result
+        function clicked(b){
+          button=b.value
+        }
+        function submitit(form){
+          result = true
+          if (button=="Back To National Target"){
+            form.screen.value = "opproducttarget"
+            form.searchbutton.value = "Find xyear=?&xper=?&xitem=?"
+          }
+          if (button=="FM Wise Target"){
+            form.screen.value = "optargetfm"
+            form.searchbutton.value = "Top"
+          }
+          return result
+        }
+        </script>
+     end jscript
+
+end screen

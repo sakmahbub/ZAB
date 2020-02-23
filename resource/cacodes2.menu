@@ -1,0 +1,52 @@
+//Common Codes.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+AR Codes & Parameter             |#classPath+"/login?menu=arcodes"
+GL Codes & Parameter             |#classPath+"/login?menu=accodes"
+IM Codes & Parameter             |#classPath+"/login?menu=imcodes"
+HR Codes & Parameter             |#classPath+"/login?menu=pdcodes"
+Sales Codes & Parameter          |#classPath+"/login?menu=opcodes"
+PO Codes & Parameter                |#classPath+"/login?menu=pocodes"
+Bank Name Entry                  |#classPath+"/login?screen=cabank"
+//Production Codes & Parameter    |#classPath+"/login?menu=mocodes"
+//Product Type                     |#classPath+"/login?screen=xcodes(xtype=Product Type)"
+//Project Flag                     |#classPath+"/login?screen=xcodes(xtype=Project Flag)"
+//Cost Center                      |#classPath+"/login?screen=xcodescostcenter"
+Branch                           |#classPath+"/login?screen=xcodesbranch"              
+Car Master                   |#classPath+"/login?screen=cacar"
+Customers Master                 |#classPath+"/login?menu=cacus"                 
+//Discount Table                   |#classPath+"/login?screen=cadiscount"
+Product Master                      |#classPath+"/login?menu=immst"                 
+//Sales Manager                    |#classPath+"/login?screen=caspsm"
+//Regional Sales Manager           |#classPath+"/login?screen=casprsm"
+//Sales Manager                    |#classPath+"/login?screen=casm"
+//Regional Sales Manager           |#classPath+"/login?screen=carsm"
+//Field Manager                    |#classPath+"/login?screen=cafm"
+//SRO                             |#classPath+"/login?screen=cappo"
+//Delivery Man                     |#classPath+"/login?screen=casp"
+//Field Manager                    |#classPath+"/login?screen=caspfm"
+//PPO                              |#classPath+"/login?screen=capp"
+//MIO                              |#classPath+"/login?screen=cappo"
+//ASO                              |#classPath+"/login?screen=caaso"
+//SR                               |#classPath+"/login?screen=caso"
+//Zone                             |#classPath+"/login?screen=xcodes(xtype=Zone)"
+//Region                           |#classPath+"/login?screen=xcodesregion"
+//Fields                           |#classPath+"/login?screen=xcodesfields"
+//Territory                        |#classPath+"/login?screen=xcodesterritoryall"
+//Market          	         |#classPath+"/login?screen=xbrmarket"
+
+
+
+
+//AM                               |#classPath+"/login?screen=caam"     
+//SPO                              |#classPath+"/login?screen=caspo"    
+//Bonus Error-1 after Summary    |#classPath+"/login?screen=opopeninvsum"
+//Bonus Error-2 after Final      |#classPath+"/login?screen=opopeninvfin"
+//Sales Representative Code        |#classPath+"/login?screen=xtrnsp"
+Units of Measurements            |#classPath+"/login?screen=xcodes(xtype=Unit of Measure)"
+//VAT Code                         |#classPath+"/login?screen=xcodesvat"
+//Invoice Update                   |#classPath+"/login?menu=invupdate" 
+//Bank                             |#classPath+"/login?screen=cabank"
+//-------------------------------------------------------------------
+

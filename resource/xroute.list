@@ -1,0 +1,14 @@
+list xroute
+  table xcodes
+  order xcode
+  select "((xcode like '%"+zvalue+"%') and xtype='Route' and xwh='"+#wh+"' and zactive='1')"
+  rows 20
+  searchselect "xtype='Route' and xwh='"+#wh+"' and zactive='1'"
+  objects xcode attrib(link "abc" embed onclick="return updateParent(this:'')")
+          
+
+  //header "Customer Code","Customer Name","Address","PPO Code","PPO Name"
+        
+end list
+
+

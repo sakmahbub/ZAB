@@ -1,0 +1,169 @@
+screen imloantogl
+
+     sidebar list imtogl,list imtogl2,list imtogl3,list imtogl4
+     sections form one,jscript myscript
+	
+      list imtogl
+        caption "Pending Loan Issue (Depz)"
+        table imconsumptionview
+ 	    order xwh
+		select "xtrn in ('Loan Issue') and xwh='08' and xprime>0"	
+        rows 200
+        objects xwh,whdesc equals((select xlong from branchview where zid=imconsumptionview.zid and xcode=imconsumptionview.xwh)),~
+		xdate,xgitem,xaccdr,~
+		descdr equals((select xdesc from acmst where acmst.zid=imconsumptionview.zid and acmst.xacc=imconsumptionview.xaccdr)),~
+		xacccr,desccr equals((select xdesc from acmst where acmst.zid=imconsumptionview.zid and acmst.xacc=imconsumptionview.xacccr)),~
+		xprime
+		headers "Plant/Office","Name","Date","Item Group","Debit Acc","Description","Credit Acc","Description","Amount"
+	total "","","","Total", "","","","",sum
+	end list
+	
+      list imtogl2
+        caption "Pending Loan Receive (Depz)"
+        table imconsumptionview
+ 	    order xwh
+		select "xtrn in ('Loan Receive') and xwh='08' and xprime>0"	
+        rows 200
+       objects xwh,whdesc equals((select xlong from branchview where zid=imconsumptionview.zid and xcode=imconsumptionview.xwh)),~
+		xdate,xgitem,xaccdr,~
+		descdr equals((select xdesc from acmst where acmst.zid=imconsumptionview.zid and acmst.xacc=imconsumptionview.xaccdr)),~
+		xacccr,desccr equals((select xdesc from acmst where acmst.zid=imconsumptionview.zid and acmst.xacc=imconsumptionview.xacccr)),~
+		xprime
+		headers "Plant/Office","Name","Date","Item Group","Debit Acc","Description","Credit Acc","Description","Amount"
+	total "","","","Total", "","","","",sum
+	end list
+	
+      list imtogl3
+        caption "Pending Loan Issue (CEPZ)"
+        table imconsumptionview
+ 	    order xwh
+		select "xtrn in ('Loan Issue') and xwh='09' and xprime>0"	
+        rows 200
+        objects xwh,whdesc equals((select xlong from branchview where zid=imconsumptionview.zid and xcode=imconsumptionview.xwh)),~
+		xdate,xgitem,xaccdr,~
+		descdr equals((select xdesc from acmst where acmst.zid=imconsumptionview.zid and acmst.xacc=imconsumptionview.xaccdr)),~
+		xacccr,desccr equals((select xdesc from acmst where acmst.zid=imconsumptionview.zid and acmst.xacc=imconsumptionview.xacccr)),~
+		xprime
+		headers "Plant/Office","Name","Date","Item Group","Debit Acc","Description","Credit Acc","Description","Amount"
+	total "","","","Total", "","","","",sum
+	end list
+	
+      list imtogl4
+        caption "Pending Loan Receive (CEPZ)"
+        table imconsumptionview
+ 	    order xwh
+		select "xtrn in ('Loan Receive') and xwh='09' and xprime>0"	
+        rows 200
+       objects xwh,whdesc equals((select xlong from branchview where zid=imconsumptionview.zid and xcode=imconsumptionview.xwh)),~
+		xdate,xgitem,xaccdr,~
+		descdr equals((select xdesc from acmst where acmst.zid=imconsumptionview.zid and acmst.xacc=imconsumptionview.xaccdr)),~
+		xacccr,desccr equals((select xdesc from acmst where acmst.zid=imconsumptionview.zid and acmst.xacc=imconsumptionview.xacccr)),~
+		xprime
+		headers "Plant/Office","Name","Date","Item Group","Debit Acc","Description","Credit Acc","Description","Amount"
+	total "","","","Total", "","","","",sum
+	end list
+
+     form one
+        caption "Inventory Loan --- Transfer To GL"
+        table imtrn
+        primarykey ximtrnnum
+        order ximtrnnum
+        //select "xwh='"+#wh+"' and xstatusord='On Transit'"
+        return "login"
+        pstyle 3
+        layout 2
+        objects Clear,Transfer to GL,"<p>" ,~
+                xstartdate,xenddate,xdate,xtrn,xfwh,xwh
+
+        field xppname
+		attrib local
+		caption Delivery Name
+		display const
+		//pick list capp
+		event after
+			set xppname=cappo.xname("xpp='"+xpp+"'")
+		end event
+        end field
+		
+        field xtrn
+          caption IM Transaction Code
+          display combo
+		  pick "Loan"
+          //pick "select xtrn from xtrn where xtypetrn = 'Inventory Transaction'"
+        end field
+
+
+        field xtroute
+		attrib local
+		caption To Route
+		display text
+		default "z"
+		pick list xroute
+        end field
+		
+		field xdate
+		caption GL Date
+        end field
+		
+		field xfwh
+		caption Plant/Store
+        end field
+		
+		field xwh
+		caption Plant/Office for GL
+        end field
+
+
+
+        field Transfer
+		event before
+		if xtrn .eq. ""
+		error "Please select transaction type!"
+		else if xfwh .eq. ""
+			error "Please select Plant/Store!"
+		else if xwh .eq. ""
+			error "Please select Plant/Office for Voucher Posting!"
+		end if
+		end event
+              event after
+                set temp = #spsql(zabsp_IM_transferIMltoGL,#id,#user,xstartdate,xenddate,xdate,xfwh,xwh,xtrn)	
+			set voucherno=#sql("select max(xvoucher) from imtrn Where xdate between '"+xstartdate+"' and '"+xenddate+"' and xwh='"+xfwh+"'")
+			if voucherno .ne. ""
+			print "<font color=green size=+2>Voucher : "+voucherno+" Created.</font>"
+			else 
+			print "<font color=red size=+2>No Voucher Created -- Please check Consumption!</font>"
+			end if
+				
+            	end event
+        end field
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "opsumprocdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

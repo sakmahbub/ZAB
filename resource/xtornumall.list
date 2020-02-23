@@ -1,0 +1,13 @@
+     list xtornumall
+        caption "Transfer Order List"</b>"
+        table imtorheader
+        order xtornum desc
+        select "(xtornum like '%"+zvalue+"%')"
+        rows 10
+        objects ~
+         xtornum attrib(link "abc" embed onclick="return updateParent(this:'')"),xdate,xregi,xreqtype
+		 
+		headers "Request No","Date" ,"Department","Request Type"
+     end list
+
+

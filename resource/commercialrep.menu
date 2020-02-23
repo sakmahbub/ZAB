@@ -1,0 +1,11 @@
+//OP Reports.menu
+//-------------------------------------------------------------------
+option                           |action
+//-------------------------------------------------------------------
+LC Detail          		|#classPath+"/login?screen=*viewcrystal lcinfo(2;in,st;zid,lcno;xlcno=LC No,xviewtype=Report View)"
+PO Print          		|#classPath+"/login?screen=*viewcrystal poprint(2;in,st;zid,pornum;xpornum=PO No,xviewtype=Report View)"
+Date Wise LC List          		|#classPath+"/login?screen=*viewcrystal lcinfodate(3;in,dt,dt;zid,fdate,tdate;xdate=From Date=,xdate=To Date=,xviewtype=Report View)"
+
+
+//-------------------------------------------------------------------
+

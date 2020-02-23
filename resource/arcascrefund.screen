@@ -1,0 +1,319 @@
+screen arcascrefund
+
+     //sidebar list invoice,list allocation 
+     sections form one,jscript myscript
+
+
+     list invoice
+        caption "<br><center><b>"Unallocated Voucher List"</b>"
+        //table arallocation
+		table arallocationarcview
+        order xcus,xvoucher
+        fixed xcus
+        select "xprime> 0"
+        rows 10
+        objects ~
+        xvoucher,xprime,xdate
+
+        headers "Invoice Number","Balance","Date"
+     end list
+
+     list allocation
+        caption "Allocated Voucher List"
+        table aralcarcview
+        order xvoucher,xinvnum
+        fixed xvoucher
+        rows 10
+        objects ~
+        xinvnum attrib(link "login?screen=aralccredit&command=Show&xinvnum=?"), ~
+        xdate,xbalance,xamount
+	  header "Invoice No","Inv Date","Invoice Balance","Allocated Amt"
+        totals "","Totals","",sum
+     end list
+
+     form one
+        caption "Check Refund Entry"
+        table arhed
+		primarykey xvoucher
+        order xvoucher
+        select "left(xvoucher,2)='CR'"// and xpaymentterm='Credit'" and xwh='"+#wh+"'
+        return "login"
+        pstyle 3
+        layout 2        
+        objects Add,Clear,Show,Update,Delete, *next,Top,Previous,Next,Bottom,Confirm,Transfer To GL,"<p>" ,~//Allocate,
+                xvoucher,xdate,xcus,xorg,xbank,xbankname,xpaymenttype,xdocnum,xwh display(hide),~
+                xprime,xbalprime display(const),xref,xdateref,xvatamt,xaitamt,xdiscprime display(hide),~
+                xstatusjv display(const),xsp display(hide),xnote,~
+                xsign display(hide),~
+                xchgsprime display(hide),xpaymentterm display(hide),xtype display(hide),xstatuschq display(hide),xtypetrn display(hide)
+	
+	field xdate
+		caption Refund Date
+		display const
+	end field
+
+	field xprime
+		caption Total Refund Amount
+	end field
+	
+	field xdocnum
+		caption MR No.
+		pick list xvouchermrcus
+	end field
+	
+	field xpaymenttype
+		default "Cheque"
+		pick "Cheque"
+	end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+        end event
+       end field
+
+
+        field xwh
+          default #wh
+        end field
+
+        field xvatamt
+          caption VAT Refund to Customer
+          display text
+        end field
+
+        field xaitamt
+          caption AIT Refund to Customer
+          display text
+        end field
+
+        field xorg
+          attrib local
+          display constant
+          caption Name
+          event after
+            set xorg=cacus.xorg("xcus='"+xcus+"'")
+          end event
+        end field
+
+	 field xbank
+		width 30
+		//pick 
+	 end field
+
+        field xbankname
+          attrib local
+          display const
+          caption Bank Name
+          event after
+          //  set xbankname=acmst.xdesc("xacc='"+xbank+"'")
+			set xbankname=cabank.xname("xbank='"+xbank+"'")
+          end event
+        end field
+
+        field xbankname2
+          attrib local
+          display const
+          caption Bank Name
+          event after
+            set xbankname=cabank.xname("xbank='"+xbank+"'")+"<br>"+cabank.xbacc("xbank='"+xbank+"'")+"<br>"+cabank.xbranch("xbank='"+xbank+"'")+"<br>"+cabank.xmadd("xbank='"+xbank+"'")+"<br>"+cabank.xacc("xbank='"+xbank+"'")+" - " +acmst.xdesc("xacc='"+cabank.xacc("xbank='"+xbank+"'")+"'")+"<br>"+
+          end event
+        end field
+		
+        field xname
+          display constant
+          event after
+          end event
+        end field
+
+        field xnote
+			height 3
+			column 2
+         // width 20
+        end field
+
+
+    field xvoucher
+	   width 15	
+         caption Cheque Refund Number
+		 pick list xvouchercr
+	   event after    
+		set globals(xvoucher)=xvoucher
+            set globals(xcus)=xcus
+			set globals(xstatuschq)=xstatuschq
+	     	      if xstatusjv .eq. "Confirmed"
+					set #field(Update.attrib)="disabled"
+					set #field(Delete.attrib)="disabled"
+         			set #field(Transfer.display)="hidden"
+            	end if
+				
+				if xstatuschq .eq. "Confirmed"
+					set #field(Update.attrib)="disabled"
+					set #field(Delete.attrib)="disabled"
+         			set #field(Confirm.display)="hidden"
+					
+            	end if
+				if xdate .lt. '"+#date+"'
+					set #field(update.display)="hidden"
+				end if
+		//class careports(getjspReport{armrprint,1,xvoucher,Print Money Receipt})
+          end event
+        end field
+		
+        field Confirm
+          event before
+			set xmrno=arhed.xvoucher("xcus='"+xcus+"' and xvoucher='"+xdocnum+"'")
+            set temp = #sql("select xinvnum from aralc where xvoucher='"+xvoucher+"'")
+			if xprime == 0
+                error "Cannot Proceed -- Amount is Blank"
+			else if xcus .ne. cacus.xcus("xcus='"+xcus+'"")
+                  error "Cannot Proceed -- Customer Invalid"
+			else if xdocnum .eq. ""
+				error "Please select MR No!"
+			else if xmrno .ne. xdocnum
+				error "MR does not Match!"
+			else if arhed.xstatuschq("xvoucher='"+xvoucher+"'") .ne. "Open"
+				error "Already Confirmed!"
+			end if
+          end event
+          event after
+			set temp = #spsql(zabsp_PR_validateAfterdetail_PO,#id,#user,xvoucher,xdocnum,0,0,"Checue Refund")
+            action Show
+          end event
+        end field
+
+    field add
+		event before
+              set terri = cacus.xterritory("xcus='"+xcus+"'")
+			  set xmrno=arhed.xvoucher("xcus='"+xcus+"' and xvoucher='"+xdocnum+"'")
+                 set xstatusjv="Open"
+				 set xstatuschq="Open"
+				 set xtype="CR--"
+				 set xsign=1 
+				 set xtypetrn="Sale"
+	    	      set xpaymentterm = "credit"	
+			if xprime == 0
+                error "Cannot Proceed -- Amount is Blank"
+            else if cacuscredit .eq. "Cash"
+                error "Cannot Proceed -- Cash Customer Not Allowed"
+            else if xcus .ne. cacus.xcus("xcus='"+xcus+'"")
+                  error "Cannot Proceed -- Customer Invalid"
+			else if xdocnum .eq. ""
+				error "Please select MR No!"
+			else if xmrno .ne. xdocnum
+				error "MR does not Match!"
+            else
+				set xprime=arhed.xprime("xvoucher='"+xdocnum+"'")
+				set xbank=arhed.xbank("xvoucher='"+xdocnum+"'")
+				set xref=arhed.xref("xvoucher='"+xdocnum+"'")
+				set xdateref=#sql("select xdateref from arhed where xvoucher='"+xdocnum+"'")
+                set xsp=cacus.xsp("xcus='"+xcus+"'")
+
+		          //*********** GETTING TRN NO ****************
+						set xdate = #date
+	            		set year = #sub(xdate,2,2)
+      	      			set trn = "CR"+xwh 
+            			set xvoucher = #trn("AR Transactions",trn,10)
+	            		set xvoucher = #sub(xvoucher,0,4)+year+#sub(xvoucher,4,10)
+				end if
+		end event
+		event after
+            set command = "add"
+            //set temp = #spsql(zabsp_ArhedChk,#id,#user,xvoucher,xcus,command)
+			//set temp = #spsql(sp_validateAfterARcas,#id,#user,xvoucher,xcus,command)
+            action Show
+          end event
+       end field
+
+        field Update
+          event before
+			set xmrno=arhed.xvoucher("xcus='"+xcus+"' and xvoucher='"+xdocnum+"'")
+            set temp = #sql("select xinvnum from aralc where xvoucher='"+xvoucher+"'")
+			if xprime == 0
+                error "Cannot Proceed -- Amount is Blank"
+			else if xcus .ne. cacus.xcus("xcus='"+xcus+'"")
+                  error "Cannot Proceed -- Customer Invalid"
+			else if xdocnum .eq. ""
+				error "Please select MR No!"
+			else if xmrno .ne. xdocnum
+				error "MR does not Match!"
+			else if arhed.xstatuschq("xvoucher='"+xvoucher+"'") .ne. "Open"
+				error "Already Confirmed!"
+            else
+				set xprime=arhed.xprime("xvoucher='"+xdocnum+"'")
+				set xbank=arhed.xbank("xvoucher='"+xdocnum+"'")
+				set xref=arhed.xref("xvoucher='"+xdocnum+"'")
+				set xdateref=#sql("select xdateref from arhed where xvoucher='"+xdocnum+"'")
+			end if
+          end event
+          event after
+          //  set command = "update"
+			//set temp = #spsql(zabsp_ArhedChk,#id,#user,xvoucher,xcus,command)
+            //set temp = #spsql(sp_validateAfterARcas,#id,#user,xvoucher,xcus,command)
+            action Show
+          end event
+        end field
+
+		
+        field Transfer
+		 event before
+			set rel=xtrnp.xrel("xtypetrn='AR Transactions' and xtrn='MR--' and zactive=1")
+			set rel = #sub(rel,0,2)
+			print rel
+			set trn="BR--"//#trim(rel)+#trim(xwh)
+			set trn2=#sql("select xtrn from xtrn where xtrn='"+trn+"'")
+			//if trn2 .ne. trn
+			//	error "Please select division for Receive"
+			//else 
+			if xstatusjv .eq. "Confirmed"
+				error "Voucher Already Created"
+			end if
+            end event
+          event after  
+		  print trn
+            set temp = #spsql(zabsp_AR_transferARtoGL,#id,#user,xvoucher,trn)
+			action show
+			//set voucher = #sql("select xvoucher from acheader where xinvnum='"+xinvnum+"'")
+		    print "<font color=red size=+1>Voucher No "+xdocnum+" Created</font>"
+          end event
+        end field
+		
+        embed onsubmit="submitit(this)"
+
+        field Details
+          embed onclick="clicked(this)"
+        end field
+
+        field Allocate
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+        function submitit(form){
+          if (detail=="Details"){
+            form.screen.value = "arcastrn"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+          if (detail == "Allocate"){
+            form.screen.value = "aralccredit"
+            form.searchbutton.value = "Find xvoucher=?"
+          }
+        }
+        </script>
+     end jscript
+
+
+
+end screen

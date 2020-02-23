@@ -1,0 +1,19 @@
+product ZAB ERP
+
+table opdoheaderarc
+  caption "DO Header"
+  columns ztime,zutime,zauserid,zuuserid,zid,~
+          xdornum,xdate,xcus,~
+          xstatusord,xref,xnote,xwh,xpornum,xstatusar,xtotamt,~
+          xdisc,xdiscf,xdatecom,xait,xamount,xvatrate,xdatedue,xavlperc,~
+          xsp,xpp,xvatamt,xaitamt,xdiscamt,xfm,xsm,xrsm,~
+	  xterritory,xfield,xregion,xarea,xpaymentterm,xdoctype,xproject,xyear,xper,~
+	  xmarket,xtype,xroute,xstatus,xprime,xdatepo,xdeltime,xdatedel,xsumnum,xcrnnum,xexpamt,xnetret
+
+
+  primary key zid, xdornum
+  foreign key
+        zid references zbusiness.zid
+        zid,xcus references cacus.zid,xcus
+  end foreign key
+end table

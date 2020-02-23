@@ -1,0 +1,10 @@
+     list caaso
+        table cafm
+        order xfm
+        select "((xname like '%"+zvalue+"%' or xfm like '%"+zvalue+"%') and zactive='1' and left(xfm,4)='ASO-')"
+        rows 10
+        objects xfm attrib(link "abc" embed onclick="return updateParent(this:'')"), ~
+                xname
+     end list
+
+

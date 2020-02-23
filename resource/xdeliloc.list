@@ -1,0 +1,13 @@
+     list xdeliloc
+        caption "Delivery Location List"
+        table deliveylocview
+        order xcode desc
+        select "(xcode like '%"+zvalue+"%' or xlong like '%"+zvalue+"%')"
+        rows 10
+        objects ~
+         xcode attrib(link "abc" embed onclick="return updateParent(this:'')"),xlong
+		 
+		headers "Location Code","Delivery Location"
+     end list
+
+

@@ -1,0 +1,144 @@
+screen xbrmarket
+
+     sidebar list one
+     sections form one, jscript myscript
+
+     list one
+        table xcodes
+        order xtype,xcode
+        select "xwh='"+#wh+"' and xtype='Market'"
+        rows 40
+        objects  xcode attrib(link "login?screen=xbrmarket&command=Show&xtype=?&xcode=?"),~
+                 xterritory,xfield,xarea,xregion
+
+        headers "Market","Territory","Field","Area","Region"
+     end list
+
+     form one
+
+     caption "Market"
+        table xcodes
+        order xtype,xcode
+        select "xwh='"+#wh+"' and xtype='Market' " 
+        return "login"
+        layout 2
+        pstyle 3
+        objects Show,Clear,Add, Update, Delete,*next,~
+                Top,Previous,Next, Bottom,"<p>" ,~
+                xtype,xcode width(50),xterritory,xfield,xarea,xregion,xwh,xbrname,~
+                zactive
+
+       field xcode
+	  caption Market Name
+        pick list xbrmarket
+       end field
+
+    field xterritory
+      caption Territory
+      display text
+      pick list xterritorybr//"select xcode from xcodes where xtype='Territory' and zactive=1"
+    end field
+
+
+       field xfield
+        display const
+       end field
+
+       field xregion
+        display const
+       end field
+
+       field xwh
+        display const
+       end field
+
+       field xarea
+        display const
+       end field
+
+       field xbrname
+        attrib local
+        caption Branch Name
+        display const
+        event after
+          set xbrname=xcodes.xlong("xtype='Branch' and xcode='"+xwh+"'")
+          class careports(getReport{marketlist,1,#wh,Print Market List})   
+	  end event
+       end field
+
+        field xtype
+          display hide
+          caption Type
+          default "Market"
+        end field
+
+        field xprops
+          display combo
+          pick "Addition,Deduction"
+          default "Addition"
+        end field
+
+        field xlong
+          width 40
+          height 2
+          //column 2
+        end field
+
+        field add
+          event before
+	      if xterritory .eq. ""
+          		error "Cannot Proceed -- Please Choose Territory"
+		end if
+            set xtype="Market"
+            set xfield=xcodes.xfield("xtype='Territory' and xcode='"+xterritory+"'")
+            set xregion=xcodes.xregion("xtype='Territory' and xcode='"+xterritory+"'")
+            set xwh=xcodes.xwh("xtype='Territory' and xcode='"+xterritory+"'")
+            set xarea=xcodes.xarea("xtype='Territory' and xcode='"+xterritory+"'")
+          end event
+        end field
+
+        field update
+          event before
+            set xtype="Market"
+            set xfield=xcodes.xfield("xtype='Territory' and xcode='"+xterritory+"'")
+            set xregion=xcodes.xregion("xtype='Territory' and xcode='"+xterritory+"'")
+            set xwh=xcodes.xwh("xtype='Territory' and xcode='"+xterritory+"'")
+            set xarea=xcodes.xarea("xtype='Territory' and xcode='"+xterritory+"'")
+          end event
+        end field
+
+        field Budget
+          embed onclick="clicked(this)"
+        end field
+        embed onsubmit="submitit(this)"
+     end form
+
+
+
+
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+        function clicked(b){
+          detail=b.value
+        }
+        function budgeted(b){
+          detail="budgeted"
+        }
+        function submitit(form){
+
+    	    if (detail=="Budget"){
+            form.screen.value = "acbudget"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

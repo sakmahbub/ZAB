@@ -1,0 +1,128 @@
+screen pdotheader
+
+//     sidebar list detail
+     sections form one,jscript myscript
+
+  	list detail
+        caption "OT Detail"
+        table pdotheader
+        order xdate,xstaff
+        rows 20
+        objects xdate attrib(link "login?screen=pdotheader&command=Show=?&xdate=?&xstaff=?"),~
+                 xstarttime,xenddate,xendtime,xapphour
+     end list
+
+     form one
+        caption "Over Time Approval Entry"
+	      table pdotheader
+        order xyearperdate,xposition
+        return "login"
+        layout 2
+        pstyle 3
+        objects Add,Show,Clear,Update,Delete,*next,Detail,Top,Next,Previous,Bottom,Confirm,~
+                xposition,xname,xdate,xstarttime,xenddate,xendtime,xapphour display(const),xtype,~
+                xrem,xothours display(text),xstatus display(const),~
+
+                //hide
+                xyearperdate display(hide),xstaff display(hide)
+
+         field xtype
+           caption Approval Type
+           pick "Amount,Leave"
+         end field
+
+         field xdate
+          caption Start Date
+          event before
+            set year = #sub(xdate,0,4)
+            set per = #sub(xdate,5,2)
+            set day = #sub(xdate,8,2)
+            set xyearperdate = year+per+day
+          end event
+          event after
+            set globals(xyearperdate)=xyearperdate
+            set globals(xstaff)=xstaff
+          end event
+         end field
+
+         field xname
+          attrib local
+          display const
+          caption
+          event after
+            set xname=pdmst.xname("xstaff='"+xstaff+"'")
+          end event
+         end field
+
+        field add
+          event before
+            set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+            set xstatus="Open"
+//            set temp = #sesql("select datediff(ss,xstarttime,xendtime) from pdotheader where xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'")
+
+          end event
+          event after
+            set temp = #spsql(sp_updatestarttime,xyearperdate,xstaff,xdate,xstarttime,xenddate,xendtime)
+          end event
+        end field
+
+        field update
+          event before
+            set xstaff=pdmst.xstaff("xposition='"+xposition+"'")
+//            set temp = #sesql("select datediff(ss,xstarttime,xendtime) from pdotheader where xyearperdate="+xyearperdate+" and xstaff='"+xstaff+"'")
+//            print temp
+//            double hour = 00
+//            set hour = temp
+//            set hour = hour/3600
+//            print hour
+          end event
+          event after
+            set temp = #spsql(sp_updatestarttime,xyearperdate,xstaff,xdate,xstarttime,xenddate,xendtime)
+          end event
+        end field
+
+        field Confirm
+          event before
+            if xstatus .eq. "Confirmed"
+              error "Cannot Proceed--Already Confirmed"
+            end if
+          end event
+          event after
+//            set temp = #spsql(sp_ConfirmOT,xyearperdate,xstaff,xdate,xtype,xapphour,#user,#id)
+            class pdsheraton(ConfirmOT{xyearperdate,xstaff,xdate,xtype,xothours})
+          end event
+        end field
+
+
+
+        embed onsubmit="submitit(this)"
+
+        field Detail
+          embed onclick="clicked(this)"
+        end field
+
+     end form
+
+     jscript myscript
+
+        <script language="javascript" type="text/javascript">
+        var detail
+
+        function clicked(b){
+          detail=b.value
+        }
+
+        function submitit(form){
+          if (detail=="Detail"){
+            form.screen.value = "pdotdetail"
+            form.searchbutton.value = "Top"
+            //return false
+          }
+        }
+
+        </script>
+     end jscript
+
+
+
+end screen

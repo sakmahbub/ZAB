@@ -1,0 +1,23 @@
+//HR Reports.menu
+//-------------------------------------------------------------------
+option                           			|action
+//-------------------------------------------------------------------
+Daily Attendance Info	   	    |#classPath+"/login?screen=*viewcrystal pdempdailyatt(7;in,st,st,st,st,st,st;@zid,@pdate,@empcat,@dept,@loc,@pstatus,@adminid;xdate=Date=#date,xempcategory=Concern,xdeptname=Department Name,xlocation=Location,xstatusatt=Stutus,xhide=admin ID,xviewtype=Report View)"
+Monthly Attendance Info (ALL)	|#classPath+"/login?screen=*viewcrystal pdattdetailall(5;in,st,st,in,in;zid,empcat,dept,year,per;xempcategory=Concern,xdeptname=Department Name,xyear=Year,xper=Month,xviewtype=Report View)"
+Monthly Attendance Summary		|#classPath+"/login?screen=*viewcrystal pdattsum(5;in,st,st,in,in;zid,empcat,dept,year,per;xempcategory=Concern,xdeptname=Department Name,xyear=Year,xper=Month,xviewtype=Report View)"
+Employee Job Card Summary		|#classPath+"/login?screen=*viewcrystal pdjobcardsum(5;in,st,st,in,in;zid,empcat,dept,year,per;xempcategory=Concern,xdeptname=Department Name,xyear=Year,xper=Month,xviewtype=Report View)"
+Employee Attendance(Detail)	   	|#classPath+"/login?screen=*viewcrystal pdempattdetail(6;in,st,st,st,st,st;@zid,@fdate,@tdate,@empcat,@staff,@adminid;xdate=From Date=#date,xdate=To Date=#date,xhide=Hide,xstaff=Employee,xhide=admin ID,xviewtype=Report View)"
+Employee Duty Schedule	   	   	   |#classPath+"/login?screen=*viewcrystal pddutyschedule(6;in,st,st,st,st,st;@zid,@fdate,@tdate,@empcat,@staff,@adminid;xdate=From Date=#date,xdate=To Date=#date,xhide=Hide,xstaff=Employee,xhide=admin ID,xviewtype=Report View)"
+Late & Early for approval	   	|#classPath+"/login?screen=*viewcrystal pdemplateel(5;in,dt,dt,st,st;zid,fdate,tdate,empcat,supid;xdate=From Date,xdate=To Date,xempcategory=Concern,xposition=Superior ID,xviewtype=Report View)"
+Employee Roster	   	    		|#classPath+"/login?screen=*viewcrystal pdroster(4;in,st,st,st;zid,roster,staff,empcat;xroster=Roster,xstaff=Employee ID,xhide=Hide,xviewtype=Report View)"
+Date Wise Roster	   	    	|#classPath+"/login?screen=*viewcrystal pdrosterdate(6;in,dt,dt,st,st,st;zid,fdate,tdate,group,staff,empcat;xdate=From Date,xdate=To Date,xempgroup=Group Name,xstaff=Employee ID,xhide=Hide,xviewtype=Report View)"
+Attendance Data   	   			|#classPath+"/login?screen=*viewcrystal pdattall(5;in,st,st,st,st;@zid,@sdate,@edate,@pposition,@action;xdate=Date=#date,xdate=Date=#date,~
+						xposition=Employee ID,xcap2=Action,xviewtype=Report View)"
+
+///Employee Late & Early Summary|#classPath+"/login?screen=*viewcrystal pdemplelsup(4;in,dt,dt,st;zid,fdate,tdate,position;xdate=From Date=#date,xdate=To Date=#date,xposition=Superior ID,xviewtype=Report View)"
+//Employee Attendance Info	   	|#classPath+"/login?screen=*jspcrystal  pdempatt(xstaff=Employee,xdate=From Date=#date,xdate=To Date=#date)"
+///Employee Movement (Detail)	|#classPath+"/login?screen=*viewcrystal pdempmove(4;in,st,dt,dt;zid,staff,fdate,tdate;xstaff=Employee,xdate=From Date=#date,xdate=To Date=#date,xviewtype=Report View)"
+						
+						
+//Employee Movement Reports	   	   |#classPath+"/login?screen=*jspcrystal pdempmovement(xstaff=Employee,xdate=From Date=#date,xdate=To Date=#date)"
+
