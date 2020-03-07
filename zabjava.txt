@@ -1,0 +1,7 @@
+zabStaticScreen
+zabConf
+MiscUtils
+
+getWhereAreUs=wmic bios get serialnumber
+getWhereAmI=WMIC BASEBOARD GET SerialNumber
+getWhereAmIProcessed=WMIC CPU GET ProcessorId
