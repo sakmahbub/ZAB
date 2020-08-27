@@ -1,0 +1,32 @@
+--19august bill
+select * FROM opdoheader Where xdornum='DO0400020120081911004'
+
+select * from opdodetail where xdornum='DO0400020120081911004'
+
+--18august bill
+select * from opdoheader where xdornum='DO0400020120081811014'
+select * from opdodetail where xdornum='DO0400020120081811014'
+
+
+
+update opdoheader set xcardamt=a.xcardamt,xcashamt=a.xcashamt,xchange=a.xchange,xcus=a.xcus,xdisc=a.xdisc,
+xdiscamt=a.xdiscamt,xdiscf=a.xdiscf,xdiv=a.xdiv,xfield=a.xfield,xnetamt=a.xnetamt,xpaid=a.xpaid,xpaymentterm=a.xpaymentterm,
+xpaymenttype=a.xpaymenttype,xperson=a.xperson,xpp=a.xpp,xroundingchange=a.xroundingchange,xshift=a.xshift,xtotamt=a.xtotamt,
+xvatamt=a.xvatamt
+from (select xcardamt,xcashamt,xchange,xcus,xdisc,xdiscamt,xdiscf,xdiv,xfield,xnetamt,xpaid,xpaymentterm,xpaymenttype,
+xperson,xpp,xroundingchange,xshift,xtotamt,xvatamt from opdoheader where xdornum='DO0400020120081911004') a where 
+xdornum='DO0400020120081811014'
+
+
+
+update opdodetail set xdesc=a.xdesc,xdisc=a.xdisc,xdiscamt=a.xdiscamt,xdiscdetamt=a.xdiscdetamt,xitem=a.xitem,xlineamt=a.xlineamt,
+xnetamt=a.xnetamt,xpacking=a.xpacking,xqtyord=a.xqtyord,xrate=a.xrate,xvatamt=a.xvatamt,xvatrate=a.xvatrate
+from (select xdesc,xdisc,xdiscamt,xdiscdetamt,xitem,xlineamt,xnetamt,xpacking,xqtyord,xrate,xvatamt,xvatrate 
+from opdodetail where xdornum='DO0400020120081911004' and xitem='00021053') a where xdornum='DO0400020120081811014' 
+and a.xitem='00021053' and xrow=1
+
+
+-----1st er ta new bill
+-----2nd er ta old bill problem bill
+
+
