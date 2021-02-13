@@ -1,0 +1,2 @@
+select * into duptable
+from orjinaltable
