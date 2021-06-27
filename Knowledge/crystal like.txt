@@ -1,0 +1,2 @@
+and {lcinfo.xlcno} LIKE "*" + {?lcno} + "*"
+and {?lcno}<>''

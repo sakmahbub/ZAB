@@ -1,0 +1,4 @@
+DECLARE @row int
+SET @row = 0
+UPDATE caitem
+SET @row = xrow = @row + 1
